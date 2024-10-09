@@ -21,27 +21,21 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Book Circulation - Full width on large screens */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">Book Circulation</h3>
-              <button className="text-arcadia-red text-sm flex items-center">
-                See more <FiChevronRight className="h-4 w-4 ml-1" />
-              </button>
-            </div>
-            <div className="max-h-full">
-              <BookCirculationTable />
+          <div className="lg:col-span-2">
+            <BookCirculationTable />
+            {/* Move LibraryAnalyticsChart here directly below BookCirculationTable */}
+            <div className="mt-4">
+              <LibraryAnalyticsChart />
             </div>
           </div>
-          
-          {/* Yung table sa taas ng Reservations Table sa Figma */}
+
+          {/* Access Table and other sections on the right */}
           <div className="lg:col-span-1 space-y-8">
             <div className="bg-white p-6 rounded-lg shadow">
-              <div className="max-h-full">
-                <AccessTable /> 
-              </div>
+              <AccessTable />
             </div>
 
-            {/* Reservations & Popular Books - Stack these on the right */}
+            {/* Reservations */}
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold">Reservations</h3>
@@ -49,11 +43,12 @@ export default function App() {
                   See more <FiChevronRight className="h-4 w-4 ml-1" />
                 </button>
               </div>
-              <div className="max-h-full">
+              <div className="w-full">
                 <ReservationsTable />
               </div>
             </div>
 
+            {/* Popular Books */}
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold">Popular Books</h3>
@@ -61,12 +56,12 @@ export default function App() {
                   See more <FiChevronRight className="h-4 w-4 ml-1" />
                 </button>
               </div>
-              <div className="max-h-full">
+              <div className="w-full">
                 <PopularBooksTable />
               </div>
             </div>
 
-            {/* Highest Rated Books - Placed directly below Popular Books */}
+            {/* Highest Rated Books */}
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold">Highest Rated Books</h3>
@@ -74,23 +69,10 @@ export default function App() {
                   See more <FiChevronRight className="h-4 w-4 ml-1" />
                 </button>
               </div>
-              <div className="max-h-full">
+              <div className="w-full">
                 <HighestRatedBooksTable />
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Library Analytics - Full width on large screens */}
-        <div className="mt-8 lg:col-span-2">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">Library Analytics</h3>
-              <button className="text-arcadia-red text-sm flex items-center">
-                See more <FiChevronRight className="h-4 w-4 ml-1" />
-              </button>
-            </div>
-            <LibraryAnalyticsChart />
           </div>
         </div>
       </main>
@@ -98,7 +80,7 @@ export default function App() {
       <footer className="bg-light-gray mt-12 py-8">
         <Footer />
       </footer>
-            <Copyright />
+      <Copyright />
     </div>
   );
 }
