@@ -1,19 +1,19 @@
 import React from "react";
 import { FiChevronRight } from "react-icons/fi";
+import { Link } from 'react-router-dom';
 
 const BookCirculationTable = () => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow"> {/* Adjusted padding */}
+    <div className="bg-white p-4 rounded-lg shadow">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold">Book Circulation</h3>
         <button className="text-arcadia-red text-sm flex items-center">
           See more <FiChevronRight className="h-4 w-4 ml-1" />
-        </button>
+        </button> 
+      
       </div>
-
-      {/* Allow overflow to be handled properly */}
-      <div className="overflow-hidden"> {/* Changed from overflow-auto to overflow-hidden */}
-        <table className="min-w-full max-w-full divide-y divide-gray-200"> {/* Added max-w-full */}
+      <div className="overflow-hidden">
+        <table className="min-w-full max-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
               <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
@@ -45,7 +45,7 @@ const BookCirculationTable = () => {
                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{item.time}</td>
                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.borrower}</td>
                 <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.title}</td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{item.id}</td> {/* Ensure Book ID is shown */}
+                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{item.id}</td>
               </tr>
             ))}
           </tbody>

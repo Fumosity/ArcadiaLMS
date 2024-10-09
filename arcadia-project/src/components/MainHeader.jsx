@@ -13,7 +13,7 @@ const MainHeader = () => (
                 <input
                     type="text"
                     placeholder="Search for a book or research"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-arcadia-red"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-arcadia-red"
                 />
                 <FiSearch className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             </div>

@@ -6,7 +6,7 @@ export default {
         "white": "#FFFFFF",
         "dark-gray": "#333333",
         "black": "#000000",
-        "light-gray": "#f4f4f4",
+        "light-gray": "#f4f4f5",
     },
     extend: {
       fontFamily: {
