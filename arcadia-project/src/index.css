@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+Antique&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+.nav-link {
+    @apply text-black font-semibold mx-4;
+    font-family: "Zen Kaku Gothic Antique";
+    font-weight: 100;
+}
+
+
+.nav-link {
+    @apply text-black font-bold mx-4 text-sm;
+}
+
+
+.navbar-content {
+    @apply items-center;
+}
+
+.navbar-cont {
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-color: #d3d3d3;
+
+}
+
+.search-bar{
+    justify-content: center;
+    align-items: center;
+}
