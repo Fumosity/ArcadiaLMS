@@ -1,6 +1,6 @@
 import React from "react";
-import MainHeader from "../components/main-components/MainHeader";
-import InventoryTitle from "../components/admin-book-inventory/InventoryTitle";
+import MainHeader from "../components/main-comp/MainHeader";
+import InventoryTitle from "../components/admin-book-inventory-comp/InventoryTitle";
 
 
 

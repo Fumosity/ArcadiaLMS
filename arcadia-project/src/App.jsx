@@ -1,16 +1,16 @@
 import React from 'react';
 import { FiSearch, FiUser, FiChevronRight } from 'react-icons/fi';
-import Header from './components/main-components/Header';
-import BookCirculationTable from './components/admin-home-page/BookCirculationTable';
-import LibraryAnalyticsChart from './components/admin-home-page/LibraryAnalyticsChart';
-import ReservationsTable from './components/admin-home-page/ReservationsTable';
-import PopularBooksTable from './components/admin-home-page/PopularBooksTable';
-import Navbar from './components/main-components/Navbar';
-import HighestRatedBooksTable from './components/admin-home-page/HighestRatedBooksTable';
-import AccessTable from './components/admin-home-page/AccessTable';
-import Footer from './components/main-components/Footer';
-import Copyright from './components/main-components/Copyright';
-import SearchBar from './components/main-components/SearchBar';
+import Header from './components/main-comp/Header';
+import BookCirculationTable from './components/admin-home-page-comp/BookCirculationTable';
+import LibraryAnalyticsChart from './components/admin-home-page-comp/LibraryAnalyticsChart';
+import ReservationsTable from './components/admin-home-page-comp/ReservationsTable';
+import PopularBooksTable from './components/admin-home-page-comp/PopularBooksTable';
+import Navbar from './components/main-comp/Navbar';
+import HighestRatedBooksTable from './components/admin-home-page-comp/HighestRatedBooksTable';
+import AccessTable from './components/admin-home-page-comp/AccessTable';
+import Footer from './components/main-comp/Footer';
+import Copyright from './components/main-comp/Copyright';
+import SearchBar from './components/main-comp/SearchBar';
 
 export default function App() {
   return (

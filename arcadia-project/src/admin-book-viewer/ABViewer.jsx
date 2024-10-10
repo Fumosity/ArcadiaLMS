@@ -1,14 +1,14 @@
 import React from 'react';
-import MainHeader from '../components/main-components/MainHeader';
-import BookViewer from '../components/admin-book-page/BookViewer';
-import Footer from '../components/main-components/Footer';
-import Copyright from '../components/main-components/Copyright';
-import AboutPage from '../components/admin-book-page/AboutPage';
-import Navbar from '../components/main-components/Navbar'; // Include Navbar here for consistency
-import PastReviews from '../components/admin-book-page/PastReviews';
-import BookCirculation from '../components/admin-book-page/BookCirculation';
-import BookInfo from '../components/admin-book-page/BookInfo';
-import Analytics from '../components/admin-book-page/Analytics';
+import MainHeader from '../components/main-comp/MainHeader';
+import BookViewer from '../components/admin-book-page-comp/BookViewer';
+import Footer from '../components/main-comp/Footer';
+import Copyright from '../components/main-comp/Copyright';
+import AboutPage from '../components/admin-book-page-comp/AboutPage';
+import Navbar from '../components/main-comp/Navbar'; // Include Navbar here for consistency
+import PastReviews from '../components/admin-book-page-comp/PastReviews';
+import BookCirculation from '../components/admin-book-page-comp/BookCirculation';
+import BookInfo from '../components/admin-book-page-comp/BookInfo';
+import Analytics from '../components/admin-book-page-comp/Analytics';
 
 
 export default function ABViewer() { // Changed component name to match the route
