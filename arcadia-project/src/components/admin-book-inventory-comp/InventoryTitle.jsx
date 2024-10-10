@@ -7,6 +7,7 @@ const InventoryTitle = () => (
         <h2 className="text-2xl font-semibold">Book Inventory for Admin</h2>
       </div>
     </div>
-   
+    
 )
+
 export default InventoryTitle;
