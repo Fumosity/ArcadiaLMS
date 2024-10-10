@@ -12,7 +12,6 @@ import Footer from './components/Footer';
 import Copyright from './components/Copyright';
 import SearchBar from './components/SearchBar';
 
-
 export default function App() {
   return (
     <div className="min-h-screen bg-gray-100">
