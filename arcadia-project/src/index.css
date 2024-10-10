@@ -40,3 +40,22 @@
     justify-content: center;
     align-items: center;
 }
+
+.title-bar{
+    justify-content: center;
+    align-items: center;
+}
+
+.main-header {
+    @apply w-full mx-auto px-4 sm:px-6 lg:px-8 py-1 flex flex-wrap items-center justify-between;
+}
+.search-bar{
+    @apply flex-grow w-full sm:w-auto max-w-lg mx-auto mt-4 sm:mt-0
+}
+.title{
+    @apply flex items-center my-2;
+    margin-left: 7rem;
+}
+.title-logo{
+    @apply flex items-center flex-shrink-0 p-1
+}
