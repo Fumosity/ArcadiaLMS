@@ -17,10 +17,7 @@ export default function ABViewer() { // Changed component name to match the rout
       <MainHeader />
       <Navbar />
       <div>
-      <div className="flex items-center mb-6">
-        <img src="/placeholder.svg?height=24&width=24" alt="Book icon" className="h-6 w-6 mr-2" />
-        <h2 className="text-2xl font-semibold">Book Viewer for Admin</h2>
-      </div>
+      
       <div className="grid grid-cols-3 gap-8">
         <div className="col-span-2 space-y-8">
           <BookInfo />
