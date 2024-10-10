@@ -17,7 +17,7 @@ const PopularAmong = () => {
           </tr>
         </thead>
         <tbody>
-          {Demogs.map((demog, index) => (
+          {Demogs.map((demog, index) => (       
             <tr key={index}>
               <td className="py-2">{demog.demog}</td>
               <td className="py-2">{demog.rating}</td>
