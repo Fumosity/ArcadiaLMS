@@ -4,34 +4,48 @@ const ARAddPreview = () => {
   const bookDetails = {
     title: 'The Metamorphosis',
     author: 'Franz Kafka',
-    genre: 'Novella, Absurdist, Fantasy',
-    category: 'Fiction',
-    publisher: 'Diamond Pocket Books',
-    synopsis: 'Update',
+    college: 'College of Engineering, Computer Studies, and Architecture',
+    department: 'Department of Computer Studies (DCS)',
+    abstract: 'Diamond Pocket Books',
+    pages: 'Update',
     keywords: 'kafkaesque, morbid',
     datePublished: '2001 (original 1915)',
-    republished: '2023',
     location: '2F, Shelf A24',
     databaseID: 'B-04321',
-    arcID: '00750095',
-    isbn: '9789390740246, 9390740243',
-    quantity: 2
+    arcID: '00750095'
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="text-xl font-semibold mb-4">About</h3>
-      <img src="/placeholder.svg?height=300&width=200" alt="Book cover" className="w-full mb-4 rounded" />
-      <p className="text-sm text-gray-500 mb-2">Click to update book cover</p>
-      {Object.entries(bookDetails).map(([key, value]) => (
-        <div key={key} className="mb-2">
-          <span className="font-semibold">{key.charAt(0).toUpperCase() + key.slice(1)}:</span> {value}
-        </div>
-      ))}
-      <div className="mt-4 flex space-x-2">
-        <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded">Discard Changes</button>
-        <button className="px-4 py-2 bg-blue-600 text-black rounded">Save Changes</button>
+    <div className="bg-white p-4 rounded-lg shadow-md">
+      {/* Book Front Page */}
+      <h3 className="text-xl font-semibold mb-3">About</h3>
+      <div className="relative bg-white p-2 mb-4 rounded-lg">
+        <img src="image/bkfrontpg.png" alt="Book cover" className="h-200 w-150 mx-auto mb-2 rounded" />
+        <p className="text-xs text-gray-500 mb-2 text-center">Click to update book cover</p>
       </div>
+
+      {/* Book details with horizontal lines only */}
+      <table className="min-w-full border-collapse">
+        <tbody>
+          {Object.entries(bookDetails).map(([key, value], index) => (
+            <tr key={index} className="border-b border-grey">
+              <td className="px-1 py-1 font-semibold capitalize" style={{ width: "40%" }}>
+                {key.replace(/([A-Z])/g, ' $1')}:
+              </td>
+              <td className="px-1 py-1 text-sm flex justify-between items-center">
+                <span>{value}</span>
+                {key === 'abstract' || key === 'pages' ? (
+                  <button className="ml-2 border border-blue-500 px-2 py-0.5 rounded-xl">
+                    View
+                  </button>
+                ) : null}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Buttons */}
     </div>
   );
 };

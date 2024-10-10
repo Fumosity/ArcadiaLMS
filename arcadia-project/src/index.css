@@ -53,6 +53,10 @@
         border-radius: 1rem;
         border-color: #d4d4d4;
     }
+    .hr-line{
+        @apply my-4 border-t;
+        border-color: #d4d4d4;
+    }
 }
 
 .nav-link {
