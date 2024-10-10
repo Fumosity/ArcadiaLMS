@@ -1,17 +1,17 @@
 import React from 'react';
-import MainHeader from '../components/MainHeader';
-import BookViewer from '../components/AdminBookPage/BookViewer';
-import Footer from '../components/Footer';
-import Copyright from '../components/Copyright';
-import AboutPage from '../components/AdminBookPage/AboutPage';
-import Navbar from '../components/Navbar'; // Include Navbar here for consistency
-import PastReviews from '../components/AdminBookPage/PastReviews';
-import BookCirculation from '../components/AdminBookPage/BookCirculation';
-import BookInfo from '../components/AdminBookPage/BookInfo';
-import Analytics from '../components/AdminBookPage/Analytics';
+import MainHeader from '../components/main-components/MainHeader';
+import BookViewer from '../components/admin-book-page/BookViewer';
+import Footer from '../components/main-components/Footer';
+import Copyright from '../components/main-components/Copyright';
+import AboutPage from '../components/admin-book-page/AboutPage';
+import Navbar from '../components/main-components/Navbar'; // Include Navbar here for consistency
+import PastReviews from '../components/admin-book-page/PastReviews';
+import BookCirculation from '../components/admin-book-page/BookCirculation';
+import BookInfo from '../components/admin-book-page/BookInfo';
+import Analytics from '../components/admin-book-page/Analytics';
 
 
-export default function AdminBookViewer() { // Changed component name to match the route
+export default function ABViewer() { // Changed component name to match the route
   return (
     <div className="min-h-screen bg-gray-100">
       <MainHeader />

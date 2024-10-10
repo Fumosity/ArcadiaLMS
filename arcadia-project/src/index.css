@@ -4,6 +4,14 @@
 @tailwind utilities;
 
 
+@layer components{
+    .title{
+        @apply flex items-center mb-6
+    }
+    .title h2{
+        @apply text-2xl font-semibold
+    }
+}
 
 .nav-link {
     @apply text-black font-semibold mx-4;
