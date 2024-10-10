@@ -6,38 +6,49 @@
 
 @layer components{
     .title{
-        @apply flex items-center mb-6
+        @apply flex items-center mb-2;
+        background-color: #F4F4F5;
     }
     .title h2{
-        @apply text-2xl font-semibold
+        @apply text-2xl font-semibold;
+    }
+    .sort-by{
+        @apply py-1 px-3 rounded-full text-sm;
+        border: 1px solid;
+    }
+    .bookinv-category, .bookinv-genre{
+        @apply bg-grey;
+    }
+    .title-logo{
+        @apply px-52 my-1 flex items-center;
+    }
+    .add-book{
+        @apply h-10 flex items-center justify-center mb-2;
+        border: 1px solid;
+        border-radius: 50px;
+        width: 21rem;
     }
 }
-
 .nav-link {
     @apply text-black font-semibold mx-4;
     font-family: "Zen Kaku Gothic Antique";
     font-weight: 100;
 }
-
 .nav-link {
     @apply text-black font-bold mx-4 text-sm;
 }
-
 .navbar-content {
     @apply items-center;
 }
-
 .navbar-cont {
     border-top: 1px solid;
     border-bottom: 1px solid;
     border-color: #d3d3d3;
 }
-
 .search-bar{
     justify-content: center;
     align-items: center;
 }
-
 .title-bar{
     justify-content: center;
     align-items: center;
@@ -49,10 +60,7 @@
 .search-bar{
     @apply flex-grow w-full sm:w-auto max-w-lg mx-auto mt-4 sm:mt-0
 }
-.title{
-    @apply flex items-center my-2;
-    margin-left: 7rem;
-}
-.title-logo{
-    @apply flex items-center flex-shrink-0 p-1
+
+.head-text-logo{
+    @apply flex items-center flex-shrink-0 p-1;
 }

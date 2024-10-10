@@ -7,11 +7,12 @@ export default {
         "dark-gray": "#333333",
         "black": "#000000",
         "light-gray": "#f4f4f4",
+        "grey": '#D4D4D8',
+        "arcadia-black": '#18181B'
     },
     extend: {
       fontFamily: {
-        'arcadia': ['Georgia', 'serif'],
-          body: ['"Zen Kaku Gothic Antique"', '"Zen Kaku Gothic New"', 'sans-serif'],
+        'Zen': ['"Zen Kaku Gothic Antique"', '"Zen Kaku Gothic New"', 'sans-serif'],
       },
     },
   },

@@ -5,9 +5,9 @@ const MainHeader = () => (
   <header className="main-header bg-white shadow-sm">
     <div className="w-full px-2 lg:px-4 py-4 flex justify-between items-center">
       {/* Left: Logo and Title */}
-      <div className="title-logo">
+      <div className="head-text-logo">
         <img src="image/arcadia.png" alt="Arcadia logo" className="h-8 w-8 mr-2" />
-        <span className="text-xl font-semibold text-arcadia-red">Arcadia</span>
+        <span className="text-3xl font-semibold text-arcadia-black">Arcadia</span>
       </div>
 
       {/* Center: Search Bar */}

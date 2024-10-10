@@ -30,7 +30,7 @@ const AdminCurrentInventory = () => {
     return (
         <div className="bg-white p-6 rounded-lg shadow-md">
             {/* Title */}
-            <h3 className="text-2xl font-semibold mb-4">Current Inventory</h3>
+            <h3 className="text-xl font-semibold mb-4">Current Inventory</h3>
 
             {/* Controls: Sort by, Pub. Date, Filter By */}
             <div className="flex flex-wrap items-center mb-6 space-x-4">
@@ -96,12 +96,12 @@ const AdminCurrentInventory = () => {
                         {inventoryData.map((item, index) => (
                             <tr key={index}>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="bookinv-category w-24 h-7 inline-flex items-center justify-center text-sm font-medium rounded-full bg-gray-100">
+                                    <span className="bookinv-category w-24 h-7 inline-flex items-center justify-center text-sm font-medium rounded-full">
                                         {item.category}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="bookinv-genre w-24 h-7 inline-flex items-center justify-center text-sm font-medium rounded-full bg-gray-100">
+                                    <span className="bookinv-genre w-24 h-7 inline-flex items-center justify-center text-sm font-medium rounded-full">
                                         {item.genre}
                                     </span>
                                 </td>
