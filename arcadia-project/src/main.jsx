@@ -5,10 +5,8 @@ import './index.css'
 import ABInventory from './admin-book-inventory/ABInventory.jsx'
 import ABViewer from './admin-book-viewer/ABViewer.jsx'
 
-
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ABViewer />
+    <ABInventory />
   </StrictMode>,
 )
