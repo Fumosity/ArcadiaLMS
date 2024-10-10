@@ -20,9 +20,15 @@ const AboutPage = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="text-xl font-semibold mb-4">About</h3>
-      <img src="/placeholder.svg?height=300&width=200" alt="Book cover" className="w-full mb-4 rounded" />
-      <p className="text-sm text-gray-500 mb-2">Click to update book cover</p>
+      {/* Book Front Page */}
+      <h3 className="text-xl font-semibold mb-4 text-center">About</h3>
+      <div className="relative bg-white p-4 mb-4 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-xl" style={{ borderRadius: "40px" }}>
+        <img src="image/bkfrontpg.png" alt="Book cover" className="h-300 w-200 mx-auto mb-4 rounded" />
+        <p className="text-sm text-gray-500 mb-2 text-center">Click to update book cover</p>
+      </div>
+
+
+
       {Object.entries(bookDetails).map(([key, value]) => (
         <div key={key} className="mb-2">
           <span className="font-semibold">{key.charAt(0).toUpperCase() + key.slice(1)}:</span> {value}
