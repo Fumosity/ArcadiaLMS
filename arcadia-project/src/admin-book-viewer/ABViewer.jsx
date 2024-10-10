@@ -8,6 +8,9 @@ import PastReviews from '../components/admin-book-viewer-comp/PastReviews';
 import BookInfo from '../components/admin-book-viewer-comp/BookInfo';
 import Analytics from '../components/admin-book-viewer-comp/Analytics';
 import BookViewer from '../components/admin-book-viewer-comp/BookViewer';
+import PopularAmong from '../components/admin-book-viewer-comp/PopularAmong';
+import SimilarTo from '../components/admin-book-viewer-comp/SimilarTo';
+import CompareTo from '../components/admin-book-viewer-comp/CompareTo';
 
 
 export default function ABViewer() { // Changed component name to match the route
@@ -16,20 +19,39 @@ export default function ABViewer() { // Changed component name to match the rout
       <MainHeader />
       <Navbar />
       <BookViewer />
-      <div>
-      
-      <div className="grid grid-cols-3 gap-8">
-        <div className="col-span-2 space-y-8">
-          <BookInfo />
-          <Analytics />
-          
-          <PastReviews />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-3 gap-8">
+          <div className="col-span-2 space-y-8">
+            <BookInfo />
+            <Analytics />
+
+            <PastReviews />
+          </div>
+          {/* About Table */}
+          <div className="lg:col-span-1 space-y-8">
+            <AboutPage />
+
+            {/* Popular Among Table */}
+            <div className="w-full">
+              <PopularAmong />  
+            </div>
+            
+            <div className="w-full">
+            {/* Similar To Table */}
+            <SimilarTo />
+            </div>
+
+            <div className="w-full">
+            {/* Compare To Table */}
+            <CompareTo />
+            </div>
+
+          </div>
         </div>
-        <div className="col-span-1">
-          <AboutPage />
-        </div>
-      </div>
-    </div>
+
+      </main>
+
 
       <footer className="bg-light-gray mt-12 py-8">
         <Footer />
