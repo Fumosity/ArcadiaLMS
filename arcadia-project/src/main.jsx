@@ -9,6 +9,6 @@ import ABViewer from './admin-book-viewer/ABViewer.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <ABViewer />
   </StrictMode>,
 )
