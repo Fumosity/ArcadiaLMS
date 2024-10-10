@@ -4,8 +4,8 @@ import { FiSearch, FiUser, FiChevronRight } from 'react-icons/fi';
 const MainHeader = () => (
     <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <img src="/placeholder.svg?height=32&width=32" alt="Arcadia logo" className="h-8 w-8 mr-2" />
+        <div className="flex items-center">
+            <img src="image/arcadia.png" alt="Arcadia logo" className="h-8 w-8 mr-2" />
             <span className="text-xl font-semibold text-arcadia-red">Arcadia</span>
           </div>
          
