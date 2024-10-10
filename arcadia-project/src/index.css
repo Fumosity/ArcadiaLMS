@@ -4,52 +4,83 @@
 @tailwind utilities;
 
 
-@layer components{
-    .title{
+@layer components {
+    .title {
         @apply flex items-center mb-2;
         background-color: #F4F4F5;
     }
-    .title h2{
+
+    .title h2 {
         @apply text-2xl font-semibold;
     }
-    .sort-by{
+
+    .sort-by {
         @apply py-1 px-3 rounded-full text-sm;
         border: 1px solid;
     }
-    .bookinv-category, .bookinv-genre{
+
+    .bookinv-category,
+    .bookinv-genre {
         @apply bg-grey;
     }
-    .title-logo{
+
+    .title-logo {
         @apply px-52 my-1 flex items-center;
     }
-    .add-book{
+
+    .add-book {
         @apply h-10 flex items-center justify-center mb-2;
         border: 1px solid;
         border-radius: 50px;
         width: 21rem;
     }
+
+    .input-field {
+        padding: 0.5rem;
+        border: 1px solid #cbd5e0;
+        border-radius: 50px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .upload-page-btn{
+        border: 1px solid;
+        border-radius: 1rem;
+        border-color: #d4d4d4;
+    }
+    .add-research-btn{
+        border: 1px solid;
+        border-radius: 1rem;
+        border-color: #d4d4d4;
+    }
 }
+
 .nav-link {
     @apply text-black font-semibold mx-4;
     font-family: "Zen Kaku Gothic Antique";
     font-weight: 100;
 }
+
 .nav-link {
     @apply text-black font-bold mx-4 text-sm;
 }
+
 .navbar-content {
     @apply items-center;
 }
+
 .navbar-cont {
     border-top: 1px solid;
     border-bottom: 1px solid;
     border-color: #d3d3d3;
 }
-.search-bar{
+
+.search-bar {
     justify-content: center;
     align-items: center;
 }
-.title-bar{
+
+.title-bar {
     justify-content: center;
     align-items: center;
 }
@@ -57,10 +88,11 @@
 .main-header {
     @apply w-full mx-auto px-4 sm:px-6 lg:px-8 py-1 flex flex-wrap items-center justify-between;
 }
-.search-bar{
+
+.search-bar {
     @apply flex-grow w-full sm:w-auto max-w-lg mx-auto mt-4 sm:mt-0
 }
 
-.head-text-logo{
+.head-text-logo {
     @apply flex items-center flex-shrink-0 p-1;
 }
