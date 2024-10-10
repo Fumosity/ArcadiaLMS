@@ -11,6 +11,6 @@ import ARAdd from './admin-research-add/ARAdd.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ABCirculationPage />
+    <ABInventory />
   </StrictMode>,
 )

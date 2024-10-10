@@ -13,13 +13,13 @@ const SimilarTo = () => {
       <table className="w-full text-left">
         <thead>
           <tr>
-            <th className="font-semibold pb-2">Book</th>
-            <th className="font-semibold pb-2">Avg. Rating</th>
+            <th className="font-semibold pb-1 border-b border-grey">Book</th>
+            <th className="font-semibold pb-1 border-b border-grey">Avg. Rating</th>
           </tr>
         </thead>
         <tbody>
           {similarBooks.map((book, index) => (
-            <tr key={index}>
+            <tr key={index} className="border-b border-grey">
               <td className="py-2">{book.book}</td>
               <td className="py-2">{book.rating}</td>
             </tr>
