@@ -7,10 +7,10 @@ import Navbar from '../components/main-comp/Navbar'; // Include Navbar here for 
 import PastReviews from '../components/admin-book-viewer-comp/PastReviews';
 import BookInfo from '../components/admin-book-viewer-comp/BookInfo';
 import Analytics from '../components/admin-book-viewer-comp/Analytics';
-import BookViewer from '../components/admin-book-viewer-comp/BookViewer';
 import PopularAmong from '../components/admin-book-viewer-comp/PopularAmong';
 import SimilarTo from '../components/admin-book-viewer-comp/SimilarTo';
 import CompareTo from '../components/admin-book-viewer-comp/CompareTo';
+import Title from '../components/main-comp/Title';
 
 
 export default function ABViewer() { // Changed component name to match the route
@@ -18,8 +18,7 @@ export default function ABViewer() { // Changed component name to match the rout
     <div className="min-h-screen bg-gray-100">
       <MainHeader />
       <Navbar />
-      <BookViewer />
-
+      <Title>Book Viewer</Title>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-3 gap-8">
           <div className="col-span-2 space-y-8">

@@ -1,6 +1,5 @@
 import React from "react";
 import MainHeader from "../components/main-comp/MainHeader";
-import InventoryTitle from "../components/admin-book-inventory-comp/InventoryTitle";
 import CurrentBookInventory from "../components/admin-book-inventory-comp/CurrentBookInventory";
 import Navbar from "../components/main-comp/Navbar";
 import BookPreviewInv from "../components/admin-book-inventory-comp/BookPreviewInventory";
@@ -8,15 +7,14 @@ import Footer from "../components/main-comp/Footer";
 import PopularAmong from "../components/admin-book-viewer-comp/PopularAmong";
 import SimilarTo from "../components/admin-book-viewer-comp/SimilarTo";
 import Copyright from "../components/main-comp/Copyright";
+import Title from "../components/main-comp/Title";
 
 const ABInventory = () => (
   <div className="min-h-screen bg-gray-100">
     {/* Main header */}
     <MainHeader />
     <Navbar />
-    {/* Inventory title */}
-    <InventoryTitle />
-
+    <Title>Book Inventory</Title>
     {/* Main content with flex layout */}
     <div className="flex justify-center items-start space-x-2 pb-12 py-8">
       <div className="flex-shrink-0">

@@ -57,6 +57,10 @@
         @apply my-4 border-t;
         border-color: #d4d4d4;
     }
+    .book-research-adding {
+        @apply mx-auto px-4 sm:px-6 lg:px-8 py-8;
+        max-width: 110rem /* 1280px */;
+    }
 }
 
 .nav-link {
@@ -100,3 +104,4 @@
 .head-text-logo {
     @apply flex items-center flex-shrink-0 p-1;
 }
+
