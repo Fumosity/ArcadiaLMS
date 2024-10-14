@@ -6,11 +6,12 @@ import ABInventory from './admin-book-inventory/ABInventory.jsx'
 import ABViewer from './admin-book-viewer/ABViewer.jsx'
 import ABCirculationPage from './admin-book-circulation-page/ABCirculationPage.jsx'
 import ARAdd from './admin-research-add/ARAdd.jsx'
+import ABAdd from './admin-book-add/ABAdd.jsx'
 
 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ABInventory />
+    <ABAdd />
   </StrictMode>,
 )
