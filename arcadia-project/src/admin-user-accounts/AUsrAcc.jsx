@@ -5,19 +5,19 @@ import Footer from "../components/main-comp/Footer";
 import Copyright from "../components/main-comp/Copyright";
 import RcntLibVisit from "../components/admin-user-acc-comp/RcntLibVisit";
 import ListOfAcc from "../components/admin-user-acc-comp/ListOfAcc";
-import BookViewer from "../components/admin-book-viewer-comp/BookViewer";
 import AccessTable from "../components/admin-home-page-comp/AccessTable";
 import Blacklist from "../components/admin-user-acc-comp/Blacklist";
 import Whitelist from "../components/admin-user-acc-comp/Whitelist";
 import SupportTix from "../components/admin-user-acc-comp/SupportTix";
 import UserReports from "../components/admin-user-acc-comp/UserReports";
+import Title from "../components/main-comp/Title";
 
 const AUsrAcc = () => (
 
         <div className="min-h-screen bg-gray-100">
             <MainHeader />
             <Navbar />
-            <BookViewer />
+            <Title>User Accounts</Title>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-3 gap-8">
