@@ -4,13 +4,14 @@ import Navbar from "../components/main-comp/Navbar";
 import Footer from "../components/main-comp/Footer";
 import Copyright from "../components/main-comp/Copyright";
 import RcntLibVisit from "../components/admin-user-acc-comp/RcntLibVisit";
-import ListOfAcc from "../components/admin-user-acc-comp/ListOfAcc";
 import AccessTable from "../components/admin-home-page-comp/AccessTable";
 import Blacklist from "../components/admin-user-acc-comp/Blacklist";
 import Whitelist from "../components/admin-user-acc-comp/Whitelist";
 import SupportTix from "../components/admin-user-acc-comp/SupportTix";
 import UserReports from "../components/admin-user-acc-comp/UserReports";
 import Title from "../components/main-comp/Title";
+import ListOfAdminAcc from "../components/admin-user-acc-comp/ListOfAdminAcc";
+import ListOfUserAcc from "../components/admin-user-acc-comp/ListOfUserAcc";
 
 const AUsrAcc = () => (
 
@@ -26,7 +27,8 @@ const AUsrAcc = () => (
                         <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
                             <RcntLibVisit />
                         </div>
-                        <ListOfAcc />
+                        <ListOfUserAcc />
+                        <ListOfAdminAcc />
 
                     </div>
 
