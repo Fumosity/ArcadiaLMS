@@ -8,7 +8,10 @@ export default {
         "black": "#000000",
         "light-gray": "#f4f4f4",
         "grey": '#D4D4D8',
-        "arcadia-black": '#18181B'
+        "arcadia-black": '#18181B',
+        "yellow": '#e8d08d',
+        "red": '#de6262',
+        "green" : '#8fd28f'
     },
     extend: {
       fontFamily: {

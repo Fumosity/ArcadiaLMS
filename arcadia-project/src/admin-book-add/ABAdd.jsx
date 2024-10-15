@@ -13,7 +13,7 @@ const ABAdd = () => (
     <MainHeader />
     <Navbar />
     <Title>Book Adding</Title>
-    <main className="book-research-adding">
+    <main className="flex justify-center items-start space-x-2 pb-12 py-8">
       <div className="grid grid-cols-3 gap-8">
         <div className="col-span-2 space-y-8">
           {/* Main content for adding research */}

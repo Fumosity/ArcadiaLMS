@@ -21,7 +21,6 @@ const ABAddPreview = () => {
       <h3 className="text-xl font-semibold mb-3">Preview</h3>
       <div className="relative bg-white p-2 mb-4 rounded-lg">
         <img src="image/bkfrontpg.png" alt="Book cover" className="h-200 w-150 mx-auto mb-2 rounded" />
-        <p className="text-xs text-gray-500 mb-2 text-center">Click to update book cover</p>
       </div>
 
       {/* Book details with horizontal lines only */}
