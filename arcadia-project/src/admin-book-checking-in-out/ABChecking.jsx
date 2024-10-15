@@ -1,15 +1,16 @@
 import React from "react";
-import MainHeader from "../components/main-comp/MainHeader";
+
 import Navbar from "../components/main-comp/Navbar";
 import Title from "../components/main-comp/Title";
 import Footer from "../components/main-comp/Footer";
 import Copyright from "../components/main-comp/Copyright";
 import AccessTable from "../components/admin-home-page-comp/AccessTable";
 import BksDueTdy from "../components/admin-book-circ-pg-comp/BksDueTdy";
-import CheckingContainer from "../components/admin-book-checkout/CheckingContainer";
+import CheckingContainer from "../components/admin-book-check-in-out-comp/CheckingContainer";
 import BCHistory from "../components/admin-book-circ-pg-comp/BCHistory";
+import MainHeader from "../components/main-comp/MainHeader";
 
-const ABCheckOut = () => (
+const ABChecking = () => (
     <div className="min-h-screen bg-gray-100 flex flex-col">
         <MainHeader />
         <Navbar />
@@ -40,4 +41,4 @@ const ABCheckOut = () => (
         <Copyright />
     </div>
 );
-export default ABCheckOut;
+export default ABChecking;
