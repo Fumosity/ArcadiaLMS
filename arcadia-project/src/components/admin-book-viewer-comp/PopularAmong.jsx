@@ -7,7 +7,7 @@ const PopularAmong = () => {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md" style={{ maxWidth: "350px", margin: "0 auto" }}> {/* Adjusted padding */}
+    <div className="bg-white p-6 rounded-lg shadow"> {/* Adjusted padding */}
       <h3 className="text-xl font-semibold mb-2">Popular Among</h3> {/* Updated font size and margin */}
       
       {/* Table with horizontal lines only */}

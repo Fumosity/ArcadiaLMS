@@ -22,20 +22,13 @@ const ASupportPage = () => (
                         {/* Main content for adding research */}
                         <SUserReports />
                         <SupportTickets />
-                            
-
                     </div>
 
                     <div className="lg:col-span-1 space-y-8">
-                        
                             <AccessTable />
-
                             <Blacklist />
-
                             <Whitelist />
-
                             <RecentSupportTix />
-
                             <LatestSupportTix />
                     </div>
 

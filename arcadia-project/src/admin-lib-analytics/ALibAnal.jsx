@@ -15,9 +15,7 @@ import Title from "../components/main-comp/Title";
 const ALibAnal = () => (
         <div className="min-h-screen bg-gray-100">
             <MainHeader />
-            <Navbar />
             <Title>Library Analytics</Title>
-
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-3 gap-8">
                     <div className="col-span-2 space-y-8">
