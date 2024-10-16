@@ -36,12 +36,6 @@ const AAccountView = () => (
                 </div>
             </div>
         </main>
-
-        {/* Footer */}
-        <footer className="bg-light-gray mt-12 py-8">
-            <Footer />
-        </footer>
-        <Copyright />
     </div>
 );
 

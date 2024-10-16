@@ -39,14 +39,6 @@ const ARInventory = () => (
 
       </div>
     </div>
-
-    {/* Placeholder for future side pane */}
-    <footer className="bg-light-gray mt-12 py-8">
-      {/* Side pane content (for later) */}
-    
-    <Footer/>
-    </footer>
-    <Copyright />
   </div>
 );
 

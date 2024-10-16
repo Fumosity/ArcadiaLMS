@@ -13,11 +13,12 @@ import ASupportPage from './admin-support/ASupportPage.jsx'
 import AHomePage from './admin-home-page/AHomePage.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import UHomePage from './UserPages/user-home-page/UHomePage.jsx'
+import AReserv from './admin-reserv-page/AReserv.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <ABAdd />
+      <App />
     </BrowserRouter>
   </StrictMode>
 )

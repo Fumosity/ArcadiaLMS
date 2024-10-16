@@ -42,12 +42,6 @@ export default function ABCirculationPage() {
                     </div>
                 </div>
             </div>
-
-            <footer className="bg-light-gray mt-12 py-8">
-                <Footer />
-            </footer>
-            <Copyright />
-
         </div>
     );
 }

@@ -1,7 +1,8 @@
 import React from "react";
 
 const Footer = () => (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="bg-light-gray mt-12 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-7 gap-8">
             <div>
                 <h4 className="text-sm font-semibold mb-4">Library Analytics</h4>
@@ -67,10 +68,8 @@ const Footer = () => (
                 </ul>
             </div>
         </div>
-
-
     </div>
-
+    </footer>
 )
 export default Footer;
 

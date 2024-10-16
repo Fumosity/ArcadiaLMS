@@ -25,11 +25,6 @@ const AReserv = () => (
                 </div>
             </div>
         </main>
-
-        <footer className="bg-light-gray mt-12 py-8">
-            <Footer />
-        </footer>
-        <Copyright />
     </div>
 );
 

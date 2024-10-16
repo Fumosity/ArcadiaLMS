@@ -28,7 +28,9 @@ function App() {
         <Route path="/support" element={<ASupportPage />} />
         <Route path="/reservations" element={<AReserv />} />
       </Routes>
+      <Footer />
       <Copyright />
+      
     </>
   )
 }
