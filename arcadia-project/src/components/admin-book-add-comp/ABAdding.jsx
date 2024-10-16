@@ -1,59 +1,97 @@
 import React from "react";
 
-const AABooking = () => (
+const ABAdding = () => (
   <div className="min-h-screen bg-gray-100">
     <div className="flex justify-center items-start p-8">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-8xl flex">
-        {/* Booking Section */}
-        <div className="w-full">
+      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-4xl flex">
+        {/* Left Side: Form Section */}
+        <div className="w-3/4">
           {/* Title */}
-          <h2 className="text-3xl font-bold mb-4">Booking</h2>
-          
-          {/* Booking Details */}
-          <div className="self-stretch h-[353px] p-2.5 flex-col justify-start items-start gap-2.5 flex">
-            <div className="self-stretch p-2.5 rounded-[15px] border justify-start items-start gap-2.5 inline-flex">
-              <div className="flex-col justify-start items-start gap-2.5 inline-flex">
-                {[
-                  { label: "Type:", value: "Admin" },
-                  { label: "User ID:", value: "1-00923" },
-                  { label: "School ID No.:", value: "2021-2-01090" },
-                  { label: "Name:", value: "Alexander B. Corrine" },
-                  { label: "College:", value: "COECSA" },
-                  { label: "Department:", value: "DCS" },
-                  { label: "Email:", value: "a.corrine@lpunetwork.edu.ph" },
-                ].map(({ label, value }) => (
-                  <div className="w-[449px] justify-between items-center inline-flex" key={label}>
-                    <label className="text-black text-base font-medium font-['Zen Kaku Gothic Antique']">{label}</label>
-                    <input
-                      className="h-[27px] px-2.5 py-0.5 rounded-[15px] border border-zinc-300 text-black text-base font-medium font-['Zen Kaku Gothic Antique']"
-                      value={value}
-                      readOnly
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="grow shrink basis-0 flex-col justify-start items-start gap-2.5 inline-flex">
-                <div className="text-black text-base font-medium font-['Zen Kaku Gothic Antique']">Library Card:</div>
-                <div className="self-stretch h-[280px] px-3.5 py-[90px] rounded-[5px] border border-zinc-300 flex-col justify-center items-center gap-2.5 flex">
-                  <img className="w-16 h-16" src="https://via.placeholder.com/64x64" alt="Placeholder" />
-                  <div className="text-zinc-500 text-base font-medium font-['Zen Kaku Gothic Antique']">Placeholder</div>
-                </div>
-              </div>
+          <h2 className="text-3xl font-bold mb-4">Book Adding</h2>
+          <p className="text-gray-600 mb-8">
+            Data points marked with an asterisk (*) are autofilled. Use a semicolon to add multiple authors.
+          </p>
+
+          {/* Upload Section */}
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <p>Upload research pages to autofill.</p>
+              <p className="text-gray-500">Accepted formats: (*.pdf, *.png, *.jpeg)</p>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="self-stretch h-[50px] justify-center items-center gap-[25px] inline-flex">
-            {["Modify", "Delete", "Blacklist", "Whitelist"].map(action => (
-              <div key={action} className="h-[33px] px-2.5 py-[5px] rounded-[40px] border border-zinc-900 justify-center items-center gap-2.5 flex">
-                <div className="text-center text-zinc-900 text-base font-medium font-['Zen Kaku Gothic Antique']">{action}</div>
-              </div>
-            ))}
+          {/* Form Section */}
+          <form className="space-y-6">
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Title:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Authors:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">College:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Department:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Abstract:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Pages:</label>
+              <input type="number" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Keywords:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Date Published:</label>
+              <input type="date" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Location:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Database ID*:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">ARC ID:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+          </form>
+
+          {/* Add Research Button */}
+          <div className="flex justify-center mt-8">
+            <button className="add-research-btn py-2 px-8 border-gray-400 rounded-2xl">
+              Add Book
+            </button>
           </div>
+        </div>
+
+        {/* Right Side: Research Cover Placeholder */}
+        <div className="w-60 ml-8 mt-72">
+          <p className="font-bold text-lg mb-2">Book Cover*</p>
+          <div className="relative bg-gray-100 p-4 h-50 border border-gray-400 rounded-lg"> 
+            <img
+              src="image/bkfrontpg.png" // Replace with dynamic path or placeholder image
+              alt="Book cover placeholder"
+              className="h-full w-full object-contain mb-2"
+            />
+            <p className="text-xs text-gray-500 text-center">Click to update book cover</p>
+          </div>
+          
         </div>
       </div>
     </div>
   </div>
 );
 
-export default AABooking;
+export default ABAdding;
