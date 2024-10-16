@@ -12,6 +12,7 @@ import ARViewer from './admin-research-viewer/ARViewer.jsx'
 import ASupportPage from './admin-support/ASupportPage.jsx'
 import AHomePage from './admin-home-page/AHomePage.jsx'
 import { BrowserRouter } from 'react-router-dom'
+import UHomePage from './UserPages/user-home-page/UHomePage.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

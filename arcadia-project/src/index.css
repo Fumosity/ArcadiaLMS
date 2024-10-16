@@ -105,3 +105,131 @@
     @apply flex items-center flex-shrink-0 p-1;
 }
 
+/** USER CSS SECTION **/
+
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+Antique&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Header Styles */
+.userHeader {
+  @apply bg-arcadia-red flex items-center justify-between py-4 px-8 text-4xl;
+}
+
+.userNav-link {
+  @apply text-black font-bold mx-4 text-sm;
+}
+
+.userAccount {
+  @apply text-arcadia-red; /* Use arcadia-red for visibility */
+}
+
+.userLogo {
+  @apply flex items-center;
+}
+
+/* Hero Section Styles */
+.userHero {
+  @apply relative bg-cover bg-center h-[500px] flex flex-col items-start justify-center pl-10 text-left text-white;
+}
+
+.userHero-overlay {
+  @apply absolute inset-0 bg-black opacity-50;
+}
+
+.userHero-title {
+  @apply text-4xl font-bold mb-4;
+}
+
+.userHero-text {
+  @apply text-lg mb-6;
+}
+
+.userHero-button {
+  @apply bg-arcadia-red hover:bg-arcadia-red text-white font-bold py-2 px-4 rounded;
+}
+
+/* Search Section Styles */
+.userSearch-section {
+  @apply bg-arcadia-red text-white py-8 px-4 text-center;
+}
+
+.userSearch-title {
+  @apply text-xl font-bold mb-4;
+}
+
+.userSearch-input {
+  @apply w-full max-w-md mx-auto py-2 px-4 rounded-md border border-grey;
+}
+
+.userSearch-suggestions {
+  @apply flex justify-center items-center gap-2 mt-6; /* Align "Try:" and buttons */
+}
+
+.userSearch-suggestions p {
+  @apply text-lg; /* Style for "Try:" text */
+}
+
+.userSuggestion-buttons {
+  @apply flex gap-2; /* Small gap between buttons */
+}
+
+.userSuggestion-button {
+  @apply bg-white text-arcadia-red font-bold py-1 px-3 rounded-full text-sm hover:bg-dark-gray hover:text-white transition-all;
+}
+
+/* Content Container */
+.userContent-container {
+  @apply flex gap-8 py-8 px-4;
+}
+
+/* Sidebar */
+.userSidebar {
+  @apply w-1/4 bg-grey p-4 rounded-lg;
+}
+
+.userSidebar-title {
+  @apply text-lg font-bold mb-4;
+}
+
+.userNews-card {
+  @apply bg-white p-4 mb-4 shadow-md rounded-md;
+}
+
+/* Main Content */
+.userMain-content {
+  @apply w-3/4;
+}
+
+.userSection-title {
+  @apply text-xl font-bold mb-4;
+}
+
+.userBook-card {
+  @apply bg-white shadow-md rounded-md p-4 flex gap-4 mb-4 items-center;
+}
+
+.userBook-info {
+  @apply flex flex-col;
+}
+
+.userGenre {
+  @apply text-sm;
+}
+
+.userBook-title {
+  @apply text-lg font-semibold;
+}
+
+.userAuthor {
+  @apply text-sm;
+}
+
+.arcadia{
+    font-family: "Zen Kaku Gothic Antique"', '"Zen Kaku Gothic New"', 'sans-serif;
+}
+
+

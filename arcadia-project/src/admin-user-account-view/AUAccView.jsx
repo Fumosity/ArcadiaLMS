@@ -15,7 +15,6 @@ const AUAccView = () => (
     <div className="min-h-screen bg-gray-100">
         {/* Main header */}
         <MainHeader />
-        <Navbar />
         <Title>User Account Viewer</Title>
 
         {/* Main content section */}

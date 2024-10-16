@@ -11,7 +11,6 @@ const AReserv = () => (
     <div className="min-h-screen bg-gray-100">
         {/* Main header */}
         <MainHeader />
-        <Navbar />
         <Title>Reservations</Title>
 
         <main className="book-research-adding">

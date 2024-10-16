@@ -14,7 +14,6 @@ export default function ABCirculationPage() {
     return (
         <div className="min-h-screen bg-gray-100">
             <MainHeader />
-            <Navbar />
             <Title>Book Circulation</Title>
             <div className="flex justify-center items-start space-x-2 pb-12 gap-8">
                 <div className="flex-shrink-0 mt-4">
