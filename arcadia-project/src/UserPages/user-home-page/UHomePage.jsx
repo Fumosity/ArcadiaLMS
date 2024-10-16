@@ -1,139 +1,66 @@
 import React from "react";
 import Header from "../../components/UserComponents/user-main-comp/header";
+import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
+import UFooter from "../../components/UserComponents/user-main-comp/UFooter";
+import UCopyright from "../../components/UserComponents/user-main-comp/UCopyright";
+import Recommended from "../../components/UserComponents/user-home-comp/Recommended";
+import USearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
+import UHero from "../../components/UserComponents/user-home-comp/UHero";
+import LatestNews from "../../components/UserComponents/user-home-comp/LatestNews";
+import MostPopular from "../../components/UserComponents/user-home-comp/MostPopular";
+import HighlyRated from "../../components/UserComponents/user-home-comp/HighlyRated";
+import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
+import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
+import Services from "../../components/UserComponents/user-main-comp/Services";
+import MostPopBk from "../../components/UserComponents/user-main-comp/MostPopBk";
+import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghestRatedBk";
 
 const UHomePage = () => {
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100">
       <Header />
       {/* Navigation */}
-      <div className="bg-white py-2 shadow-md">
-        <nav className="flex justify-between items-center px-4">
-          <div className="flex">
-            <a href="#" className="userNav-link">Home</a>
-            <a href="#" className="userNav-link">Books</a>
-            <a href="#" className="userNav-link">Theses</a>
-            <a href="#" className="userNav-link">Reservations</a>
-            <a href="#" className="userNav-link">Cafe</a>
+      <UNavbar />
+      <USearchBar />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Content Container */}
+        <div className="userContent-container flex py-8 px-4 gap-8">
+          {/* Sidebar */}
+          <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4">
+            <ArcOpHr />
+            <UpEvents />
+            <Services />
+            <MostPopBk />
+            <HighestRatedBk />
           </div>
-          <div className="userAccount">
-            <a href="#">Account</a>
-          </div>
-        </nav>
-      </div>
 
-      {/* Hero Section */}
-      <section className="userHero bg-hero-image">
-        <div className="userHero-overlay"></div>
-        <div className="relative z-10">
-          <h1 className="userHero-title">Welcome to Arcadia Library</h1>
-          <p className="userHero-text">Discover knowledge, explore resources, and reserve your favorite books today.</p>
-          <button className="userHero-button">Explore Now</button>
-        </div>
-      </section>
+          {/* Main Content */}
+          <div className="userMain-content w-3/4">
+            {/* Hero Section */}
+            <UHero />
+            
+            {/* News and Updates */}
+            <LatestNews />
 
-      {/* Search Section */}
-      <section className="userSearch-section">
-        <h2 className="userSearch-title">What are you looking for?</h2>
-        <input type="text" className="userSearch-input" placeholder="Search for books, authors, or topics..." />
+            {/* Recommended for You */}
+            <Recommended />
 
-        <div className="userSearch-suggestions">
-          <p>Try:</p>
-          <div className="userSuggestion-buttons">
-            <button className="userSuggestion-button">Option 1</button>
-            <button className="userSuggestion-button">Option 2</button>
-            <button className="userSuggestion-button">Option 3</button>
-            <button className="userSuggestion-button">Option 4</button>
+            {/* Most Popular */}
+            <MostPopular />
+
+            {/* Highly Rated */}
+            <HighlyRated />
+
           </div>
         </div>
-      </section>
+      </main>
 
-      {/* Content Container */}
-      <div className="userContent-container flex py-8 px-4 gap-8">
-        {/* Sidebar */}
-        <aside className="userSidebar w-1/4 bg-white p-4 rounded-lg">
-          <h2 className="userSidebar-title">Latest News and Updates</h2>
-          {/* 7 Vertical Cards */}
-          {[...Array(7)].map((_, index) => (
-            <div key={index} className="news-card bg-white p-4 mb-4 shadow-md rounded-md">
-              <p>News update {index + 1}</p>
-            </div>
-          ))}
-        </aside>
-
-        {/* Main Content */}
-        <div className="userMain-content w-3/4">
-          {/* Recommended for You */}
-          <section>
-            <h2 className="userSection-title">Recommended for You</h2>
-            <div className="flex gap-4 flex-wrap">
-              {[...Array(5)].map((_, index) => (
-                <div key={index} className="userBook-card bg-white shadow-md rounded-md p-4 flex gap-4 mb-4 items-center">
-                  <img
-                    src="https://via.placeholder.com/80x120"
-                    alt="Book Cover"
-                    className="w-20 h-30 rounded-md" // Adjust size as needed
-                  />
-                  <div className="userBook-info">
-                    <p className="userGenre hidden sm:block">Fiction</p>
-                    <p className="userBook-title hidden sm:block">The Great Story</p>
-                    <p className="userAuthor hidden sm:block">J. Doe</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Most Popular */}
-          <section className="mt-8">
-            <h2 className="userSection-title">Most Popular</h2>
-            <div className="flex gap-4 flex-wrap">
-              {[...Array(5)].map((_, index) => (
-                <div key={index} className="userBook-card bg-white shadow-md rounded-md p-4 flex gap-4 mb-4 items-center">
-                  <img
-                    src="https://via.placeholder.com/80x120"
-                    alt="Book Cover"
-                    className="w-20 h-30 rounded-md" // Adjust size as needed
-                  />
-                  <div className="userBook-info">
-                    <p className="userGenre hidden sm:block">Thriller</p>
-                    <p className="userBook-title hidden sm:block">Edge of Fear</p>
-                    <p className="userAuthor hidden sm:block">J. Doe</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Highly Rated */}
-          <section className="mt-8">
-            <h2 className="userSection-title">Highly Rated</h2>
-            <div className="flex gap-4 flex-wrap">
-              {[...Array(5)].map((_, index) => (
-                <div key={index} className="userBook-card bg-white shadow-md rounded-md p-4 flex gap-4 mb-4 items-center">
-                  <img
-                    src="https://via.placeholder.com/80x120"
-                    alt="Book Cover"
-                    className="w-20 h-30 rounded-md"
-                  />
-                  <div className="userBook-info">
-                    <p className="userGenre hidden sm:block">Romance</p>
-                    <p className="userBook-title hidden sm:block">Love in the Air</p>
-                    <p className="userAuthor hidden sm:block">J. Doe</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-arcadia-red text-white py-12 mt-16">
-        <div className="container mx-auto text-center">
-          <p>© 2024 Arcadia Library. All rights reserved.</p>
-        </div>
+      <footer className="text-white bg-arcadia-black w-full py-8 mt-16 border-b border-white">
+        <UFooter />
       </footer>
-      <div className="h-8"></div>
+      <UCopyright />
+
     </div>
   );
 }

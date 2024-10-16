@@ -11,6 +11,7 @@ export default {
         "arcadia-black": '#18181B',
         "yellow": '#e8d08d',
         "red": '#de6262',
+        "yellow": '#FFFF9F',
         "green" : '#8fd28f'
     },
     extend: {

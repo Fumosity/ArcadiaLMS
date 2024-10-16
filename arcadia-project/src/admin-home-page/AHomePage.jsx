@@ -76,7 +76,6 @@ const AHomePage = () => {
       <footer className="bg-light-gray mt-12 py-8">
         <Footer />
       </footer>
-      <Copyright />
     </div>
   );
 }

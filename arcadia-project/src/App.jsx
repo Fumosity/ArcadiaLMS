@@ -10,6 +10,8 @@ import ASupportPage from './admin-support/ASupportPage';
 import AReserv from './admin-reserv-page/AReserv';
 import ARInventory from './admin-research-inventory/ARInventory';
 import AUsrAcc from './admin-user-accounts/AUsrAcc';
+import Footer from './components/main-comp/Footer';
+import Copyright from './components/main-comp/Copyright';
 
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
         <Route path="/support" element={<ASupportPage />} />
         <Route path="/reservations" element={<AReserv />} />
       </Routes>
+      <Copyright />
     </>
   )
 }

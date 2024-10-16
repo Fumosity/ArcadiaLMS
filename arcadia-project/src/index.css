@@ -149,7 +149,7 @@
 }
 
 .userHero-button {
-  @apply bg-arcadia-red hover:bg-arcadia-red text-white font-bold py-2 px-4 rounded;
+  @apply border bg-opacity-0 hover:bg-arcadia-red text-white font-bold py-2 px-4 rounded-lg;
 }
 
 /* Search Section Styles */
@@ -178,7 +178,7 @@
 }
 
 .userSuggestion-button {
-  @apply bg-white text-arcadia-red font-bold py-1 px-3 rounded-full text-sm hover:bg-dark-gray hover:text-white transition-all;
+  @apply border border-white bg-arcadia-red text-white py-1 px-3 rounded-full text-sm hover:bg-dark-gray hover:text-white transition-all;
 }
 
 /* Content Container */
@@ -188,7 +188,7 @@
 
 /* Sidebar */
 .userSidebar {
-  @apply w-1/4 bg-grey p-4 rounded-lg;
+  @apply bg-white p-4 rounded-lg;
 }
 
 .userSidebar-title {
