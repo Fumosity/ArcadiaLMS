@@ -15,7 +15,7 @@ const ABAdding = () => (
           {/* Upload Section */}
           <div className="flex justify-between items-center mb-6">
             <div>
-              <p>Upload research pages to autofill.</p>
+              <p>Upload book pages to autofill.</p>
               <p className="text-gray-500">Accepted formats: (*.pdf, *.png, *.jpeg)</p>
             </div>
           </div>
@@ -31,27 +31,35 @@ const ABAdding = () => (
               <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
             </div>
             <div className="flex justify-between items-center">
-              <label className="w-1/4">College:</label>
+              <label className="w-1/4">Genre:</label>
               <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
             </div>
             <div className="flex justify-between items-center">
-              <label className="w-1/4">Department:</label>
+              <label className="w-1/4">Category:</label>
               <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
             </div>
             <div className="flex justify-between items-center">
-              <label className="w-1/4">Abstract:</label>
+              <label className="w-1/4">Publisher:</label>
               <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
             </div>
             <div className="flex justify-between items-center">
-              <label className="w-1/4">Pages:</label>
-              <input type="number" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+              <label className="w-1/4">Synopsis:</label>
+              <textarea className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" rows="3"></textarea>
             </div>
             <div className="flex justify-between items-center">
               <label className="w-1/4">Keywords:</label>
               <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
             </div>
             <div className="flex justify-between items-center">
-              <label className="w-1/4">Date Published:</label>
+              <label className="w-1/4">Date Published (Current):</label>
+              <input type="date" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Date Published (Original):</label>
+              <input type="date" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Date Procured:</label>
               <input type="date" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
             </div>
             <div className="flex justify-between items-center">
@@ -66,9 +74,17 @@ const ABAdding = () => (
               <label className="w-1/4">ARC ID:</label>
               <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
             </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">ISBN:</label>
+              <input type="text" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
+            <div className="flex justify-between items-center">
+              <label className="w-1/4">Quantity:</label>
+              <input type="number" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+            </div>
           </form>
 
-          {/* Add Research Button */}
+          {/* Add Book Button */}
           <div className="flex justify-center mt-8">
             <button className="add-research-btn py-2 px-8 border-gray-400 rounded-2xl">
               Add Book
@@ -76,7 +92,7 @@ const ABAdding = () => (
           </div>
         </div>
 
-        {/* Right Side: Research Cover Placeholder */}
+        {/* Right Side: Book Cover Placeholder */}
         <div className="w-60 ml-8 mt-72">
           <p className="font-bold text-lg mb-2">Book Cover*</p>
           <div className="relative bg-gray-100 p-4 h-50 border border-gray-400 rounded-lg"> 
@@ -87,7 +103,6 @@ const ABAdding = () => (
             />
             <p className="text-xs text-gray-500 text-center">Click to update book cover</p>
           </div>
-          
         </div>
       </div>
     </div>

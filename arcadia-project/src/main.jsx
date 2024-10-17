@@ -18,7 +18,7 @@ import AReserv from './admin-reserv-page/AReserv.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <ABAdd />
     </BrowserRouter>
   </StrictMode>
 )
