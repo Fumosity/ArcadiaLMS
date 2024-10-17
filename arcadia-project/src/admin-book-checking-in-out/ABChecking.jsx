@@ -13,7 +13,6 @@ import MainHeader from "../components/main-comp/MainHeader";
 const ABChecking = () => (
     <div className="min-h-screen bg-gray-100 flex flex-col">
         <MainHeader />
-        <Navbar />
         <Title>Book Checking</Title>
         <main className="flex-grow flex items-center justify-center">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -35,10 +34,6 @@ const ABChecking = () => (
                 </div>
             </div>
         </main>
-        <footer className="bg-light-gray mt-12 py-8">
-            <Footer />
-        </footer>
-        <Copyright />
     </div>
 );
 export default ABChecking;

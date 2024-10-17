@@ -1,14 +1,11 @@
 import React from "react";
 import MainHeader from "../components/main-comp/MainHeader";
-import Navbar from "../components/main-comp/Navbar";
 import BorrowedBks from "../components/admin-book-circ-pg-comp/BorrowedBks";
 import AccessTable from "../components/admin-home-page-comp/AccessTable";
 import BCHistory from "../components/admin-book-circ-pg-comp/BCHistory";
 import ReturnedBks from "../components/admin-book-circ-pg-comp/ReturnedBks";
 import OverdueBks from "../components/admin-book-circ-pg-comp/OverdueBks";
 import BksDueTdy from "../components/admin-book-circ-pg-comp/BksDueTdy";
-import Footer from "../components/main-comp/Footer";
-import Copyright from "../components/main-comp/Copyright";
 import Title from "../components/main-comp/Title";
 export default function ABCirculationPage() {
     return (

@@ -12,6 +12,9 @@ import ARInventory from './admin-research-inventory/ARInventory';
 import AUsrAcc from './admin-user-accounts/AUsrAcc';
 import Footer from './components/main-comp/Footer';
 import Copyright from './components/main-comp/Copyright';
+import ABChecking from './admin-book-checking-in-out/ABChecking';
+import ABAdd from './admin-book-add/ABAdd';
+import ARAdd from './admin-research-add/ARAdd';
 
 function App() {
   return (
@@ -27,6 +30,11 @@ function App() {
         <Route path="/useraccounts" element={<AUsrAcc />} />
         <Route path="/support" element={<ASupportPage />} />
         <Route path="/reservations" element={<AReserv />} />
+        <Route path="/abcirculationpage" element={<ABCirculationPage />} />
+        <Route path="/bookcheckinout" element={<ABChecking />} />
+        <Route path="/bookadding" element={<ABAdd />} />
+        <Route path="/researchadding" element={<ARAdd />} />
+
       </Routes>
       <Footer />
       <Copyright />

@@ -11,7 +11,6 @@ const ABAdd = () => (
   <div className="min-h-screen bg-gray-100">
     {/* Main header */}
     <MainHeader />
-    <Navbar />
     <Title>Book Adding</Title>
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-3 gap-8">
@@ -25,11 +24,6 @@ const ABAdd = () => (
         </div>
       </div>
     </main>
-
-    <footer className="bg-light-gray mt-12 py-8">
-      <Footer />
-    </footer>
-    <Copyright />
   </div>
 );
 
