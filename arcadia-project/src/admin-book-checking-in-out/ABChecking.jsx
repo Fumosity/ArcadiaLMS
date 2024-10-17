@@ -14,7 +14,6 @@ const ABChecking = () => (
     <div className="min-h-screen bg-gray-100 flex flex-col">
         <MainHeader />
         <Title>Book Checking</Title>
-        <main className="flex-grow flex items-center justify-center">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-3 gap-8">
                     <div className="col-span-2 space-y-8">
@@ -28,12 +27,9 @@ const ABChecking = () => (
                             <AccessTable />
                         </div>
                         <BksDueTdy />
-
-
                     </div>
                 </div>
             </div>
-        </main>
     </div>
 );
 export default ABChecking;

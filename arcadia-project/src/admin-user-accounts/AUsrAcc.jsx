@@ -18,7 +18,6 @@ const AUsrAcc = () => (
         <div className="min-h-screen bg-gray-100">
             <MainHeader />
             <Title>User Accounts</Title>
-
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-3 gap-8">
                     <div className="col-span-2 space-y-8">
@@ -33,9 +32,7 @@ const AUsrAcc = () => (
 
                     {/* Preview section */}
                     <div className="lg:col-span-1 space-y-8">
-                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
                             <AccessTable />
-                        </div>
 
                             <Blacklist />
 

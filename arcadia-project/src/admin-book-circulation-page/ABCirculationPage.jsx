@@ -31,12 +31,8 @@ export default function ABCirculationPage() {
 
 
                 <div className="lg:col-span-1 space-y-8 mt-8">
-                    <div className="bg-white p-6 rounded-lg shadow">
                         <AccessTable />
-                    </div>
-                    <div className="mt-4">
                         <BksDueTdy />
-                    </div>
                 </div>
             </div>
         </div>

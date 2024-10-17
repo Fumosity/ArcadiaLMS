@@ -21,8 +21,8 @@ const AReserv = () => (
                 </div>
                 {/* Preview section */}
                 <div className="lg:col-span-1 space-y-8">
-                    <TodayReserv />
-                </div>
+                        <TodayReserv />
+                    </div>
             </div>
         </main>
     </div>
