@@ -28,9 +28,7 @@ const AHomePage = () => {
 
           {/* Access Table and other sections on the right */}
           <div className="lg:col-span-1 space-y-8">
-            <div className="bg-white p-6 rounded-lg shadow">
               <AccessTable />
-            </div>
 
             {/* Reservations */}
             <div className="bg-white p-6 rounded-lg shadow">
