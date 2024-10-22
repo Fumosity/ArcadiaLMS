@@ -1,7 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
-
-export const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_ANON_KEY);
 
 //Adds a new record to the book table
 export const addBook = async (bookData) => {
