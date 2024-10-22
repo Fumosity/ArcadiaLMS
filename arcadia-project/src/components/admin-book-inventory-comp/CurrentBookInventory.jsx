@@ -1,33 +1,220 @@
-import React, { useEffect, useState } from "react";
-import { supabase } from "/src/supabaseClient.js";
+import React, { useState } from "react";
 
-const CurrentBookInventory = ({ onBookSelect }) => {
-    const [inventoryData, setInventoryData] = useState([]);
+// Sample data
+const inventoryData = [
+    {
+        category: "Fiction", 
+        genre: "Novella", 
+        bookTitle: "The Metamorphosis",
+        author: "Franz Kafka",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+    {
+        category: "Non-fiction", 
+        genre: "Novella", 
+        bookTitle: "Vincent Vaughn Fadri",
+        author: "Karl Marx",
+        bookId: "B-04321",
+        pubDate: "2021 (c. 1915)",
+        qty: 2,
+    },
+];
+
+const AdminCurrentInventory = () => {
+    // State for sorting and filtering
     const [sortOrder, setSortOrder] = useState("Descending");
     const [pubDateFilter, setPubDateFilter] = useState("After 2020");
-    const [hoveredGenreIndex, setHoveredGenreIndex] = useState(null);
-
-    useEffect(() => {
-        const fetchBooks = async () => {
-            const { data, error } = await supabase
-                .from('book')
-                .select('*');
-
-            if (error) {
-                console.error("Error fetching books:", error);
-            } else {
-                setInventoryData(data);
-            }
-        };
-
-        fetchBooks();
-    }, []);
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md mr-5">
+            {/* Title */}
             <h3 className="text-xl font-semibold mb-4">Current Inventory</h3>
 
+            {/* Controls: Sort by, Pub. Date, Filter By */}
             <div className="flex flex-wrap items-center mb-6 space-x-4">
+                {/* Sort by */}
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Sort By:</span>
                     <button
@@ -40,6 +227,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                     </button>
                 </div>
 
+                {/* Pub. Date */}
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Pub. Date:</span>
                     <button
@@ -58,6 +246,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                     </button>
                 </div>
 
+                {/* Filter By */}
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Filter By:</span>
                     <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Category</button>
@@ -66,15 +255,16 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 </div>
             </div>
 
+            {/* Table */}
             <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                <table className="align-middle min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50 ">
                         <tr>
-                            {["Category", "Genres", "Book Title", "Author", "Book ID", "Original Pub. Date", "Qty."].map(
+                            {["Category", "Genres", "Book Title", "Author", "Book ID", "Pub. Date", "Qty."].map(
                                 (header) => (
                                     <th
                                         key={header}
-                                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-6 py-3 text-middle text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         {header}
                                     </th>
@@ -83,72 +273,33 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {inventoryData.map((item, index) => {
-                            const genres = item.genre.split(";");
-
-                            return (
-                                <tr
-                                    key={index}
-                                    className="hover:bg-gray-100 cursor-pointer"
-                                >
-                                    <td className="px-4 py-4 text-sm text-gray-900">
-                                        <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full">
-                                            {item.category}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900">
-                                        <div className="flex items-center">
-                                            <span
-                                                className={`bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border border-gray-300 p-1 ${hoveredGenreIndex === index ? 'bg-gray-200' : ''}`}
-                                                onMouseEnter={() => setHoveredGenreIndex(index)}
-                                                onMouseLeave={() => setHoveredGenreIndex(null)}
-                                            >
-                                                {genres[0]}
-                                            </span>
-                                            {genres.length > 1 && (
-                                                <span
-                                                    className={`bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border border-gray-300 p-1 ml-1 ${hoveredGenreIndex === index ? 'bg-gray-200' : ''}`}
-                                                    onMouseEnter={() => setHoveredGenreIndex(index)}
-                                                    onMouseLeave={() => setHoveredGenreIndex(null)}
-                                                >
-                                                    ...
-                                                </span>
-                                            )}
-                                        </div>
-                                        {hoveredGenreIndex === index && genres.length > 1 && (
-                                            <div className="mt-1">
-                                                {genres.slice(1).map((genre, i) => (
-                                                    <div key={i} className="border border-gray-300 rounded p-1 mt-1 text-sm">
-                                                        {genre}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
-                                        <a 
-                                            href="#" // You can change this to a proper link or route if needed
-                                            onClick={() => onBookSelect(item)}
-                                            className="text-blue-600 hover:underline"
-                                        >
-                                            {item.title}
-                                        </a>
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
-                                        {item.author}
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                        {item.bookID}
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                        {item.originalPubDate}
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                        {item.quantity}
-                                    </td>
-                                </tr>
-                            );
-                        })}
+                        {inventoryData.map((item, index) => (
+                            <tr key={index}>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className="bookinv-category w-24 h-7 inline-flex items-center justify-center text-sm font-medium rounded-full">
+                                        {item.category}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className="bookinv-genre w-24 h-7 inline-flex items-center justify-center text-sm font-medium rounded-full">
+                                        {item.genre}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {item.bookTitle}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {item.author}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {item.bookId}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {item.pubDate}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.qty}</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
@@ -156,4 +307,4 @@ const CurrentBookInventory = ({ onBookSelect }) => {
     );
 };
 
-export default CurrentBookInventory;
+export default AdminCurrentInventory;

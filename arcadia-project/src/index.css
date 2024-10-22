@@ -109,6 +109,11 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+Antique&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 /* Header Styles */
 .userHeader {
   @apply bg-arcadia-red flex items-center justify-between py-4 px-8 text-4xl;

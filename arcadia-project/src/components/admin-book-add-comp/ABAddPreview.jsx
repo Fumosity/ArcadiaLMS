@@ -1,18 +1,22 @@
 import React from "react";
 
-const ABAddPreview = () => {
+const ABAddPreview = ({ formData }) => {
   const bookDetails = {
-    title: 'The Metamorphosis',
-    author: 'Franz Kafka',
-    genre: 'History',
-    category: 'Pdiddy',
-    publisher: 'Pheonix',
-    synopsis: '...',
-    keywords: 'kafkaesque, morbid',
-    datePublished: '2001 (original 1915)',
-    location: '2F, Shelf A24',
-    databaseID: 'B-04321',
-    arcID: '00750095'
+    title: formData.title || '',
+    author: Array.isArray(formData.author) ? formData.author.join(',') : formData.author.split(';').join(',') || '',
+    genre: Array.isArray(formData.genre) ? formData.genre.join(',') : formData.genre.split(';').join(',') || '',
+    category: Array.isArray(formData.category) ? formData.category.join(',') : formData.category.split(';').join(',') || '',
+    publisher: formData.publisher || '',
+    synopsis: formData.synopsis || '',  
+    keyword: Array.isArray(formData.keyword) ? formData.keyword.join(',') : formData.keyword.split(';').join(',') || '',
+    datePublished: `${formData.currentPubDate} (original ${formData.originalPubDate})` || '',
+    procDate: formData.procDate || '',
+    location: formData.location || '',
+    databaseID: formData.bookID || '',
+    arcID: formData.arcID || '',
+    isbn: formData.isbn || '',
+    quantity: formData.quantity || '',
+    cover: formData.cover || '',
   };
 
   return (
@@ -20,7 +24,7 @@ const ABAddPreview = () => {
       {/* Book Front Page */}
       <h3 className="text-xl font-semibold mb-3">Preview</h3>
       <div className="relative bg-white p-2 mb-4 rounded-lg">
-        <img src="image/bkfrontpg.png" alt="Book cover" className="h-200 w-150 mx-auto mb-2 rounded" />
+        <img src={bookDetails.cover} alt="Book cover" className="h-200 w-150 mx-auto mb-2 rounded" />
       </div>
 
       {/* Book details with horizontal lines only */}

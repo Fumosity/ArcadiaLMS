@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import MainHeader from "../components/main-comp/MainHeader";
 import CurrentBookInventory from "../components/admin-book-inventory-comp/CurrentBookInventory";
@@ -9,11 +9,6 @@ import Title from "../components/main-comp/Title";
 
 const ABInventory = () => {
   const navigate = useNavigate(); // Initialize useNavigate
-  const [selectedBook, setSelectedBook] = useState(null); // State to hold the selected book details
-
-  const handleBookSelect = (book) => {
-    setSelectedBook(book); // Update selected book
-  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -23,18 +18,18 @@ const ABInventory = () => {
       {/* Main content with flex layout */}
       <div className="flex justify-center items-start space-x-2 pb-12 py-8">
         <div className="flex-shrink-0">
-          <CurrentBookInventory onBookSelect={handleBookSelect} /> {/* Pass the handler to CurrentBookInventory */}
+          <CurrentBookInventory />
         </div>
-        <div className="hidden lg:flex flex-col items-start flex-shrink-0">
+        <div className="hidden lg:flex flex-col items-start flex-shrink-0"> {/* Stack vertically */}
           {/* Circular Add Book Button */}
           <button 
             className="add-book mb-4 px-4 py-2 rounded-full border-grey hover:bg-blue-600 transition"
             onClick={() => navigate('/bookadding')} // Navigate to ABAdd on click
           >
             Add Book
-          </button>   
+          </button>
           <div className="w-full mt-5">
-            <BookPreviewInv book={selectedBook} /> {/* Pass the selected book to BookPreviewInv */}
+            <BookPreviewInv />
           </div>
 
           <div className="w-full mt-5">
