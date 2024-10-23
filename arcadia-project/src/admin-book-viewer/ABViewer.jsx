@@ -1,10 +1,6 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom'; // Import useLocation
-import MainHeader from '../components/main-comp/MainHeader';
-import Footer from '../components/main-comp/Footer';
-import Copyright from '../components/main-comp/Copyright';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import AboutPage from '../components/admin-book-viewer-comp/AboutPage';
-import Navbar from '../components/main-comp/Navbar'; 
 import PastReviews from '../components/admin-book-viewer-comp/PastReviews';
 import BookInfo from '../components/admin-book-viewer-comp/BookInfo';
 import Analytics from '../components/admin-book-viewer-comp/Analytics';
@@ -12,29 +8,51 @@ import PopularAmong from '../components/admin-book-viewer-comp/PopularAmong';
 import SimilarTo from '../components/admin-book-viewer-comp/SimilarTo';
 import CompareTo from '../components/admin-book-viewer-comp/CompareTo';
 import Title from '../components/main-comp/Title';
+import { supabase } from '/src/supabaseClient.js'; // Import Supabase client
 
 export default function ABViewer() {
-  const location = useLocation(); // Get the location object
-  const { selectedBook } = location.state || {}; // Extract the selected book from state
+  const location = useLocation();
+  const [book, setBook] = useState(null); // State to hold the fetched book details
+
+  useEffect(() => {
+    const fetchBookDetails = async () => {
+      const query = new URLSearchParams(location.search);
+      const title = query.get('title');
+
+      if (title) {
+        const { data, error } = await supabase
+          .from('book')
+          .select('*')
+          .eq('title', title)
+          .single(); // Fetch the book with the matching title
+
+        if (error) {
+          console.error("Error fetching book:", error);
+        } else {
+          setBook(data); // Set the fetched book details in state
+        }
+      }
+    };
+
+    fetchBookDetails();
+  }, [location.search]); // Fetch book details when the component mounts
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <MainHeader />
-      <Navbar />
       <Title>Book Viewer</Title>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-3 gap-8">
           <div className="col-span-2 space-y-8">
-            {/* Pass the selectedBook to BookInfo */}
-            <BookInfo book={selectedBook} />
+            {/* Pass the fetched book to BookInfo */}
+            <BookInfo book={book} />
             <Analytics />
             <PastReviews />
           </div>
-          {/* About Table */}
           <div className="lg:col-span-1 space-y-8">
-            <AboutPage />
+            {/* Pass the fetched book to AboutPage */}
+            <AboutPage book={book} />
             <div className="w-full">
-              <PopularAmong />  
+              <PopularAmong />
             </div>
             <div className="w-full">
               <SimilarTo />
@@ -45,10 +63,6 @@ export default function ABViewer() {
           </div>
         </div>
       </main>
-      <footer className="bg-light-gray mt-12 py-8">
-        <Footer />
-      </footer>
-      <Copyright />
     </div>
   );
 }
