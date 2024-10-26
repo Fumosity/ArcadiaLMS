@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "/src/supabaseClient.js";
+import { Link } from "react-router-dom"; // Import Link
 
 const CurrentBookInventory = ({ onBookSelect }) => {
     const [inventoryData, setInventoryData] = useState([]);
@@ -9,7 +10,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
 
     useEffect(() => {
         const fetchBooks = async () => {
-            const { data, error } = await supabase
+            const { data, error } = await supabase  
                 .from('book')
                 .select('*');
 
@@ -90,6 +91,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                 <tr
                                     key={index}
                                     className="hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => onBookSelect(item)} // Keep the existing onClick handler
                                 >
                                     <td className="px-4 py-4 text-sm text-gray-900">
                                         <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full">
@@ -126,13 +128,12 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                         )}
                                     </td>
                                     <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
-                                        <a 
-                                            href="#" // You can change this to a proper link or route if needed
-                                            onClick={() => onBookSelect(item)}
+                                        <Link 
+                                            to={`/abviewer?title=${encodeURIComponent(item.title)}`} // Pass title in query params
                                             className="text-blue-600 hover:underline"
                                         >
                                             {item.title}
-                                        </a>
+                                        </Link>
                                     </td>
                                     <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
                                         {item.author}

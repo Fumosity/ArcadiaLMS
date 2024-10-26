@@ -15,6 +15,7 @@ import Copyright from './components/main-comp/Copyright';
 import ABChecking from './admin-book-checking-in-out/ABChecking';
 import ABAdd from './admin-book-add/ABAdd';
 import ARAdd from './admin-research-add/ARAdd';
+import ABViewer from './admin-book-viewer/ABViewer';
 
 function App() {
   return (
@@ -34,8 +35,9 @@ function App() {
         <Route path="/bookcheckinout" element={<ABChecking />} />
         <Route path="/bookadding" element={<ABAdd />} />
         <Route path="/researchadding" element={<ARAdd />} />
-
+        <Route path="/abviewer" element={<ABViewer />}/>
       </Routes>
+      
       <Footer />
       <Copyright />
       
