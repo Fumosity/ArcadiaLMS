@@ -1,13 +1,5 @@
 import React from "react";
-import MainHeader from "../components/main-comp/MainHeader";
-import Navbar from "../components/main-comp/Navbar";
-import Footer from "../components/main-comp/Footer";
-import Copyright from "../components/main-comp/Copyright";
 import Title from "../components/main-comp/Title";
-import Blacklist from "../components/admin-user-acc-comp/Blacklist";
-import Whitelist from "../components/admin-user-acc-comp/Whitelist";
-import RecentReports from "../components/admin-user-report-view-comp/RecentReports";
-import RecentSupport from "../components/admin-user-report-view-comp/RecentSupport";
 import ARTitle from "../components/admin-research-viewer/ARTitle";
 import ARFullText from "../components/admin-research-viewer/ARFullText";
 import ARAbout from "../components/admin-research-viewer/ARAbout";
@@ -17,9 +9,6 @@ import ARPastReview from "../components/admin-research-viewer/ARPastReview";
 
 const ARViewer = () => (
     <div className="min-h-screen bg-gray-100">
-        {/* Main header */}
-        <MainHeader />
-        <Navbar />
         <Title>User Account Viewer</Title>
 
         {/* Main content section */}
@@ -46,12 +35,6 @@ const ARViewer = () => (
                 </div>
             </div>
         </main>
-
-        {/* Footer */}
-        <footer className="bg-light-gray mt-12 py-8">
-            <Footer />
-        </footer>
-        <Copyright />
     </div>
 );
 

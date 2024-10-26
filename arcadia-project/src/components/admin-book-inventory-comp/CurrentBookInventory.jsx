@@ -94,14 +94,14 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                     onClick={() => onBookSelect(item)} // Keep the existing onClick handler
                                 >
                                     <td className="px-4 py-4 text-sm text-gray-900">
-                                        <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full">
+                                        <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full p-2">
                                             {item.category}
                                         </span>
                                     </td>
                                     <td className="px-4 py-4 text-sm text-gray-900">
                                         <div className="flex items-center">
                                             <span
-                                                className={`bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border border-gray-300 p-1 ${hoveredGenreIndex === index ? 'bg-gray-200' : ''}`}
+                                                className={`bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-grey p-2 ${hoveredGenreIndex === index ? 'bg-gray-200' : ''}`}
                                                 onMouseEnter={() => setHoveredGenreIndex(index)}
                                                 onMouseLeave={() => setHoveredGenreIndex(null)}
                                             >
@@ -109,7 +109,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                             </span>
                                             {genres.length > 1 && (
                                                 <span
-                                                    className={`bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border border-gray-300 p-1 ml-1 ${hoveredGenreIndex === index ? 'bg-gray-200' : ''}`}
+                                                    className={`bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-grey p-2 ml-1 ${hoveredGenreIndex === index ? 'bg-gray-200' : ''}`}
                                                     onMouseEnter={() => setHoveredGenreIndex(index)}
                                                     onMouseLeave={() => setHoveredGenreIndex(null)}
                                                 >
@@ -120,8 +120,8 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                         {hoveredGenreIndex === index && genres.length > 1 && (
                                             <div className="mt-1">
                                                 {genres.slice(1).map((genre, i) => (
-                                                    <div key={i} className="border border-gray-300 rounded p-1 mt-1 text-sm">
-                                                        {genre}
+                                                    <div key={i} className="bg-gray-200rounded-full border-grey p-2 mt-1 text-sm">
+                                                        {genre ? ' ' : ' '}
                                                     </div>
                                                 ))}
                                             </div>

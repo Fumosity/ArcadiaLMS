@@ -13,6 +13,7 @@ import { supabase } from '/src/supabaseClient.js'; // Import Supabase client
 export default function ABViewer() {
   const location = useLocation();
   const [book, setBook] = useState(null); // State to hold the fetched book details
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     const fetchBookDetails = async () => {
@@ -29,7 +30,10 @@ export default function ABViewer() {
         if (error) {
           console.error("Error fetching book:", error);
         } else {
-          setBook(data); // Set the fetched book details in state
+          setTimeout(() => {
+            setBook(data); // Set the fetched book details in state
+            setLoading(false); 
+          }, 1500); 
         }
       }
     };
@@ -43,14 +47,12 @@ export default function ABViewer() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-3 gap-8">
           <div className="col-span-2 space-y-8">
-            {/* Pass the fetched book to BookInfo */}
-            <BookInfo book={book} />
+            <BookInfo book={book} loading={loading} /> {/* Pass loading prop */}
             <Analytics />
             <PastReviews />
           </div>
           <div className="lg:col-span-1 space-y-8">
-            {/* Pass the fetched book to AboutPage */}
-            <AboutPage book={book} />
+            <AboutPage book={book} loading={loading} /> {/* Pass loading prop */}
             <div className="w-full">
               <PopularAmong />
             </div>

@@ -1,220 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { supabase } from "/src/supabaseClient.js"; // Import your Supabase client
+import { Link } from "react-router-dom"; // Import Link
 
-// Sample data
-const inventoryData = [
-    {
-        category: "Fiction", 
-        genre: "Novella", 
-        bookTitle: "The Metamorphosis",
-        author: "Franz Kafka",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-    {
-        category: "Non-fiction", 
-        genre: "Novella", 
-        bookTitle: "Vincent Vaughn Fadri",
-        author: "Karl Marx",
-        bookId: "B-04321",
-        pubDate: "2021 (c. 1915)",
-        qty: 2,
-    },
-];
-
-const CurrentResearchInventory = () => {
-    // State for sorting and filtering
+const CurrentResearchInventory = ({ onResearchSelect }) => {
+    const [inventoryData, setInventoryData] = useState([]);
     const [sortOrder, setSortOrder] = useState("Descending");
     const [pubDateFilter, setPubDateFilter] = useState("After 2020");
 
+    useEffect(() => {
+        const fetchResearch = async () => {
+            const { data, error } = await supabase  
+                .from('research') // Fetch from 'research' table
+                .select('*');
+
+            if (error) {
+                console.error("Error fetching research:", error);
+            } else {
+                setInventoryData(data);
+            }
+        };
+
+        fetchResearch();
+    }, []);
+
     return (
         <div className="bg-white p-6 rounded-lg shadow-md mr-5">
-            {/* Title */}
-            <h3 className="text-xl font-semibold mb-4">Current Inventory</h3>
+            <h3 className="text-xl font-semibold mb-4">Current Research Inventory</h3>
 
-            {/* Controls: Sort by, Pub. Date, Filter By */}
             <div className="flex flex-wrap items-center mb-6 space-x-4">
-                {/* Sort by */}
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Sort By:</span>
                     <button
@@ -227,7 +40,6 @@ const CurrentResearchInventory = () => {
                     </button>
                 </div>
 
-                {/* Pub. Date */}
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Pub. Date:</span>
                     <button
@@ -245,26 +57,17 @@ const CurrentResearchInventory = () => {
                         {pubDateFilter}
                     </button>
                 </div>
-
-                {/* Filter By */}
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium">Filter By:</span>
-                    <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Category</button>
-                    <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Genre</button>
-                    <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Quantity</button>
-                </div>
             </div>
 
-            {/* Table */}
             <div className="overflow-x-auto">
-                <table className="align-middle min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50 ">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
                         <tr>
-                            {["Category", "Genres", "Book Title", "Author", "Book ID", "Pub. Date", "Qty."].map(
+                            {["College", "Department", "Title", "Authors", "Thesis ID", "Pub. Date"].map(
                                 (header) => (
                                     <th
                                         key={header}
-                                        className="px-6 py-3 text-middle text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         {header}
                                     </th>
@@ -274,30 +77,34 @@ const CurrentResearchInventory = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {inventoryData.map((item, index) => (
-                            <tr key={index}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="bookinv-category w-24 h-7 inline-flex items-center justify-center text-sm font-medium rounded-full">
-                                        {item.category}
-                                    </span>
+                            <tr
+                                key={index}
+                                className="hover:bg-gray-100 cursor-pointer"
+                                onClick={() => onResearchSelect(item)} // Keep the existing onClick handler
+                            >
+                                <td className="px-4 py-4 text-sm text-gray-900">
+                                    {item.college}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="bookinv-genre w-24 h-7 inline-flex items-center justify-center text-sm font-medium rounded-full">
-                                        {item.genre}
-                                    </span>
+                                <td className="px-4 py-4 text-sm text-gray-900">
+                                    {item.department}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {item.bookTitle}
+                                <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
+                                    <Link 
+                                        to={`/researchviewer?title=${encodeURIComponent(item.title)}`} // Pass title in query params
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        {item.title}
+                                    </Link>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {item.author}
+                                <td className="px-4 py-4 text-sm text-gray-900">
+                                    {item.authors}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {item.bookId}
+                                <td className="px-4 py-4 text-sm text-gray-500">
+                                    {item.thesisID}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td className="px-4 py-4 text-sm text-gray-500">
                                     {item.pubDate}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.qty}</td>
                             </tr>
                         ))}
                     </tbody>

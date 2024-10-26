@@ -16,6 +16,7 @@ import ABChecking from './admin-book-checking-in-out/ABChecking';
 import ABAdd from './admin-book-add/ABAdd';
 import ARAdd from './admin-research-add/ARAdd';
 import ABViewer from './admin-book-viewer/ABViewer';
+import ARViewer from './admin-research-viewer/ARViewer';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route path="/bookadding" element={<ABAdd />} />
         <Route path="/researchadding" element={<ARAdd />} />
         <Route path="/abviewer" element={<ABViewer />}/>
+        <Route path="/abviewer" element={<ARViewer />}/>
       </Routes>
       
       <Footer />

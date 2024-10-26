@@ -1,10 +1,16 @@
-import React from "react";
+import React from 'react';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const AboutPage = ({ book }) => {
   if (!book)
     return (
       <div className="bg-white p-4 rounded-lg shadow-md">
-        Select a book to see details.
+        <Skeleton height={20} width={150} className="mb-2" />
+        <Skeleton height={200} className="mb-2" />
+        <Skeleton count={8} className="mb-1" />
+        <Skeleton width={100} height={25} className="mt-2" />
+        <Skeleton width={100} height={25} className="mt-2" />
       </div>
     );
 
