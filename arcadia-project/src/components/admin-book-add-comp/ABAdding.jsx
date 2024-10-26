@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { addBook, newIDAndProcDateGenerator } from "../../backend/ABAddBackend.jsx";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";

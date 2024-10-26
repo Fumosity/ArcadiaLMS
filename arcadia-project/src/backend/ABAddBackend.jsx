@@ -1,5 +1,4 @@
 import { supabase } from "../supabaseClient.js";
-import { v4 as uuidv4 } from "uuid";
 
 //Adds a new record to the book table
 export const addBook = async (bookData) => {
@@ -39,7 +38,7 @@ export const fetchBooks = async () => {
     }
 };
 
-export const newIDAndProcDateGenerator = async (formData, setFormData) =>{
+export const newIDAndProcDateGenerator = async (formData, setFormData) => {
     const { data, error } = await supabase.from('book').select('bookID').order('bookID', { ascending: false }).limit(1);
 
     if (error) {
@@ -59,7 +58,7 @@ export const newIDAndProcDateGenerator = async (formData, setFormData) =>{
 
         setFormData ({
             ...formData,
-            id: newID,
+            bookID: newID,
             procDate: newProcDate,
         });
     };
