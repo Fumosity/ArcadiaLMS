@@ -16,21 +16,24 @@ const ARAdding = ({ formData, setFormData }) => {
   const uploadCover = async (e) => {
     let coverFile = e.target.files[0];
     const filePath = `${uuidv4()}_${coverFile.name}`;
-
+  
     const { data, error } = await supabase.storage.from("research-covers").upload(filePath, coverFile, {
       cacheControl: '3600',
       upsert: false,
     });
-
+  
     if (error) {
       console.error("Error uploading image: ", error);
     } else {
       const { data: publicData, error: urlError } = supabase.storage.from("research-covers").getPublicUrl(filePath);
-
+  
       if (urlError) {
         console.error("Error getting public URL: ", urlError.message);
       } else {
-        setFormData({ ...formData, cover: publicData.publicUrl });
+        setFormData((prevData) => ({
+          ...prevData,
+          cover: publicData.publicUrl, 
+        }));
       }
     }
   };
