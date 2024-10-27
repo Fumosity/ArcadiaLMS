@@ -44,10 +44,9 @@ const ARAdding = ({ formData, setFormData }) => {
   };
 
   const handleSubmit = async () => {
-    const pdfUrls = []; // Array to hold the URLs of uploaded PDFs
-    const imageUrls = []; // Array to hold the URLs of uploaded images
+    const pdfUrls = [];
+    const imageUrls = [];
 
-    // Upload all selected files to Supabase
     for (const file of uploadedFiles) {
       const filePath = `${uuidv4()}_${file.name}`;
       const { error } = await supabase.storage.from("research-files").upload(filePath, file, {
@@ -62,24 +61,22 @@ const ARAdding = ({ formData, setFormData }) => {
         if (urlError) {
           console.error("Error getting public URL: ", urlError.message);
         } else {
-          // Check if the file is a PDF or an image and store URLs accordingly
           if (file.type === "application/pdf") {
-            pdfUrls.push(publicData.publicUrl); // Add to PDF URLs
+            pdfUrls.push(publicData.publicUrl);
           } else if (file.type.startsWith("image/")) {
-            imageUrls.push(publicData.publicUrl); // Add to image URLs
+            imageUrls.push(publicData.publicUrl);
           }
         }
       }
     }
 
-    // Join URLs into a single string separated by commas
     setFormData((prevData) => ({
       ...prevData,
-      pdf: pdfUrls.join(', '), // Set PDF URLs
-      images: imageUrls.join(', '), // Set image URLs
+      pdf: pdfUrls.join(', '),
+      images: imageUrls.join(', '),
     }));
 
-    await addResearch({ ...formData, pdf: pdfUrls.join(', '), images: imageUrls.join(', ') }); // Ensure both fields contain URLs
+    await addResearch({ ...formData, pdf: pdfUrls.join(', '), images: imageUrls.join(', ') });
 
     setFormData({
       thesisID: '',
@@ -124,7 +121,7 @@ const ARAdding = ({ formData, setFormData }) => {
               </button>
             </div>
 
-            {uploadedFiles.length > 0 && ( // Display the uploaded file names if they exist
+            {uploadedFiles.length > 0 && (
               <p className="text-grey mb-4">
                 Uploaded Files: {uploadedFiles.map(file => file.name).join(', ')}
               </p>
@@ -186,7 +183,8 @@ const ARAdding = ({ formData, setFormData }) => {
 
           <div className="w-60 ml-8 mt-72">
             <p className="font-bold text-lg mb-2">Research Cover*</p>
-            <div className="relative bg-gray-100 p-4 h-50 border border-gray-400 rounded-lg hover:bg-grey" onClick={handleCoverClick}>
+            <div className="relative bg-gray-100 p-4 h-50 border border-gray-400 rounded-lg hover:bg-grey
+            " onClick={handleCoverClick}>
               <img
                 src={formData.cover || "image/researchcover.png"}
                 alt="Research cover placeholder"
