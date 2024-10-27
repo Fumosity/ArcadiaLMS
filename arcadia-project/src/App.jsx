@@ -17,6 +17,7 @@ import ABAdd from './admin-book-add/ABAdd';
 import ARAdd from './admin-research-add/ARAdd';
 import ABViewer from './admin-book-viewer/ABViewer';
 import ARViewer from './admin-research-viewer/ARViewer';
+import ModalTest from './z_modals/ModalTest';
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
       <Header/>
       <Navbar />
       <Routes>
-        <Route path="/" element={<AHomePage />} />
+        <Route path="/" element={<ModalTest />} />
         <Route path="/analytics" element={<ALibAnal />} />
         <Route path="/circulatoryhistory" element={<ABCirculationPage />} />
         <Route path="/bookmanagement" element={<ABInventory />} />
