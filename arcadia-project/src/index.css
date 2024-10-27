@@ -63,6 +63,65 @@
     }
 }
 
+/* Custom dropdown styles */
+.input-field {
+  appearance: none;
+  -webkit-appearance: none; /* for Safari */
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cccccc;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.input-field:focus {
+  border-color: #5a67d8;
+  box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.3);
+}
+/* Wrapper for custom dropdown */
+.select-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.select-dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  border: 1px solid #cccccc;
+  outline: none;
+  transition: border-color 0.3s ease;
+  cursor: pointer;
+}
+
+/* Show the dropdown with focus styles */
+.select-dropdown:focus {
+  border-color: #5a67d8;
+  box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.3);
+}
+
+/* Custom arrow for the dropdown */
+.select-dropdown-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #666;
+  pointer-events: none;
+}
+
+
+
 .nav-link {
     @apply text-black font-semibold mx-4;
     font-family: "Zen Kaku Gothic Antique";

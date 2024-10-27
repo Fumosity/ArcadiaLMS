@@ -8,31 +8,64 @@ const ARAdding = ({ formData, setFormData }) => {
   const coverInputRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+
+  const collegeDepartmentMap = {
+    "CAMS": [""],
+    "CLAE": [""],
+    "CBA": [""],
+    "COECSA": ["DOA", "DCS", "DOE"],
+    "CFAD": [""],
+    "CITHM": [""],
+    "CON": [""]
+  };
+
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
+
+  const updateDepartmentOptions = (selectedCollege) => {
+    const departments = collegeDepartmentMap[selectedCollege] || [];
+    setDepartmentOptions(departments);
+    if (selectedCollege === "(COECSA) College of Engineering, Computer Studies, and Architecture") {
+      // Reset to empty string when COECSA is selected, as it will populate with actual departments
+      setFormData((prevData) => ({
+        ...prevData,
+        department: '', // Clear department selection for COECSA
+      }));
+    } else {
+      // For non-COECSA options, set department to "N/A"
+      setFormData((prevData) => ({
+        ...prevData,
+        department: 'N/A',
+      }));
+    }
+  };
+
 
   const uploadCover = async (e) => {
     let coverFile = e.target.files[0];
     const filePath = `${uuidv4()}_${coverFile.name}`;
-  
+
     const { data, error } = await supabase.storage.from("research-covers").upload(filePath, coverFile, {
       cacheControl: '3600',
       upsert: false,
     });
-  
+
     if (error) {
       console.error("Error uploading image: ", error);
     } else {
       const { data: publicData, error: urlError } = supabase.storage.from("research-covers").getPublicUrl(filePath);
-  
+
       if (urlError) {
         console.error("Error getting public URL: ", urlError.message);
       } else {
         setFormData((prevData) => ({
           ...prevData,
-          cover: publicData.publicUrl, 
+          cover: publicData.publicUrl,
         }));
       }
     }
@@ -94,7 +127,7 @@ const ARAdding = ({ formData, setFormData }) => {
       pubDate: '',
       cover: '',
       pdf: '',
-      images: '' 
+      images: ''
     });
     setUploadedFiles([]);
   };
@@ -116,8 +149,8 @@ const ARAdding = ({ formData, setFormData }) => {
                 <p>Upload research pages to autofill.</p>
                 <p className="text-gray-500">Accepted formats: (*.pdf, *.png, *.jpeg)</p>
               </div>
-              <button 
-                className="upload-page-btn py-2 px-4 border-gray-400 rounded-2xl" 
+              <button
+                className="upload-page-btn py-2 px-4 border-gray-400 rounded-2xl"
                 onClick={() => setIsModalOpen(true)}
               >
                 Upload Pages
@@ -129,35 +162,69 @@ const ARAdding = ({ formData, setFormData }) => {
                 Uploaded Files: {uploadedFiles.map(file => file.name).join(', ')}
               </p>
             )}
-            
+
             <form className="space-y-6">
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Title:</label>
-                <input type="text" name="title" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.title} onChange={handleChange} />
+                <input type="text" name="title" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.title} onChange={handleChange} placeholder="Full Research Title" />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Authors:</label>
-                <input type="text" name="author" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.author} onChange={handleChange} />
+                <input type="text" name="author" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.author} onChange={handleChange} placeholder="Author 1; Author 2; Author 3;..." />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">College:</label>
-                <input type="text" name="college" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.college} onChange={handleChange} />
+                <div className="select-dropdown-wrapper w-2/3">
+                  <select
+                    name="college"
+                    className="select-dropdown"
+                    value={formData.college}
+                    onChange={(e) => {
+                      handleChange(e);
+                      updateDepartmentOptions(e.target.value);
+                    }}
+                  >
+                    <option value="">Select a college</option>
+                    {Object.keys(collegeDepartmentMap).map((college) => (
+                      <option key={college} value={college}>
+                        {college}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Department:</label>
-                <input type="text" name="department" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.department} onChange={handleChange} />
-              </div>
+              {formData.college === "COECSA" && (
+                <div className="flex justify-between items-center">
+                  <label className="w-1/4">Department:</label>
+                  <div className="select-dropdown-wrapper w-2/3">
+                    <select
+                      name="department"
+                      className="select-dropdown"
+                      value={formData.department}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select a department</option>
+                      {departmentOptions.map((department) => (
+                        <option key={department} value={department}>
+                          {department}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Abstract:</label>
-                <input type="text" name="abstract" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.abstract} onChange={handleChange} />
+                <input type="text" name="abstract" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.abstract} onChange={handleChange}  placeholder="Full Abstract Text"/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Pages:</label>
-                <input type="number" name="page" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" />
+                <input type="number" name="page" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" placeholder="No. of pages"/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
-                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.keyword} onChange={handleChange} />
+                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.keyword} onChange={handleChange} placeholder="Keyword 1; Keyword 2; Keyword 3;..."/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Date Published:</label>
@@ -165,15 +232,15 @@ const ARAdding = ({ formData, setFormData }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
-                <input type="text" name="location" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.location} onChange={handleChange} />
+                <input type="text" name="location" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.location} onChange={handleChange} placeholder="Shelf Location"/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Database ID*:</label>
-                <input type="text" name="thesisID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.thesisID} onChange={handleChange} />
+                <input type="number" name="thesisID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.thesisID} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">ARC ID:</label>
-                <input type="text" name="arcID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.arcID} onChange={handleChange} />
+                <input type="text" name="arcID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.arcID} onChange={handleChange} placeholder="ARC Issued ID, eg. LPUCAV012345"/>
               </div>
             </form>
 
@@ -206,10 +273,10 @@ const ARAdding = ({ formData, setFormData }) => {
         </div>
       </div>
 
-      <ResearchUploadModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onFileSelect={handleFileSelect} 
+      <ResearchUploadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onFileSelect={handleFileSelect}
       />
     </div>
   );
