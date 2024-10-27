@@ -79,10 +79,8 @@ const ARAdding = ({ formData, setFormData }) => {
       images: imageUrls.join(', '), // Set image URLs
     }));
 
-    // Now you can add the research
     await addResearch({ ...formData, pdf: pdfUrls.join(', '), images: imageUrls.join(', ') }); // Ensure both fields contain URLs
 
-    // Reset formData
     setFormData({
       thesisID: '',
       title: '',
@@ -96,7 +94,7 @@ const ARAdding = ({ formData, setFormData }) => {
       pubDate: '',
       cover: '',
       pdf: '',
-      images: '' // Reset images field
+      images: '' 
     });
     setUploadedFiles([]);
   };
@@ -133,7 +131,6 @@ const ARAdding = ({ formData, setFormData }) => {
             )}
             
             <form className="space-y-6">
-              {/* Form fields as previously defined */}
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Title:</label>
                 <input type="text" name="title" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.title} onChange={handleChange} />

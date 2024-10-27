@@ -2,18 +2,25 @@ import React, { useState } from 'react';
 
 function ResearchUploadModal({ isOpen, onClose, onFileSelect }) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [numberOfPages, setNumberOfPages] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
     setUploadedFiles(files);
-    onFileSelect(files); // Pass uploaded files back to ARAdding
+    setNumberOfPages(files.length);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Optionally handle additional form submission logic here
-    onClose(); // Close the modal after submission
+  const handleUpload = () => {
+    onFileSelect(uploadedFiles); // Pass uploaded files back to ARAdding when upload is confirmed
+    onClose();
+  };
+
+  const handleCancel = () => {
+    setUploadedFiles([]);
+    setNumberOfPages(0);
+    setShowPreview(false);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -39,7 +46,11 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect }) {
         <section>
           <div className="mb-4">
             <p className="text-gray-800">
-              Upload research pages for autofill. Accepted formats: PDF, PNG, JPEG.
+              Upload research pages for autofill. The uploaded pages should
+              include the following: Title Page, Abstract, Keywords.
+              <br />
+              <br />
+              Accepted formats: (A PDF, or an image format: PNG, JPEG)
             </p>
             <label
               htmlFor="file-upload"
@@ -53,16 +64,17 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect }) {
                 accept=".pdf,.png,.jpeg,.jpg"
                 onChange={handleFileUpload}
                 className="hidden"
+                aria-label="Upload research pages"
               />
             </label>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-3">
             <div>
               <label className="text-gray-800">Files uploaded:</label>
-              <input  
+              <input
                 type="text"
-                value={uploadedFiles.length > 0 ? uploadedFiles.map((file) => file.name).join(', ') : ''}
+                value={uploadedFiles.length > 0 ? uploadedFiles.map((file) => file.name).join(', ') : 'No files uploaded'}
                 readOnly
                 className="w-full mt-1 p-2 border rounded-md"
               />
@@ -72,7 +84,17 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect }) {
               <label className="text-gray-800">Number of pages*:</label>
               <input
                 type="text"
-                value={uploadedFiles.length}
+                value={numberOfPages}
+                readOnly
+                className="w-full mt-1 p-2 border rounded-md"
+              />
+            </div>
+
+            <div>
+              <label className="text-gray-800">Page order:</label>
+              <input
+                type="text"
+                value="According to filename"
                 readOnly
                 className="w-full mt-1 p-2 border rounded-md"
               />
@@ -97,13 +119,21 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect }) {
 
             <div className="flex justify-center mt-4">
               <button
-                type="submit"
+                onClick={handleUpload}
                 className="px-6 py-2 bg-grey rounded-full hover:bg-arcadia-red hover:text-white"
+                aria-label="Upload files"
               >
                 Upload
               </button>
+              <button
+                onClick={handleCancel}
+                className="px-6 py-2 bg-grey rounded-full hover:bg-arcadia-red hover:text-white ml-2"
+                aria-label="Cancel upload"
+              >
+                Cancel
+              </button>
             </div>
-          </form>
+          </div>
         </section>
       </div>
     </div>

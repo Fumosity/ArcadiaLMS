@@ -1,6 +1,6 @@
 import React from "react";
 
-const ResearchPreviewInv = ({ research }) => { // Accept the research prop
+const ResearchPreviewInv = ({ research }) => { 
   if (!research) return <div className="bg-white p-4 rounded-lg shadow-md">Select a research to see details.</div>; // Return a message if no research is selected
 
   const researchDetails = {

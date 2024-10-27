@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "/src/supabaseClient.js"; // Import your Supabase client
-import { Link } from "react-router-dom"; // Import Link
+import { supabase } from "/src/supabaseClient.js"; 
+import { Link } from "react-router-dom"; 
 
 const CurrentResearchInventory = ({ onResearchSelect }) => {
     const [inventoryData, setInventoryData] = useState([]);
@@ -80,7 +80,6 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                             <tr
                                 key={index}
                                 className="hover:bg-gray-100 cursor-pointer"
-                                onClick={() => onResearchSelect(item)} // Keep the existing onClick handler
                             >
                                 <td className="px-4 py-4 text-sm text-gray-900">
                                     {item.college}
@@ -90,7 +89,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                                 </td>
                                 <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
                                     <Link 
-                                        to={`/researchviewer?title=${encodeURIComponent(item.title)}`} // Pass title in query params
+                                        to={`/arviewer?thesisID=${item.thesisID}`} // Pass thesisID in query params
                                         className="text-blue-600 hover:underline"
                                     >
                                         {item.title}
