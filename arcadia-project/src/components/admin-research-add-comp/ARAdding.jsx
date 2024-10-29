@@ -3,6 +3,7 @@ import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
 import { addResearch, newThesisIDGenerator } from "../../backend/ARAddBackend.jsx";
 import ResearchUploadModal from '../../z_modals/ResearchUploadModal';
+import ARAddPreview from "../admin-research-add-comp/ARAddPreview";
 
 const ARAdding = ({ formData, setFormData }) => {
   const coverInputRef = useRef(null);
