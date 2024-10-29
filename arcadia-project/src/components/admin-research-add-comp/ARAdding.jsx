@@ -9,6 +9,7 @@ const ARAdding = ({ formData, setFormData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const collegeDepartmentMap = {
     "CAMS": [""],
@@ -80,6 +81,7 @@ const ARAdding = ({ formData, setFormData }) => {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     const pdfUrls = [];
     const imageUrls = [];
 
@@ -130,6 +132,8 @@ const ARAdding = ({ formData, setFormData }) => {
       images: ''
     });
     setUploadedFiles([]);
+    newThesisIDGenerator({}, setFormData);
+    setIsSubmitting(false);
   };
 
   useEffect(() => { newThesisIDGenerator(formData, setFormData) }, []);
@@ -216,7 +220,7 @@ const ARAdding = ({ formData, setFormData }) => {
 
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Abstract:</label>
-                <input type="text" name="abstract" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.abstract} onChange={handleChange}  placeholder="Full Abstract Text"/>
+                <input type="text" name="abstract" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.abstract } onChange={ handleChange }  placeholder="Full Abstract Text"/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Pages:</label>
@@ -224,29 +228,29 @@ const ARAdding = ({ formData, setFormData }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
-                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.keyword} onChange={handleChange} placeholder="Keyword 1; Keyword 2; Keyword 3;..."/>
+                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.keyword } onChange={ handleChange } placeholder="Keyword 1; Keyword 2; Keyword 3;..."/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Date Published:</label>
-                <input type="date" name="pubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.pubDate} onChange={handleChange} />
+                <input type="date" name="pubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.pubDate } onChange={ handleChange } />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
-                <input type="text" name="location" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.location} onChange={handleChange} placeholder="Shelf Location"/>
+                <input type="text" name="location" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.location } onChange={ handleChange } placeholder="Shelf Location"/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Database ID*:</label>
-                <input type="number" name="thesisID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.thesisID} onChange={handleChange} />
+                <input type="number" name="thesisID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.thesisID } onChange={ handleChange } />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">ARC ID:</label>
-                <input type="text" name="arcID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.arcID} onChange={handleChange} placeholder="ARC Issued ID, eg. LPUCAV012345"/>
+                <input type="text" name="arcID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.arcID } onChange={ handleChange } placeholder="ARC Issued ID, eg. LPUCAV012345"/>
               </div>
             </form>
 
             <div className="flex justify-center mt-8">
-              <button type="button" onClick={handleSubmit} className="add-research-btn py-2 px-8 border-gray-400 rounded-2xl">
-                Add Research
+              <button type="button" onClick={ handleSubmit } className="add-research-btn py-2 px-8 border-gray-400 rounded-2xl">
+                {isSubmitting ? "Submitting..." : "Add Research"}
               </button>
             </div>
           </div>
@@ -254,7 +258,7 @@ const ARAdding = ({ formData, setFormData }) => {
           <div className="w-60 ml-8 mt-72">
             <p className="font-bold text-lg mb-2">Research Cover*</p>
             <div className="relative bg-gray-100 p-4 h-50 border border-gray-400 rounded-lg hover:bg-grey
-            " onClick={handleCoverClick}>
+            " onClick={ handleCoverClick }>
               <img
                 src={formData.cover || "image/researchcover.png"}
                 alt="Research cover placeholder"
@@ -264,9 +268,9 @@ const ARAdding = ({ formData, setFormData }) => {
             </div>
             <input
               type="file"
-              ref={coverInputRef}
+              ref={ coverInputRef }
               className="hidden"
-              onChange={uploadCover}
+              onChange={ uploadCover }
               accept="image/png, image/jpeg, image/jpg"
             />
           </div>
@@ -275,8 +279,8 @@ const ARAdding = ({ formData, setFormData }) => {
 
       <ResearchUploadModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onFileSelect={handleFileSelect}
+        onClose={ () => setIsModalOpen(false) }
+        onFileSelect={ handleFileSelect }
       />
     </div>
   );
