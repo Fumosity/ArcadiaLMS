@@ -23,8 +23,7 @@ const [formData, setFormData] = useState({
   bookID: '',
   arcID: '',
   isbn: '',
-  quantity: '',
-  cover: '',
+  cover: ''
 })
 
   return(

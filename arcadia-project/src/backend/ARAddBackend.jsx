@@ -1,5 +1,6 @@
 import { supabase } from "../supabaseClient.js";
 
+//Adds a new record to the research table
 export const addResearch = async (formData) => {
     try {
         const { data, error } = await supabase.from('research').insert([
@@ -20,6 +21,7 @@ export const addResearch = async (formData) => {
     }
 };
 
+//Checks the latest thesisID number and generates new ones
 export const newThesisIDGenerator = async (formData, setFormData) => {
     const { data, error } = await supabase.from('research').select('thesisID').order('thesisID', { ascending: false }).limit(1);
 

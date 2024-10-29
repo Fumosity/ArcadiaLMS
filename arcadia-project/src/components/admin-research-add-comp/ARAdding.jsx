@@ -5,6 +5,7 @@ import { addResearch, newThesisIDGenerator } from "../../backend/ARAddBackend.js
 import ResearchUploadModal from '../../z_modals/ResearchUploadModal';
 import ARAddPreview from "../admin-research-add-comp/ARAddPreview";
 
+//Main Function
 const ARAdding = ({ formData, setFormData }) => {
   const coverInputRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,24 +23,22 @@ const ARAdding = ({ formData, setFormData }) => {
     "CON": [""]
   };
 
-
+  //Aggregates form inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  //Handles the dynamic COECSA department selection
   const updateDepartmentOptions = (selectedCollege) => {
     const departments = collegeDepartmentMap[selectedCollege] || [];
     setDepartmentOptions(departments);
     if (selectedCollege === "(COECSA) College of Engineering, Computer Studies, and Architecture") {
-      // Reset to empty string when COECSA is selected, as it will populate with actual departments
       setFormData((prevData) => ({
         ...prevData,
-        department: '', // Clear department selection for COECSA
+        department: '',
       }));
-    } else {
-      // For non-COECSA options, set department to "N/A"
       setFormData((prevData) => ({
         ...prevData,
         department: 'N/A',
@@ -47,7 +46,7 @@ const ARAdding = ({ formData, setFormData }) => {
     }
   };
 
-
+  //Holds and sends the uploaded cover image when submitted
   const uploadCover = async (e) => {
     let coverFile = e.target.files[0];
     const filePath = `${uuidv4()}_${coverFile.name}`;
@@ -73,14 +72,17 @@ const ARAdding = ({ formData, setFormData }) => {
     }
   };
 
+  //Checks if the cover image input field was clicked
   const handleCoverClick = () => {
     coverInputRef.current.click();
   };
 
+  //Checks if the upload pages input field was clicked
   const handleFileSelect = (files) => {
     setUploadedFiles(files);
   };
 
+  //Handles the submission to the database
   const handleSubmit = async () => {
     setIsSubmitting(true);
     const pdfUrls = [];
@@ -132,13 +134,16 @@ const ARAdding = ({ formData, setFormData }) => {
       pdf: '',
       images: ''
     });
+
     setUploadedFiles([]);
-    newThesisIDGenerator({}, setFormData);
+    await newThesisIDGenerator({}, setFormData);
     setIsSubmitting(false);
   };
 
+  //Generate a new thesisID
   useEffect(() => { newThesisIDGenerator(formData, setFormData) }, []);
 
+  //Form
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex justify-center items-start p-8">

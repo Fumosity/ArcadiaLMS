@@ -3,12 +3,12 @@ import React from "react";
 const ABAddPreview = ({ formData }) => {
   const bookDetails = {
     title: formData.title || '',
-    author: Array.isArray(formData.author) ? formData.author.join(',') : formData.author.split(';').join(',') || '',
-    genre: Array.isArray(formData.genre) ? formData.genre.join(',') : formData.genre.split(';').join(',') || '',
-    category: Array.isArray(formData.category) ? formData.category.join(',') : formData.category.split(';').join(',') || '',
+    author: Array.isArray(formData.author) ? formData.author.join(',') : (formData.author ?? '').split(';').join(',') || '',
+    genre: Array.isArray(formData.genre) ? formData.genre.join(',') : (formData.genre ?? '').split(';').join(',') || '',
+    category: Array.isArray(formData.category) ? formData.category.join(',') : (formData.category ?? '').split(';').join(',') || '',
     publisher: formData.publisher || '',
     synopsis: formData.synopsis || '',
-    keyword: Array.isArray(formData.keyword) ? formData.keyword.join(',') : formData.keyword.split(';').join(',') || '',
+    keyword: Array.isArray(formData.keyword) ? formData.keyword.join(',') : (formData.keyword ?? '').split(';').join(',') || '',
     currentPubDate: formData.currentPubDate || '',
     originalPubDate: formData.originalPubDate || '',
     procDate: formData.procDate || '',
@@ -16,8 +16,7 @@ const ABAddPreview = ({ formData }) => {
     databaseID: formData.bookID || '',
     arcID: formData.arcID || '',
     isbn: formData.isbn || '',
-    quantity: formData.quantity || '',
-    cover: formData.cover || '',
+    cover: formData.cover || ''
   };
 
   return (

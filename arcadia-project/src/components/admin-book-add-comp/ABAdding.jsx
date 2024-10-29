@@ -1,15 +1,20 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { addBook, newIDAndProcDateGenerator } from "../../backend/ABAddBackend.jsx";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
 
+//Main Function
 const ABAdding = ({ formData, setFormData }) => {
   const fileInputRef = useRef(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cover, setCover] = useState('');
 
+  //Aggregates form inputs
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  //Holds and sends the uploaded cover image when submitted
   const uploadCover = async (e) => {
     let coverFile = e.target.files[0];
     const filePath = `${uuidv4()}_${coverFile.name}`;
@@ -32,10 +37,12 @@ const ABAdding = ({ formData, setFormData }) => {
     }
   };
 
+  //Checks which input field the user clicked
   const handleDivClick = () => {
     fileInputRef.current.click();
   }
 
+  //Generate a new bookID and procDate
   useEffect(() => {
     const generateNewIDAndProcDate = async () => {
       await newIDAndProcDateGenerator(formData, setFormData);
@@ -43,7 +50,10 @@ const ABAdding = ({ formData, setFormData }) => {
     generateNewIDAndProcDate();
   }, []);
 
+  //Handles the submission to the database
   const handleSubmit = async () => {
+    setIsSubmitting(true);
+
     await addBook(formData)
     setFormData({
       title: '',
@@ -60,11 +70,21 @@ const ABAdding = ({ formData, setFormData }) => {
       bookID: '',
       arcID: '',
       isbn: '',
-      quantity: '',
       cover: ''
     });
+
+    setCover('');
+    setFormData((prevData) => ({ ...prevData, cover: '' }));
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
+
+    await newIDAndProcDateGenerator({}, setFormData);
+    setIsSubmitting(false);
   };
 
+  //Form
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex justify-center items-start p-8">
@@ -143,16 +163,12 @@ const ABAdding = ({ formData, setFormData }) => {
                 <label className="w-1/4">ISBN:</label>
                 <input type="text" name="isbn" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.isbn} onChange={handleChange} />
               </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Quantity:</label>
-                <input type="number" name="quantity" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.quantity} onChange={handleChange} />
-              </div>
             </form>
 
             {/* Add Book Button */}
             <div className="flex justify-center mt-8">
               <button type="button" onClick={handleSubmit} className="add-research-btn py-2 px-8 border-gray-400 rounded-2xl">
-                Add Book
+              {isSubmitting ? "Submitting..." : "Add Book"}
               </button>
             </div>
           </div>
@@ -162,7 +178,7 @@ const ABAdding = ({ formData, setFormData }) => {
             <p className="font-bold text-lg mb-2">Book Cover*</p>
             <div className="relative bg-gray-100 p-4 h-50 border border-gray-400 rounded-lg" onClick={ handleDivClick }> 
               <img
-                src= { formData.cover || 'N/A'} // Replace with dynamic path or placeholder image
+                src= { formData.cover || 'N/A'}
                 alt="Book cover placeholder"
                 className="h-full w-full object-contain mb-2"
               />
@@ -173,7 +189,7 @@ const ABAdding = ({ formData, setFormData }) => {
               ref={fileInputRef} 
               className="hidden" 
               onChange={uploadCover} 
-              accept="image/png, image/jpeg, image/jpg" // Specify accepted formats
+              accept="image/png, image/jpeg, image/jpg"
             />
           </div>
         </div>
