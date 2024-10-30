@@ -17,6 +17,7 @@ import ABAdd from './admin-book-add/ABAdd';
 import ARAdd from './admin-research-add/ARAdd';
 import ABViewer from './admin-book-viewer/ABViewer';
 import ARViewer from './admin-research-viewer/ARViewer';
+import ABModify from './admin-book-modify/ABModify';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route path="/researchadding" element={<ARAdd />} />
         <Route path="/abviewer" element={<ABViewer />}/>
         <Route path="/arviewer" element={<ARViewer />}/>
+        <Route path="/bookmodify" element={<ABModify />}/>
       </Routes>
       
       <Footer />

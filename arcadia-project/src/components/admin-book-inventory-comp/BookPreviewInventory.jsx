@@ -1,7 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const BookPreviewInventory = ({ book }) => { // Accept the book prop
-  if (!book) return <div className="bg-white p-4 rounded-lg shadow-md">Select a book to see details.</div>; // Return a message if no book is selected
+const BookPreviewInventory = ({ book }) => {
+  const navigate = useNavigate();
+
+  if (!book) return <div className="bg-white p-4 rounded-lg shadow-md">Select a book to see details.</div>;
 
   const bookDetails = {
     title: book.title,
@@ -18,6 +21,12 @@ const BookPreviewInventory = ({ book }) => { // Accept the book prop
     arcID: book.arcID,
     isbn: book.isbn,
     quantity: book.quantity,
+  };
+
+  // Create a function to handle navigation
+  const handleModifyBook = () => {
+    const queryParams = new URLSearchParams(bookDetails).toString();
+    navigate(`/bookmodify?${queryParams}`);
   };
 
   return (
@@ -41,9 +50,13 @@ const BookPreviewInventory = ({ book }) => { // Accept the book prop
         </tbody>
       </table>
 
-      <div className="mt-3 flex justify-center space-x-2">
-        <button className="px-2 py-1 bg-gray-200 text-gray-800 rounded text-xs">Discard Changes</button>
-        <button className="px-2 py-1 bg-blue-600 text-gray-800 rounded text-xs">Save Changes</button>
+      <div className="mt-3 flex justify-center">
+        <button
+          className="px-4 py-2 bg-grey rounded-full border-grey text-sm hover:bg-arcadia-red hover:text-white"
+          onClick={handleModifyBook}
+        >
+          Modify Book
+        </button>
       </div>
     </div>
   );
