@@ -17,10 +17,9 @@ const ABInventory = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Main header */}
       <MainHeader />
       <Title>Book Inventory</Title>
-      {/* Main content with flex layout */}
+
       <div className="flex justify-center items-start space-x-2 pb-12 py-8">
         <div className="flex-shrink-0">
           <CurrentBookInventory onBookSelect={handleBookSelect} /> {/* Pass the handler to CurrentBookInventory */}

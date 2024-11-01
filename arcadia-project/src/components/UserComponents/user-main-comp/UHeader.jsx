@@ -1,7 +1,7 @@
 import React from "react";
 import { FiUser } from 'react-icons/fi';
 
-const Header = () => (
+const UHeader = () => (
   <header className="bg-arcadia-red shadow">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
       
@@ -20,4 +20,4 @@ const Header = () => (
   </header>
 );
 
-export default Header;
+export default UHeader;

@@ -1,16 +1,16 @@
 import React from 'react';
 
-const BookCopiesTableModal = ({ isOpen, onClose }) => {
+const BookCopies = ({ isOpen, onClose }) => {
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Available':
-        return 'bg-green-300 text-lime-950';
+        return 'bg-green text-lime-950';
       case 'Reserved':
-        return 'bg-amber-200 text-yellow-950';
+        return 'bg-yellow text-yellow-950';
       case 'Damaged':
-        return 'bg-red-400 text-red-950';
+        return 'bg-red text-red-950';
       default:
-        return 'bg-green-300 text-lime-950';
+        return 'bg-green text-lime-950';
     }
   };
 
@@ -19,14 +19,13 @@ const BookCopiesTableModal = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-xl max-w-2xl w-full shadow-lg relative">
-        
-        {/* Use your existing close button design */}
+  
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
           aria-label="Close"
         >
-          <span className="text-lg">&times;</span> {/* You can customize this further */}
+          <span className="text-lg">&times;</span>
         </button>
 
         <header className="flex items-center justify-between mb-4">
@@ -85,7 +84,7 @@ const BookCopiesTableModal = ({ isOpen, onClose }) => {
             { id: '123459', callNo: 'LPUCAV-0023921', status: 'Damaged', dateAcq: '2021' }
           ].map((book, index) => (
             <React.Fragment key={index}>
-              <div className="flex justify-between items-center gap-10 text-base text-zinc-900">
+              <div className="flex justify-between items-center gap-10 text-base text-zinc-900 mt-3">
                 <span className="w-[100px]">{book.id}</span>
                 <span className="w-[150px]">{book.callNo}</span>
                 <span className={`px-5 rounded-3xl w-[100px] ${getStatusStyle(book.status)}`}>
@@ -114,4 +113,4 @@ const BookCopiesTableModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default BookCopiesTableModal;
+export default BookCopies;

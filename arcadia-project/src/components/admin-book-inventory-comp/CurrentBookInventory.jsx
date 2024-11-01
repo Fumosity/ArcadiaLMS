@@ -1,34 +1,56 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "/src/supabaseClient.js";
-import { Link } from "react-router-dom"; // Import Link
+import { Link } from "react-router-dom";
+import BookCopies from "../../z_modals/BookCopies";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 const CurrentBookInventory = ({ onBookSelect }) => {
     const [inventoryData, setInventoryData] = useState([]);
     const [sortOrder, setSortOrder] = useState("Descending");
     const [pubDateFilter, setPubDateFilter] = useState("After 2020");
     const [hoveredGenreIndex, setHoveredGenreIndex] = useState(null);
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchBooks = async () => {
-            const { data, error } = await supabase  
-                .from('book')
-                .select('*');
-
-            if (error) {
-                console.error("Error fetching books:", error);
-            } else {
-                setInventoryData(data);
-            }
+            setTimeout(async () => {
+                const { data, error } = await supabase
+                    .from("book")
+                    .select("*");
+                if (error) {
+                    console.error("Error fetching books:", error);
+                } else {
+                    setInventoryData(data);
+                }
+                setIsLoading(false); // Data fetching complete
+            }, 1500); // 1.5 seconds delay
         };
-
         fetchBooks();
     }, []);
+
+    const handleRowClick = (book) => {
+        setSelectedBook(book);
+        onBookSelect(book); // Pass the selected book to BookPreviewInventory
+    };
+
+    const handleViewClick = (book) => {
+        setSelectedBook(book);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedBook(null);
+    };
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md mr-5">
             <h3 className="text-xl font-semibold mb-4">Current Inventory</h3>
-
             <div className="flex flex-wrap items-center mb-6 space-x-4">
+                {/* Sorting and Filtering Controls */}
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Sort By:</span>
                     <button
@@ -40,7 +62,6 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                         {sortOrder}
                     </button>
                 </div>
-
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Pub. Date:</span>
                     <button
@@ -49,8 +70,8 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                 pubDateFilter === "After 2020"
                                     ? "After 2021"
                                     : pubDateFilter === "After 2021"
-                                        ? "After 2022"
-                                        : "After 2020"
+                                    ? "After 2022"
+                                    : "After 2020"
                             )
                         }
                         className="bg-gray-200 py-1 px-3 rounded-full text-sm"
@@ -58,12 +79,11 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                         {pubDateFilter}
                     </button>
                 </div>
-
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Filter By:</span>
                     <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Category</button>
                     <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Genre</button>
-                    <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Quantity</button>
+                    <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Copies</button>
                 </div>
             </div>
 
@@ -71,7 +91,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            {["Category", "Genres", "Book Title", "Author", "Book ID", "Original Pub. Date", "Qty."].map(
+                            {["Category", "Genres", "Book Title", "Author", "Book ID", "Original Pub. Date", "Copies"].map(
                                 (header) => (
                                     <th
                                         key={header}
@@ -84,75 +104,115 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {inventoryData.map((item, index) => {
-                            const genres = item.genre.split(";");
-
-                            return (
-                                <tr
-                                    key={index}
-                                    className="hover:bg-gray-100 cursor-pointer"
-                                    onClick={() => onBookSelect(item)} // Keep the existing onClick handler
-                                >
+                        {isLoading ? (
+                            Array.from({ length: 5 }).map((_, index) => (
+                                <tr key={index}>
                                     <td className="px-4 py-4 text-sm text-gray-900">
-                                        <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full p-2">
-                                            {item.category}
-                                        </span>
+                                        <Skeleton className="w-24" />
                                     </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900">
-                                        <div className="flex items-center">
-                                            <span
-                                                className={`bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-grey p-2 ${hoveredGenreIndex === index ? 'bg-gray-200' : ''}`}
-                                                onMouseEnter={() => setHoveredGenreIndex(index)}
-                                                onMouseLeave={() => setHoveredGenreIndex(null)}
-                                            >
-                                                {genres[0]}
+                                    <td className="px-4 py-4 text-sm">
+                                        <Skeleton className="w-24" />
+                                    </td>
+                                    <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
+                                        <Skeleton className="w-40" />
+                                    </td>
+                                    <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
+                                        <Skeleton className="w-32" />
+                                    </td>
+                                    <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
+                                        <Skeleton className="w-20" />
+                                    </td>
+                                    <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
+                                        <Skeleton className="w-32" />
+                                    </td>
+                                    <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
+                                        <Skeleton className="w-20" />
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            inventoryData.map((item, index) => {
+                                const genres = item.genre.split(";");
+
+                                return (
+                                    <tr
+                                        key={index}
+                                        className="hover:bg-gray-100 cursor-pointer"
+                                        onClick={() => handleRowClick(item)} // Row click event
+                                    >
+                                        <td className="px-4 py-4 text-sm text-gray-900">
+                                            <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full p-2">
+                                                {item.category}
                                             </span>
-                                            {genres.length > 1 && (
+                                        </td>
+                                        <td className="px-4 py-4 text-sm">
+                                            <div className="flex items-center space-x-1">
                                                 <span
-                                                    className={`bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-grey p-2 ml-1 ${hoveredGenreIndex === index ? 'bg-gray-200' : ''}`}
+                                                    className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-gray p-2"
                                                     onMouseEnter={() => setHoveredGenreIndex(index)}
                                                     onMouseLeave={() => setHoveredGenreIndex(null)}
                                                 >
-                                                    ...
+                                                    {genres[0]}
                                                 </span>
-                                            )}
-                                        </div>
-                                        {hoveredGenreIndex === index && genres.length > 1 && (
-                                            <div className="mt-1">
-                                                {genres.slice(1).map((genre, i) => (
-                                                    <div key={i} className="bg-gray-200rounded-full border-grey p-2 mt-1 text-sm">
-                                                        {genre ? ' ' : ' '}
-                                                    </div>
-                                                ))}
+                                                {genres.length > 1 && (
+                                                    <span
+                                                        className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-grey p-2"
+                                                        onMouseEnter={() => setHoveredGenreIndex(index)}
+                                                        onMouseLeave={() => setHoveredGenreIndex(null)}
+                                                    >
+                                                        ...
+                                                    </span>
+                                                )}
                                             </div>
-                                        )}
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
-                                        <Link 
-                                            to={`/abviewer?title=${encodeURIComponent(item.title)}`} // Pass title in query params
-                                            className="text-blue-600 hover:underline"
-                                        >
-                                            {item.title}
-                                        </Link>
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
-                                        {item.author}
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                        {item.bookID}
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                        {item.originalPubDate}
-                                    </td>
-                                    <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                        {item.quantity}
-                                    </td>
-                                </tr>
-                            );
-                        })}
+                                            {hoveredGenreIndex === index && genres.length > 1 && (
+                                                <div className="mt-1 transition-opacity duration-300 ease-in-out opacity-100">
+                                                    {genres.slice(1).map((genre, i) => (
+                                                        <div key={i} className="bg-grey rounded-full p-2 mt-1 text-sm">
+                                                            {genre}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
+                                            <Link
+                                                to={`/abviewer?bookID=${encodeURIComponent(item.bookID)}`} // Change to bookID
+                                                className="text-blue-600 hover:underline"
+                                            >
+                                                {item.title}
+                                            </Link>
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
+                                            {item.author}
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
+                                            {item.bookID}
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
+                                            {item.originalPubDate}
+                                        </td>
+                                        <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
+                                            <button
+                                                className="border rounded-full px-4 py-1"
+                                                onClick={() => handleViewClick(item)}
+                                            >
+                                                View
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        )}
                     </tbody>
                 </table>
             </div>
+
+            {/* BookCopies Modal */}
+            <BookCopies
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                book={selectedBook}
+            />
         </div>
     );
 };

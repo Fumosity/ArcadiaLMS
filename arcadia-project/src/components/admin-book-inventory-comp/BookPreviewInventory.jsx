@@ -1,10 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const BookPreviewInventory = ({ book }) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
-  if (!book) return <div className="bg-white p-4 rounded-lg shadow-md">Select a book to see details.</div>;
+  // Simulate loading effect when a book is selected
+  useEffect(() => {
+    if (book) {
+      // Simulate a delay to show the skeleton effect
+      const timer = setTimeout(() => setLoading(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [book]);
+
+  // Show a message if no book is selected
+  if (!book) {
+    return <div className="bg-white p-4 rounded-lg shadow-md">Select a book to see details.</div>;
+  }
+
+  // Show skeletons while loading
+  if (loading) {
+    return (
+      <div className="bg-white p-4 rounded-lg shadow-md">
+        <h3 className="text-xl font-semibold mb-3">
+          <Skeleton width={150} />
+        </h3>
+        <div className="relative bg-white p-2 mb-4 rounded-lg">
+          <Skeleton height={200} width={150} className="mx-auto mb-2 rounded" />
+          <p className="text-xs text-gray-500 mb-2 text-center">
+            <Skeleton width={120} />
+          </p>
+        </div>
+        <table className="min-w-full border-collapse">
+          <tbody>
+            {[...Array(10)].map((_, index) => (
+              <tr key={index} className="border-b border-grey">
+                <td className="px-1 py-1 font-semibold capitalize" style={{ width: "40%" }}>
+                  <Skeleton width={80} />
+                </td>
+                <td className="px-1 py-1 text-sm">
+                  <Skeleton width={150} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="mt-3 flex justify-center">
+          <Skeleton width={100} height={35} borderRadius={20} />
+        </div>
+      </div>
+    );
+  }
 
   const bookDetails = {
     title: book.title,

@@ -18,14 +18,14 @@ export default function ABViewer() {
   useEffect(() => {
     const fetchBookDetails = async () => {
       const query = new URLSearchParams(location.search);
-      const title = query.get('title');
+      const bookID = query.get('bookID'); // Get bookID from query params
 
-      if (title) {
+      if (bookID) {
         const { data, error } = await supabase
           .from('book')
           .select('*')
-          .eq('title', title)
-          .single(); // Fetch the book with the matching title
+          .eq('bookID', bookID) // Fetch the book with the matching bookID
+          .single(); // Ensure we get a single result
 
         if (error) {
           console.error("Error fetching book:", error);
@@ -33,7 +33,7 @@ export default function ABViewer() {
           setTimeout(() => {
             setBook(data); // Set the fetched book details in state
             setLoading(false); 
-          }, 1500); 
+          }, 1000); 
         }
       }
     };
