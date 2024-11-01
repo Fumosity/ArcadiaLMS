@@ -52,6 +52,13 @@ const ABAdding = ({ formData, setFormData }) => {
 
   //Handles the submission to the database
   const handleSubmit = async () => {
+    const isFormValid = Object.values(formData).every(value => value && value.length > 0);
+
+    if (!isFormValid) {
+      alert("Please fill in all fields before submitting.");
+      return;
+    }
+    
     setIsSubmitting(true);
 
     await addBook(formData)
@@ -109,59 +116,59 @@ const ABAdding = ({ formData, setFormData }) => {
             <form className="space-y-6">
               <div className="flex justify-between items-center" key="title">
                 <label className="w-1/4">Title:</label>
-                <input type="text" name="title" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.title} onChange={handleChange} />
+                <input type="text" name="title" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.title} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Authors:</label>
-                <input type="text" name="author" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.author} onChange={handleChange} />
+                <input type="text" name="author" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.author} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Genre:</label>
-                <input type="text" name="genre" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.genre} onChange={handleChange} />
+                <input type="text" name="genre" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.genre} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Category:</label>
-                <input type="text" name="category" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.category} onChange={handleChange} />
+                <input type="text" name="category" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.category} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Publisher:</label>
-                <input type="text" name="publisher" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.publisher} onChange={handleChange} />
+                <input type="text" name="publisher" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.publisher} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Synopsis:</label>
-                <textarea name="synopsis" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" rows="3" value={formData.synopsis} onChange={handleChange} />
+                <textarea name="synopsis" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" rows="3" value={formData.synopsis} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
-                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.keyword} onChange={handleChange} />
+                <input type="text" name="keyword" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.keyword} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Date Published (Current):</label>
-                <input type="date" name="currentPubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.currentPubDate} onChange={handleChange} />
+                <input type="date" name="currentPubDate" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.currentPubDate} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Date Published (Original):</label>
-                <input type="date" name="originalPubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.originalPubDate} onChange={handleChange} />
+                <input type="date" name="originalPubDate" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.originalPubDate} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Date Procured:</label>
-                <input type="date" name="procDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.procDate} onChange={handleChange} />
+                <input type="date" name="procDate" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.procDate} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
-                <input type="text" name="location" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.location} onChange={handleChange} />
+                <input type="text" name="location" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.location} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Database ID*:</label>
-                <input type="text" name="bookID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.bookID} onChange={handleChange} />
+                <input type="text" name="bookID" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.bookID} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">ARC ID:</label>
-                <input type="text" name="arcID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.arcID} onChange={handleChange} />
+                <input type="text" name="arcID" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.arcID} onChange={handleChange} />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">ISBN:</label>
-                <input type="text" name="isbn" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.isbn} onChange={handleChange} />
+                <input type="text" name="isbn" required className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.isbn} onChange={handleChange} />
               </div>
             </form>
 
@@ -184,13 +191,7 @@ const ABAdding = ({ formData, setFormData }) => {
               />
               <p className="text-xs text-gray-500 text-center">Click to update book cover</p>
             </div>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              onChange={uploadCover} 
-              accept="image/png, image/jpeg, image/jpg"
-            />
+            <input type="file" ref={fileInputRef} required className="hidden" onChange={uploadCover} accept="image/png, image/jpeg, image/jpg" />
           </div>
         </div>
       </div>

@@ -84,6 +84,14 @@ const ARAdding = ({ formData, setFormData }) => {
 
   //Handles the submission to the database
   const handleSubmit = async () => {
+    const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "thesisID", "arcID"];
+    const hasEmptyFields = requiredFields.some(field => !formData[field]);
+
+    if (hasEmptyFields) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+    
     setIsSubmitting(true);
     const pdfUrls = [];
     const imageUrls = [];
@@ -176,11 +184,11 @@ const ARAdding = ({ formData, setFormData }) => {
             <form className="space-y-6">
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Title:</label>
-                <input type="text" name="title" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.title} onChange={handleChange} placeholder="Full Research Title" />
+                <input type="text" name="title" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.title} onChange={handleChange} placeholder="Full Research Title" required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Authors:</label>
-                <input type="text" name="author" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.author} onChange={handleChange} placeholder="Author 1; Author 2; Author 3;..." />
+                <input type="text" name="author" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={formData.author} onChange={handleChange} placeholder="Author 1; Author 2; Author 3;..." required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">College:</label>
@@ -226,31 +234,31 @@ const ARAdding = ({ formData, setFormData }) => {
 
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Abstract:</label>
-                <input type="text" name="abstract" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.abstract } onChange={ handleChange }  placeholder="Full Abstract Text"/>
+                <input type="text" name="abstract" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.abstract } onChange={ handleChange }  placeholder="Full Abstract Text" required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Pages:</label>
-                <input type="number" name="page" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" placeholder="No. of pages"/>
+                <input type="number" name="page" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" placeholder="No. of pages" required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
-                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.keyword } onChange={ handleChange } placeholder="Keyword 1; Keyword 2; Keyword 3;..."/>
+                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.keyword } onChange={ handleChange } placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Date Published:</label>
-                <input type="date" name="pubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.pubDate } onChange={ handleChange } />
+                <input type="date" name="pubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.pubDate } onChange={ handleChange } required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
-                <input type="text" name="location" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.location } onChange={ handleChange } placeholder="Shelf Location"/>
+                <input type="text" name="location" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.location } onChange={ handleChange } placeholder="Shelf Location" required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Database ID*:</label>
-                <input type="number" name="thesisID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.thesisID } onChange={ handleChange } />
+                <input type="number" name="thesisID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.thesisID } onChange={ handleChange } required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">ARC ID:</label>
-                <input type="text" name="arcID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.arcID } onChange={ handleChange } placeholder="ARC Issued ID, eg. LPUCAV012345"/>
+                <input type="text" name="arcID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.arcID } onChange={ handleChange } placeholder="ARC Issued ID, eg. LPUCAV012345" required />
               </div>
             </form>
 
@@ -272,13 +280,7 @@ const ARAdding = ({ formData, setFormData }) => {
               />
               <p className="text-xs text-gray-500 text-center">Click to update thesis cover</p>
             </div>
-            <input
-              type="file"
-              ref={ coverInputRef }
-              className="hidden"
-              onChange={ uploadCover }
-              accept="image/png, image/jpeg, image/jpg"
-            />
+            <input type="file" ref={ coverInputRef } className="hidden" onChange={ uploadCover } accept="image/png, image/jpeg, image/jpg" required />
           </div>
         </div>
       </div>
