@@ -12,7 +12,8 @@ export default {
         "yellow": '#e8d08d',
         "red": '#de6262',
         "yellow": '#FFFF9F',
-        "green" : '#8fd28f'
+        "green" : '#8fd28f',
+        "arcadia-yellow" : '#E9D08E'
     },
     extend: {
       fontFamily: {
