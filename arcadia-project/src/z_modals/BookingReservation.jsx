@@ -15,7 +15,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="1-00923"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -25,7 +25,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="2021-2-01090"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -35,7 +35,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="Alexander B. Corrine"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -45,7 +45,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="COECSA"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -55,7 +55,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="DCS"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -70,7 +70,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="ARC-1"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -80,7 +80,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="August 23"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -90,7 +90,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="11:00AM-12:00PM"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -109,7 +109,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="CS101 Group Study"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -119,7 +119,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 defaultValue="09123456789"
-                className="flex-1 px-3 py-1.5 bg-gray-100 border rounded-full text-right"
+                className="inputBox"
                 readOnly
               />
             </div>
@@ -130,13 +130,13 @@ const BookingReservation = ({ isOpen, onClose }) => {
 
         <div className="flex justify-center space-x-4 mt-8">
           <button
-            className="px-8 py-2 bg-arcadia-red text-white rounded-full hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            className="modifyButton"
             onClick={onClose}
           >
             Modify
           </button>
           <button
-            className="px-8 py-2 border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
+            className="cancelButton"
             onClick={onClose}
           >
             Cancel

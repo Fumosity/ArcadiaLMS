@@ -282,4 +282,18 @@
     font-family: "Zen Kaku Gothic Antique"', '"Zen Kaku Gothic New"', 'sans-serif;
 }
 
+.inputBox{
+  @apply flex-1 px-3 py-1 border border-grey rounded-full text-right overflow-hidden;
+}
 
+.inputWithChangeBttn{
+  @apply absolute right-0.5 top-1/2 transform -translate-y-1/2 px-3 py-1 text-xs sm:text-sm border rounded-full hover:bg-grey hover:border-grey;
+}
+
+.modifyButton{
+  @apply px-8 py-1 bg-arcadia-red text-white rounded-full hover:bg-grey hover:text-black focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+}
+
+.cancelButton{
+  @apply px-8 py-1 border border-black rounded-full hover:bg-grey focus:outline-none focus:ring-2 focus:ring-grey focus:ring-offset-2;
+}

@@ -26,6 +26,9 @@ import UsrRegistration from './UserPages/user-registration-page/UsrRegistration'
 import UFooter from './components/UserComponents/user-main-comp/UFooter';
 import UHeader from './components/UserComponents/user-main-comp/UHeader';
 
+// Testing modals
+import ModalTest from './z_modals/ModalTest';
+
 function App() {
   return (
     <Routes>
@@ -49,7 +52,7 @@ function App() {
             <Header />
             <Navbar />
             <Routes>
-              <Route path="/" element={<AHomePage />} />
+              <Route path="/" element={<ModalTest />} />
               <Route path="/analytics" element={<ALibAnal />} />
               <Route path="/circulatoryhistory" element={<ABCirculationPage />} />
               <Route path="/bookmanagement" element={<ABInventory />} />
