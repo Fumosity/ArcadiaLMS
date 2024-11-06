@@ -26,6 +26,7 @@ import ABModify from './admin-book-modify/ABModify';
 import UFooter from './components/UserComponents/user-main-comp/UFooter';
 import UHeader from './components/UserComponents/user-main-comp/UHeader';
 import UHomePage from './UserPages/user-home-page/UHomePage';
+import UCopyright from './components/UserComponents/user-main-comp/UCopyright';
 
 // Testing modals
 import ModalTest from './z_modals/ModalTest';
@@ -43,6 +44,7 @@ function App() {
               <Route path="/" element={<UHomePage />} />
             </Routes>
             <UFooter />
+            <UCopyright />
           </>
         }
       />

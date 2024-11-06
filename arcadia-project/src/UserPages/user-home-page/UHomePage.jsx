@@ -54,10 +54,6 @@ const UHomePage = () => {
         </div>
       </main>
 
-      <footer className="text-white bg-arcadia-black w-full py-8 mt-16 border-b border-white">
-        <UFooter />
-      </footer>
-      <UCopyright />
 
     </div>
   );
