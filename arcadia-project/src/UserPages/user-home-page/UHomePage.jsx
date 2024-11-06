@@ -14,11 +14,12 @@ import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
 import MostPopBk from "../../components/UserComponents/user-main-comp/MostPopBk";
 import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghestRatedBk";
+import UHeader from "../../components/UserComponents/user-main-comp/UHeader";
 
 const UHomePage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header />
+      <UHeader />
       {/* Navigation */}
       <UNavbar />
       <USearchBar />
