@@ -17,7 +17,7 @@ import UHeader from "../../components/UserComponents/user-main-comp/UHeader";
 
 const UHomePage = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-light-white">
       <UNavbar />
       <USearchBar />
 
