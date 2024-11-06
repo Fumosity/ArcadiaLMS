@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../../components/UserComponents/user-main-comp/header";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import UFooter from "../../components/UserComponents/user-main-comp/UFooter";
 import UCopyright from "../../components/UserComponents/user-main-comp/UCopyright";
@@ -19,8 +18,6 @@ import UHeader from "../../components/UserComponents/user-main-comp/UHeader";
 const UHomePage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
-      <UHeader />
-      {/* Navigation */}
       <UNavbar />
       <USearchBar />
 

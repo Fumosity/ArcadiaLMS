@@ -23,6 +23,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 if (error) {
                     console.error("Error fetching books:", error);
                 } else {
+                    console.log("Fetched books:", data); // Log the fetched data
                     setInventoryData(data);
                 }
                 setIsLoading(false); // Data fetching complete
@@ -45,6 +46,10 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         setIsModalOpen(false);
         setSelectedBook(null);
     };
+
+    // Get unique books based on title
+    const uniqueBooks = Array.from(new Set(inventoryData.map(item => item.title)))
+        .map(title => inventoryData.find(item => item.title === title));
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md mr-5">
@@ -70,8 +75,8 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                 pubDateFilter === "After 2020"
                                     ? "After 2021"
                                     : pubDateFilter === "After 2021"
-                                    ? "After 2022"
-                                    : "After 2020"
+                                        ? "After 2022"
+                                        : "After 2020"
                             )
                         }
                         className="bg-gray-200 py-1 px-3 rounded-full text-sm"
@@ -131,7 +136,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                 </tr>
                             ))
                         ) : (
-                            inventoryData.map((item, index) => {
+                            uniqueBooks.map((item, index) => {
                                 const genres = item.genre.split(";");
 
                                 return (
@@ -207,11 +212,10 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 </table>
             </div>
 
-            {/* BookCopies Modal */}
             <BookCopies
                 isOpen={isModalOpen}
                 onClose={closeModal}
-                book={selectedBook}
+                bookCopies={selectedBook ? selectedBook.bookCopies : []} // Pass an empty array if undefined
             />
         </div>
     );

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BookCopies = ({ isOpen, onClose }) => {
+const BookCopies = ({ isOpen, onClose, bookCopies = [] }) => {
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Available':
@@ -77,20 +77,15 @@ const BookCopies = ({ isOpen, onClose }) => {
 
           <div className="mt-2.5 border-t border-zinc-300" />
 
-          {[
-            { id: '123456', callNo: 'LPUCAV-0023918', status: 'Available', dateAcq: '2021' },
-            { id: '123457', callNo: 'LPUCAV-0023919', status: 'Available', dateAcq: '2022' },
-            { id: '123458', callNo: 'LPUCAV-0023920', status: 'Reserved', dateAcq: '2021' },
-            { id: '123459', callNo: 'LPUCAV-0023921', status: 'Damaged', dateAcq: '2021' }
-          ].map((book, index) => (
+          {bookCopies.map((book, index) => (
             <React.Fragment key={index}>
               <div className="flex justify-between items-center gap-10 text-base text-zinc-900 mt-3">
-                <span className="w-[100px]">{book.id}</span>
-                <span className="w-[150px]">{book.callNo}</span>
-                <span className={`px-5 rounded-3xl w-[100px] ${getStatusStyle(book.status)}`}>
-                  {book.status}
+                <span className="w-[100px]">{book.bookID}</span>
+                <span className="w-[150px]">{book.arcID}</span>
+                <span className={`px-5 rounded-3xl w-[100px] ${getStatusStyle('Available')}`}>
+                  Available {/* Hardcoded status for now */}
                 </span>
-                <span className="w-[100px]">{book.dateAcq}</span>
+                <span className="w-[100px]">{book.currentPubDate}</span>
               </div>
               <div className="mt-2.5 border-t border-zinc-300" />
             </React.Fragment>
