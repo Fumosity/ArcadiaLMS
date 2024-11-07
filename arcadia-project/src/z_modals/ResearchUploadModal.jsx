@@ -1,24 +1,76 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
-function ResearchUploadModal({ isOpen, onClose, onFileSelect }) {
+function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect, onExtractedData }) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [numberOfPages, setNumberOfPages] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
+  const [extractedData, setExtractedData] = useState({
+    title: '',
+    abstract: '',
+    authors: '',
+    keywords: '',
+    publication_date: '',
+    department: '',
+    college: ''
+  });
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
     setUploadedFiles(files);
-    setNumberOfPages(files.length);
   };
 
-  const handleUpload = () => {
-    onFileSelect(uploadedFiles); // Pass uploaded files back to ARAdding when upload is confirmed
-    onClose();
+  const handleUpload = async () => {
+    try {
+      const formData = new FormData();
+      let totalPages = 0;  // Initialize total pages count
+
+      // Append each selected file to the form data
+      for (const file of uploadedFiles) {
+        formData.append('files', file);
+      }
+
+      const response = await axios.post('http://127.0.0.1:8000/extract-text/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log("Extracted text from backend:", response.data.text);
+
+      const extractedData = {
+        title: response.data.title,
+        abstract: response.data.abstract,
+        authors: response.data.authors,
+        keywords: response.data.keywords,
+        publication_date: response.data.publication_date,
+        department: response.data.department,
+        college: response.data.college
+      };
+  
+      setExtractedData(extractedData);
+      onFileSelect(extractedData); // Add extractedData here
+      onExtractedData(extractedData); // <-- Add this line
+
+      // Count the number of pages from the response
+      uploadedFiles.forEach((file) => {
+        if (file.type === "application/pdf") {
+          // Add logic to determine page count based on file
+          totalPages = response.data.total_pages; // assuming the backend gives pageCount for PDFs
+        } else {
+          totalPages += 1; // Each image counts as 1 page
+        }
+      });
+      console.log(response.data)
+      // Set the total page count
+      onPageCountChange(totalPages);
+
+    } catch (error) {
+      console.error("Error extracting text:", error);
+    }
   };
 
   const handleCancel = () => {
     setUploadedFiles([]);
-    setNumberOfPages(0);
     setShowPreview(false);
     onClose();
   };
@@ -38,9 +90,6 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect }) {
 
         <header className="mb-4">
           <h1 className="text-2xl font-medium text-gray-900">Upload Research</h1>
-          <p className="text-sm font-medium text-gray-700">
-            Data points marked with an asterisk (*) are autofilled.
-          </p>
         </header>
 
         <section>
@@ -80,26 +129,6 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect }) {
               />
             </div>
 
-            <div>
-              <label className="text-gray-800">Number of pages*:</label>
-              <input
-                type="text"
-                value={numberOfPages}
-                readOnly
-                className="w-full mt-1 p-2 border rounded-md"
-              />
-            </div>
-
-            <div>
-              <label className="text-gray-800">Page order:</label>
-              <input
-                type="text"
-                value="According to filename"
-                readOnly
-                className="w-full mt-1 p-2 border rounded-md"
-              />
-            </div>
-
             <div className="flex items-center">
               <label htmlFor="preview-checkbox" className="text-gray-800 mr-2">
                 Show Research Preview? (PDF only)
@@ -120,14 +149,14 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect }) {
             <div className="flex justify-center mt-4">
               <button
                 onClick={handleUpload}
-                className="px-6 py-2 bg-grey rounded-full hover:bg-arcadia-red hover:text-white"
+                className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white"
                 aria-label="Upload files"
               >
                 Upload
               </button>
               <button
                 onClick={handleCancel}
-                className="px-6 py-2 bg-grey rounded-full hover:bg-arcadia-red hover:text-white ml-2"
+                className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white ml-2"
                 aria-label="Cancel upload"
               >
                 Cancel

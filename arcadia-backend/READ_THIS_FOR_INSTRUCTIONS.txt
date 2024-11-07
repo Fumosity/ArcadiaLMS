@@ -1,0 +1,20 @@
+## Project Setup Instructions
+
+### System Dependencies
+
+1. **Tesseract OCR**
+   - Download the Tesseract installer from [Tesseract Releases](https://github.com/tesseract-ocr/tesseract/releases).
+   - Install it and add the installation path (e.g., `C:\Program Files\Tesseract-OCR`) to your system PATH.
+
+2. **Poppler**
+   - Download Poppler from [Poppler for Windows](http://blog.alivate.com.au/poppler-windows/).
+   - Extract the files and add the `bin` folder (e.g., `C:\poppler-xx\bin`) to your system PATH.
+
+3. Just search how to add to your system PATH.
+
+### Python Dependencies
+
+To install Python packages, activate your virtual environment and run:
+
+```bash
+pip install -r requirements.txt

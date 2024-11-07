@@ -12,6 +12,7 @@ const ARAdding = ({ formData, setFormData }) => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pageCount, setPageCount] = useState(0); 
 
   const collegeDepartmentMap = {
     "CAMS": [""],
@@ -34,7 +35,7 @@ const ARAdding = ({ formData, setFormData }) => {
   const updateDepartmentOptions = (selectedCollege) => {
     const departments = collegeDepartmentMap[selectedCollege] || [];
     setDepartmentOptions(departments);
-    if (selectedCollege === "(COECSA) College of Engineering, Computer Studies, and Architecture") {
+    if (selectedCollege === "COECSA") {
       setFormData((prevData) => ({
         ...prevData,
         department: '',
@@ -77,9 +78,18 @@ const ARAdding = ({ formData, setFormData }) => {
     coverInputRef.current.click();
   };
 
-  //Checks if the upload pages input field was clicked
+  // Separate function to handle file uploads
   const handleFileSelect = (files) => {
     setUploadedFiles(files);
+    setPageCount(files.length);
+  };
+
+  // Function to handle extracted data and update formData
+  const handleExtractedData = (data) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      ...data  // Merge the extracted data into formData
+    }));
   };
 
   //Handles the submission to the database
@@ -134,7 +144,7 @@ const ARAdding = ({ formData, setFormData }) => {
       college: '',
       department: '',
       abstract: '',
-      keyword: [],
+      keywords: [],
       location: '',
       arcID: '',
       pubDate: '',
@@ -238,11 +248,11 @@ const ARAdding = ({ formData, setFormData }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Pages:</label>
-                <input type="number" name="page" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" placeholder="No. of pages" required />
+                <input type="number" name="page" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={pageCount} placeholder="No. of pages" required readOnly/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
-                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.keyword } onChange={ handleChange } placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
+                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.keywords } onChange={ handleChange } placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Date Published:</label>
@@ -289,6 +299,8 @@ const ARAdding = ({ formData, setFormData }) => {
         isOpen={isModalOpen}
         onClose={ () => setIsModalOpen(false) }
         onFileSelect={ handleFileSelect }
+        onExtractedData={handleExtractedData}    // For autofill data
+        onPageCountChange={setPageCount}
       />
     </div>
   );
