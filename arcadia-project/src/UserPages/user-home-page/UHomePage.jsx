@@ -14,7 +14,7 @@ import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghe
 
 const UHomePage = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-light-white">
       <UNavbar />
       <USearchBar />
 

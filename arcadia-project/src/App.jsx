@@ -30,6 +30,7 @@ import UCopyright from './components/UserComponents/user-main-comp/UCopyright';
 
 // Testing modals
 import ModalTest from './z_modals/ModalTest';
+import UBkCatalog from './UserPages/user-book-catalog-page/UBkCatalog';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
             <Routes>
               <Route path="/" element={<UHomePage />} />
               <Route path="/user-registration" element={<UsrRegistration />} />
+              <Route path="/" element={<UBkCatalog />} />
             </Routes>
             <UFooter />
             <UCopyright />

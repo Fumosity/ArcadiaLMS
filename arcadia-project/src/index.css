@@ -297,3 +297,29 @@
 .cancelButton{
   @apply px-8 py-1 border border-black rounded-full hover:bg-grey focus:outline-none focus:ring-2 focus:ring-grey focus:ring-offset-2;
 }
+
+/* Custom Checkbox Styles */
+.custom-checkbox {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid; /* Arcadia red border color */
+  background-color: transparent;
+  border-radius: 0.25rem; /* Rounded corners */
+
+  /* Center the checkmark */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-checkbox:checked {
+  background-color: #8B0000;
+  border: #8B0000; /* Arcadia red background when checked */
+}
+
+.custom-checkbox:checked::before {
+  content: '✓'; /* Checkmark symbol */
+  color: white; /* White color for the checkmark */
+  font-weight: bold;
+}

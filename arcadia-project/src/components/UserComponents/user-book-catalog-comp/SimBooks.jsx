@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Recommended = () => {
+const SimBooks = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const totalEntries = 5; // Total number of recommended books
     const entriesPerPage = 4; // Books per page
@@ -18,10 +18,7 @@ const Recommended = () => {
     return (
         <div className="bg-white p-6 border border-grey rounded-xl mt-8">
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold">Recommended for You</h2>
-                <button className="border border-arcadia-red bg-arcadia-red text-white rounded-full font-medium text-sm px-6 py-2 transition-colors hover:bg-red-600">
-                    See more
-                </button>
+                <h2 className="text-2xl font-semibold">Similar Books</h2>
             </div>
 
             {/* Book Cards */}
@@ -42,27 +39,8 @@ const Recommended = () => {
                     </div>
                 ))}
             </div>
-
-            {/* Pagination */}
-            <div className="flex justify-center items-center mt-6 space-x-4">
-                <button
-                    className={`bg-arcadia-red text-white py-2 px-4 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-red-700"}`}
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                >
-                    Previous Page
-                </button>
-                <span className="text-xs">Page {currentPage}</span>
-                <button
-                    className={`bg-arcadia-red text-white py-2 px-4 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-red-700"}`}
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                >
-                    Next Page
-                </button>
-            </div>
         </div>
     );
 };
 
-export default Recommended;
+export default SimBooks;
