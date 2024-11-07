@@ -30,21 +30,19 @@ import UCopyright from './components/UserComponents/user-main-comp/UCopyright';
 
 // Testing modals
 import ModalTest from './z_modals/ModalTest';
-import UBkCatalog from './UserPages/user-book-catalog-page/UBkCatalog';
 
 function App() {
   return (
     <Routes>
       {/* User Route */}
       <Route
-        path="/*" 
+        path="/*"
         element={
           <>
             <UHeader />
             <Routes>
               <Route path="/" element={<UHomePage />} />
               <Route path="/user-registration" element={<UsrRegistration />} />
-              <Route path="/" element={<UBkCatalog />} />
             </Routes>
             <UFooter />
             <UCopyright />
@@ -54,28 +52,27 @@ function App() {
       
       {/* Admin Routes */}
       <Route
-        path="/*"
+        path="/admin/*"
         element={
           <>
             <Header />
             <Navbar />
             <Routes>
-              <Route path="/" element={<ModalTest />} />
-              <Route path="/ahomepage" element={<AHomePage />} />
-              <Route path="/analytics" element={<ALibAnal />} />
-              <Route path="/circulatoryhistory" element={<ABCirculationPage />} />
-              <Route path="/bookmanagement" element={<ABInventory />} />
-              <Route path="/researchmanagement" element={<ARInventory />} />
-              <Route path="/useraccounts" element={<AUsrAcc />} />
-              <Route path="/support" element={<ASupportPage />} />
-              <Route path="/reservations" element={<AReserv />} />
-              <Route path="/abcirculationpage" element={<ABCirculationPage />} />
-              <Route path="/bookcheckinout" element={<ABChecking />} />
-              <Route path="/bookadding" element={<ABAdd />} />
-              <Route path="/researchadding" element={<ARAdd />} />
-              <Route path="/abviewer" element={<ABViewer />} />
-              <Route path="/arviewer" element={<ARViewer />} />
-              <Route path="/bookmodify" element={<ABModify />} />
+              <Route path="ahomepage" element={<AHomePage />} />
+              <Route path="analytics" element={<ALibAnal />} />
+              <Route path="circulatoryhistory" element={<ABCirculationPage />} />
+              <Route path="bookmanagement" element={<ABInventory />} />
+              <Route path="researchmanagement" element={<ARInventory />} />
+              <Route path="useraccounts" element={<AUsrAcc />} />
+              <Route path="support" element={<ASupportPage />} />
+              <Route path="reservations" element={<AReserv />} />
+              <Route path="abcirculationpage" element={<ABCirculationPage />} />
+              <Route path="bookcheckinout" element={<ABChecking />} />
+              <Route path="bookadding" element={<ABAdd />} />
+              <Route path="researchadding" element={<ARAdd />} />
+              <Route path="abviewer" element={<ABViewer />} />
+              <Route path="arviewer" element={<ARViewer />} />
+              <Route path="bookmodify" element={<ABModify />} />
             </Routes>
             <Footer />
             <Copyright />
