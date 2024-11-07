@@ -22,7 +22,7 @@ import ARViewer from './admin-research-viewer/ARViewer';
 import ABModify from './admin-book-modify/ABModify';
 
 // User Components
-// import UsrRegistration from './UserPages/user-registration-page/UsrRegistration';
+import UsrRegistration from './UserPages/user-registration-page/UsrRegistration';
 import UFooter from './components/UserComponents/user-main-comp/UFooter';
 import UHeader from './components/UserComponents/user-main-comp/UHeader';
 import UHomePage from './UserPages/user-home-page/UHomePage';
@@ -42,6 +42,7 @@ function App() {
             <UHeader />
             <Routes>
               <Route path="/" element={<UHomePage />} />
+              <Route path="/user-registration" element={<UsrRegistration />} />
             </Routes>
             <UFooter />
             <UCopyright />

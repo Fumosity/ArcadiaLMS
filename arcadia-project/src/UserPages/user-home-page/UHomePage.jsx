@@ -1,7 +1,5 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import UFooter from "../../components/UserComponents/user-main-comp/UFooter";
-import UCopyright from "../../components/UserComponents/user-main-comp/UCopyright";
 import Recommended from "../../components/UserComponents/user-home-comp/Recommended";
 import USearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
 import UHero from "../../components/UserComponents/user-home-comp/UHero";
@@ -13,7 +11,6 @@ import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
 import MostPopBk from "../../components/UserComponents/user-main-comp/MostPopBk";
 import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghestRatedBk";
-import UHeader from "../../components/UserComponents/user-main-comp/UHeader";
 
 const UHomePage = () => {
   return (
@@ -53,8 +50,6 @@ const UHomePage = () => {
           </div>
         </div>
       </main>
-
-
     </div>
   );
 }
