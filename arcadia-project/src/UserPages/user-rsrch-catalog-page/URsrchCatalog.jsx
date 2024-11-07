@@ -3,28 +3,29 @@ import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import USearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
 import Title from "../../components/main-comp/Title";
 import FilterSidebar from "../../components/UserComponents/user-book-catalog-comp/FilterSidebar";
-import SimBooks from "../../components/UserComponents/user-book-catalog-comp/SimBooks";
 import BkSearchResults from "../../components/UserComponents/user-book-catalog-comp/BkSearchResults";
+import URFilterSidebar from "../../components/UserComponents/user-rsrch-catalog-comp/URFilterSidebar";
+import SimRsrch from "../../components/UserComponents/user-rsrch-catalog-comp/SimRsrch";
+import RsrchSearchResults from "../../components/UserComponents/user-rsrch-catalog-comp/RsrchSearchResults";
 
-
-const UBkCatalog = () => {
+const URsrchCatalog = () => {
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />
             <USearchBar />
-            <Title>Book Catalog</Title>
+            <Title>Research Catalog</Title>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="userContent-container flex py-8 px-4 gap-8">
                     <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4">
-                        <FilterSidebar />
+                        <URFilterSidebar />
                     </div>
 
                     <div className="userMain-content w-3/4">
-                        <SimBooks />
+                        <SimRsrch />
                         
                         <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4">
-                            <BkSearchResults />
+                            <RsrchSearchResults />
                         </div>
 
                     </div>
@@ -36,4 +37,4 @@ const UBkCatalog = () => {
     )
 };
 
-export default UBkCatalog;
+export default URsrchCatalog;
