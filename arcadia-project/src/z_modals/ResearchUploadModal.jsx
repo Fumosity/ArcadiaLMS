@@ -40,9 +40,9 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
       const extractedData = {
         title: response.data.title,
         abstract: response.data.abstract,
-        authors: response.data.authors,
+        author: response.data.author,
         keywords: response.data.keywords,
-        publication_date: response.data.publication_date,
+        pubDate: response.data.pubDate,
         department: response.data.department,
         college: response.data.college
       };

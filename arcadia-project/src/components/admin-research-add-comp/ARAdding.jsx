@@ -31,22 +31,19 @@ const ARAdding = ({ formData, setFormData }) => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  //Handles the dynamic COECSA department selection
-  const updateDepartmentOptions = (selectedCollege) => {
-    const departments = collegeDepartmentMap[selectedCollege] || [];
-    setDepartmentOptions(departments);
-    if (selectedCollege === "COECSA") {
-      setFormData((prevData) => ({
-        ...prevData,
-        department: '',
-      }));
-      setFormData((prevData) => ({
-        ...prevData,
-        department: 'N/A',
-      }));
-    }
+  const updateDepartmentOptions = (college) => {
+    // Assuming `collegeDepartmentMap` contains the mapping from college to an array of departments
+    const options = collegeDepartmentMap[college] || [];
+  
+    setDepartmentOptions(options);
+    
+    // If the currently selected department is no longer valid for the new college, reset it
+    setFormData((prevData) => ({
+      ...prevData,
+      department: options.includes(prevData.department) ? prevData.department : "", // reset department if invalid
+    }));
   };
-
+  
   //Holds and sends the uploaded cover image when submitted
   const uploadCover = async (e) => {
     let coverFile = e.target.files[0];
@@ -88,8 +85,11 @@ const ARAdding = ({ formData, setFormData }) => {
   const handleExtractedData = (data) => {
     setFormData((prevData) => ({
       ...prevData,
-      ...data  // Merge the extracted data into formData
+      ...data,
+      college: data.college,
+      department: data.department,  // Ensure department is set from extracted data if available
     }));
+    updateDepartmentOptions(data.college);  // Ensure department options are updated when data is autofilled
   };
 
   //Handles the submission to the database
@@ -248,7 +248,7 @@ const ARAdding = ({ formData, setFormData }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Pages:</label>
-                <input type="number" name="page" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={pageCount} placeholder="No. of pages" required readOnly/>
+                <input type="number" name="page" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={pageCount} placeholder="No. of pages" required/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
@@ -256,7 +256,7 @@ const ARAdding = ({ formData, setFormData }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Date Published:</label>
-                <input type="date" name="pubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.pubDate } onChange={ handleChange } required />
+                <input type="month" name="pubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.pubDate } onChange={ handleChange } required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
