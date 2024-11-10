@@ -2,8 +2,13 @@ import React from "react";
 
 const MostPopBk = () => {
     return (
-        <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Most Popular Books</h2>
+        <div className="uSidebar-cont">
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold mb-2.5">Most Popular Books</h2>
+                <button className="uSidebar-Seemore">
+                    See more
+                </button>
+            </div>
             <ul className="space-y-2 text-sm text-gray-600 divide-y divide-grey">
                 <li className="flex justify-between py-2">
                     <span>Touch Me Not</span>

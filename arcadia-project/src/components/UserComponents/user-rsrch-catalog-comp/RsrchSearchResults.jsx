@@ -43,19 +43,19 @@ export default function RsrchSearchResults() {
     const displayedRsrchs = rsrchs.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
 
     return (
-        <div className="p-6 w-[870px] mx-auto bg-white shadow-md rounded-md border border-grey">
+        <div className="uMain-cont">
             <h2 className="text-xl font-semibold mb-4">3 Results for "algorithms"</h2>
 
             {/* Book Entry */}
             {displayedRsrchs.map((rsrch, index) => (
-                <div key={index} className="flex w-[800px] gap-4 p-4 border border-grey rounded-lg shadow-sm mb-6">
+                <div key={index} className="genCard-cont flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm mb-6">
                     <div className="flex-shrink-0 w-[200px]">
                         <img
                             src={rsrch.img || "https://via.placeholder.com/150x300"}
                             alt={`${rsrch.title} Book Cover`}
-                            className="w-full h-[300px] object-cover border border-grey rounded-md"
+                            className="w-full h-[300px] bg-grey object-cover border border-grey rounded-md"
                         />
-                        <p className="text-arcadia-red text-xs mt-2 cursor-pointer text-center">
+                        <p className="text-arcadia-red text-xs mt-2 cursor-pointer text-center underline">
                             Report a broken link or error
                         </p>
                     </div>
@@ -89,7 +89,7 @@ export default function RsrchSearchResults() {
 
 
                             
-                                <button className="bg-arcadia-red rounded-xl text-white py-1 px-3 text-sm hover:bg-red">
+                                <button className="viewRsrch-btn">
                                     View Research
                                 </button>
 
@@ -102,7 +102,7 @@ export default function RsrchSearchResults() {
             {/* Pagination */}
             <div className="flex justify-center items-center mt-6 space-x-4">
                 <button
-                    className={`bg-arcadia-red text-white py-2 px-4 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-red-700 hover:font-semibold"}`}
+                    className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-red hover:font-semibold"}`}
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                 >
@@ -110,7 +110,7 @@ export default function RsrchSearchResults() {
                 </button>
                 <span className="text-xs">Page {currentPage} of {totalPages}</span>
                 <button
-                    className={`bg-arcadia-red text-white py-2 px-4 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-red-700"}`}
+                    className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-red"}`}
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                 >

@@ -35,19 +35,19 @@ export default function BkSearchResults() {
     const displayedBooks = books.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
 
     return (
-        <div className="p-6 w-[870px] mx-auto bg-white shadow-md rounded-md border border-grey">
+        <div className="uMain-cont">
             <h2 className="text-xl font-semibold mb-4">3 Results for "Robinson Crusoe"</h2>
-
+  
             {/* Book Entry */}
             {displayedBooks.map((book, index) => (
-                <div key={index} className="flex w-[800px] gap-4 p-4 border border-grey rounded-lg shadow-sm mb-6">
+                <div key={index} className="genCard-cont flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm mb-6">
                     <div className="flex-shrink-0 w-[200px]">
                         <img
                             src={book.img || "https://via.placeholder.com/150x300"}
                             alt={`${book.title} Book Cover`}
-                            className="w-full h-[300px] object-cover border border-grey rounded-md"
+                            className="w-full h-[300px] bg-grey object-cover border border-grey rounded-md"
                         />
-                        <p className="text-arcadia-red text-xs mt-2 cursor-pointer text-center">
+                        <p className="text-arcadia-red text-xs mt-2 cursor-pointer text-center underline">
                             Report a broken link or error
                         </p>
                     </div>
@@ -77,10 +77,10 @@ export default function BkSearchResults() {
                         </div>
 
                         <div className="flex items-center justify-end gap-2 mt-4">
-                            <button className="bg-arcadia-red text-white py-1 px-3 rounded-md text-sm hover:bg-red">
+                            <button className="viewBk-btn">
                                 View Book
                             </button>
-                            <button className="border border-gray-300 text-gray-700 py-1 px-4 rounded-md text-sm hover:bg-gray-100">
+                            <button className="reserveBk-btn">
                                 Reserve
                             </button>
                         </div>
@@ -91,7 +91,7 @@ export default function BkSearchResults() {
             {/* Pagination */}
             <div className="flex justify-center items-center mt-6 space-x-4">
                 <button
-                    className={`bg-arcadia-red text-white py-2 px-4 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-red-700 hover:font-semibold"}`}
+                    className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-red hover:font-semibold"}`}
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                 >
@@ -99,7 +99,7 @@ export default function BkSearchResults() {
                 </button>
                 <span className="text-xs">Page {currentPage} of {totalPages}</span>
                 <button
-                    className={`bg-arcadia-red text-white py-2 px-4 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-red-700"}`}
+                    className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-red"}`}
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                 >

@@ -16,7 +16,7 @@ const SimBooks = () => {
     ];
 
     return (
-        <div className="bg-white p-6 border border-grey rounded-xl mt-8">
+        <div className="uHero-cont">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Similar Books</h2>
             </div>
@@ -24,7 +24,7 @@ const SimBooks = () => {
             {/* Book Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
                 {books.map((book, index) => (
-                    <div key={index} className="bg-white shadow-md rounded-lg p-4">
+                    <a key={index} className="genCard-cont">
                         <img
                             src={book.img}
                             alt={book.title}
@@ -33,10 +33,11 @@ const SimBooks = () => {
                         <h3 className="text-lg font-semibold mb-2 truncate">{book.title}</h3>
                         <p className="text-sm text-gray-500 mb-2 truncate">{book.author}</p>
                         <p className="text-xs text-gray-400 mb-2 truncate">{book.category}</p>
-                        <div className="flex items-center">
-                            <span className="text-yellow-500 text-sm">★ {book.rating.toFixed(2)}</span>
+                        <div className="flex items-center space-x-1">
+                            <span className="text-bright-yellow text-sm">★</span>
+                            <p className=" text-sm">{book.rating.toFixed(2)}</p>
                         </div>
-                    </div>
+                    </a>
                 ))}
             </div>
         </div>

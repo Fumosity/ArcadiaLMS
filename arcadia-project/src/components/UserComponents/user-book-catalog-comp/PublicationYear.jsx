@@ -9,8 +9,8 @@ export default function PublicationYear() {
     };
 
     return (
-        <div>
-            <h3 className="font-semibold mb-2">Publication Year</h3>
+        <div className="uSidebar-cont">
+            <h2 className="text-xl font-semibold mb-2.5">Publication Year</h2>
             <div className="space-y-2">
                 {yearOptions.map((option) => (
                     <div key={option} className="flex items-center space-x-2">

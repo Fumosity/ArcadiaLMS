@@ -15,17 +15,20 @@ const UBkCatalog = () => {
             <Title>Book Catalog</Title>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="userContent-container flex py-8 px-4 gap-8">
-                    <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4">
+                {/* Content Container */}
+                <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
+                    {/* Sidebar */}
+                    <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4 mr-5">
                         <FilterSidebar />
                     </div>
 
-                    <div className="userMain-content w-3/4">
+                    {/* Main Content */}
+                    <div className="userMain-content lg:w-3/4 w-full ml-5">
+                        {/* Hero Section */}
                         <SimBooks />
-                        
-                        <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4">
-                            <BkSearchResults />
-                        </div>
+
+                        {/* News and Updates */}
+                        <BkSearchResults />
 
                     </div>
                 </div>

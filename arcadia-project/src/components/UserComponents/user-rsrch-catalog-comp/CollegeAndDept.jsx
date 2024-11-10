@@ -17,8 +17,8 @@ export default function CollegeAndDept() {
     };
 
     return (
-        <div className="">
-            <h3 className="font-semibold mb-2">Collage and Department</h3>
+        <div className="uSidebar-cont">
+            <h2 className="font-semibold mb-2">Collage and Department</h2>
             <div className="space-y-2">
                 <h4 className="mb-2">College</h4>
                 {collegeOptions.map((option) => (

@@ -5,68 +5,74 @@
 
 
 @layer components {
-    .title {
-        @apply flex items-center mb-2;
-        background-color: #F4F4F5;
-    }
+  .title {
+    @apply flex items-center mb-2;
+    background-color: #F4F4F5;
+  }
 
-    .title h2 {
-        @apply text-2xl font-semibold;
-    }
+  .title h2 {
+    @apply text-2xl font-semibold;
+  }
 
-    .sort-by {
-        @apply py-1 px-3 rounded-full text-sm;
-        border: 1px solid;
-    }
+  .sort-by {
+    @apply py-1 px-3 rounded-full text-sm;
+    border: 1px solid;
+  }
 
-    .bookinv-category,
-    .bookinv-genre {
-        @apply bg-grey;
-    }
+  .bookinv-category,
+  .bookinv-genre {
+    @apply bg-grey;
+  }
 
-    .title-logo {
-        @apply px-52 my-1 flex items-center;
-    }
+  .title-logo {
+    @apply px-52 my-1 flex items-center;
+  }
 
-    .add-book {
-        @apply h-10 flex items-center justify-center mb-2;
-        border: 1px solid;
-        border-radius: 50px;
-        width: 21rem;
-    }
+  .add-book {
+    @apply h-10 flex items-center justify-center mb-2;
+    border: 1px solid;
+    border-radius: 50px;
+    width: 21rem;
+  }
 
-    .input-field {
-        padding: 0.5rem;
-        border: 1px solid #cbd5e0;
-        border-radius: 50px;
-        width: 100%;
-        box-sizing: border-box;
-    }
+  .input-field {
+    padding: 0.5rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 50px;
+    width: 100%;
+    box-sizing: border-box;
+  }
 
-    .upload-page-btn{
-        border: 1px solid;
-        border-radius: 1rem;
-        border-color: #d4d4d4;
-    }
-    .add-research-btn{
-        border: 1px solid;
-        border-radius: 1rem;
-        border-color: #d4d4d4;
-    }
-    .hr-line{
-        @apply my-4 border-t;
-        border-color: #d4d4d4;
-    }
-    .book-research-adding {
-        @apply mx-auto px-4 sm:px-6 lg:px-8 py-8;
-        max-width: 110rem /* 1280px */;
-    }
+  .upload-page-btn {
+    border: 1px solid;
+    border-radius: 1rem;
+    border-color: #d4d4d4;
+  }
+
+  .add-research-btn {
+    border: 1px solid;
+    border-radius: 1rem;
+    border-color: #d4d4d4;
+  }
+
+  .hr-line {
+    @apply my-4 border-t;
+    border-color: #d4d4d4;
+  }
+
+  .book-research-adding {
+    @apply mx-auto px-4 sm:px-6 lg:px-8 py-8;
+    max-width: 110rem
+      /* 1280px */
+    ;
+  }
 }
 
 /* Custom dropdown styles */
 .input-field {
   appearance: none;
-  -webkit-appearance: none; /* for Safari */
+  -webkit-appearance: none;
+  /* for Safari */
   background-color: #f9f9f9;
   padding: 12px;
   border-radius: 10px;
@@ -79,6 +85,7 @@
   border-color: #5a67d8;
   box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.3);
 }
+
 /* Wrapper for custom dropdown */
 .select-dropdown-wrapper {
   position: relative;
@@ -123,45 +130,45 @@
 
 
 .nav-link {
-    @apply text-black font-semibold mx-4;
-    font-family: "Zen Kaku Gothic Antique";
-    font-weight: 100;
+  @apply text-black font-semibold mx-4;
+  font-family: "Zen Kaku Gothic Antique";
+  font-weight: 100;
 }
 
 .nav-link {
-    @apply text-black font-bold mx-4 text-sm;
+  @apply text-black font-bold mx-4 text-sm;
 }
 
 .navbar-content {
-    @apply items-center;
+  @apply items-center;
 }
 
 .navbar-cont {
-    border-top: 1px solid;
-    border-bottom: 1px solid;
-    border-color: #d3d3d3;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  border-color: #d3d3d3;
 }
 
 .search-bar {
-    justify-content: center;
-    align-items: center;
+  justify-content: center;
+  align-items: center;
 }
 
 .title-bar {
-    justify-content: center;
-    align-items: center;
+  justify-content: center;
+  align-items: center;
 }
 
 .main-header {
-    @apply w-full mx-auto px-4 sm:px-6 lg:px-8 py-1 flex flex-wrap items-center justify-between;
+  @apply w-full mx-auto px-4 sm:px-6 lg:px-8 py-1 flex flex-wrap items-center justify-between;
 }
 
 .search-bar {
-    @apply flex-grow w-full sm:w-auto max-w-lg mx-auto mt-4 sm:mt-0
+  @apply flex-grow w-full sm:w-auto max-w-lg mx-auto mt-4 sm:mt-0
 }
 
 .head-text-logo {
-    @apply flex items-center flex-shrink-0 p-1;
+  @apply flex items-center flex-shrink-0 p-1;
 }
 
 /* Header Styles */
@@ -174,7 +181,8 @@
 }
 
 .userAccount {
-  @apply text-arcadia-red; /* Use arcadia-red for visibility */
+  @apply text-arcadia-red;
+  /* Use arcadia-red for visibility */
 }
 
 .userLogo {
@@ -216,15 +224,18 @@
 }
 
 .userSearch-suggestions {
-  @apply flex justify-center items-center gap-2 mt-6; /* Align "Try:" and buttons */
+  @apply flex justify-center items-center gap-2 mt-6;
+  /* Align "Try:" and buttons */
 }
 
 .userSearch-suggestions p {
-  @apply text-lg; /* Style for "Try:" text */
+  @apply text-lg;
+  /* Style for "Try:" text */
 }
 
 .userSuggestion-buttons {
-  @apply flex gap-2; /* Small gap between buttons */
+  @apply flex gap-2;
+  /* Small gap between buttons */
 }
 
 .userSuggestion-button {
@@ -278,24 +289,56 @@
   @apply text-sm;
 }
 
-.arcadia{
-    font-family: "Zen Kaku Gothic Antique"', '"Zen Kaku Gothic New"', 'sans-serif;
+.arcadia {
+  font-family: "Zen Kaku Gothic Antique" ', ' "Zen Kaku Gothic New" ', ' sans-serif;
 }
 
-.inputBox{
+.inputBox {
   @apply flex-1 px-3 py-1 border border-grey rounded-full text-right overflow-hidden;
 }
 
-.inputWithChangeBttn{
+.inputWithChangeBttn {
   @apply absolute right-0.5 top-1/2 transform -translate-y-1/2 px-3 py-1 text-xs sm:text-sm border rounded-full hover:bg-grey hover:border-grey;
 }
 
-.modifyButton{
-  @apply px-8 py-1 bg-arcadia-red text-white rounded-full hover:bg-grey hover:text-black focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+.modifyButton {
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-grey hover:text-black focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width: 100px;
 }
 
-.cancelButton{
-  @apply px-8 py-1 border border-black rounded-full hover:bg-grey focus:outline-none focus:ring-2 focus:ring-grey focus:ring-offset-2;
+.cancelButton {
+  @apply px-2.5 py-1 border border-black rounded-full hover:bg-grey focus:outline-none focus:ring-2 focus:ring-grey focus:ring-offset-2;
+  width: 100px;
+}
+
+.uPage-btn {
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-grey hover:text-black focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width: 100px;
+  font-size: 12px;
+}
+
+.uSee-more {
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-grey hover:text-black focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width: 100px;
+  font-size: 12px;
+}
+
+.viewBk-btn {
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-red focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width: 100px;
+  font-size: 12px;
+}
+
+.reserveBk-btn {
+  @apply px-2.5 py-1 border border-black rounded-full hover:bg-grey focus:outline-none focus:ring-2 focus:ring-grey focus:ring-offset-2;
+  width: 100px;
+  font-size: 12px;
+}
+
+.viewRsrch-btn {
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-red focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width: 100px;
+  font-size: 12px;
 }
 
 /* Custom Checkbox Styles */
@@ -303,9 +346,11 @@
   appearance: none;
   width: 1rem;
   height: 1rem;
-  border: 1px solid; /* Arcadia red border color */
+  border: 1px solid;
+  /* Arcadia red border color */
   background-color: transparent;
-  border-radius: 0.25rem; /* Rounded corners */
+  border-radius: 0.25rem;
+  /* Rounded corners */
 
   /* Center the checkmark */
   display: flex;
@@ -315,11 +360,98 @@
 
 .custom-checkbox:checked {
   background-color: #8B0000;
-  border: #8B0000; /* Arcadia red background when checked */
+  border: #8B0000;
+  /* Arcadia red background when checked */
 }
 
 .custom-checkbox:checked::before {
-  content: '✓'; /* Checkmark symbol */
-  color: white; /* White color for the checkmark */
+  content: '✓';
+  /* Checkmark symbol */
+  color: white;
+  /* White color for the checkmark */
   font-weight: bold;
+}
+
+.uSidebar-cont {
+  background-color: white;
+  padding: 16px;
+  margin-bottom: 25px;
+  border: 1px solid #d4d4d8;
+  border-radius: 20px;
+  width: 334px;
+}
+
+.uSidebar-filter {
+  background-color: white;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 15px;
+  padding-right: 15px;
+  border: 1px solid #d4d4d8;
+  border-radius: 20px;
+  width: 334px;
+}
+
+.uMain-cont {
+  background-color: white;
+  padding: 24px;
+  border: 1px solid #d4d4d8;
+  border-radius: 20px;
+  margin-top: 32px;
+  width: 1000px;
+}
+
+.bookCard-cont {
+  width: 170px;
+  height: 340px;
+  background-color: white;
+  padding: 16px;
+  border: 1px solid #d4d4d8;
+  border-radius: 15px;
+}
+
+.genCard-cont {
+  @apply bg-white border border-grey rounded-xl p-4 transform transition duration-300 hover:shadow-lg hover:scale-105;
+}
+
+.uHero-cont {
+  width: 1000px;
+  background-color: white;
+  padding: 24px;
+  border: 1px solid #d4d4d8;
+  border-radius: 20px;
+  margin-top: 2px;
+}
+
+.uSidebar-Seemore {
+  @apply px-2 py-0.5 text-arcadia-black hover:bg-grey hover:text-black focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width: auto;
+  /* Removes fixed width */
+  font-size: 10px;
+  /* Adjust font size */
+  border: 1px solid #d4d4d8;
+  border-radius: 9999px;
+  /* Makes it a pill shape */
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.whiteButtons {
+  @apply px-2.5 py-1 text-center border border-a-t-red text-a-t-red rounded-full hover:bg-red hover:border-red hover:text-white focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width:100px;
+  font-size: 12px;
+}
+
+.genRedBtns {
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-red focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width: 100px;
+  font-size: 12px;
+}
+
+.genWhiteButtons {
+  @apply px-2.5 py-1 text-center border border-a-t-red text-a-t-red rounded-full hover:bg-red hover:border-red hover:text-white focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width:250px;
+  font-size: 12px;
 }

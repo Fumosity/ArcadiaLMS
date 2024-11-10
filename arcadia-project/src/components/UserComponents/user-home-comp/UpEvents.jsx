@@ -11,8 +11,8 @@ const UpEvents = () => {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4">
-      <h2 className="text-lg font-semibold text-gray-800 mb-2">Upcoming Events</h2>
+    <div className="uSidebar-cont">
+      <h2 className="text-xl font-semibold mb-2.5">Upcoming Events</h2>
       {/* Calendar Component */}
       <div className="bg-gray-100 p-4 rounded-lg mb-4">
         <Calendar

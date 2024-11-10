@@ -12,8 +12,8 @@ const ArcOpHr = () => {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-      <h2 className="text-lg font-semibold text-gray-800 mb-2">ARC Operating Hours</h2>
+    <div className="uSidebar-cont">
+      <h2 className="text-xl font-semibold mb-2.5">ARC Operating Hours</h2>
       <table className="w-full text-sm">
         <thead>
           <tr className="text-gray-600">

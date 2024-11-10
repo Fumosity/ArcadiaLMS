@@ -16,15 +16,15 @@ const SimRsrch = () => {
     ];
 
     return (
-        <div className="bg-white p-6 border border-grey rounded-xl mt-8">
+        <div className="uHero-cont">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Similar Research</h2>
             </div>
 
-            {/* Book Cards */}
+            {/* Research Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
                 {rsrches.map((rsrch, index) => (
-                    <div key={index} className="bg-white border border-grey rounded-lg p-4">
+                    <a key={index} className="genCard-cont">
                         <img
                             src={rsrch.img}
                             alt={rsrch.title}
@@ -34,7 +34,7 @@ const SimRsrch = () => {
                         <p className="text-sm text-gray-500 mb-2 truncate">{rsrch.college}</p>
                         <p className="text-xs text-gray-400 mb-2 truncate">{rsrch.dept}</p>
                         
-                    </div>
+                    </a>
                 ))}
             </div>
         </div>

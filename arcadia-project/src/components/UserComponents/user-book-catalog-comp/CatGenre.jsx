@@ -23,8 +23,8 @@ export default function CatGenre() {
     };
 
     return (
-        <div className="space-y-4">
-            <h3 className="font-semibold">Category and Genre</h3>
+        <div className='uSidebar-cont'>
+            <h2 className="text-xl font-semibold mb-2.5">Category and Genre</h2>
 
             {/* Category checkboxes with single-select behavior and custom styles */}
             <div className="space-y-2">
