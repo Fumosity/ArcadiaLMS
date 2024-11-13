@@ -28,7 +28,7 @@ const ABInventory = () => {
           {/* Circular Add Book Button */}
           <button 
             className="add-book mb-4 px-4 py-2 rounded-full border-grey hover:bg-blue-600 transition"
-            onClick={() => navigate('/bookadding')} // Navigate to ABAdd on click
+            onClick={() => navigate('/admin/bookadding')} // Navigate to ABAdd on click
           >
             Add Book
           </button>   

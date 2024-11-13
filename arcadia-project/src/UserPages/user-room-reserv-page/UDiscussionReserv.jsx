@@ -3,17 +3,9 @@ import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import UsearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
 import Title from "../../components/main-comp/Title";
 
-import SimBooks from "../../components/UserComponents/user-book-catalog-comp/SimBooks";
-
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
-import UHero from "../../components/UserComponents/user-home-comp/UHero";
-import LibServ from "../../components/UserComponents/user-serv-comp/LibServ";
-import SupportCont from "../../components/UserComponents/user-support-comp/SupportCont";
-import ContactUs from "../../components/UserComponents/user-support-comp/ContactUs";
-import FAQSection from "../../components/UserComponents/user-faq-comp/FAQSection";
-import RoomReservation from "../../components/UserComponents/user-room-reser-comp/CurrentReservations";
 import CurrentReservations from "../../components/UserComponents/user-room-reser-comp/CurrentReservations";
 import ReservHero from "../../components/UserComponents/user-room-reser-comp/ReservHero";
 import RoomBooking from "../../components/UserComponents/user-room-reser-comp/RoomBooking";
