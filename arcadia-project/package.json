@@ -16,6 +16,7 @@
     "@mui/x-date-pickers": "^7.22.2",
     "@supabase/supabase-js": "^2.45.6",
     "axios": "^1.7.7",
+    "bcryptjs": "^2.4.3",
     "calendar-react": "^0.2.2",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
