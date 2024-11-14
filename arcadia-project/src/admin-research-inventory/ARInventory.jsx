@@ -30,7 +30,7 @@ const ARInventory = () => {
           {/* Circular Add Research Button */}
           <button 
             className="add-book mb-4 px-4 py-2 rounded-full border-grey hover:bg-blue-600 transition"
-            onClick={() => navigate('/researchadding')} // Navigate to /researchadding on click
+            onClick={() => navigate('/admin/researchadding')} // Navigate to /researchadding on click
           >
             Add Research
           </button>

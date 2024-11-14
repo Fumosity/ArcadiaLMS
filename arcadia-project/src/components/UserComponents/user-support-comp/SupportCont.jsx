@@ -1,4 +1,6 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import USupportTix from "../../../UserPages/user-support-tickets-page/USupportTix";
 
 const SupportCont = () => {
     const libsupport = [
@@ -6,11 +8,13 @@ const SupportCont = () => {
             title: "User Reports",
             desc: "With your help, make the ARC better by reporting problems within the ARC or in our system, like erroneous information or the lack of stocks in our inventories. Together, we can make our library the best it could be!",
             more: "Make a report",
+            link: "/user/support/reportticket",
         },
         {
             title: "Support Tickets",
             desc: "Do you have problems with your account, library card, or transactions? File a support ticket so we can help you!",
             more: "File a support ticket",
+            link: "/user/support/supportticket",
         },
         {
             title: "FAQs",
@@ -39,12 +43,12 @@ const SupportCont = () => {
                                 <p className="text-sm text-justify text-gray-500 mb-4">{support.desc}</p>
                             </div>
                             <div className="mt-auto">
-                                <a
-                                    href="#"
+                                <Link
+                                    to ={support.link}
                                     className="text-sm text-arcadia-red font-medium hover:underline"
                                 >
                                     {support.more}
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     ))}

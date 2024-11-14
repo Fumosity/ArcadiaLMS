@@ -1,6 +1,5 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import Recommended from "../../components/UserComponents/user-home-comp/Recommended";
 import USearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
 import UHero from "../../components/UserComponents/user-home-comp/UHero";
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";

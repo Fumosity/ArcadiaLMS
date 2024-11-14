@@ -75,7 +75,7 @@ const BookPreviewInventory = ({ book }) => {
   // Create a function to handle navigation
   const handleModifyBook = () => {
     const queryParams = new URLSearchParams(bookDetails).toString();
-    navigate(`/bookmodify?${queryParams}`);
+    navigate(`/admin/bookmodify?${queryParams}`);
   };
 
   return (

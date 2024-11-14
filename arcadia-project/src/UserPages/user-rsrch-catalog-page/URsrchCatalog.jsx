@@ -2,8 +2,6 @@ import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import USearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
 import Title from "../../components/main-comp/Title";
-import FilterSidebar from "../../components/UserComponents/user-book-catalog-comp/FilterSidebar";
-import BkSearchResults from "../../components/UserComponents/user-book-catalog-comp/BkSearchResults";
 import URFilterSidebar from "../../components/UserComponents/user-rsrch-catalog-comp/URFilterSidebar";
 import SimRsrch from "../../components/UserComponents/user-rsrch-catalog-comp/SimRsrch";
 import RsrchSearchResults from "../../components/UserComponents/user-rsrch-catalog-comp/RsrchSearchResults";

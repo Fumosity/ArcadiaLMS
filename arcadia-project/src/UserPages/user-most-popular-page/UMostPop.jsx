@@ -1,6 +1,5 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import Recommended from "../../components/UserComponents/user-home-comp/Recommended";
 import USearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
 import UHero from "../../components/UserComponents/user-home-comp/UHero";
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
@@ -8,9 +7,7 @@ import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
 import MostPopBk from "../../components/UserComponents/user-main-comp/MostPopBk";
 import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghestRatedBk";
-import LatestNewsUpd from "../../components/UserComponents/user-news-n-updates-comp/LatestNewsUpd";
 import Title from "../../components/main-comp/Title";
-import ExpandedReco from "../../components/UserComponents/user-reco-comp/ExpandedReco";
 import ExpandedMostPop from "../../components/UserComponents/user-most-popular-comp/ExpandedMostPop";
 
 const UMostPop = () => {

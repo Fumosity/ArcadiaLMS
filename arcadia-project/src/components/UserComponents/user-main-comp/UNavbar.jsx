@@ -7,12 +7,12 @@ export default function UNavbar(){
     <nav className="flex justify-center items-center px-4">
       <div className="userNavbar-content flex">
         <CustomLink to="/" className="userNav-link">Home</CustomLink>
-        <CustomLink to="/bookmanagement" className="userNav-link">Book Catalog</CustomLink>
-        <CustomLink to="/researchmanagement" className="userNav-link">Research Catalog</CustomLink>
-        <CustomLink to="/reservations" className="userNav-link">News and Updates</CustomLink>
-        <CustomLink to="/reservations" className="userNav-link">Reservations</CustomLink>
-        <CustomLink to="/reservations" className="userNav-link">Services</CustomLink>
-        <CustomLink to="/cafe" className="userNav-link">Support</CustomLink>
+        <CustomLink to="/user/bookmanagement" className="userNav-link">Book Catalog</CustomLink>
+        <CustomLink to="/user/researchmanagement" className="userNav-link">Research Catalog</CustomLink>
+        <CustomLink to="/user/newsupdates" className="userNav-link">News and Updates</CustomLink>
+        <CustomLink to="/user/reservations" className="userNav-link">Reservations</CustomLink>
+        <CustomLink to="/user/services" className="userNav-link">Services</CustomLink>
+        <CustomLink to="/user/support" className="userNav-link">Support</CustomLink>
       </div>
     </nav>
   </div>)

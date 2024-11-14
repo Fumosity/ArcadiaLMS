@@ -27,9 +27,20 @@ import UFooter from './components/UserComponents/user-main-comp/UFooter';
 import UHeader from './components/UserComponents/user-main-comp/UHeader';
 import UHomePage from './UserPages/user-home-page/UHomePage';
 import UCopyright from './components/UserComponents/user-main-comp/UCopyright';
+import UBkCatalog from './UserPages/user-book-catalog-page/UBkCatalog';
+import URsrchCatalog from './UserPages/user-rsrch-catalog-page/URsrchCatalog';
+import UNewsNUpd from './UserPages/user-news-and-updates-page/UNewsNUpd';
+import UDiscussionReserv from './UserPages/user-room-reserv-page/UDiscussionReserv';
+import UServices from './UserPages/user-services-page/UServices';
+import USupport from './UserPages/user-support-page/USupport';
+import USupportTix from './UserPages/user-support-tickets-page/USupportTix';
+import UReports from './UserPages/user-report-page/UReports';
+import RegisterForm from './components/UserComponents/user-login-sign-up-comp/RegisterForm';
+
+
 
 // Testing modals
-import ModalTest from './z_modals/ModalTest';
+// import ModalTest from './z_modals/ModalTest';
 
 function App() {
   return (
@@ -42,14 +53,23 @@ function App() {
             <UHeader />
             <Routes>
               <Route path="/" element={<UHomePage />} />
-              <Route path="/user-registration" element={<UsrRegistration />} />
+              <Route path="/user/bookmanagement" element={<UBkCatalog />} />
+              <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
+              <Route path="/user/newsupdates" element={<UNewsNUpd />} />
+              <Route path="/user/reservations" element={<UDiscussionReserv />} />
+              <Route path="/user/services" element={<UServices />} />
+              <Route path="/user/support" element={<USupport />} />
+              <Route path="/user/support/supportticket" element={<USupportTix />} />
+              <Route path="/user/support/reportticket" element={<UReports />} />
+              <Route path="/user/user-registration" element={<RegisterForm />} />
+              
             </Routes>
             <UFooter />
             <UCopyright />
           </>
         }
       />
-      
+
       {/* Admin Routes */}
       <Route
         path="/admin/*"
@@ -58,7 +78,7 @@ function App() {
             <Header />
             <Navbar />
             <Routes>
-              <Route path="ahomepage" element={<AHomePage />} />
+              <Route path="/" element={<AHomePage />} />
               <Route path="analytics" element={<ALibAnal />} />
               <Route path="circulatoryhistory" element={<ABCirculationPage />} />
               <Route path="bookmanagement" element={<ABInventory />} />
