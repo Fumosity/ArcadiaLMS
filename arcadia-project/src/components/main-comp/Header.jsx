@@ -5,7 +5,7 @@ const Header = () => (
   <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center">
-            <img src="image/arcadia.png" alt="Arcadia logo" className="h-8 w-8 mr-2" />
+            <img src="/image/arcadia.png" alt="Arcadia logo" className="h-8 w-8 mr-2" />
             <span className="text-xl font-semibold text-arcadia-red">Arcadia</span>
           </div>
          

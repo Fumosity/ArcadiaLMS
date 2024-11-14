@@ -22,7 +22,7 @@ const BookInfo = ({ book }) => { // Accept book as a prop
       <h4 className="font-semibold mb-2">Synopsis:</h4>
       <p className="text-sm text-gray-700">{book.synopsis}</p>
     </div>
-  );
+  ); 
 };
 
 export default BookInfo;

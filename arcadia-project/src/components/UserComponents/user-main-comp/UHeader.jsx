@@ -7,7 +7,7 @@ const UHeader = () => (
       
       {/* Left-aligned Logo and Text */}
       <div className="flex items-center">
-        <img src="image/arcadia.png" alt="Arcadia logo" className="h-8 w-8 mr-2" />
+        <img src="/image/arcadia.png" alt="Arcadia logo" className="h-8 w-8 mr-2" />
         <span className="text-xl font-semibold text-white">Arcadia</span>
       </div>
       

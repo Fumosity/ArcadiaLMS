@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Header from './components/main-comp/Header';
 import Navbar from './components/main-comp/Navbar';
 import Footer from './components/main-comp/Footer';
@@ -35,9 +35,9 @@ import UServices from './UserPages/user-services-page/UServices';
 import USupport from './UserPages/user-support-page/USupport';
 import USupportTix from './UserPages/user-support-tickets-page/USupportTix';
 import UReports from './UserPages/user-report-page/UReports';
-import RegisterForm from './components/UserComponents/user-login-sign-up-comp/RegisterForm';
-
-
+import AUReportView from './admin-support/ASupportPage';
+import AReportViewPage from './admin-report/AReportViewPage';
+import ReportView from './components/admin-report-view-comp/ReportView';
 
 // Testing modals
 // import ModalTest from './z_modals/ModalTest';
@@ -46,6 +46,8 @@ function App() {
   return (
     <Routes>
       {/* User Route */}
+      {/* <Route path="*" element={<UHomePage/>}/> */}
+      
       <Route
         path="/*"
         element={
@@ -61,7 +63,7 @@ function App() {
               <Route path="/user/support" element={<USupport />} />
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
-              <Route path="/user/user-registration" element={<RegisterForm />} />
+              <Route path="/user/user-registration" element={<UsrRegistration />} />
               
             </Routes>
             <UFooter />
@@ -93,6 +95,7 @@ function App() {
               <Route path="abviewer" element={<ABViewer />} />
               <Route path="arviewer" element={<ARViewer />} />
               <Route path="bookmodify" element={<ABModify />} />
+              <Route path="reportticket" element={<AReportViewPage />} />
             </Routes>
             <Footer />
             <Copyright />

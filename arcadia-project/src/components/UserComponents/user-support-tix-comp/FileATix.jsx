@@ -18,7 +18,7 @@ const FileATix = () => {
         const { error } = await supabase.from("support_ticket").insert([
             {
                 type,
-                status: "ongoing",
+                status: "Ongoing",
                 date,
                 time,
                 subject,
