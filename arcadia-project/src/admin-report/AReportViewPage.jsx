@@ -5,7 +5,7 @@ import ReportView from "../components/admin-report-view-comp/ReportView";
 
 
 const AReportViewPage = () => (
-    <div className="min-h-screen bg-gray-100">
+    <div className="">
         {/* Main header */}
         <Title>User Report View</Title>
 

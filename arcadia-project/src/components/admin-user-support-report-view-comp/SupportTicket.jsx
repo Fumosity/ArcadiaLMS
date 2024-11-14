@@ -26,7 +26,7 @@ const TableRow = ({ type, status, subject, date, time, ticketID, ticketDetails }
         : status === "Ongoing"
         ? "bg-yellow"
         : status === "Intended"
-        ? "bg-arcadia-red"
+        ? "bg-red"
         : "bg-grey"; 
 
     return (
