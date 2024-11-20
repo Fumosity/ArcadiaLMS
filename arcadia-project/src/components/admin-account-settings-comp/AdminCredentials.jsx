@@ -10,7 +10,7 @@ const defaultUser = {
     photoUrl: "/placeholder.svg?height=100&width=100"
 };
 
-export function UserCredentials({ user = defaultUser }) {
+export function AdminCredentials({ user = defaultUser }) {
     return (
         <div className="uMain-cont">
             {/* User Profile Section */}

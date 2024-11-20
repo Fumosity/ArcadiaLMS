@@ -16,30 +16,23 @@ import FAQSection from "../../components/UserComponents/user-faq-comp/FAQSection
 import { UserCredentials } from "../../components/UserComponents/user-account-comp/UserCredentials";
 import { AccountSettings } from "../../components/UserComponents/user-account-comp/AccountSetting";
 import UserCirculationHistory from "../../components/UserComponents/user-account-comp/UserCirculationHistory";
+import { AdminSettings } from "../components/admin-account-settings-comp/AdminSettings";
+import { AdminCredentials } from "../components/admin-account-settings-comp/AdminCredentials";
 
-const UAccountProfile = () => {
+const AAccountSettings = () => {
     return (
         <div className="min-h-screen bg-light-white">
-            <UNavbar />
-            <UsearchBar />
-            <Title>Frequently Asked Questions</Title>
+            <Title>Account Settings</Title>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Content Container */}
                 <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
-                    {/* Sidebar */}
-                    <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mr-5">
-                        <ArcOpHr />
-                        <UpEvents />
-                        <Services />
-                    </div>
-
                     {/* Main Content */}
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
                         {/* Hero Section */}
-                        <UserCredentials />
-                        <AccountSettings />
-                        <UserCirculationHistory />
+                        <AdminCredentials />
+                        <AdminSettings />
+
 
 
                     </div>
@@ -50,4 +43,4 @@ const UAccountProfile = () => {
     )
 };
 
-export default UAccountProfile;
+export default AAccountSettings;

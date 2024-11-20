@@ -20,7 +20,7 @@ const ALibAnal = () => (
                 <div className="grid grid-cols-3 gap-8">
                     <div className="col-span-2 space-y-8">
                         {/* Main content for adding research */}
-                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
+                        <div className="bg-white overflow-hidden p-6 rounded-lg w-full">
                             <RcntLibVisit />
                         </div>
                             <LibBookCirc />

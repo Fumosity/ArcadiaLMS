@@ -20,7 +20,9 @@ export default {
         "silver" : '#F4F4F5',
         "a-t-red" : '#902424',
         "dark-blue" : '#0096C7',
-        "light-blue" : '#48CAE4'
+        "light-blue" : '#48CAE4',
+        "dark-green" : '#234F1E',
+        "pastel-yellow" : '#FDFD96',
     },
     extend: {
       fontFamily: {

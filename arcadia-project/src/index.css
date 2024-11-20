@@ -311,8 +311,13 @@
   width: 100px;
 }
 
+.schedBtn {
+  @apply px-2.5 py-1 border border-black rounded-full hover:bg-grey focus:outline-none focus:ring-2 focus:ring-grey focus:ring-offset-2;
+  width: 135px;
+}
+
 .uPage-btn {
-  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-grey hover:text-black focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-red focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
   width: 100px;
   font-size: 12px;
 }
@@ -378,7 +383,8 @@
   margin-bottom: 25px;
   border: 1px solid #d4d4d8;
   border-radius: 20px;
-  width: 334px;
+  width: 100%;
+  max-width: 334px;
 }
 
 .uSidebar-filter {
@@ -399,6 +405,15 @@
   border-radius: 20px;
   margin-top: 32px;
   width: 1000px;
+}
+
+.aMain-cont {
+  background-color: white;
+  padding: 24px;
+  border: 1px solid #d4d4d8;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 1000px;
 }
 
 .bookCard-cont {
