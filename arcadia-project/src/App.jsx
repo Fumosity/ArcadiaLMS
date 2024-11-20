@@ -20,6 +20,7 @@ import ARAdd from './admin-research-add/ARAdd';
 import ABViewer from './admin-book-viewer/ABViewer';
 import ARViewer from './admin-research-viewer/ARViewer';
 import ABModify from './admin-book-modify/ABModify';
+import ASchedule from './admin-schedule-page/ASchedule'
 
 // User Components
 import UsrRegistration from './UserPages/user-registration-page/UsrRegistration';
@@ -38,6 +39,7 @@ import UReports from './UserPages/user-report-page/UReports';
 import AUReportView from './admin-support/ASupportPage';
 import AReportViewPage from './admin-report/AReportViewPage';
 import ReportView from './components/admin-report-view-comp/ReportView';
+import UAccountProfile from './UserPages/user-account-page/UAccountProfile';
 
 // Testing modals
 // import ModalTest from './z_modals/ModalTest';
