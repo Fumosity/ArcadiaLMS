@@ -1,5 +1,6 @@
 import React from "react";
 import { FiUser } from 'react-icons/fi';
+import { Link, useMatch, useResolvedPath} from "react-router-dom";
 
 const UHeader = () => (
   <header className="bg-arcadia-red shadow">
@@ -13,7 +14,7 @@ const UHeader = () => (
       
       {/* Right-aligned Admin Info */}
       <div className="ml-auto flex items-center">
-        <span className="mr-2 text-white">Arcadia_Admin</span>
+        <Link to="/user/login" className="mr-2 text-white">Arcadia_Admin</Link>
         <FiUser className="h-6 w-6 text-gray-300" />
       </div>
     </div>

@@ -20,7 +20,6 @@ const TableRow = ({ type, status, subject, date, time, ticketID, ticketDetails }
         type === "Research" ? "rounded-full" :
         type === "Account" ? "rounded-full" : "";
 
-    // Set the border color for the status
     const statusColor = status === "Resolved"
         ? "bg-green"
         : status === "Ongoing"
@@ -31,12 +30,11 @@ const TableRow = ({ type, status, subject, date, time, ticketID, ticketDetails }
 
     return (
         <Link 
-            to="/admin/reportticket" 
+            to="/admin/supportticket" 
             state={{ ticket: ticketDetails }}  // Passing ticket details via state
-            className="w-full grid grid-cols-7 gap-4 items-center text-center text-sm text-gray-900 mb-2 cursor-pointer hover:bg-gray-100"
+            className="w-full grid grid-cols-6 gap-4 items-center text-center text-sm text-gray-900 mb-2 cursor-pointer hover:bg-gray-100"
         >
-            <div className={`${backgroundColor} text-gray-800 py-1 px-3`}>{type || "Not Available"}</div>
-            {/* Add border and color for status */}
+            <div className={`${backgroundColor} border rounded-full py-1 px-3`}>{type || "Not Available"}</div>
             <div className={`py-1 px-3 rounded-full ${statusColor}`}>
                 {status || "Not Available"}
             </div>
@@ -51,27 +49,24 @@ const TableRow = ({ type, status, subject, date, time, ticketID, ticketDetails }
 const SupportTicket = () => {
     const [tickets, setTickets] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [isLoading, setIsLoading] = useState(true);  // Loading state to control skeleton display
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchTickets = async () => {
             try {
-                // Simulating a delay of 1.5s
                 setTimeout(async () => {
                     const { data, error } = await supabase
                         .from('support_ticket')
                         .select('ticket_id, type, status, subject, date, time, content');
 
-                    if (error) {
-                        throw error;
-                    }
+                    if (error) throw error;
 
                     setTickets(data);
-                    setIsLoading(false);  // Set loading to false after data is fetched
+                    setIsLoading(false);
                 }, 1500);
             } catch (error) {
                 console.error("Error fetching tickets:", error.message);
-                setIsLoading(false);  // Set loading to false if error occurs
+                setIsLoading(false);
             }
         };
 
@@ -110,7 +105,7 @@ const SupportTicket = () => {
                 </div>
             </div>
 
-            <div className="w-full grid grid-cols-7 gap-4 text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            <div className="w-full grid grid-cols-6 gap-4 text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
                 <div>Type</div>
                 <div>Status</div>
                 <div>Subject</div>
@@ -121,10 +116,9 @@ const SupportTicket = () => {
             <div className="w-full border-t border-grey mb-2"></div>
 
             {isLoading ? (
-                // Display skeleton loaders while fetching data
                 <div className="space-y-4">
                     {[...Array(5)].map((_, index) => (
-                        <div key={index} className="w-full grid grid-cols-7 gap-4 text-center text-sm mb-2">
+                        <div key={index} className="w-full grid grid-cols-6 gap-4 text-center text-sm mb-2">
                             <Skeleton count={1} height={20} />
                             <Skeleton count={1} height={20} />
                             <Skeleton count={1} height={20} />
@@ -144,7 +138,7 @@ const SupportTicket = () => {
                             date={ticket.date}
                             time={ticket.time}
                             ticketID={ticket.ticket_id}
-                            ticketDetails={ticket}  // Passing full ticket details to TableRow
+                            ticketDetails={ticket}
                         />
                         <div className="w-full border-t border-grey mb-2"></div>
                     </React.Fragment>

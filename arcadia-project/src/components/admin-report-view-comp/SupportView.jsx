@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; // to receive state data
+import { useLocation } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { supabase } from "/src/supabaseClient.js";
 
 const ReportView = () => {
   const { state } = useLocation();
-  const ticket = state?.ticket; // Receive the passed report data
-
+  const ticket = state?.ticket;
   const [isLoading, setIsLoading] = useState(true);
   const [reply, setReply] = useState('');
 
@@ -24,9 +23,9 @@ const ReportView = () => {
     const formattedStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1).toLowerCase();
   
     const { data, error } = await supabase
-      .from('report_ticket')
+      .from('support_ticket')
       .update({ status: formattedStatus })  // Use formattedStatus here
-      .eq('report_id', ticket.report_id);  // Match the ticket by its unique ID
+      .eq('ticket_id', ticket.ticket_id);  // Match the ticket by its unique ID
   
     if (error) {
       console.error("Error updating status:", error);
@@ -35,6 +34,7 @@ const ReportView = () => {
       alert(`Status updated to ${formattedStatus}`);
     }
   };
+  
 
   const reportFields = [
     { label: 'User ID*:', value: ticket?.user_id || 'Not Available' },
@@ -104,13 +104,14 @@ const ReportView = () => {
           {buttons.map((button, index) => (
             <button
               key={index}
-              className="py-2 px-6 bg-sky-500 rounded-full border"
+              className="px-1 py-1 border rounded-full w-[200px]"
               onClick={() => updateStatus(button.status)}
             >
               {button.label}
             </button>
           ))}
         </div>
+
         <div className="flex flex-col w-full lg:w-1/2">
           <label className="text-black">Reply:</label>
           <textarea

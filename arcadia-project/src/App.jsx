@@ -36,11 +36,9 @@ import UServices from './UserPages/user-services-page/UServices';
 import USupport from './UserPages/user-support-page/USupport';
 import USupportTix from './UserPages/user-support-tickets-page/USupportTix';
 import UReports from './UserPages/user-report-page/UReports';
-import AUReportView from './admin-support/ASupportPage';
 import AReportViewPage from './admin-report/AReportViewPage';
-import ReportView from './components/admin-report-view-comp/ReportView';
-import UAccountProfile from './UserPages/user-account-page/UAccountProfile';
-import ASystemReport from './admin-system-reports-page/ASystemReport';
+import ASupportViewPage from './admin-report/ASupportViewPage';
+import ULogin from './UserPages/user-log-sign-page/ULogin';
 
 // Testing modals
 import ModalTest from './z_modals/ModalTest';
@@ -51,7 +49,7 @@ function App() {
     <Routes>
       {/* User Route */}
       {/* <Route path="*" element={<UHomePage/>}/> */}
-      
+
       <Route
         path="/*"
         element={
@@ -59,6 +57,7 @@ function App() {
             <UHeader />
             <Routes>
               <Route path="/" element={<UHomePage />} />
+              <Route path="/user/login" element={<ULogin />} />
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
               <Route path="/user/newsupdates" element={<UNewsNUpd />} />
@@ -68,7 +67,7 @@ function App() {
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
               <Route path="/user/user-registration" element={<UsrRegistration />} />
-              
+
             </Routes>
             <UFooter />
             <UCopyright />
@@ -84,6 +83,7 @@ function App() {
             <Header />
             <Navbar />
             <Routes>
+              
               <Route path="/" element={<AHomePage />} />
               <Route path="analytics" element={<ALibAnal />} />
               <Route path="circulatoryhistory" element={<ABCirculationPage />} />
@@ -100,6 +100,7 @@ function App() {
               <Route path="arviewer" element={<ARViewer />} />
               <Route path="bookmodify" element={<ABModify />} />
               <Route path="reportticket" element={<AReportViewPage />} />
+              <Route path="supportticket" element={<ASupportViewPage />} />
             </Routes>
             <Footer />
             <Copyright />

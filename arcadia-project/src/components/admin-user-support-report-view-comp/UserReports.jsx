@@ -1,91 +1,100 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "/src/supabaseClient.js";
+import { Link } from "react-router-dom"; // Import Link to navigate
+import Skeleton from "react-loading-skeleton"; 
+import "react-loading-skeleton/dist/skeleton.css";
 
-// Reusable button component for consistent styling
-const Button = ({ children, onClick, className }) => (
-    <button
-        onClick={onClick}
-        className={`bg-gray-200 py-1 px-3 rounded-full text-xs hover:bg-gray-300 ${className}`}
-        style={{ borderRadius: "40px" }}
+const TableRow = ({ type, status, subject, date, time, reportID, reportDetails }) => {
+  const statusColor =
+    status === "Resolved" ? "bg-green" :
+    status === "Ongoing" ? "bg-yellow" :
+    status === "Intended" ? "bg-red" : "bg-grey";
+
+  return (
+    <Link
+      to="/admin/reportticket" // Update the link to navigate to ReportView
+      state={{ ticket: reportDetails }} // Pass the selected report data to the ReportView via state
+      className="w-full grid grid-cols-6 gap-4 items-center text-center text-sm text-gray-900 mb-2 cursor-pointer hover:bg-gray-100"
     >
-        {children}
-    </button>
-);
-
-// Reusable table row component for admin actions
-const TableRow = ({ type, date, time, userName, userEmail, userID, reportID }) => {
-    // Set background color for specific types
-    const backgroundColor = 
-        type === 'Book' ? 'bg-yellow rounded-full' :
-        type === 'Research' ? 'bg-yellow rounded-full' :
-        type === 'Admin' ? 'bg-yellow rounded-full' :
-        type === 'User' ? 'bg-yellow rounded-full' :
-        '';
-    return (
-        <div className={`w-full grid grid-cols-7 gap-4 items-center text-center text-sm text-gray-900 mb-2`}>
-            <div className={`${backgroundColor} text-gray-800 py-1 px-3`}>{type}</div>
-            <div>{date}</div>
-            <div>{time}</div>
-            <div className={`truncate max-w-xs`}>{userEmail}</div>
-            <div>{userName}</div>
-            <div>{userID}</div>
-            <div>{reportID}</div>
-        </div>
-    );
+      <div className="border rounded-full py-1 px-3">{type || "Not Available"}</div>
+      <div className={`py-1 px-3 rounded-full ${statusColor}`}>
+        {status || "Not Available"}
+      </div>
+      <div className="truncate max-w-xs">{subject || "Not Available"}</div>
+      <div>{date || "Not Available"}</div>
+      <div>{time || "Not Available"}</div>
+      <div>{reportID || "Not Available"}</div>
+    </Link>
+  );
 };
 
 const UserReports = () => {
-    return (
-        <>
-            {/* Title and Navigation Button */}
-            <div className="w-full flex justify-between items-center mb-4">
-                <h2 className="text-zinc-900 text-xl font-semibold">User Reports</h2>
-            </div>
+  const [reports, setReports] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-            {/* Sorting and Filtering Section */}
-            <div className="flex flex-wrap justify-between items-center mb-6 space-x-4">
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Sort By:</span>
-                    <Button>Descending</Button>
-                    <span className="font-medium text-sm">Filter By:</span>
-                    <Button>Type</Button>
-                    <Button>College</Button>
-                    <Button>Department</Button>
-                </div>
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Search:</span>
-                    <input
-                        type="text"
-                        placeholder="A title, borrower, or ID"
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm"
-                        style={{ borderRadius: "40px" }}
-                    />
-                </div>
-            </div>
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from("report_ticket")
+          .select("report_id, type, status, subject, date, time, content");
 
-            {/* Table Header */}
-            <div className="w-full grid grid-cols-7 gap-4 text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                <div>Type</div>
-                <div>Date</div>
-                <div>Time</div>
-                <div>Email</div>
-                <div>Name</div>
-                <div>User ID</div>
-                <div>Report ID</div>
-            </div>
-            <div className="w-full border-t border-grey mb-2"></div>
+        if (error) throw error;
 
-            {/* Table Rows with updated types */}
-            <TableRow type="Book" date="August 23" time="1:24 PM" userName="Alexander Corrine" userEmail="alexander@example.com" userID="12345" reportID="R001" />
+        setReports(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching reports:", error.message);
+        setIsLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, []);
+
+  return (
+    <>
+      <div className="w-full flex justify-between items-center mb-4">
+        <h2 className="text-zinc-900 text-xl font-semibold">User Reports</h2>
+      </div>
+
+      <div className="w-full grid grid-cols-6 gap-4 text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
+        <div>Type</div>
+        <div>Status</div>
+        <div>Subject</div>
+        <div>Date</div>
+        <div>Time</div>
+        <div>Report ID</div>
+      </div>
+      <div className="w-full border-t border-grey mb-2"></div>
+
+      {isLoading ? (
+        <div className="space-y-4">
+          {[...Array(5)].map((_, index) => (
+            <Skeleton key={index} height={20} />
+          ))}
+        </div>
+      ) : reports.length > 0 ? (
+        reports.map(report => (
+          <React.Fragment key={report.report_id}>
+            <TableRow
+              type={report.type}
+              status={report.status}
+              subject={report.subject}
+              date={report.date}
+              time={report.time}
+              reportID={report.report_id}
+              reportDetails={report} // Pass the entire report data
+            />
             <div className="w-full border-t border-grey mb-2"></div>
-            <TableRow type="Research" date="August 23" time="1:09 PM" userName="Alexander Corrine" userEmail="alexander@example.com" userID="12346" reportID="R002" />
-            <div className="w-full border-t border-grey mb-2"></div>
-            <TableRow type="User" date="August 23" time="2:00 PM" userName="Alexander Corrine" userEmail="alexander@example.com" userID="12347" reportID="R003" />
-            <div className="w-full border-t border-grey mb-2"></div>
-            <TableRow type="Admin" date="August 23" time="2:00 PM" userName="Alexander Corrine" userEmail="alexander@example.com" userID="12347" reportID="R003" />
-            <div className="w-full border-t border-grey mb-2"></div>
-            
-        </>
-    );
+          </React.Fragment>
+        ))
+      ) : (
+        <div className="text-center text-gray-500">No reports found</div>
+      )}
+    </>
+  );
 };
 
 export default UserReports;

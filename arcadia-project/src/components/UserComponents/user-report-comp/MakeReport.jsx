@@ -18,7 +18,7 @@ const MakeReport = () => {
         const { error } = await supabase.from("report_ticket").insert([
             {
                 type,
-                status: "open",
+                status: "Ongoing",
                 date,
                 time,
                 subject,
