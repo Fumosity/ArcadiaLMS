@@ -93,6 +93,21 @@ const UsrRegistration = () => {
       const { data, error } = await supabase.from('user_accounts').insert([newUser]);
       if (error) throw error;
       alert("Please check your LPU email to authenticate your account.");
+
+      const emailResponse = await fetch('http://localhost:5000/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: `${email}@lpunetwork.edu.ph`,
+          firstName,
+          arcId: newUser.userARCID,
+        }),
+      });
+  
+      if (!emailResponse.ok) {
+        throw new Error('Failed to send authentication email.');
+      }
+
       setFirstName('');
       setLastName('');
       setLPUID('');
