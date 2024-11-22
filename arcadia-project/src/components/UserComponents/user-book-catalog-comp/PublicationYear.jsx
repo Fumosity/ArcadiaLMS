@@ -9,7 +9,7 @@ export default function PublicationYear() {
     };
 
     return (
-        <div className="uSidebar-cont">
+        <div className="uSidebar-filter">
             <h2 className="text-xl font-semibold mb-2.5">Publication Year</h2>
             <div className="space-y-2">
                 {yearOptions.map((option) => (

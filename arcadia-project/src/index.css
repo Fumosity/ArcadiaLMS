@@ -399,6 +399,7 @@
 }
 
 .uMain-cont {
+  @apply relative overflow-hidden;
   background-color: white;
   padding: 24px;
   border: 1px solid #d4d4d8;
@@ -426,8 +427,10 @@
 }
 
 .genCard-cont {
-  @apply bg-white border border-grey rounded-xl p-4 transform transition duration-300 hover:shadow-lg hover:scale-105;
+  @apply bg-white border border-grey rounded-xl p-4 transform transition duration-300 hover:shadow-lg hover:scale-105 will-change-transform;
 }
+
+
 
 .uHero-cont {
   width: 1000px;
@@ -435,7 +438,6 @@
   padding: 24px;
   border: 1px solid #d4d4d8;
   border-radius: 20px;
-  margin-top: 2px;
 }
 
 .uSidebar-Seemore {
@@ -455,7 +457,7 @@
 
 .whiteButtons {
   @apply px-2.5 py-1 text-center border border-a-t-red text-a-t-red rounded-full hover:bg-red hover:border-red hover:text-white focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
-  width:100px;
+  width:auto;
   font-size: 12px;
 }
 
@@ -468,5 +470,29 @@
 .genWhiteButtons {
   @apply px-2.5 py-1 text-center border border-a-t-red text-a-t-red rounded-full hover:bg-red hover:border-red hover:text-white focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
   width:250px;
+  font-size: 12px;
+}
+
+.reasonFines {
+  @apply px-2.5 py-1 text-sm text-center border border-red bg-red text-black rounded-full;
+  width: 100px;
+}
+
+.viewBtn {
+  @apply px-2.5 py-1 text-center border border-grey text-grey rounded-full hover:bg-dark-grey hover:border-dark-grey hover:text-white focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+
+}
+
+.contSearchbar {
+  @apply px-2.5 py-1 text-center border text-sm border-grey rounded-full
+}
+
+.input-bar{
+  @apply flex-1 px-3 py-0.5 border border-grey rounded-full text-right
+}
+
+.penBtn {
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-red focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width: 155px;
   font-size: 12px;
 }

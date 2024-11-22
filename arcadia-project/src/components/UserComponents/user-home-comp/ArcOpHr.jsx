@@ -12,7 +12,7 @@ const ArcOpHr = () => {
   ];
 
   return (
-    <div className="uSidebar-cont">
+    <div className="uSidebar-filter">
       <h2 className="text-xl font-semibold mb-2.5">ARC Operating Hours</h2>
       <table className="w-full text-sm">
         <thead>

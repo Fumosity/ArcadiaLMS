@@ -14,6 +14,11 @@ import DeleteSupadminAcc from './attention-modals/DeleteSupadminAcc';
 import BookingReservation from './BookingReservation';
 import UserAccount from './UserAccount';
 import AdminAccount from './AdminAccount';
+import PrintReport from './PrintReport';
+import ModifySchedule from './ModifySchedule';
+import AddEvents from './AddEvents';
+import RemoveEvent from './RemoveEvent';
+import ModifyEvents from './ModifyEvents';
 
 function ModalTest() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +28,7 @@ function ModalTest() {
       <button onClick={() => setIsModalOpen(true)} className="btn">
         Open Research Upload Modal
       </button>
-      <AdminAccount isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ModifyEvents isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }

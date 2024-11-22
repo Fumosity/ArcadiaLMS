@@ -9,7 +9,7 @@ export default function Language() {
     };
 
     return (
-        <div className="uSidebar-cont">
+        <div className="uSidebar-filter">
             <h3 className="text-xl font-semibold mb-2.5">Language</h3>
             <div className="space-y-2">
                 {languageOptions.map((option) => (

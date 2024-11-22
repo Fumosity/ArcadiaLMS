@@ -7,9 +7,9 @@ export default function FilterSidebar() {
     return (
 
 
-        <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4">
+        <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 ">
 
-            <div className="uSidebar-filter flex items-center space-x-2 px-3 py-0.5 border border-grey rounded-xl">
+            <div className="uSidebar-filter flex items-center space-x-2 px-3 py-0.5 border border-grey rounded-full">
                 <label htmlFor="sort" className="text-sm font-semibold">Sort:</label>
 
                 {/* Select Dropdown with Custom Arrow */}
@@ -46,7 +46,7 @@ export default function FilterSidebar() {
                 Clear Filters
             </button>
 
-
+            
             <PublicationYear />
 
 

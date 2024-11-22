@@ -40,9 +40,11 @@ import AUReportView from './admin-support/ASupportPage';
 import AReportViewPage from './admin-report/AReportViewPage';
 import ReportView from './components/admin-report-view-comp/ReportView';
 import UAccountProfile from './UserPages/user-account-page/UAccountProfile';
+import ASystemReport from './admin-system-reports-page/ASystemReport';
 
 // Testing modals
-// import ModalTest from './z_modals/ModalTest';
+import ModalTest from './z_modals/ModalTest';
+import ErrorPage from './UserPages/ErrorPage';
 
 function App() {
   return (

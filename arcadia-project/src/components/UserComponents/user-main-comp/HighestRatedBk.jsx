@@ -2,7 +2,7 @@ import React from "react";
 
 const HighestRatedBk = () => {
   return (
-    <div className="uSidebar-cont">
+    <div className="uSidebar-filter">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold mb-2.5">Highest Rated Books</h2>
         <button className="uSidebar-Seemore">

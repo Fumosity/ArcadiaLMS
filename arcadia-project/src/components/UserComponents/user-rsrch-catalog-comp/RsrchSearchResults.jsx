@@ -48,7 +48,7 @@ export default function RsrchSearchResults() {
 
             {/* Book Entry */}
             {displayedRsrchs.map((rsrch, index) => (
-                <div key={index} className="genCard-cont flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm mb-6">
+                <div key={index} className="genCard-cont flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg mb-6">
                     <div className="flex-shrink-0 w-[200px]">
                         <img
                             src={rsrch.img || "https://via.placeholder.com/150x300"}

@@ -2,7 +2,7 @@ import React from "react";
 
 const Services = () => {
     return (
-        <div className="uSidebar-cont">
+        <div className="uSidebar-filter">
             <h2 className="text-xl font-semibold mb-2.5">Services</h2>
             <ul className="space-y-3 text-base text-gray-600 divide-y divide-grey">
                 <li className="py-2">Chat with Arcadia</li>

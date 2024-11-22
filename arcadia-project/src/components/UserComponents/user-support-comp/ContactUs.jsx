@@ -9,7 +9,7 @@ const ContactUs = () => {
     ];
 
     return (
-        <div className="uHero-cont p-6 bg-white rounded-lg border border-gray-200">
+        <div className="uMain-cont p-6 bg-white rounded-lg border border-gray-200">
             <h2 className="text-lg font-semibold mb-4">Contact Us</h2>
 
             <p className="text-sm mb-4">

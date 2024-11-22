@@ -23,11 +23,11 @@ export default function CatGenre() {
     };
 
     return (
-        <div className='uSidebar-cont'>
+        <div className='uSidebar-filter'>
             <h2 className="text-xl font-semibold mb-2.5">Category and Genre</h2>
 
             {/* Category checkboxes with single-select behavior and custom styles */}
-            <div className="space-y-2">
+            <div className="space-y-2 mb-2">
                 {['All', 'Fiction', 'Nonfiction'].map((option) => (
                     <div key={option} className="flex items-center space-x-2">
                         {/* Custom checkbox styling */}
@@ -47,7 +47,7 @@ export default function CatGenre() {
 
             {/* Search Genre dropdown */}
             <div className="space-y-2 border-t border-grey">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center mt-2 justify-between">
                     <p className="text-sm font-medium">Search for Genre:</p>
                     <div className="flex items-center space-x-1 text-sm">
                         <button
@@ -109,8 +109,8 @@ export default function CatGenre() {
 
 
             {/* Exclude Genre dropdown */}
-            <div className="space-y-2 border-t border-grey">
-                <p className="text-sm font-medium">Exclude Genre:</p>
+            <div className="space-y-2 mt-2 border-t border-grey">
+                <p className="text-sm font-medium mt-2">Exclude Genre:</p>
                 <div className="relative w-full">
                     <select
                         onChange={(e) => handleGenreSelect(e.target.value, setExcludeGenre, excludeGenre)}

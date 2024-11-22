@@ -22,7 +22,7 @@ const AdminAccount = ({ isOpen, onClose }) => {
 
         <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
           <div className="flex-1 space-y-4 min-w-0">
-          <div className="flex items-center">
+            <div className="flex items-center">
               <span className="w-32 text-sm font-medium">Type:</span>
               <div className="flex-1 flex items-center relative">
                 <input
@@ -31,7 +31,7 @@ const AdminAccount = ({ isOpen, onClose }) => {
                   className="flex-1 px-3 py-1.5 border border-grey rounded-full text-right pr-20" // Add padding for the button
                   readOnly
                 />
-                <button 
+                <button
                   className="inputWithChangeBttn"
                   onClick={handleChangeType} // Change type on button click
                 >
