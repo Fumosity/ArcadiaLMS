@@ -6,7 +6,7 @@ const UHero = () => {
             <section className="userHero relative">
                 <div className="absolute inset-0">
                     <img 
-                        src="image/bg-hero.png" 
+                        src="/image/bg-hero.png" 
                         alt="Hero Background" 
                         className="w-full h-full object-cover rounded-lg" // Add rounded-lg here
                     />
