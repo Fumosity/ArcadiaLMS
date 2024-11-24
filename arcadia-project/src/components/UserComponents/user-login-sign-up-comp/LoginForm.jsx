@@ -60,7 +60,7 @@ export default function LoginForm() {
 
         <div className="flex gap-4 justify-center items-center">
           <Link
-            to="/register"
+            to="/user/register"
             className="whiteButtons"
           >
             Register

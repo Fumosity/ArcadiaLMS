@@ -43,6 +43,7 @@ import ULogin from './UserPages/user-log-sign-page/ULogin';
 // Testing modals
 import ModalTest from './z_modals/ModalTest';
 import ErrorPage from './UserPages/ErrorPage';
+import URegister from './UserPages/user-log-sign-page/URegister';
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
             <UHeader />
             <Routes>
               <Route path="/" element={<UHomePage />} />
+              <Route path="/user/register" element={<UsrRegistration />} />
               <Route path="/user/login" element={<ULogin />} />
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
@@ -66,7 +68,6 @@ function App() {
               <Route path="/user/support" element={<USupport />} />
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
-              <Route path="/user/user-registration" element={<UsrRegistration />} />
 
             </Routes>
             <UFooter />
@@ -83,7 +84,6 @@ function App() {
             <Header />
             <Navbar />
             <Routes>
-              
               <Route path="/" element={<AHomePage />} />
               <Route path="analytics" element={<ALibAnal />} />
               <Route path="circulatoryhistory" element={<ABCirculationPage />} />
