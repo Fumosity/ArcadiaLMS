@@ -43,6 +43,7 @@ import ULogin from './UserPages/user-log-sign-page/ULogin';
 // Testing modals
 import ModalTest from './z_modals/ModalTest';
 import ErrorPage from './UserPages/ErrorPage';
+import URegister from './UserPages/user-log-sign-page/URegister';
 
 function App() {
   return (
@@ -56,8 +57,9 @@ function App() {
           <>
             <UHeader />
             <Routes>
-              <Route path="/" element={<UHomePage />} />
+              <Route path="/" element={<ModalTest />} />
               <Route path="/user/login" element={<ULogin />} />
+              <Route path="/user/register" element={<URegister />} />
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
               <Route path="/user/newsupdates" element={<UNewsNUpd />} />

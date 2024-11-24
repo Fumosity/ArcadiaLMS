@@ -18,7 +18,7 @@ export default function RegisterForm() {
     <div className="uMain-cont max-w-md mx-auto p-8 bg-white rounded-2xl">
       <div className="flex justify-center mb-6">
         <div className="flex items-center gap-1">
-          <img src="image/arcadia.png" alt="Book icon" className="h-13 w-13" />
+          <img src="/image/arcadia.png" alt="Book icon" className="h-13 w-13" />
           <h1 className="text-5xl font-semibold">Arcadia</h1>
         </div>
       </div>
@@ -150,7 +150,7 @@ export default function RegisterForm() {
             className="whiteButtons px-4 py-2 rounded-full bg-red-800 text-white hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
             Register
-          </button>
+          </button> 
         </div>
       </form>
 
