@@ -28,7 +28,7 @@ function ModalTest() {
       <button onClick={() => setIsModalOpen(true)} className="btn">
         Open Research Upload Modal
       </button>
-      <ModifyEvents isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ModifySchedule isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
