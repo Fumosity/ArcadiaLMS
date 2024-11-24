@@ -57,12 +57,9 @@ function App() {
           <>
             <UHeader />
             <Routes>
-<<<<<<< HEAD
               <Route path="/" element={<UHomePage />} />
               <Route path="/user/register" element={<UsrRegistration />} />
-=======
               <Route path="/" element={<ModalTest />} />
->>>>>>> fd9e7641a7898faaea3d124dd59715180bd8d1eb
               <Route path="/user/login" element={<ULogin />} />
               <Route path="/user/register" element={<URegister />} />
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
