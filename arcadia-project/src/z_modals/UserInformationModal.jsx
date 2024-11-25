@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
 import { supabase } from './../supabaseClient';
+import WrngPromoteToIntern from './warning-modals/WrngPromoteToIntern';
+import WrngDemoteFromIntern from './warning-modals/WrngDemoteFromIntern';
 
 const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
   if (!isOpen) return null;
 
   const [modifiedUser, setModifiedUser] = useState({
     ...user,
-    name: `${user.userFName} ${user.userLName}`
+    name: `${user.userFName} ${user.userLName}`,
+    password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isAttentionModalOpen, setIsAttentionModalOpen] = useState(false);
+  const [isDemotionModalOpen, setIsDemotionModalOpen] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const handleChangeType = () => {
+  const handleChangeType = (e) => {
+    const newType = e.target.value;
     setModifiedUser((prevUser) => ({
       ...prevUser,
-      type: prevUser.type === "Student" ? "Teacher" :
-        prevUser.type === "Teacher" ? "Intern" : "Student",
+      type: newType,
     }));
   };
 
@@ -23,8 +29,8 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
 
     if (name === 'name') {
       const nameParts = value.split(' ');
-      const userLName = nameParts.pop(); // Last word is last name
-      const userFName = nameParts.join(' '); // Remaining parts are first name
+      const userLName = nameParts.pop();
+      const userFName = nameParts.join(' ');
       setModifiedUser((prevUser) => ({
         ...prevUser,
         userFName,
@@ -40,18 +46,48 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
   };
 
   const handleSubmit = async () => {
+    if (modifiedUser.type === 'Intern' && user.type !== 'Intern') {
+      setIsAttentionModalOpen(true);
+      return;
+    }
+
+    if (modifiedUser.type !== 'Intern' && user.type === 'Intern') {
+      setIsDemotionModalOpen(true);
+      return;
+    }
+
+    await updateUserInDatabase();
+  };
+
+  const handleAttentionConfirm = async () => {
+    setIsAttentionModalOpen(false);
+    await updateUserInDatabase();
+  };
+  
+  const handleDemotionConfirm = async () => {
+    setIsDemotionModalOpen(false);
+    await updateUserInDatabase();
+  };
+
+  const updateUserInDatabase = async () => {
     setIsLoading(true);
     try {
+      const updateData = {
+        userAccountType: modifiedUser.type,
+        userFName: modifiedUser.userFName,
+        userLName: modifiedUser.userLName,
+        userCollege: modifiedUser.college,
+        userDepartment: modifiedUser.department,
+        userEmail: modifiedUser.email,
+      };
+
+      if (modifiedUser.password) {
+        updateData.userPassword = modifiedUser.password;
+      }
+
       const { data, error } = await supabase
         .from('user_accounts')
-        .update({
-          userAccountType: modifiedUser.type,
-          userFName: modifiedUser.userFName,
-          userLName: modifiedUser.userLName,
-          userCollege: modifiedUser.college,
-          userDepartment: modifiedUser.department,
-          userEmail: modifiedUser.email,
-        })
+        .update(updateData)
         .eq('userID', modifiedUser.userId);
 
       if (error) {
@@ -71,6 +107,10 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-4xl p-8 sm:p-10">
@@ -80,21 +120,17 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
           <div className="flex-1 space-y-4 min-w-0">
             <div className="flex items-center">
               <span className="w-32 text-sm font-medium">Type:</span>
-              <div className="flex-1 flex items-center relative">
-                <input
-                  type="text"
-                  name="type"
-                  value={modifiedUser.type}
-                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full text-right pr-20"
-                  readOnly
-                />
-                <button
-                  className="absolute right-0 px-4 py-1 text-sm text-blue-600 hover:text-blue-800"
-                  onClick={handleChangeType}
-                >
-                  Change
-                </button>
-              </div>
+              <select
+                name="type"
+                value={modifiedUser.type}
+                onChange={handleChangeType}
+                className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
+              >
+                <option value="Intern">Intern</option>
+                <option value="Teacher">Teacher</option>
+                <option value="Student">Student</option>
+                <option value="User">User</option>
+              </select>
             </div>
 
             <div className="flex items-center">
@@ -104,7 +140,7 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
                 name="userId"
                 value={modifiedUser.userId}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
-                readOnly
+                onChange={handleInputChange}
               />
             </div>
 
@@ -115,7 +151,7 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
                 name="schoolId"
                 value={modifiedUser.schoolId}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
-                readOnly
+                onChange={handleInputChange}
               />
             </div>
 
@@ -139,12 +175,9 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
                 onChange={handleInputChange}
               />
             </div>
-
           </div>
 
           <div className="flex-1 space-y-4 min-w-0">
-
-
             <div className="flex items-center">
               <span className="w-32 text-sm font-medium">College:</span>
               <input
@@ -182,13 +215,19 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
               <span className="w-32 text-sm font-medium">Password:</span>
               <div className="flex-1 flex items-center relative">
                 <input
-                  type="password"
-                  value="********"
-                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full text-right pr-20"
-                  readOnly
+                  type={isPasswordVisible ? "text" : "password"}
+                  name="password"
+                  value={modifiedUser.password}
+                  onChange={handleInputChange}
+                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
+                  placeholder="Enter new password"
                 />
-                <button className="absolute right-0 px-4 py-1 text-sm text-blue-600 hover:text-blue-800">
-                  Change
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 text-sm text-blue-600 hover:text-blue-800"
+                >
+                  {isPasswordVisible ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
@@ -211,6 +250,22 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
           </button>
         </div>
       </div>
+
+      <WrngPromoteToIntern
+        isOpen={isAttentionModalOpen}
+        onClose={() => setIsAttentionModalOpen(false)}
+        userFName={modifiedUser.userFName}
+        userLName={modifiedUser.userLName}
+        onPromote={handleAttentionConfirm}
+      />
+
+      <WrngDemoteFromIntern
+        isOpen={isDemotionModalOpen}
+        onClose={() => setIsDemotionModalOpen(false)}
+        userFName={modifiedUser.userFName}
+        userLName={modifiedUser.userLName}
+        onDemote={handleDemotionConfirm}
+      />
     </div>
   );
 };

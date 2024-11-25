@@ -1,6 +1,6 @@
 import React from 'react';
 
-const WrngDemote = ({ isOpen, onClose, onDemote, userFName, userLName }) => {
+const WrngPromoteToIntern = ({ isOpen, onClose, onPromote, userFName, userLName }) => {
   if (!isOpen) return null;
 
   return (
@@ -23,8 +23,7 @@ const WrngDemote = ({ isOpen, onClose, onDemote, userFName, userLName }) => {
 
         {/* Modal Content */}
         <p className="text-gray-700 mb-6">
-          You are about to demote <span className="font-bold">{userFName} {userLName}</span> into a regular user account. This will result in the loss of full access to the system. 
-          <br />
+          You are about to promote <span className="font-bold">{userFName} {userLName}</span> into an Intern user account.           <br />
           <br />
           Are you sure about this?
         </p>
@@ -38,10 +37,10 @@ const WrngDemote = ({ isOpen, onClose, onDemote, userFName, userLName }) => {
             Nevermind
           </button>
           <button
-            onClick={onDemote}
+            onClick={onPromote}
             className="cancelButton"
           >
-            Demote
+            Promote
           </button>
         </div>
       </div>
@@ -49,4 +48,4 @@ const WrngDemote = ({ isOpen, onClose, onDemote, userFName, userLName }) => {
   );
 };
 
-export default WrngDemote;
+export default WrngPromoteToIntern;

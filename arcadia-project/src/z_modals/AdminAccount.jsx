@@ -11,6 +11,7 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
   const [modifiedUser, setModifiedUser] = useState({
     ...user,
     name: `${user.userFName} ${user.userLName}`,
+    password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isDemoteModalOpen, setIsDemoteModalOpen] = useState(false);
@@ -18,25 +19,10 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
   const [isPromoteToSuperadminModalOpen, setIsPromoteToSuperadminModalOpen] = useState(false);
   const [isPromoteToAdminModalOpen, setIsPromoteToAdminModalOpen] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const handleChangeType = (e) => {
     const newType = e.target.value;
-
-    if (modifiedUser.type === "Superadmin" && newType === "Admin") {
-      setIsDemoteModalOpen(true);
-    }
-
-    if (modifiedUser.type === "Superadmin" || "Admin" && newType === "Intern") {
-      setIsDemoteToInternModalOpen(true);
-    }
-
-    if (modifiedUser.type === "Admin" && newType === "Superadmin") {
-      setIsPromoteToSuperadminModalOpen(true);
-    }
-
-    if (modifiedUser.type === "Intern" && newType === "Admin") {
-      setIsPromoteToAdminModalOpen(true);
-    }
 
     setModifiedUser((prevUser) => ({
       ...prevUser,
@@ -72,20 +58,20 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
       return;
     }
 
-    if (modifiedUser.type === "Intern" && user.type === "Superadmin" || "Admin") {
+    if (modifiedUser.type === "Intern" && (user.type === "Superadmin" || user.type === "Admin")) {
       setPendingSubmit(true); // Wait for demotion confirmation
       setIsDemoteToInternModalOpen(true);
       return;
     }
 
     if (modifiedUser.type === "Superadmin" && user.type === "Admin") {
-      setPendingSubmit(true); // Wait for demotion confirmation
+      setPendingSubmit(true); // Wait for promotion confirmation
       setIsPromoteToSuperadminModalOpen(true);
       return;
     }
 
     if (modifiedUser.type === "Admin" && user.type === "Intern") {
-      setPendingSubmit(true); // Wait for demotion confirmation
+      setPendingSubmit(true); // Wait for promotion confirmation
       setIsPromoteToAdminModalOpen(true);
       return;
     }
@@ -125,9 +111,12 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
           userCollege: modifiedUser.college,
           userDepartment: modifiedUser.department,
           userEmail: modifiedUser.email,
-          userPassword: modifiedUser.password,
         })
         .eq("userID", modifiedUser.userId);
+      
+        if (modifiedUser.password) {
+          updateData.userPassword = modifiedUser.password;
+        }
 
       if (error) {
         console.error("Error updating user:", error);
@@ -144,6 +133,10 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
   };
 
   return (
@@ -190,6 +183,28 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
                 onChange={handleInputChange}
               />
             </div>
+
+            <div className="flex items-center">
+              <span className="w-32 text-sm font-medium">First Name:</span>
+              <input
+                type="text"
+                name="userFName"
+                value={modifiedUser.userFName || ""}
+                className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="flex items-center">
+              <span className="w-32 text-sm font-medium">Last Name:</span>
+              <input
+                type="text"
+                name="userLName"
+                value={modifiedUser.userLName || ""}
+                className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
+                onChange={handleInputChange}
+              />
+            </div>
+
           </div>
 
           <div className="flex-1 space-y-4 min-w-0">
@@ -225,6 +240,27 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
                 onChange={handleInputChange}
               />
             </div>
+
+            <div className="flex items-center">
+              <span className="w-32 text-sm font-medium">Password:</span>
+              <div className="flex-1 flex items-center relative">
+                <input
+                  type={isPasswordVisible ? "text" : "password"}
+                  name="password"
+                  value={modifiedUser.password}
+                  onChange={handleInputChange}
+                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
+                  placeholder="Enter new password"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 text-sm text-blue-600 hover:text-blue-800"
+                >
+                  {isPasswordVisible ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -253,7 +289,7 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
         onClose={() => setIsDemoteToInternModalOpen(false)}
         userFName={modifiedUser.userFName}
         userLName={modifiedUser.userLName}
-        onPromote={handleDemoteToInternConfirm}
+        onDemote={handleDemoteToInternConfirm}
       />
 
       <PromoteToSuperadmin
@@ -264,13 +300,8 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
       <PromoteAdminModal
         isOpen={isPromoteToAdminModalOpen}
         onClose={() => setIsPromoteToAdminModalOpen(false)}
-        userFName={modifiedUser.userFName}
-        userLName={modifiedUser.userLName}
         onPromote={handlePromoteToAdminConfirm}
       />
-
-
-
     </div>
   );
 };
