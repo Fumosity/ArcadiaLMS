@@ -9,7 +9,6 @@ import MainHeader from "../components/main-comp/MainHeader";
 
 const ABChecking = () => (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-        <MainHeader />
         <Title>Book Checking</Title>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-3 gap-8">
@@ -18,7 +17,7 @@ const ABChecking = () => (
                         <BCHistory />
                     </div>
                     <div className="lg:col-span-1 space-y-8">
-                            <AccessTable />
+                        <AccessTable />
                         <BksDueTdy />
                     </div>
                 </div>

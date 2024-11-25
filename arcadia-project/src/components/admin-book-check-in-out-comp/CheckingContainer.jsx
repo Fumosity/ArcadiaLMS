@@ -1,17 +1,216 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../supabaseClient'; 
 
 const CheckingContainer = () => {
   const [checkMode, setCheckMode] = useState('Check Out');
+  const [isSubmitting, setIsSubmitting] = useState(false); // State for loading indicator
+  const [emptyFields, setEmptyFields] = useState({}); // Track empty fields
+
+  // Function to get the PC's current local time
+  const getLocalTime = () => {
+    const now = new Date();
+    return now.toTimeString().slice(0, 5); // Returns in "HH:MM" format
+  };
+
+  const formatDate = (date) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Manila' };
+    return new Date(date).toLocaleDateString('en-PH', options);
+  };
+
+  // Function to calculate deadline 3 days ahead of the given date
+  const calculateDeadline = (selectedDate) => {
+    const date = new Date(selectedDate);
+    date.setDate(date.getDate() + 3); // Add 3 days
+    return formatDate(date); // Return formatted date
+  };
+
+  const [formData, setFormData] = useState({
+    userID: '',
+    bookID: '',
+    schoolNo: '',
+    bookTitle: '',
+    name: '',
+    date: '', // Store date in YYYY-MM-DD format
+    college: '',
+    time: getLocalTime(), // Set the initial value to the PC's local time
+    department: '',
+    deadline: '', // Initialize deadline as empty
+  });
+
+  useEffect(() => {
+    if (checkMode === 'Check In') {
+      setFormData((prev) => ({
+        ...prev,
+        time: getLocalTime(),
+        deadline: '', // Clear deadline when "Check In" is selected
+      }));
+    }
+  }, [checkMode]);
+
+  useEffect(() => {
+    if (formData.userID) {
+      const fetchUserData = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('user_accounts')
+            .select('userLPUID, userFName, userLName, userCollege, userDepartment')
+            .eq('userID', formData.userID)
+            .single(); 
+
+          if (error || !data) {
+            setFormData((prev) => ({
+              ...prev,
+              schoolNo: '',
+              name: '',
+              college: '',
+              department: '',
+            }));
+          } else {
+            setFormData((prev) => ({
+              ...prev,
+              schoolNo: data.userLPUID,
+              name: `${data.userFName} ${data.userLName}`,
+              college: data.userCollege,
+              department: data.userDepartment,
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      };
+
+      fetchUserData();
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        schoolNo: '',
+        name: '',
+        college: '',
+        department: '',
+      }));
+    }
+  }, [formData.userID]);
+
+  useEffect(() => {
+    if (formData.bookID) {
+      const fetchBookData = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('book')
+            .select('title')
+            .eq('bookID', formData.bookID)
+            .single(); 
+
+          if (error || !data) {
+            setFormData((prev) => ({
+              ...prev,
+              bookTitle: '',
+            }));
+          } else {
+            setFormData((prev) => ({
+              ...prev,
+              bookTitle: data.title,
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching book data:', error);
+        }
+      };
+
+      fetchBookData();
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        bookTitle: '',
+      }));
+    }
+  }, [formData.bookID]);
 
   const handleCheckChange = (e) => {
     setCheckMode(e.target.value);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      let updatedFormData = { ...prev, [name]: value };
+
+      if (name === 'date') {
+        updatedFormData.deadline = calculateDeadline(value); // Calculate and set the deadline
+      }
+
+      return updatedFormData;
+    });
+  };
+
+  const handleSubmit = async () => {
+    // Check if all required fields are filled
+    const requiredFields = [
+      'userID', 'bookID', 'date', 'time', 'schoolNo', 'name', 'college', 'department', 'bookTitle'
+    ];
+
+    let emptyFields = {};
+    for (let field of requiredFields) {
+      if (!formData[field]) {
+        emptyFields[field] = true; // Mark field as empty
+      }
+    }
+
+    if (Object.keys(emptyFields).length > 0) {
+      setEmptyFields(emptyFields); // Set empty fields state
+      alert('Please fill in all required fields.');
+      return; // Prevent form submission if any required field is empty
+    }
+
+    setIsSubmitting(true); // Set submitting state to true when form is being submitted
+    setEmptyFields({}); // Reset empty fields before submission
+
+    try {
+      const { userID, schoolNo, name, college, department, bookID, bookTitle, date, time, deadline } = formData;
+      const currentTime = getLocalTime();
+      
+      const transactionType = checkMode === 'Check Out' ? 'Borrowed' : 'Returned';
+  
+      const transactionData = {
+        user_id: userID,
+        school_id: schoolNo,
+        name: name,
+        college: college,
+        department: department,
+        book_id: bookID,
+        book_title: bookTitle,
+        checkout_date: checkMode === 'Check Out' ? date : null,
+        checkout_time: checkMode === 'Check Out' ? time : null,
+        checkin_date: checkMode === 'Check In' ? date : null,
+        checkin_time: checkMode === 'Check In' ? time : null,
+        ...(checkMode === 'Check Out' && { deadline }),
+        book_cover: '/path-to-book-cover.jpg',
+        transaction_type: transactionType,
+      };
+  
+      console.log('Transaction data being submitted:', transactionData);
+  
+      const { data, error } = await supabase.from('book_transactions').insert([transactionData]);
+  
+      if (error) {
+        console.error('Error inserting transaction:', error);
+        alert('Error submitting the form. Please try again.');
+      } else {
+        console.log('Transaction successful:', data);
+        alert('Transaction completed successfully!');
+      }
+    } catch (error) {
+      console.error('Error processing transaction:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false); // Set submitting state back to false when done
+    }
   };
 
   return (
     <div className="max-w-6xl mx-auto p-4 bg-white shadow-lg rounded-lg">
       <h2 className="text-lg font-bold mb-3">Checking</h2>
 
-      {/* Check In / Check Out Options */}
       <div className="flex items-center mb-3">
         <label className="mr-2">
           <input
@@ -35,138 +234,55 @@ const CheckingContainer = () => {
         </label>
       </div>
 
-      {/* Form Section - Horizontal alignment of inputs */}
       <div className="grid grid-cols-2 gap-4 mb-5">
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">User ID:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="1-00923"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">Book ID:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="B-1742"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">School No.:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="2021-02909"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">Book Title:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="National Geographic World Atlas"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">Name:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="Alexander B. Corrine"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">Check Out Date:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="September 11 2024"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">College:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="COEDCSA"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">Check Out Time:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="12:04PM"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">Department:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="DCS"
-          />
-        </div>
-        <div className="flex items-center">
-          <label className="w-1/3 text-sm font-medium">Deadline:</label>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-full w-full p-1.5 text-right"
-            readOnly
-            value="September 18 2024"
-          />
-        </div>
-        {/* Autofill Data Text */}
-        <div className="mb-3">
-          <p className="text-gray-500 italic">Autofill data</p>
-        </div>
-        {/* Autofill Data Text */}
-        <div className="mb-3">
-          <p className="text-gray-500 italic">Autofill data</p>
-        </div>
+        {Object.entries(formData).map(([key, value]) => {
+          let label = key.replace(/([A-Z])/g, ' $1');
+          let inputType = 'text';
+
+          if (key === 'userID') label = 'User ID';
+          if (key === 'bookID') label = 'Book ID*';
+          if (key === 'bookTitle') label = 'Book Title*';
+
+          if (key === 'date') {
+            label = checkMode === 'Check In' ? 'Check In Date' : 'Check Out Date';
+            inputType = 'date';
+          } else if (key === 'time') {
+            label = checkMode === 'Check In' ? 'Check In Time' : 'Check Out Time';
+            inputType = 'time';
+          }
+
+          // Hide deadline field for "Check In"
+          if (key === 'deadline' && checkMode === 'Check In') {
+            return null;
+          }
+
+          return (
+            <div className="flex items-center" key={key}>
+              <label className="w-1/3 text-sm font-medium capitalize">
+                {label}:
+              </label>
+              <input
+                type={inputType}
+                name={key}
+                value={value}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 rounded-full border ${
+                  emptyFields[key] ? 'border-red-500' : 'border-gray-300'
+                }`}
+                required
+              />
+            </div>
+          );
+        })}
       </div>
 
-      {/* "Library Card" and "Book Cover" Text */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p className="font-semibold">Library Card</p>
-        </div>
-        <div>
-          <p className="font-semibold">Book Cover</p>
-        </div>
-      </div>
-
-      {/* QR Code and Book Cover - Aligned Horizontally */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Library Card QR Code */}
-        <div className="border border-gray-300 rounded p-3 text-center">
-          <p>Click to Scan Library Card QR Code</p>
-          <div className="mt-2 w-20 h-20 mx-auto bg-gray-200">
-            {/* Placeholder for QR Code */}
-          </div>
-        </div>
-
-        {/* Book Cover Image */}
-        <div className="border border-gray-300 rounded p-3 text-center">
-          <img src="/path-to-book-cover.jpg" alt="Book Cover" className="mx-auto max-h-56" />
-        </div>
-      </div>
-
-      {/* Dynamic Button - Centered */}
-      <div className="mt-5 flex justify-center">
-        <button className="border border-black text-black font-bold py-1.5 px-4 rounded-full hover:bg-gray-100">
-          {checkMode}
+      <div className="flex justify-center mb-4">
+        <button
+          onClick={handleSubmit}
+          className="border px-4 py-2 rounded-full"
+          disabled={isSubmitting} // Disable button while submitting
+        >
+          {isSubmitting ? 'Submitting...' : 'Submit'}
         </button>
       </div>
     </div>

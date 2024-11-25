@@ -1,44 +1,5 @@
-import React, { useState } from "react";
-
-const brrwdbooksData = [
-    {
-        type: "Borrowed",
-        date: "November 1",
-        time: "12:15 PM",
-        borrower: "Alex Jones",
-        bookTitle: "Book of Revelations",
-        bookId: "JADE-0422",
-        due: "August 30",
-    },
-    {
-        type: "Borrowed",
-        date: "August 23",
-        time: "10:00 AM",
-        borrower: "Keith Thurman",
-        bookTitle: "Moises' Fat Juice",
-        bookId: "B450-PR0",
-        due: "August 30",
-    },
-    {
-        type: "Borrowed",
-        date: "January 1",
-        time: "2:30 PM",
-        borrower: "Von Fadri",
-        bookTitle: "Chinese New Year",
-        bookId: "TECH-211",
-        due: "August 30",
-    },
-
-    {
-        type: "Borrowed",
-        date: "September 11",
-        time: "9:11 AM",
-        borrower: "Vladimir Y.",
-        bookTitle: "Terrorist Attacks",
-        bookId: "TWN-101",
-        due: "August 30",
-    },
-];
+import React, { useState, useEffect } from "react";
+import { supabase } from "../../supabaseClient"; // Import Supabase client
 
 const BorrowedBks = () => {
     // State for sorting and filtering
@@ -48,10 +9,32 @@ const BorrowedBks = () => {
     const [typeOrder, setTypeOrder] = useState("Borrowed");
     const [dateRange, setDateRange] = useState("After 2020");
     const [searchTerm, setSearchTerm] = useState("");
+    const [borrowedBooks, setBorrowedBooks] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Fetch borrowed books data from Supabase
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('book_transactions')
+                .select('transaction_type, checkout_date, checkout_time, name, book_title, book_id, deadline')
+                .eq('transaction_type', 'Borrowed'); // Only fetch 'Borrowed' transactions
+
+            if (error) {
+                console.error("Error fetching data:", error);
+            } else {
+                setBorrowedBooks(data);
+            }
+            setLoading(false);
+        };
+
+        fetchData();
+    }, []); // Empty dependency array to run only once when the component mounts
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const totalEntries = brrwdbooksData.length; // Total number of entries
+    const totalEntries = borrowedBooks.length; // Total number of entries
     const totalPages = Math.ceil(totalEntries / entries); // Total number of pages
 
     return (
@@ -71,7 +54,6 @@ const BorrowedBks = () => {
                         {typeOrder}
                     </span>
                 </div>
-
 
                 {/* Sort by */}
                 <div className="flex items-center space-x-2">
@@ -137,32 +119,41 @@ const BorrowedBks = () => {
             </div>
 
             {/* Table */}
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50 rounded-t-lg" style={{ borderRadius: "40px" }}>
-                    <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book ID</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {brrwdbooksData.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
-                        <tr key={index} className="hover:bg-gray-100">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.type}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.date}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.time}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.borrower}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.bookTitle}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.bookId}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.due}</td>
+            {loading ? (
+                <div className="text-center">Loading...</div>
+            ) : (
+                <table className="min-w-full divide-y divide-gray-200 text-center">
+                    <thead className="bg-gray-50 rounded-t-lg" style={{ borderRadius: "40px" }}>
+                        <tr>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Book ID</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200 text-center">
+                        {borrowedBooks.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
+                            <tr key={index} className="hover:bg-gray-100">
+                                <td
+                                 className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
+                                    ${book.transaction_type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}
+                                                > 
+                                    {book.transaction_type}
+                                 </td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.checkout_date}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.checkout_time}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.name}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.book_title}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.book_id}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.deadline}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
 
             {/* Pagination Controls */}
             <div className="flex justify-center items-center mt-4 space-x-4">

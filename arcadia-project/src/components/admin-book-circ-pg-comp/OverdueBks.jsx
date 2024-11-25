@@ -1,63 +1,81 @@
-import React, { useState } from "react";
-
-const ovrdData = [
-    {
-        type: "Overdue",
-        date: "November 1",
-        time: "12:15 PM",
-        borrower: "Alex Jones",
-        bookTitle: "Book of Revelations",
-        bookId: "JADE-0422",
-        due: "August 30",
-    },
-    {
-        type: "Overdue",
-        date: "August 23",
-        time: "10:00 AM",
-        borrower: "Keith Thurman",
-        bookTitle: "Moises' Fat Juice",
-        bookId: "B450-PR0",
-        due: "August 30",
-    },
-    {
-        type: "Overdue",
-        date: "January 1",
-        time: "2:30 PM",
-        borrower: "Von Fadri",
-        bookTitle: "Chinese New Year",
-        bookId: "TECH-211",
-        due: "August 30",
-    },
-
-    {
-        type: "Overdue",
-        date: "September 11",
-        time: "9:11 AM",
-        borrower: "Vladimir Y.",
-        bookTitle: "Terrorist Attacks",
-        bookId: "TWN-101",
-        due: "August 30",
-    },
-];
+import { supabase } from '../../supabaseClient';
+import React, { useState, useEffect } from "react";
 
 const OverdueBks = () => {
-    // State for sorting and filtering
     const [sortOrder, setSortOrder] = useState("Descending");
-    const [pubDateFilter, setPubDateFilter] = useState("After 2020");
     const [entries, setEntries] = useState(10);
     const [typeOrder, setTypeOrder] = useState("Overdue");
     const [dateRange, setDateRange] = useState("After 2020");
     const [searchTerm, setSearchTerm] = useState("");
-
-    // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
-    const totalEntries = ovrdData.length; // Total number of entries
-    const totalPages = Math.ceil(totalEntries / entries); // Total number of pages
+    const [overdueData, setOverdueData] = useState([]);
+    const totalEntries = overdueData.length;
+    const totalPages = Math.ceil(totalEntries / entries);
+
+    useEffect(() => {
+        // Fetch overdue book data from Supabase
+        const fetchData = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('book_transactions')
+                    .select('transaction_type, checkout_date, checkout_time, name, book_title, book_id, deadline')
+                    .lte('checkout_date', new Date().toISOString()); // Fetch overdue transactions
+
+                if (error) {
+                    console.error("Error fetching data: ", error.message);
+                } else {
+                    console.log("Raw data from Supabase:", data); // Debugging: raw data from Supabase
+
+                    const formattedData = data.map(item => {
+                        const date = item.checkout_date;
+                        const time = item.checkout_time;
+
+                        const formattedTime = time
+                            ? new Date(`1970-01-01T${time}Z`).toLocaleString('en-US', {
+                                  hour: 'numeric',
+                                  minute: 'numeric',
+                                  hour12: true,
+                              })
+                            : null;
+
+                        return {
+                            type: item.transaction_type,
+                            date,
+                            time: formattedTime,
+                            borrower: item.name,
+                            bookTitle: item.book_title,
+                            bookId: item.book_id,
+                            deadline: item.deadline, // Use the deadline column from Supabase
+                        };
+                    });
+
+                    setOverdueData(formattedData);
+                }
+            } catch (error) {
+                console.error("Error: ", error);
+            }
+        };
+
+        fetchData();
+    }, []); // Empty dependency array means this will run once when the component mounts
+
+    // Function to truncate the title if it's too long
+    const truncateTitle = (title, maxLength = 25) => {
+        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
+    };
+
+    // Function to format the deadline to an English date
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            month: 'long', // e.g., November
+            day: 'numeric', // e.g., 24
+        });
+    };
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
             {/* Title */}
-            <h3 className="text-xl font-semibold mb-4">Returned Books</h3>
+            <h3 className="text-xl font-semibold mb-4">Overdue Books</h3>
 
             {/* Controls: Type, Sort by, Date Range, No. of Entries, Search */}
             <div className="flex flex-wrap items-center mb-6 space-x-4">
@@ -71,7 +89,6 @@ const OverdueBks = () => {
                         {typeOrder}
                     </span>
                 </div>
-
 
                 {/* Sort by */}
                 <div className="flex items-center space-x-2">
@@ -96,8 +113,8 @@ const OverdueBks = () => {
                                 dateRange === "After 2020"
                                     ? "After 2021"
                                     : dateRange === "After 2021"
-                                        ? "After 2022"
-                                        : "After 2020"
+                                    ? "After 2022"
+                                    : "After 2020"
                             )
                         }
                         className="sort-by bg-gray-200 py-1 px-3 rounded-full text-xs"
@@ -150,7 +167,7 @@ const OverdueBks = () => {
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                    {ovrdData.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
+                    {overdueData.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
                         <tr key={index} className="hover:bg-gray-100">
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.type}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.date}</td>
@@ -158,7 +175,7 @@ const OverdueBks = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.borrower}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.bookTitle}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.bookId}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.due}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(book.deadline)}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -174,7 +191,7 @@ const OverdueBks = () => {
                 >
                     Previous Page
                 </button>
-                <span className="text-sm">Page {currentPage} of {totalPages}</span>
+                <span className="text-xs">{`Page ${currentPage} of ${totalPages}`}</span>
                 <button
                     className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
                     style={{ borderRadius: "40px" }}

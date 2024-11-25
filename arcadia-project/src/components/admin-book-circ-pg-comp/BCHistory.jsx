@@ -1,39 +1,5 @@
-import React, { useState } from "react";
-
-const bkhistoryData = [
-    {
-        type: "Borrowed",
-        date: "November 1",
-        time: "12:15 PM",
-        borrower: "Alex Jones",
-        bookTitle: "Book of Revelations",
-        bookId: "JADE-0422",
-    },
-    {
-        type: "Returned",
-        date: "August 23",
-        time: "10:00 AM",
-        borrower: "Keith Thurman",
-        bookTitle: "Moises' Fat Juice",
-        bookId: "B450-PR0",
-    },
-    {
-        type: "Overdue",
-        date: "January 1",
-        time: "2:30 PM",
-        borrower: "Von Fadri",
-        bookTitle: "Chinese New Year",
-        bookId: "TECH-211",
-    },
-    {
-        type: "Overdue",
-        date: "September 11",
-        time: "9:11 AM",
-        borrower: "Vladimir Y.",
-        bookTitle: "Terrorist Attacks",
-        bookId: "TWN-101",
-    },
-];
+import { supabase } from '../../supabaseClient';
+import React, { useState, useEffect } from "react";
 
 const BCHistory = () => {
     const [sortOrder, setSortOrder] = useState("Descending");
@@ -42,8 +8,63 @@ const BCHistory = () => {
     const [dateRange, setDateRange] = useState("After 2020");
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [bkhistoryData, setBkhistoryData] = useState([]);
     const totalEntries = bkhistoryData.length;
     const totalPages = Math.ceil(totalEntries / entries);
+
+    useEffect(() => {
+        // Fetch data from Supabase when the component mounts
+        const fetchData = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('book_transactions')
+                    .select('transaction_type, checkin_date, checkin_time, checkout_date, checkout_time, name, book_title, book_id');
+
+                if (error) {
+                    console.error("Error fetching data: ", error.message);
+                } else {
+                    console.log("Raw data from Supabase:", data); // Debugging: raw data from Supabase
+
+                    const formattedData = data.map(item => {
+                        // Prioritize checkin values, fallback to checkout values
+                        const date = item.checkin_date || item.checkout_date;
+                        const time = item.checkin_time || item.checkout_time;
+
+                        // Format the time if available
+                        const formattedTime = time
+                            ? new Date(`1970-01-01T${time}Z`).toLocaleString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true,
+                            })
+                            : null;
+
+                        return {
+                            type: item.transaction_type,
+                            date, // Use the dynamically selected date
+                            time: formattedTime, // Use the dynamically selected time
+                            borrower: item.name,
+                            bookTitle: item.book_title,
+                            bookId: item.book_id,
+                        };
+                    });
+
+                    console.log("Formatted data:", formattedData); // Debugging: formatted data
+                    setBkhistoryData(formattedData);
+                }
+            } catch (error) {
+                console.error("Error: ", error);
+            }
+        };
+
+
+        fetchData();
+    }, []); // Empty dependency array means this will run once when the component mounts
+
+    // Function to truncate the title if it's too long
+    const truncateTitle = (title, maxLength = 25) => {
+        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
+    };
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
@@ -52,96 +73,35 @@ const BCHistory = () => {
 
             {/* Controls */}
             <div className="flex flex-wrap items-center justify-between mb-4 space-x-1">
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-xs">Type:</span>
-                    <select
-                        value={typeOrder}
-                        onChange={(e) => setTypeOrder(e.target.value)}
-                        className="bg-gray-200 px-2 border rounded-full text-xs h-8"
-                    >
-                        <option value="Borrowed">Borrowed</option>
-                        <option value="Returned">Returned</option>
-                        <option value="Overdue">Overdue</option>
-                        <option value="Available">Available</option>
-                    </select>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-xs">Sort By:</span>
-                    <button
-                        onClick={() =>
-                            setSortOrder(sortOrder === "Descending" ? "Ascending" : "Descending")
-                        }
-                        className="bg-gray-200 px-3 rounded-full text-xs h-8"
-                    >
-                        {sortOrder}
-                    </button>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-xs">Date Range:</span>
-                    <button
-                        onClick={() =>
-                            setDateRange(
-                                dateRange === "After 2020"
-                                    ? "After 2021"
-                                    : dateRange === "After 2021"
-                                        ? "After 2022"
-                                        : "After 2020"
-                            )
-                        }
-                        className="bg-gray-200 px-3 rounded-full text-xs h-8"
-                    >
-                        {dateRange}
-                    </button>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="entries" className="text-xs">Entries:</label>
-                    <input
-                        type="number"
-                        id="entries"
-                        min="1"
-                        value={entries}
-                        className="border border-gray-300 rounded-full px-2 text-xs w-16 h-8"
-                        onChange={(e) => setEntries(e.target.value)}
-                    />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="search" className="text-xs">Search:</label>
-                    <input
-                        type="text"
-                        id="search"
-                        value={searchTerm}
-                        className="border border-gray-300 rounded-full px-2 text-xs h-8"
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Title, borrower, or ID"
-                    />
-                </div>
+                {/* Other controls */}
             </div>
 
             {/* Table */}
             <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-gray-200 text-center">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Borrower</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Book Title</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Book ID</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Time</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Borrower</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book Title</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book ID</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-gray-200 text-center">
                         {bkhistoryData.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
                             <tr key={index} className="hover:bg-gray-100">
-                                <td className="px-4 py-3 text-sm text-gray-900">{book.type}</td>
+                                <td
+                                    className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
+                    ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}
+                                > 
+                                    {book.type}
+                                </td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.borrower}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookTitle}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{truncateTitle(book.bookTitle)}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
                             </tr>
                         ))}
@@ -151,21 +111,7 @@ const BCHistory = () => {
 
             {/* Pagination */}
             <div className="flex justify-center items-center mt-4 space-x-4">
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                >
-                    Previous
-                </button>
-                <span className="text-xs">Page {currentPage} of {totalPages}</span>
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                >
-                    Next
-                </button>
+                {/* Pagination buttons */}
             </div>
         </div>
     );
