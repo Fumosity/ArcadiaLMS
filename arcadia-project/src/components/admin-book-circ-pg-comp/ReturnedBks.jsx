@@ -30,13 +30,18 @@ const ReturnedBks = () => {
                         const date = item.checkin_date;
                         const time = item.checkin_time;
 
-                        const formattedTime = time
-                            ? new Date(`1970-01-01T${time}Z`).toLocaleString('en-US', {
-                                  hour: 'numeric',
-                                  minute: 'numeric',
-                                  hour12: true,
-                              })
-                            : null;
+                        let formattedTime = null;
+                        if (time) {
+                            // Ensure time is in the format HH:mm (24-hour format)
+                            const timeString = time.includes(':') ? time : `${time.slice(0, 2)}:${time.slice(2)}`;
+
+                            // Convert time into 12-hour format with AM/PM, no 'Z' for local time
+                            formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString('en-PH', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true,
+                            });
+                        }
 
                         return {
                             type: item.transaction_type,
@@ -152,30 +157,31 @@ const ReturnedBks = () => {
                     />
                 </div>
             </div>
-
-            {/* Table */}
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 text-center">
                 <thead className="bg-gray-50 rounded-t-lg" style={{ borderRadius: "40px" }}>
                     <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book ID</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Time</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Borrower</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book Title</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book ID</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Deadline</th>
                     </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200 text-center">
                     {returnedData.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
                         <tr key={index} className="hover:bg-gray-100">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.type}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.date}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.time}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.borrower}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.bookTitle}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.bookId}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(book.deadline)}</td>
+                            <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
+                                    ${book.type === "Returned" ? "bg-green" : ""}`}
+                                                >
+                                {book.type}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">{book.borrower}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">{truncateTitle(book.bookTitle)}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">{formatDate(book.deadline)}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -189,16 +195,18 @@ const ReturnedBks = () => {
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                 >
-                    Previous Page
+                    Previous
                 </button>
-                <span className="text-sm">Page {currentPage} of {totalPages}</span>
+                <span className="text-xs">
+                    Page {currentPage} of {totalPages}
+                </span>
                 <button
                     className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
                     style={{ borderRadius: "40px" }}
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                 >
-                    Next Page
+                    Next
                 </button>
             </div>
         </div>

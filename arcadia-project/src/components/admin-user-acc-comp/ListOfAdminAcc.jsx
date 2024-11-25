@@ -136,7 +136,7 @@ const ListOfAdminAcc = () => {
                 </div>
 
                 {/* Table */}
-                <table className="w-full table-auto">
+                <table className="w-full table-auto divide-y-2">
                     <thead>
                         <tr>
                             <th className="text-left py-2">Type</th>

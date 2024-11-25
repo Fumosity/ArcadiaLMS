@@ -1,42 +1,56 @@
+//Import Section
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabaseClient.js";
 
+//Main Function
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [email, setEmail] = useState(""); //userEmail
+  const [password, setPassword] = useState(""); //userPassword
+  const [error, setError] = useState(""); //Error storage
+  const navigate = useNavigate(); //Command to navigate to a desired page
 
+  //Submit Function
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault(); //Disable default behavior
+    setError(""); //Clear error storage
     
     try {
-      // Query the `user_accounts` table for matching credentials
-      const { data, error } = await supabase
+      //Grab emails from database
+      const { data: emailCheck, error: emailError } = await supabase
+        .from("user_accounts")
+        .select("*")
+        .eq("userEmail", email)
+        .single();
+
+        //Check if inputted email is in the database
+      if (emailError || !emailCheck) {
+        window.alert("This email does not exist. Please register or try again.");
+        return;
+      }
+
+      //Grab passwords from database
+      const { data: loginData, error: loginError } = await supabase
         .from("user_accounts")
         .select("*")
         .eq("userEmail", email)
         .eq("userPassword", password) // Consider hashing passwords for security
-        .single(); // Fetch only one row
+        .single();
 
-      if (error) {
-        setError("Invalid email or password. Please try again.");
+        //Check if inputted password is in the database
+      if (loginError || !loginData) {
+        window.alert("Incorrect password. Please try again.");
         return;
       }
 
-      // Login successful
-      if (data) {
-        navigate("http://localhost:5173/"); // Redirect to dashboard or other protected page
-      } else {
-        setError("Invalid email or password. Please try again.");
-      }
+      localStorage.setItem("user", JSON.stringify(loginData)); //Set persistence to logged on user
+      navigate("/"); //Go to homepage
     } catch (err) {
       setError("Unable to connect to the server. Please check your network.");
     }
   };
 
+  //Frontend Section
   return (
     <div className="uMain-cont max-w-md mx-auto p-8 bg-white rounded-2xl">
       <div className="flex justify-center mb-6">

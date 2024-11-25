@@ -24,7 +24,36 @@ const BorrowedBks = () => {
             if (error) {
                 console.error("Error fetching data:", error);
             } else {
-                setBorrowedBooks(data);
+                // Format the fetched data
+                const formattedData = data.map(item => {
+                    const date = item.checkout_date;
+                    const time = item.checkout_time;
+
+                    let formattedTime = null;
+                    if (time) {
+                        // Ensure time is in the format HH:mm (24-hour format)
+                        const timeString = time.includes(':') ? time : `${time.slice(0, 2)}:${time.slice(2)}`;
+
+                        // Convert time into 12-hour format with AM/PM
+                        formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString('en-PH', {
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true,
+                        });
+                    }
+
+                    return {
+                        type: item.transaction_type,
+                        date,
+                        time: formattedTime,
+                        borrower: item.name,
+                        bookTitle: item.book_title,
+                        bookId: item.book_id,
+                        deadline: item.deadline
+                    };
+                });
+
+                setBorrowedBooks(formattedData); // Set formatted data
             }
             setLoading(false);
         };
@@ -139,15 +168,14 @@ const BorrowedBks = () => {
                             <tr key={index} className="hover:bg-gray-100">
                                 <td
                                  className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
-                                    ${book.transaction_type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}
-                                                > 
-                                    {book.transaction_type}
+                                    ${book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}> 
+                                    {book.type}
                                  </td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.checkout_date}</td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.checkout_time}</td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.name}</td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.book_title}</td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.book_id}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.date}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.time}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.borrower}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.bookTitle}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.bookId}</td>
                                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.deadline}</td>
                             </tr>
                         ))}
@@ -159,20 +187,18 @@ const BorrowedBks = () => {
             <div className="flex justify-center items-center mt-4 space-x-4">
                 <button
                     className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    style={{ borderRadius: "40px" }}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                 >
-                    Previous Page
+                    Previous
                 </button>
                 <span className="text-sm">Page {currentPage} of {totalPages}</span>
                 <button
                     className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    style={{ borderRadius: "40px" }}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                 >
-                    Next Page
+                    Next
                 </button>
             </div>
         </div>
