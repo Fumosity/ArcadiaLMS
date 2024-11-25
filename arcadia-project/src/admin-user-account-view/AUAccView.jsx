@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import MainHeader from "../components/main-comp/MainHeader";
 import Navbar from "../components/main-comp/Navbar";
 import Footer from "../components/main-comp/Footer";
@@ -7,39 +8,45 @@ import Title from "../components/main-comp/Title";
 import Blacklist from "../components/admin-user-acc-comp/Blacklist";
 import Whitelist from "../components/admin-user-acc-comp/Whitelist";
 import AUserCirc from "../components/admin-user-account-view-comp/AUserCirc";
-import AUBooking from "../components/admin-user-account-view-comp/AUBooking";
-import RecentReports from "../components/admin-user-report-view-comp/RecentReports";
-import RecentSupport from "../components/admin-user-report-view-comp/RecentSupport";
+import RecentReports from "../components/admin-user-support-report-view-comp/RecentReports";
+import RecentSupport from "../components/admin-user-support-report-view-comp/RecentSupport";
+import UserInformations from "../components/admin-user-account-view-comp/UserInformations";
 
-const AUAccView = () => (
-    <div className="min-h-screen bg-gray-100">
-        {/* Main header */}
-        <MainHeader />
-        <Title>User Account Viewer</Title>
+const AUAccView = () => {
+    const location = useLocation();
+    const user = location.state?.user || {};
 
-        {/* Main content section */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid grid-cols-3 gap-8">
-                <div className="col-span-2 space-y-8">
-                    {/* Left side content */}
-                    <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                        <AUBooking />
+    return (
+        <div className="min-h-screen bg-gray-100">
+            {/* Main header */}
+            <Title>User Account Viewer</Title>
+
+            {/* Main content section */}
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="grid grid-cols-3 gap-8">
+                    <div className="col-span-2 space-y-8">
+                        {/* Left side content */}
+                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
+                            <UserInformations user={user} />
+                        </div>
+                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
+                            <AUserCirc user={user} />
+                        </div>
                     </div>
-                    <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                        <AUserCirc />
+
+                    {/* Right side content */}
+                    <div className="lg:col-span-1 space-y-8">
+                        <Blacklist />
+                        <Whitelist />
+                        <RecentReports user={user} />
+                        <RecentSupport user={user} />   
                     </div>
                 </div>
+            </main>
 
-                {/* Right side content */}
-                <div className="lg:col-span-1 space-y-8">
-                    <Blacklist />
-                    <Whitelist />
-                    <RecentReports />
-                    <RecentSupport />   
-                </div>
-            </div>
-        </main>
-    </div>
-);
+        </div>
+    );
+};
 
 export default AUAccView;
+

@@ -1,19 +1,23 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import MainHeader from "../components/main-comp/MainHeader";
 import Navbar from "../components/main-comp/Navbar";
 import Footer from "../components/main-comp/Footer";
 import Copyright from "../components/main-comp/Copyright";
 import Title from "../components/main-comp/Title";
-import AABooking from "../components/admin-account-view-comp/AABooking";
+import AABooking from "../components/admin-account-view-comp/AdminInformations";
 import Blacklist from "../components/admin-user-acc-comp/Blacklist";
 import Whitelist from "../components/admin-user-acc-comp/Whitelist";
 import AAListAdmin from "../components/admin-account-view-comp/AAListAdmin";
+import AdminInformations from "../components/admin-account-view-comp/AdminInformations";
 
-const AAccountView = () => (
+const AAccountView = () => {
+    const location = useLocation();
+    const user = location.state?.user || {};
+    return(
     <div className="min-h-screen bg-gray-100">
         {/* Main header */}
-        <MainHeader />
-        <Navbar />
+
         <Title>Admin Account Viewer</Title>
 
         {/* Main content section */}
@@ -22,21 +26,22 @@ const AAccountView = () => (
                 <div className="col-span-2 space-y-8">
                     {/* Left side content */}
                     <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                        <AABooking />
+                        <AdminInformations user={user} />
                     </div>
                     <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                        <AAListAdmin />
+                        <AAListAdmin user={user} />
                     </div>
                 </div>
 
                 {/* Right side content */}
                 <div className="lg:col-span-1 space-y-8">
-                    <Blacklist />
-                    <Whitelist/>
+                    <Blacklist user={user} />
+                    <Whitelist user={user}/>
                 </div>
             </div>
         </main>
     </div>
-);
+    );
+};
 
 export default AAccountView;

@@ -12,7 +12,7 @@ import PromoteToIntern from './attention-modals/PromoteToIntern';
 import PromoteToSuperadmin from './attention-modals/PromoteToSuperadmin';
 import DeleteSupadminAcc from './attention-modals/DeleteSupadminAcc';
 import BookingReservation from './BookingReservation';
-import UserAccount from './UserAccount';
+
 import AdminAccount from './AdminAccount';
 import PrintReport from './PrintReport';
 import ModifySchedule from './ModifySchedule';
