@@ -1,13 +1,40 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../../../supabaseClient.js";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
+    setError("");
+    
+    try {
+      // Query the `user_accounts` table for matching credentials
+      const { data, error } = await supabase
+        .from("user_accounts")
+        .select("*")
+        .eq("userEmail", email)
+        .eq("userPassword", password) // Consider hashing passwords for security
+        .single(); // Fetch only one row
+
+      if (error) {
+        setError("Invalid email or password. Please try again.");
+        return;
+      }
+
+      // Login successful
+      if (data) {
+        navigate("http://localhost:5173/"); // Redirect to dashboard or other protected page
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
+    } catch (err) {
+      setError("Unable to connect to the server. Please check your network.");
+    }
   };
 
   return (

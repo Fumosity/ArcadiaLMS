@@ -61,6 +61,9 @@ function App() {
             <UHeader />
             <Routes>
               <Route path="/" element={<AUAccView />} />
+              <Route path="/" element={<UHomePage />} />
+              <Route path="/user/register" element={<UsrRegistration />} />
+              <Route path="/" element={<ModalTest />} />
               <Route path="/user/login" element={<ULogin />} />
               <Route path="/user/register" element={<URegister />} />
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />

@@ -1,64 +1,78 @@
 import { supabase } from "../supabaseClient.js";
 
-//Checks and adds a new entry to the 'book_titles' table and returns the ID for the 'book' table
-export const checkAndAddBookTitle = async (title) => {
-    const { data, error } = await supabase.from('book_titles').select('titleID, quantity').eq('title', title).single();
+//Checks and adds a new entry or increments a current entry to the 'book_titles'
+export const checkAndAddBookTitle = async (bookData) => {
+    try {
+        const { data, error } = await supabase.from('book_titles').select('titleID, quantity').eq('title', bookData.title).single();
 
-    if (error) {
-        if (error.code === "PGRST116") {
-            const { data: newTitle, error: insertError } = await supabase.from('book_titles').insert([{ title, quantity: 0 }]).select('titleID').single();
+        if (error) {
+            if (error.code === "PGRST116") {
+                const newTitleData = {
+                    title: bookData.title,
+                    quantity: 1,
+                    author: Array.isArray(bookData.author) ? bookData.author : bookData.author.split(';'),
+                    genre: Array.isArray(bookData.genre) ? bookData.genre : bookData.genre.split(';'),
+                    category: Array.isArray(bookData.category) ? bookData.category : bookData.category.split(';'),
+                    synopsis: bookData.synopsis,
+                    keyword: Array.isArray(bookData.keyword) ? bookData.keyword : bookData.keyword.split(';'),
+                    publisher: bookData.publisher,
+                    currentPubDate: bookData.currentPubDate,
+                    originalPubDate: bookData.originalPubDate,
+                    procDate: bookData.procDate,
+                    cover: bookData.cover,
+                };
 
-            if (insertError) {
-                console.error("Error adding a new title: ", insertError);
-                return null;
+                const { data: newTitle, error: insertError } = await supabase.from('book_titles').insert([newTitleData]).select('titleID').single();
+                if (insertError) throw insertError;
+
+                return newTitle.titleID;
+            } else {
+                throw error;
             }
-
-            return newTitle.titleID;
-        } else {
-            console.error("Error fetching title: ", error);
-            return null;
         }
-    }
 
-    return data.titleID;
+        const newQuantity = data.quantity + 1;
+        const { error: updateError } = await supabase.from('book_titles').update({ quantity: newQuantity }).eq('titleID', data.titleID);
+        if (updateError) throw updateError;
+
+        return data.titleID;
+    } catch (err) {
+        console.error("Error in checkAndAddBookTitle:", err);
+        return null;
+    }
 }
 
 //Adds a new record to the book and book_update table
 export const addBook = async (bookData) => {
     try {
-        const titleID = await checkAndAddBookTitle(bookData.title);
+        const titleID = await checkAndAddBookTitle(bookData);
 
-        if (!titleID) {
-            console.error("Failed to retrieve the title ID for the book: ", error);
+        if (!titleID) { 
+            console.error("Failed to retrieve the title ID for the book.");
             return false;
         }
 
-        const { data: bookInsertData, error: bookInsertError } = await supabase .from('book').insert([{ ...bookData, titleID: titleID, }]);
-        
+        const specificBookData = {
+            bookID: bookData.bookID,
+            titleID: titleID,
+            title: bookData.title,
+            arcID: bookData.arcID,
+            isbn: bookData.isbn,
+            location: bookData.location,
+        };
+
+        // Insert into 'book' table
+        const { error: bookInsertError } = await supabase.from('book').insert([specificBookData]);
+
         if (bookInsertError) {
-            console.error("Error adding book:", bookInsertError);
-            return false;
-        } 
-
-        const { data: titleData, error: fetchQuantityError } = await supabase.from('book_titles').select('quantity').eq('titleID', titleID).single();
-
-        if (fetchQuantityError) {
-            console.error("Error fetching current quantity:", fetchQuantityError);
+            console.error("Error adding book to 'book' table:", bookInsertError);
             return false;
         }
 
-        const newQuantity = titleData.quantity + 1;
-        const { error: updateError } = await supabase.from('book_titles') .update({ quantity: newQuantity }).eq('titleID', titleID);
-
-        if (updateError) {
-            console.error("Error updating book quantity in book_titles:", updateError);
-            return false;
-        }
-
-        console.log("Book added and quantity updated successfully:", bookInsertData);
+        console.log("Book added successfully.");
         return true;
     } catch (error) {
-        console.error("Supabase Error: ", error);
+        console.error("Error in addBook:", error);
         return false;
     }
 };
@@ -67,39 +81,43 @@ export const addBook = async (bookData) => {
 export const fetchBooks = async () => {
     try {
         const { data, error } = await supabase.from('book').select('*');
-        if (error) {
-            console.error("Error fetching books: ", error);
-        } else {
-            return data;
-        }
+        if (error) throw error;
+        return data;
     } catch (error) {
         console.error("Supabase Error: ", error);
     }
 };
 
-//Checks for the current date and latest bookID number and generates new ones
-export const newIDAndProcDateGenerator = async (formData, setFormData) => {
-    const { data, error } = await supabase.from('book').select('bookID').order('bookID', { ascending: false }).limit(1);
+export const generateNewBookID = async (setFormData) => {
+    try {
+        const { data, error } = await supabase
+            .from('book')
+            .select('bookID')
+            .order('bookID', { ascending: false })
+            .limit(1);
 
-    if (error) {
-        console.error("Error retrieving book ID: ", error);
-    } else if (data && data.length > 0) {
-        const newID = data[0].bookID + 1;   
+        if (error) throw error;
+
+        const newID = (data && data.length > 0) ? data[0].bookID + 1 : 1;
+
+        setFormData((prevData) => ({
+            ...prevData,
+            bookID: newID,
+        }));
+    } catch (error) {
+        console.error("Error generating new bookID:", error);
+    }
+};
+
+export const generateProcDate = (setFormData) => {
+    try {
         const newProcDate = new Date().toISOString().split('T')[0];
 
-        setFormData ({
-            ...formData,
-            bookID: newID,
+        setFormData((prevData) => ({
+            ...prevData,
             procDate: newProcDate,
-        });
-    } else {
-        const newID = 1;   
-        const newProcDate = new Date().toISOString().split('T')[0];
-
-        setFormData ({
-            ...formData,
-            bookID: newID,
-            procDate: newProcDate,
-        });
-    };
-}
+        }));
+    } catch (error) {
+        console.error("Error generating procDate:", error);
+    }
+};
