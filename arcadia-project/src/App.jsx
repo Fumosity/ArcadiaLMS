@@ -47,6 +47,7 @@ import URegister from './UserPages/user-log-sign-page/URegister';
 import AUAccView from './admin-user-account-view/AUAccView';
 import UserInformations from './components/admin-user-account-view-comp/UserInformations';
 import AAccountView from './admin-account-view/AAccountView';
+import UAccountProfile from './UserPages/user-account-page/UAccountProfile';
 
 function App() {
   return (
@@ -72,7 +73,7 @@ function App() {
               <Route path="/user/support" element={<USupport />} />
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
-
+              <Route path="/user/accountview" element={<UAccountProfile />} />
             </Routes>
             <UFooter />
             <UCopyright />

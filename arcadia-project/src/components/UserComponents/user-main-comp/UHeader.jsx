@@ -51,7 +51,7 @@ const UHeader = () => {
                   <ul className="py-1">
                     <li>
                       <Link
-                        to="/account"
+                        to="/user/accountview"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       >
                         Manage Account
