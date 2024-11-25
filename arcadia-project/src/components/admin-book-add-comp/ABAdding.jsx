@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { addBook, newIDAndProcDateGenerator } from "../../backend/ABAddBackend.jsx";
+import { addBook, generateNewBookID, generateProcDate } from "../../backend/ABAddBackend.jsx";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -50,11 +50,9 @@ const ABAdding = ({ formData, setFormData }) => {
 
   //Generate a new bookID and procDate
   useEffect(() => {
-    const generateNewIDAndProcDate = async () => {
-      await newIDAndProcDateGenerator(formData, setFormData);
-    };
-    generateNewIDAndProcDate();
-  }, []);
+    generateNewBookID(setFormData);
+    generateProcDate(setFormData);
+  }, [setFormData]);
 
   const errorStyle = {
     border: '1px solid red'
@@ -118,8 +116,9 @@ const ABAdding = ({ formData, setFormData }) => {
     }
 
     console.log(formData);
+    generateNewBookID(setFormData);
+    generateProcDate(setFormData);
 
-    await newIDAndProcDateGenerator({}, setFormData);
     setIsSubmitting(false);
   };
 

@@ -1,4 +1,3 @@
-# main.py
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from PIL import Image
@@ -8,13 +7,15 @@ import fitz  # PyMuPDF for PDF handling
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import re
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import SVC
-import numpy as np
+from joblib import load
 from datetime import datetime
+import numpy as np
+import pandas as pd
 
+# Initialize FastAPI app
 app = FastAPI()
 
+# Enable CORS for frontend interaction
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -23,126 +24,64 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Sample data for SVM model (titles, authors, etc.)
-data = [
-    # Titles
-    ("A KNN-based Text Classifier", "title"),
-    ("Artificial Intelligence in Healthcare", "title"),
-    ("Deep Learning for Autonomous Driving", "title"),
-    ("A Survey on Machine Translation Techniques", "title"),
-    ("Natural Language Processing and Its Applications", "title"),
-    ("Blockchain Technology in Financial Services", "title"),
-    ("Big Data Analytics for Decision Making", "title"),
-    ("Machine Learning Algorithms for Text Mining", "title"),
-    ("Neural Networks and Pattern Recognition", "title"),
-    ("AI Ethics and Society: A Growing Concern", "title"),
-    
-    # Authors
-    ("Alexander A. Rubio, Fatima C. Eusebio", "authors"),
-    ("John T. Maxwell", "authors"),
-    ("Jane K. Doe, Richard P. Johnson, Amy L. Thompson", "authors"),
-    ("Maria G. Perez", "authors"),
-    ("Helen M. Lee, Robert T. Chang", "authors"),
-    ("Lucas F. Martins, Emily R. Clarke, Carlos J. Gutierrez", "authors"),
-    ("Anita K. Sharma, Michael B. Davis", "authors"),
-    ("Paul W. Allen", "authors"),
-    ("David H. Li, Sandra N. Wilson", "authors"),
-    ("Christopher J. Miller, Nancy S. Moore, Sarah C. Gomez", "authors"),
+# Load the dataset
+df = pd.read_csv('app/research_corpus.csv')
 
-    # Abstracts
-    ("This research explores the use of K-Nearest Neighbors in text classification tasks, demonstrating its efficiency across multiple datasets.", "abstract"),
-    ("The study investigates the application of deep learning in the development of autonomous vehicles, highlighting recent advancements.", "abstract"),
-    ("This paper presents a comprehensive survey on the latest machine translation techniques, comparing various neural network approaches.", "abstract"),
-    ("We examine the ethical concerns surrounding artificial intelligence, focusing on the implications of AI in decision-making processes.", "abstract"),
-    ("Our research analyzes big data analytics techniques and their role in facilitating data-driven decision-making in businesses.", "abstract"),
-    ("The work introduces a blockchain-based model for securing financial transactions, offering a comparative analysis of current methodologies.", "abstract"),
-    ("This study discusses the development of neural networks and their use in pattern recognition tasks, particularly in image processing.", "abstract"),
-    ("An in-depth analysis of natural language processing applications, including sentiment analysis, machine translation, and speech recognition.", "abstract"),
-    ("This research examines the integration of AI in healthcare, assessing its impact on diagnostics and patient care.", "abstract"),
-    ("The paper explores various machine learning algorithms used in text mining, with a focus on improving classification accuracy.", "abstract"),
+# Display the first few rows to inspect the data
+print(df.head())
 
-    # Colleges (stays as is)
-    ("COLLEGE OF ENGINEERING, COMPUTER STUDIES, AND ARCHITECTURE", "college"),
-    ("COLLEGE OF ALLIED MEDICAL SCIENCES", "college"),
-    ("COLLEGE OF FINE ARTS AND DESIGN", "college"),
-    ("COLLEGE OF INTERNATIONAL TOURISM AND HOSPITALITY MANAGEMENT", "college"),
-    ("COLLEGE OF LIBERAL ARTS AND EDUCATION", "college"),
-    ("COLLEGE OF BUSINESS ADMINISTRATION", "college"),
-    ("COLLEGE OF NURSING", "college"),
-    ("COLLEGE OF LAW", "college"),
-]
-
-texts = [text for text, label in data]
-labels = [label for text, label in data]
-
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(texts)
-clf = SVC()
-clf.fit(X, labels)
-
-# Preprocessing functions
-date_pattern = re.compile(r'^(January|February|March|...|December)\s+\d{4}')
-excluded_sections = ["Approval Sheet", "Certificate of Originality", "Acknowledgement"]
+excluded_sections = ["Approval Sheet", "Certificate of Originality", "Acknowledgement", "Table of Contents"]
 resume_sections = ["Abstract", "Keywords"]
 
+# Preprocessing and helper functions remain unchanged
+title, authors, college, department, abstract, keywords, pubdate = "","","","","","","",
+
 def find_department(line):
-    keywords = {
-        "DCS": ["computer science", "information technology", "library information science"],
-        "DOA": ["architecture"],
-        "DOE": ["engineering"]
-    }
+    if "computer science" in line:
+        return "DCS"
+    if "information technology" in line:
+        return "DCS"
+    if "library information science" in line:
+        return "DCS"
+    if "architecture" in line:
+        return "DOA"
+    if "engineering" in line:
+        return "DOE"
 
-    for department, keywords_list in keywords.items():
-        if any(keyword in line.lower() for keyword in keywords_list):
-            return department
-    
-    return None
-
-def preprocess_text(text):
-    pub_date = None
-    keywords = None
-    department = ""
-    college = ""
-
+def remove_sections(text):
     lines = text.split("\n")
 
     cleaned_lines = []
+    original_lines = []
     current_paragraph = []
+    original_paragraph = []
     inside_excluded_section = False
     skip_current_paragraph = False
+    apply_period_joining = False 
+    is_keywords_section = False 
 
     number_only_pattern = re.compile(r'^\d+$')
+    added_lines = set() 
 
     for line in lines:
+        original_line = line
         line = line.strip()
 
         if number_only_pattern.match(line):
             continue
-
-        if date_pattern.match(line) and not pub_date:
-            pub_date = line
-            continue
-
+        
         line_lower = line.lower()
 
-        if line_lower.startswith("in partial fulfillment") or line_lower.startswith("an undergraduate"):
-            skip_current_paragraph = True
-
-        if line_lower.startswith("college of") and not college:
-            college = line
-        elif line_lower.startswith("college of") and college:
-            continue
-
-        if "bachelor of" in line_lower and not department:
+        if "bachelor of" in line_lower:
             department = find_department(line_lower)
 
         if line_lower.startswith("lyceum"):
             continue
 
-        if line_lower.startswith("keywords"):
-            line_lower = re.sub(r'[^\w\s,]', '', line_lower)
-            line_lower = line_lower.strip()
-            keywords = line_lower.replace("keywords", "")
+        if line_lower.startswith("in partial fulfillment") or line_lower.startswith("an undergraduate"):
+            skip_current_paragraph = True
+
+        if line in added_lines:
             continue
 
         # Determine if we're entering an excluded section
@@ -153,54 +92,103 @@ def preprocess_text(text):
         # Determine if we're in a resume section and should start including again
         if any(resume_header.lower() in line_lower for resume_header in resume_sections):
             inside_excluded_section = False
-            continue
+            apply_period_joining = True
 
-        
+            # Handle Keywords as a separate section
+            if "keywords" in line_lower:
+                is_keywords_section = True
+                if current_paragraph:
+                    cleaned_lines.append(" ".join(current_paragraph).strip())
+                    original_lines.append(" ".join(original_paragraph).strip())
+
+                    current_paragraph = []
+                    original_paragraph = []
+
+                cleaned_lines.append(line)  # Add 'Keywords' title as a standalone line
+                original_lines.append(original_line)
+                continue
+            else:
+                is_keywords_section = False
+                continue
+
         # Skip lines inside the excluded section, resume adding lines otherwise
         if inside_excluded_section:
             continue
 
         if line:
+            if is_keywords_section:
+                # If inside the Keywords section, add each line distinctly
+                if current_paragraph:
+                    cleaned_lines.append(" ".join(current_paragraph).strip())
+                    original_lines.append(" ".join(original_paragraph).strip())
+                    current_paragraph = []
+                    original_paragraph = []
+                cleaned_lines.append(line)
+                original_lines.append(original_line)
+                added_lines.add(line)
+                continue
+
             current_paragraph.append(line)
+            original_paragraph.append(original_line)
+            added_lines.add(line)
         else:
             if current_paragraph:
+                # Apply period-joining logic only if we're in sections after resume sections
                 cleaned_paragraph = " ".join(current_paragraph).strip()
+                original_paragraph_text = " ".join(original_paragraph).strip()
+
                 if not skip_current_paragraph:
-                    cleaned_lines.append(cleaned_paragraph)
+                    # If apply_period_joining is active, append to last item to keep it continuous
+                    if apply_period_joining and cleaned_lines and cleaned_lines[-1] and '.' in cleaned_lines[-1]:
+                        cleaned_lines[-1] += " " + cleaned_paragraph
+                        original_lines[-1] += " " + original_paragraph_text
+                    else:
+                        cleaned_lines.append(cleaned_paragraph)
+                        original_lines.append(original_paragraph_text)
+                
                 current_paragraph = []
+                original_paragraph = []
                 skip_current_paragraph = False
 
     if current_paragraph:
-        cleaned_lines.append(" ".join(current_paragraph))
+        if apply_period_joining and cleaned_lines:
+            cleaned_lines[-1] += " " + ". ".join(current_paragraph)
+            original_lines[-1] += " " + ". ".join(original_paragraph)
 
-    cleaned_text = "\n".join(cleaned_lines)
+        else:
+            cleaned_lines.append(" ".join(current_paragraph))
+            original_lines.append(" ".join(original_paragraph))
 
-    cleaned_text = re.sub(r'[^\w\s.,\'"()—:;/]', '', cleaned_text).strip()
+    presectioned_text = "\n\n".join(cleaned_lines)
+    original_text = "\n\n".join(original_lines)
 
-    return cleaned_text, pub_date, keywords, department, college
+    presectioned_text = re.sub(r'[^\w\s.,\'"()-—:;/]', '', presectioned_text).strip()
 
-# Classification function
-def classify_text_lines(text):
-    lines = text.split("\n")
+    # Return both the cleaned text and extracted metadata (publication date, keywords, college)
+    return presectioned_text, original_text, department
 
-    title, abstract, authors = "", "", ""
+def preprocess_text(text):
+    # Split the text by lines to keep structural information intact
+    lines = text.splitlines()
+    
+    cleaned_lines = []
+    for line in lines:
+        # Remove extra whitespace and lowercase the line
+        cleaned_line = re.sub(r"\s+", " ", line).strip().lower()
+        
+        # Append if the line has content to avoid empty lines
+        if cleaned_line:
+            cleaned_lines.append(cleaned_line)
+    
+    # Join lines back into a single string with double newlines to separate chunks
+    cleaned_text = "\n\n".join(cleaned_lines)
+    
+    return cleaned_text
 
-    for i, line in enumerate(lines):
-        features = vectorizer.transform([line])
-        prediction = clf.predict(features)[0]
-
-        if i == 0:
-            title = line
-            continue
-
-        if prediction == "abstract":
-            abstract += line + " "
-        elif prediction == "authors":
-            authors += line + ", "
-
-    return title.strip(), abstract.strip(), authors.strip()
-
+# Classification function using the new model
 def replace_college_names(college_name):
+  college_name = proper_case(college_name)
+
   acronym_map = {
       "Allied Medical Sciences": "CAMS",
       "Liberal Arts and Education": "CLAE",
@@ -251,37 +239,76 @@ def proper_case(name):
     return ' '.join(words)
 
 def format_authors(authors_text):
-    # Clean the text by stripping leading/trailing spaces and normalizing spaces
-    authors_text = re.sub(r'\s+', ' ', authors_text.strip()).replace(",", "")
-    
-    # Split authors text into words
-    words = authors_text.split(' ')
-    
+    """Formats authors' names into a semicolon-separated string.
+
+    Args:
+        authors_text: The raw author names string.
+
+    Returns:
+        A formatted string of author names.
+    """
+
+    authors_text = re.sub(r'\s+', ' ', authors_text.strip())
+    words = authors_text.split(" ")
+
     formatted_authors = []
     current_author = []
-    
-    for i, word in enumerate(words):
-        # If the word contains a period, it's likely a middle initial or part of an initial (like M. or F.)
-        if re.match(r'^[A-Z]\.$', word):
-            current_author.append(word)
-        elif i + 1 < len(words) and re.match(r'^[A-Z][a-z]+$', words[i + 1]):  # next word is likely a last name
-            # If the next word is a valid name (not an initial), finalize this author and start a new one
-            current_author.append(word)
-            formatted_authors.append(proper_case(' '.join(current_author)))  # Apply proper case here
-            current_author = []
-        else:
-            # Add word to current name if it's part of the first or second name
-            current_author.append(word)
-        
-    # If any name is left without being appended, append it now
-    if current_author:
-        formatted_authors.append(proper_case(' '.join(current_author)))  # Apply proper case here
-    
-    # Now join with semicolons for separation, no commas involved
-    formatted_authors_text = '; '.join(formatted_authors)
-    
-    return formatted_authors_text
 
+    for i, word in enumerate(words):
+        current_author.append(word)
+
+        # Check if the current word is preceded by a middle initial
+        if i > 0 and re.match(r'^[A-Z]\.$', words[i-1]):
+            formatted_authors.append(" ".join(current_author).strip())
+            current_author = []
+
+    # Add the last author, even if it doesn't end with a middle initial
+    if current_author:
+        formatted_authors.append(" ".join(current_author).strip())
+
+    return "; ".join(formatted_authors)
+
+def classify_text_chunks(preprocessed_text, original_text, pipeline):
+    # Split text into paragraphs or chunks
+    preprocessed_chunks = preprocessed_text.split("\n\n")
+    original_chunks = original_text.split("\n\n")
+
+    assert len(preprocessed_chunks) == len(original_chunks), "Mismatch between preprocessed and original text chunks"
+
+    classified_sections = {label: "" for label in ['title', 'authors', 'college', 'abstract', 'keywords', 'pubdate']}
+
+    for i, chunk in enumerate(preprocessed_chunks):
+        # Reshape the chunk into a 2D array as expected by the pipeline (1 sample, 1 feature)
+        chunk_reshaped = np.array([chunk]).reshape(-1, 1)  # Ensures a 2D shape (1, 1)
+
+        # Manually calculate the text length for this chunk
+        text_length = np.array([[len(chunk)]])  # This will be a 2D array with shape (1, 1)
+
+        # Combine the chunk and its length into a single array of features
+        combined_features = np.hstack([chunk_reshaped, text_length])  # Combine text and text length
+
+        # Convert the combined features to a DataFrame with appropriate column names
+        df_features = pd.DataFrame(combined_features, columns=['text', 'text_length'])
+
+        # Transform the chunk with TF-IDF and text length, and then predict the section label
+        predicted_section = pipeline.predict(df_features)[0]
+        
+        # Append the chunk to the appropriate section
+        classified_sections[predicted_section] += original_chunks[i].strip() + " "
+
+    print("=====Initial Classification=====")
+    for section, content in classified_sections.items():
+        print(f"{section.capitalize()}: {content.strip()}\n")
+
+    # Assign classified sections to respective variables
+    title = classified_sections.get('title', "").strip()
+    authors = classified_sections.get('authors', "").strip()
+    college = classified_sections.get('college', "").strip()
+    abstract = classified_sections.get('abstract', "").strip()
+    keywords = classified_sections.get('keywords', "").strip()
+    pubdate = classified_sections.get('pubdate', "").strip()
+
+    return title, authors, college, abstract, keywords, pubdate    
 
 # Text extraction endpoint
 @app.post("/extract-text/")
@@ -298,62 +325,155 @@ async def extract_text(files: List[UploadFile] = File(...)):
                 pdf_doc = fitz.open(stream=pdf_data, filetype="pdf")
                 total_pages += pdf_doc.page_count
                 
-                # Extract up to 15 pages or until Table of Contents is found
-                for page_num in range(15):  # Limit to 15 pages to avoid excessive scanning
+                for page_num in range(15):  # Limit to 15 pages
                     page = pdf_doc.load_page(page_num)
                     page_text = page.get_text("text")
-                    
-                    # Check for Table of Contents keywords
                     if any(keyword.lower() in page_text.lower() for keyword in toc_keywords):
                         break
-                    
                     pdf_text += page_text + "\n\n"
-                
                 total_text += pdf_text + "\n\n"
             else:
-                # For image files, handle with OCR (e.g., if JPG, PNG)
                 image = Image.open(io.BytesIO(await file.read()))
                 text = pytesseract.image_to_string(image)
                 total_text += text + "\n\n"
                 total_pages += 1
 
-        print("\n\n==========TOTALTEXT==========\n\n", total_text)
-
         # Preprocess and classify text
-        clean_text, pub_date, keywords, department, college = preprocess_text(total_text)
+        presectioned_text, original_text, department = remove_sections(total_text)
+        cleaned_text = preprocess_text(presectioned_text)
 
-        print("\n\n==========CLEANTEXT==========\n\n", clean_text)
+        """
+        ===LABELING AND FEATURE EXTRACTION===
+        """
 
-        title, abstract, author = classify_text_lines(clean_text)
+        from sklearn.feature_extraction.text import TfidfVectorizer
 
-        author = format_authors(author)
+        vectorizer = TfidfVectorizer(stop_words='english')
+
+        # Assume you have a list of clean text documents
+        documents = [cleaned_text] 
+        X = vectorizer.fit_transform(documents)
+
+        # Convert the TF-IDF matrix to a more readable form
+        feature_names = vectorizer.get_feature_names_out()
+        dense = X.todense()
+        df_tfidf  = pd.DataFrame(dense, columns=feature_names)
+
+        print("feature extraction:\n\n", df_tfidf)
+
+        """
+        ===TRAINING===
+        """
+
+        from sklearn.model_selection import train_test_split
+        from sklearn.svm import SVC
+        from sklearn.metrics import accuracy_score
+        from sklearn.metrics import classification_report, confusion_matrix
+        from sklearn.pipeline import Pipeline
+        from sklearn.compose import ColumnTransformer
+        from sklearn.preprocessing import FunctionTransformer
+        import numpy as np
+
+        # Reshape the dataset
+        # Assuming `df` has columns 'text' (chunks) and 'label' (category)
+        data = {
+            "text": [],
+            "label": []
+        }
+
+        for column in ['title', 'authors', 'college', 'abstract', 'keywords', 'pubdate']:
+            for text in df[column]:
+                data["text"].append(text)
+                data["label"].append(column)
+
+        # Create a new DataFrame
+        classification_df = pd.DataFrame(data)
+        # Clean the data to remove NaN values
+        classification_df = classification_df.dropna(subset=["text", "label"])
+        classification_df["text"] = classification_df["text"].fillna("")
+
+        # Normalize text data
+        classification_df["text"] = classification_df["text"].str.lower()
+        classification_df["text"] = classification_df["text"].str.replace(r"\s+", " ", regex=True)  # Replace extra spaces
+        classification_df["text"] = classification_df["text"].str.replace(r'[^\w\s.,\'"()-—:;/]', '', regex=True)  # Remove punctuation
+        classification_df['text_length'] = classification_df['text'].apply(len)
+
+        # Function to return text length
+        def add_text_length(X):
+            return np.array([[len(text)] for text in X])
+
+        # Prepare the data (ensure classification_df has 'text' and 'label' columns)
+        X = classification_df[['text', 'text_length']]  # Selecting both 'text' and 'text_length' columns
+        y = classification_df['label']
+
+        # Split the data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
+
+        # Create a transformer for text length
+        text_length_transformer = FunctionTransformer(add_text_length, validate=False)
+
+        # Create a column transformer that combines TF-IDF and text length
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('tfidf', TfidfVectorizer(stop_words='english', ngram_range=(1, 2), max_features=10000), 'text'),
+                ('text_length', text_length_transformer, 'text')
+            ])
+
+        # Create a pipeline that first applies the preprocessor and then fits the model
+        pipeline = Pipeline(steps=[
+            ('preprocessor', preprocessor),
+            ('classifier', SVC(class_weight="balanced", C=10, kernel="linear"))
+        ])
+
+        # Train the model
+        pipeline.fit(X_train, y_train)
+
+        # Evaluate the model
+        y_pred = pipeline.predict(X_test)
+
+        # Print evaluation results
+        from sklearn.metrics import accuracy_score, classification_report
+        print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+        print(classification_report(y_test, y_pred))  # Set zero_division to handle undefined precision
+
+        title, authors, college, abstract, keywords, pubdate = classify_text_chunks(cleaned_text, original_text, pipeline)
+
+        keywords_pattern = re.compile(r'\b(keywords?|key words?)\b', re.IGNORECASE)
+
+        if keywords_pattern.search(title):
+            title, keywords = keywords, title
+
+        keywords = re.sub(r'\b(keywords?|key words?)\b.*?(?:—|:)?\s*', '', keywords, flags=re.IGNORECASE).strip()
+
+        # Format output
+        authors = format_authors(authors)
         college = replace_college_names(college)
-        pub_date = convert_date(pub_date)
+        pubdate = convert_date(pubdate)
         title = proper_case(title)
 
-        print(f"""\n\n\n\n==========RESULTS===========
-            \ntitle: {title}
-            \npublication date: {pub_date}
-            \nauthors: {author}
-            \ncollege: {college}
-            \ndepartment: {department}
-            \nabstract: {abstract}
-            \nkeywords: {keywords}
-            \npages: {total_pages}"""
-            )
-        
+        print("=====Final Classification=====")
+        print(f"Title: {title}\n")
+        print(f"Authors: {authors}\n")
+        print(f"College: {college}\n")
+        print(f"Department: {department}\n")
+        print(f"Abstract: {abstract}\n")
+        print(f"Keywords: {keywords}\n")
+        print(f"Publication Date: {pubdate}\n")
+
+        # Return JSON response
         return JSONResponse(content={
-            "text": clean_text,
+            "text": cleaned_text,
             "total_pages": total_pages,
             "title": title,
             "abstract": abstract,
-            "author": author,
+            "author": authors,
             "college": college,
             "department": department,
-            "pubDate": pub_date,
+            "pubDate": pubdate,
             "keywords": keywords
         })
     
     except Exception as e:
-        print("Error:", str(e))
         return JSONResponse(content={"error": str(e)}, status_code=500)

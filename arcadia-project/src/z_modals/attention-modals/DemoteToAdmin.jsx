@@ -19,7 +19,7 @@ const DemoteToAdmin = ({ isOpen, onClose, onDemote }) => {
           <h2 className="text-xl font-semibold">Attention!</h2>
         </div>
         <p className="text-gray-700 mb-6">
-        You are about to make a Superadmin account into an admin which removes some admin privileges and turns it into an admin account. 
+        You are about to make a Superadmin account into an Admin which removes some admin privileges and turns it into an admin account. 
         <br />
         <br />
         Are you sure about this?

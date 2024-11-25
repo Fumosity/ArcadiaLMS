@@ -1,51 +1,44 @@
-import React, { useState } from "react";
-
-const userData = [
-    {
-        type: "Student",
-        email: "s.alcantara@example.com",
-        name: "Samuel Alcantara",
-        userId: "123",
-        schoolId: "2021-01000",
-        college: "COECSA",
-        department: "DCS"
-    },
-    {
-        type: "Student",
-        email: "a.jordan@example.com",
-        name: "Amanda Jordan",
-        userId: "456",
-        schoolId: "2020-02000",
-        college: "COECSA",
-        department: "DCS"
-    },
-    {
-        type: "Student",
-        email: "k.thurman@example.com",
-        name: "Keith Thurman",
-        userId: "789",
-        schoolId: "2019-03000",
-        college: "COECSA",
-        department: "IT"
-    },
-    {
-        type: "Student",
-        email: "m.jackson@example.com",
-        name: "Michael Jackson",
-        userId: "101",
-        schoolId: "2018-04000",
-        college: "CAS",
-        department: "Math"
-    }
-
-];
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../../supabaseClient.js"; // Adjust the import path as necessary.
 
 const ListOfUserAcc = () => {
+    const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const [entriesPerPage, setEntriesPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOrder, setSortOrder] = useState("Ascending");
     const [typeFilter, setTypeFilter] = useState("All");
+    const [userData, setUserData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUserAccounts = async () => {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from("user_accounts")
+                .select("userAccountType, userEmail, userFName, userLName, userID, userLPUID, userCollege, userDepartment")
+                .in("userAccountType", ["User", "Teacher", "Student", "Intern"]); // Use .in() to filter multiple types
+
+            if (error) {
+                console.error("Error fetching data from Supabase:", error);
+            } else {
+                const formattedData = data.map((user) => ({
+                    type: user.userAccountType,
+                    email: user.userEmail,
+                    name: `${user.userFName} ${user.userLName}`,
+                    userId: user.userID,
+                    schoolId: user.userLPUID,
+                    college: user.userCollege,
+                    department: user.userDepartment,
+                }));
+                setUserData(formattedData);
+            }
+            setLoading(false);
+        };
+
+        fetchUserAccounts();
+    }, []);
 
     const totalPages = Math.ceil(userData.length / entriesPerPage);
 
@@ -58,17 +51,42 @@ const ListOfUserAcc = () => {
         }
     });
 
-    // Handle filtering by user type
-    const filteredData = sortedData.filter((user) =>
-        (typeFilter === "All" || user.type === typeFilter) &&
-        (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.schoolId.includes(searchTerm))
-    );
+    // Handle filtering and searching
+    const filteredData = sortedData.filter((user) => {
+        const matchesType =
+            typeFilter === "All" || user.type === typeFilter;
+
+        const matchesSearch =
+            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.schoolId.includes(searchTerm);
+
+        return matchesType && matchesSearch;
+    });
 
     // Pagination logic
     const startIndex = (currentPage - 1) * entriesPerPage;
     const displayedUsers = filteredData.slice(startIndex, startIndex + entriesPerPage);
+
+    const handleUserClick = (user) => {
+        const nameParts = user.name.split(' ');
+        const userLName = nameParts.pop(); // Last part is last name
+        const userFName = nameParts.join(' '); // Join remaining parts as first name
+
+        navigate("/admin/useraccounts/viewusers", {
+            state: {
+                user: {
+                    ...user,
+                    userFName,
+                    userLName,
+                }
+            }
+        });
+    };
+
+    if (loading) {
+        return <p>Loading data...</p>;
+    }
 
     return (
         <div className="space-y-6">
@@ -99,7 +117,10 @@ const ListOfUserAcc = () => {
                             onChange={(e) => setTypeFilter(e.target.value)}
                         >
                             <option value="All">All</option>
+                            <option value="User">User</option>
                             <option value="Student">Student</option>
+                            <option value="Teacher">Teacher</option>
+                            <option value="Intern">Intern</option>
                         </select>
                     </div>
 
@@ -132,7 +153,7 @@ const ListOfUserAcc = () => {
                     </thead>
                     <tbody>
                         {displayedUsers.map((user, index) => (
-                            <tr key={index} className="hover:bg-gray-100">
+                            <tr key={index} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleUserClick(user)}>
                                 <td className="py-2">
                                     <span className="px-2 py-1 bg-gray-200 rounded-full text-xs">
                                         {user.type}
@@ -153,7 +174,7 @@ const ListOfUserAcc = () => {
                 <div className="flex justify-center items-center mt-4 space-x-4">
                     <button
                         className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
                     >
                         Previous Page
@@ -161,7 +182,7 @@ const ListOfUserAcc = () => {
                     <span className="text-sm">Page {currentPage} of {totalPages}</span>
                     <button
                         className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
                     >
                         Next Page
@@ -173,3 +194,4 @@ const ListOfUserAcc = () => {
 };
 
 export default ListOfUserAcc;
+

@@ -44,6 +44,9 @@ import ULogin from './UserPages/user-log-sign-page/ULogin';
 import ModalTest from './z_modals/ModalTest';
 import ErrorPage from './UserPages/ErrorPage';
 import URegister from './UserPages/user-log-sign-page/URegister';
+import AUAccView from './admin-user-account-view/AUAccView';
+import UserInformations from './components/admin-user-account-view-comp/UserInformations';
+import AAccountView from './admin-account-view/AAccountView';
 
 function App() {
   return (
@@ -102,6 +105,10 @@ function App() {
               <Route path="bookmodify" element={<ABModify />} />
               <Route path="reportticket" element={<AReportViewPage />} />
               <Route path="supportticket" element={<ASupportViewPage />} />
+              <Route path="useraccounts/viewusers" element={<AUAccView />} />
+              <Route path="useraccounts/viewadmins" element={<AAccountView />} />
+
+
             </Routes>
             <Footer />
             <Copyright />
