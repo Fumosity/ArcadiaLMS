@@ -7,8 +7,6 @@ const AccessTable = () => {
   const actions = [
     { action: 'Access Book Checking', path: '/admin/bookcheckinout' },
     { action: 'Access Book Circulation', path: '/admin/abcirculationpage' },
-    { action: 'Access Book Inventory', path: '/admin/bookmanagement' },
-    { action: 'Access Research Inventory', path: '/admin/researchmanagement' },
   ];
 
   return (

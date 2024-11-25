@@ -9,8 +9,9 @@ const OverdueBks = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [overdueData, setOverdueData] = useState([]);
+
     const totalEntries = overdueData.length;
-    const totalPages = Math.ceil(totalEntries / entries);
+    const totalPages = Math.ceil(totalEntries / Number(entries));
 
     useEffect(() => {
         // Fetch overdue book data from Supabase
@@ -19,7 +20,7 @@ const OverdueBks = () => {
                 const { data, error } = await supabase
                     .from('book_transactions')
                     .select('transaction_type, checkout_date, checkout_time, name, book_title, book_id, deadline')
-                    .lte('checkout_date', new Date().toISOString()); // Fetch overdue transactions
+                    .lt('deadline', new Date().toISOString()); // Fetch records where the deadline is past the current date
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
@@ -30,16 +31,21 @@ const OverdueBks = () => {
                         const date = item.checkout_date;
                         const time = item.checkout_time;
 
-                        const formattedTime = time
-                            ? new Date(`1970-01-01T${time}Z`).toLocaleString('en-US', {
-                                  hour: 'numeric',
-                                  minute: 'numeric',
-                                  hour12: true,
-                              })
-                            : null;
+                        let formattedTime = null;
+                        if (time) {
+                            // Ensure time is in the format HH:mm (24-hour format)
+                            const timeString = time.includes(':') ? time : `${time.slice(0, 2)}:${time.slice(2)}`;
+
+                            // Convert time into 12-hour format with AM/PM, no 'Z' for local time
+                            formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString('en-PH', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true,
+                            });
+                        }
 
                         return {
-                            type: item.transaction_type,
+                            type: "Overdue", // Always set to "Overdue" for overdue entries
                             date,
                             time: formattedTime,
                             borrower: item.name,
@@ -59,33 +65,56 @@ const OverdueBks = () => {
         fetchData();
     }, []); // Empty dependency array means this will run once when the component mounts
 
-    // Function to truncate the title if it's too long
-    const truncateTitle = (title, maxLength = 25) => {
-        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
-    };
-
-    // Function to format the deadline to an English date
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            month: 'long', // e.g., November
-            day: 'numeric', // e.g., 24
+    // Filter books by search term
+    const filteredData = overdueData
+        .filter(book =>
+            book.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            book.borrower.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            book.bookId.toString().includes(searchTerm)
+        )
+        // Filter by date range
+        .filter(book => {
+            if (dateRange === "After 2020") {
+                return new Date(book.deadline).getFullYear() > 2020;
+            } else if (dateRange === "Before 2020") {
+                return new Date(book.deadline).getFullYear() <= 2020;
+            }
+            return true;
+        })
+        // Filter by type order (Overdue in this case)
+        .filter(book => book.type === typeOrder)
+        // Sort by date
+        .sort((a, b) => {
+            const dateA = new Date(a.deadline);
+            const dateB = new Date(b.deadline);
+            if (sortOrder === "Descending") {
+                return dateB - dateA;
+            } else {
+                return dateA - dateB;
+            }
         });
-    };
+
+    // Truncate long titles
+    const truncateTitle = (title, maxLength = 25) =>
+        title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
+
+    // Format date for display
+    const formatDate = dateString =>
+        new Date(dateString).toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+        });
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
-            {/* Title */}
             <h3 className="text-xl font-semibold mb-4">Overdue Books</h3>
 
-            {/* Controls: Type, Sort by, Date Range, No. of Entries, Search */}
+            {/* Controls Section */}
             <div className="flex flex-wrap items-center mb-6 space-x-4">
                 {/* Type */}
                 <div className="flex items-center space-x-2">
                     <span className="font-medium text-sm">Type:</span>
-                    <span
-                        className="bg-gray-200 border border-gray-300 py-1 px-3 rounded-full text-xs"
-                        style={{ borderRadius: "40px" }}
-                    >
+                    <span className="bg-gray-200 border border-gray-300 py-1 px-3 rounded-full text-xs" style={{ borderRadius: "40px" }}>
                         {typeOrder}
                     </span>
                 </div>
@@ -94,10 +123,8 @@ const OverdueBks = () => {
                 <div className="flex items-center space-x-2">
                     <span className="font-medium text-sm">Sort By:</span>
                     <button
-                        onClick={() =>
-                            setSortOrder(sortOrder === "Descending" ? "Ascending" : "Descending")
-                        }
-                        className="sort-by bg-gray-200 py-1 px-3 rounded-full text-xs"
+                        onClick={() => setSortOrder(sortOrder === "Descending" ? "Ascending" : "Descending")}
+                        className="bg-gray-200 py-1 px-3 rounded-full text-xs hover:bg-gray-300"
                         style={{ borderRadius: "40px" }}
                     >
                         {sortOrder}
@@ -117,7 +144,7 @@ const OverdueBks = () => {
                                     : "After 2020"
                             )
                         }
-                        className="sort-by bg-gray-200 py-1 px-3 rounded-full text-xs"
+                        className="bg-gray-200 py-1 px-3 rounded-full text-xs hover:bg-gray-300"
                         style={{ borderRadius: "40px" }}
                     >
                         {dateRange}
@@ -154,51 +181,56 @@ const OverdueBks = () => {
             </div>
 
             {/* Table */}
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50 rounded-t-lg" style={{ borderRadius: "40px" }}>
+            <table className="min-w-full divide-y divide-gray-200 text-center">
+                <thead className="bg-gray-50">
                     <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book ID</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Book ID</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
                     </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {overdueData.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
-                        <tr key={index} className="hover:bg-gray-100">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.type}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.date}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.time}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.borrower}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.bookTitle}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.bookId}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(book.deadline)}</td>
-                        </tr>
-                    ))}
+                <tbody className="bg-white divide-y divide-gray-200 text-center">
+                    {filteredData
+                        .slice((currentPage - 1) * Number(entries), currentPage * Number(entries))
+                        .map((book, index) => (
+                            <tr key={index}>
+                                <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
+                                    ${book.type === "Overdue" ? "bg-red" : ""}`}>{book.type}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.borrower}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{truncateTitle(book.bookTitle)}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{formatDate(book.deadline)}</td>
+                            </tr>
+                        ))}
                 </tbody>
             </table>
 
             {/* Pagination Controls */}
-            <div className="flex justify-center items-center mt-4 space-x-4">
+            <div className="flex justify-center space-x-4 mt-4">
                 <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    style={{ borderRadius: "40px" }}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
+                    className="py-2 px-4 rounded-full bg-gray-200 hover:bg-gray-300 text-sm disabled:opacity-50"
                 >
-                    Previous Page
+                    Previous
                 </button>
-                <span className="text-xs">{`Page ${currentPage} of ${totalPages}`}</span>
+
+                <span className="text-sm text-gray-600">
+                    Page {currentPage} of {totalPages}
+                </span>
+
                 <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    style={{ borderRadius: "40px" }}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
+                    className="py-2 px-4 rounded-full bg-gray-200 hover:bg-gray-300 text-sm disabled:opacity-50"
                 >
-                    Next Page
+                    Next
                 </button>
             </div>
         </div>

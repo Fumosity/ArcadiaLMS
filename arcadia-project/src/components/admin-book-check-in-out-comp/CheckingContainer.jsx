@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient'; 
+import { supabase } from '../../supabaseClient';
 
 const CheckingContainer = () => {
   const [checkMode, setCheckMode] = useState('Check Out');
@@ -55,7 +55,7 @@ const CheckingContainer = () => {
             .from('user_accounts')
             .select('userLPUID, userFName, userLName, userCollege, userDepartment')
             .eq('userID', formData.userID)
-            .single(); 
+            .single();
 
           if (error || !data) {
             setFormData((prev) => ({
@@ -99,7 +99,7 @@ const CheckingContainer = () => {
             .from('book')
             .select('title')
             .eq('bookID', formData.bookID)
-            .single(); 
+            .single();
 
           if (error || !data) {
             setFormData((prev) => ({
@@ -168,36 +168,74 @@ const CheckingContainer = () => {
     try {
       const { userID, schoolNo, name, college, department, bookID, bookTitle, date, time, deadline } = formData;
       const currentTime = getLocalTime();
-      
+
       const transactionType = checkMode === 'Check Out' ? 'Borrowed' : 'Returned';
-  
-      const transactionData = {
-        user_id: userID,
-        school_id: schoolNo,
-        name: name,
-        college: college,
-        department: department,
-        book_id: bookID,
-        book_title: bookTitle,
-        checkout_date: checkMode === 'Check Out' ? date : null,
-        checkout_time: checkMode === 'Check Out' ? time : null,
-        checkin_date: checkMode === 'Check In' ? date : null,
-        checkin_time: checkMode === 'Check In' ? time : null,
-        ...(checkMode === 'Check Out' && { deadline }),
-        book_cover: '/path-to-book-cover.jpg',
-        transaction_type: transactionType,
-      };
-  
-      console.log('Transaction data being submitted:', transactionData);
-  
-      const { data, error } = await supabase.from('book_transactions').insert([transactionData]);
-  
-      if (error) {
-        console.error('Error inserting transaction:', error);
-        alert('Error submitting the form. Please try again.');
+
+      // Check if there's an existing transaction with the same userID, bookID, and bookTitle
+      const { data: existingTransaction, error: fetchError } = await supabase
+        .from('book_transactions')
+        .select('transaction_type')
+        .eq('book_id', bookID)
+        .eq('user_id', userID)
+        .eq('book_title', bookTitle)
+        .order('checkout_date', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching existing transaction:', fetchError);
+      }
+
+      // If a matching transaction exists and is 'Borrowed', update it to 'Returned' and remove the deadline
+      if (existingTransaction && existingTransaction.transaction_type === 'Borrowed' && checkMode === 'Check In') {
+        const { error: updateError } = await supabase
+          .from('book_transactions')
+          .update({
+            transaction_type: 'Returned',
+            checkin_date: date,
+            checkin_time: time,
+            deadline: null, // Remove the deadline when returning the book
+          })
+          .eq('book_id', bookID)
+          .eq('user_id', userID)
+          .eq('book_title', bookTitle)
+          .eq('transaction_type', 'Borrowed');
+
+        if (updateError) {
+          console.error('Error updating transaction:', updateError);
+          alert('Error updating the transaction. Please try again.');
+          return;
+        } else {
+          alert('Transaction updated to "Returned" successfully!');
+        }
       } else {
-        console.log('Transaction successful:', data);
-        alert('Transaction completed successfully!');
+        // Insert a new transaction for Check Out or Check In
+        const transactionData = {
+          user_id: userID,
+          school_id: schoolNo,
+          name: name,
+          college: college,
+          department: department,
+          book_id: bookID,
+          book_title: bookTitle,
+          checkout_date: checkMode === 'Check Out' ? date : null,
+          checkout_time: checkMode === 'Check Out' ? time : null,
+          checkin_date: checkMode === 'Check In' ? date : null,
+          checkin_time: checkMode === 'Check In' ? time : null,
+          ...(checkMode === 'Check Out' && { deadline }),
+          book_cover: '/path-to-book-cover.jpg',
+          transaction_type: transactionType,
+        };
+
+        const { data, error } = await supabase.from('book_transactions').insert([transactionData]);
+
+        if (error) {
+          console.error('Error inserting transaction:', error);
+          alert('Error submitting the form. Please try again.');
+        } else {
+          console.log('Transaction successful:', data);
+          alert('Transaction completed successfully!');
+        }
       }
     } catch (error) {
       console.error('Error processing transaction:', error);
@@ -206,6 +244,8 @@ const CheckingContainer = () => {
       setIsSubmitting(false); // Set submitting state back to false when done
     }
   };
+
+
 
   return (
     <div className="max-w-6xl mx-auto p-4 bg-white shadow-lg rounded-lg">
@@ -266,9 +306,8 @@ const CheckingContainer = () => {
                 name={key}
                 value={value}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 rounded-full border ${
-                  emptyFields[key] ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-3 py-2 rounded-full border ${emptyFields[key] ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 required
               />
             </div>
