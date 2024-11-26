@@ -2,7 +2,7 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     colors: {
-        "arcadia-red": "#8B0000",
+        "arcadia-red": "#902424",
         "white": "#FFFFFF",
         "dark-gray": "#333333",
         "black": "#000000",
