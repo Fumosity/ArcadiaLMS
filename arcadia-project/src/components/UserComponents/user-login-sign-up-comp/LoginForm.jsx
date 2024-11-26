@@ -44,7 +44,13 @@ export default function LoginForm() {
       }
 
       localStorage.setItem("user", JSON.stringify(loginData)); //Set persistence to logged on user
-      navigate("/"); //Go to homepage
+      if (loginData.userRole === "Admin" || "Superadmin" || "Intern") {
+        navigate("/admin"); // Redirect to admin dashboard
+      } else if (loginData.userRole === "Student" || "Teacher") {
+        navigate("/"); // Redirect to user homepage
+      } else {
+        window.alert("Unknown account type. Contact support.");
+      } //Go to homepage
     } catch (err) {
       setError("Unable to connect to the server. Please check your network.");
     }
