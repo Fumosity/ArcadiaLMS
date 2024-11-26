@@ -66,7 +66,7 @@ function App() {
               <Route path="/user/register" element={<UsrRegistration />} />
               <Route path="/user/login" element={<ULogin />} />
               <Route path="/user/register" element={<URegister />} />
-              <Route path="/user/bookmanagement" element={<UBkSearchCatalog />} />
+              <Route path="/user/bookmanagement" element={<UBkCatalog />} />
               <Route path="/user/bookcatalog" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
               <Route path="/user/newsupdates" element={<UNewsNUpd />} />
@@ -110,8 +110,6 @@ function App() {
               <Route path="supportticket" element={<ASupportViewPage />} />
               <Route path="useraccounts/viewusers" element={<AUAccView />} />
               <Route path="useraccounts/viewadmins" element={<AAccountView />} />
-
-
             </Routes>
             <Footer />
             <Copyright />
