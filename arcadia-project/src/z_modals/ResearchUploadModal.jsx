@@ -37,18 +37,20 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
 
       console.log("Extracted text from backend:", response.data.text);
 
+      let reformatPubDate = response.data.pubDate + "-01"
+
       const extractedData = {
         title: response.data.title,
         abstract: response.data.abstract,
         author: response.data.author,
-        keywords: response.data.keywords,
-        pubDate: response.data.pubDate,
+        keyword: response.data.keywords,
+        pubDate: reformatPubDate,
         department: response.data.department,
         college: response.data.college
       };
   
       setExtractedData(extractedData);
-      onFileSelect(extractedData); // Add extractedData here
+      onFileSelect(uploadedFiles); // Add extractedData here
       onExtractedData(extractedData); // <-- Add this line
 
       // Count the number of pages from the response

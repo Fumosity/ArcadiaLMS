@@ -77,8 +77,10 @@ const ARAdding = ({ formData, setFormData }) => {
 
   // Separate function to handle file uploads
   const handleFileSelect = (files) => {
-    setUploadedFiles(files);
-    setPageCount(files.length);
+    console.log("Files received in handleFileSelect:", files);
+
+    setUploadedFiles(Array.isArray(files) ? files : []);
+    setPageCount(Array.isArray(files) ? files.length : 0);
   };
 
   // Function to handle extracted data and update formData
@@ -94,6 +96,7 @@ const ARAdding = ({ formData, setFormData }) => {
 
   //Handles the submission to the database
   const handleSubmit = async () => {
+    
     const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "thesisID", "arcID"];
     const hasEmptyFields = requiredFields.some(field => !formData[field]);
 
@@ -106,7 +109,14 @@ const ARAdding = ({ formData, setFormData }) => {
     const pdfUrls = [];
     const imageUrls = [];
 
-    for (const file of uploadedFiles) {
+    console.log(uploadedFiles)
+
+    if (!Array.isArray(uploadedFiles)) {
+      console.error("uploadedFiles is not an array:", uploadedFiles);
+      return;
+    }
+
+    for (const file of uploadedFiles) { //error here
       const filePath = `${uuidv4()}_${file.name}`;
       const { error } = await supabase.storage.from("research-files").upload(filePath, file, {
         cacheControl: '3600',
@@ -252,11 +262,11 @@ const ARAdding = ({ formData, setFormData }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
-                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.keywords } onChange={ handleChange } placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
+                <input type="text" name="keyword" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.keyword } onChange={ handleChange } placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Date Published:</label>
-                <input type="month" name="pubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.pubDate } onChange={ handleChange } required />
+                <input type="date" name="pubDate" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.pubDate } onChange={ handleChange } required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
