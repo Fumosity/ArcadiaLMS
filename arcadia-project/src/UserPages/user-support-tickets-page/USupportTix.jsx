@@ -10,7 +10,7 @@ const USupportTix = () => {
         <div className="min-h-screen bg-light-white">
             <UNavbar />
             <UsearchBar />
-            <Title>User Report View</Title>
+            <Title>Support Tickets</Title>
 
             <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 

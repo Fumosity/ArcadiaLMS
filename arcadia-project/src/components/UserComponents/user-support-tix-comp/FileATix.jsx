@@ -1,14 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from "/src/supabaseClient.js";
 
 const FileATix = () => {
+    const [searchParams] = useSearchParams();
     const [type, setType] = useState("select-type");
     const [subject, setSubject] = useState("");
     const [content, setContent] = useState("");
+    const [userID, setUserID] = useState(null);
+
+    // Retrieve the user_ID from localStorage
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (user && user.userID) {
+            setUserID(user.userID);
+        }
+    }, []);
 
     const handleSubmit = async () => {
         if (type === "select-type" || !subject || !content) {
             alert("Please fill out all fields.");
+            return;
+        }
+
+        if (!userID) {
+            alert("Unable to identify the user. Please log in again.");
             return;
         }
 
@@ -17,6 +33,7 @@ const FileATix = () => {
 
         const { error } = await supabase.from("support_ticket").insert([
             {
+                user_ID: userID, // Include the user_ID here
                 type,
                 status: "Ongoing",
                 date,
@@ -28,6 +45,7 @@ const FileATix = () => {
 
         if (error) {
             console.error("Error submitting ticket:", error);
+            alert("Failed to file the ticket. Please try again.");
         } else {
             alert("Ticket filed successfully!");
             setType("select-type");
@@ -46,7 +64,9 @@ const FileATix = () => {
                     value={type}
                     onChange={(e) => setType(e.target.value)}
                 >
-                    <option value="select-type" className="text-center text-grey">Select Type</option>
+                    <option value="select-type" className="text-center text-grey">
+                        Select Type
+                    </option>
                     <option value="system" className="text-center">Account</option>
                     <option value="book" className="text-center">Book</option>
                     <option value="feedback" className="text-center">Research</option>

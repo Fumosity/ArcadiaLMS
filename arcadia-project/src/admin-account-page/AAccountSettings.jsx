@@ -1,28 +1,13 @@
 import React from "react";
-import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import UsearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
-import Title from "../../components/main-comp/Title";
 
-import SimBooks from "../../components/UserComponents/user-book-catalog-comp/SimBooks";
-
-import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
-import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
-import Services from "../../components/UserComponents/user-main-comp/Services";
-import UHero from "../../components/UserComponents/user-home-comp/UHero";
-import LibServ from "../../components/UserComponents/user-serv-comp/LibServ";
-import SupportCont from "../../components/UserComponents/user-support-comp/SupportCont";
-import ContactUs from "../../components/UserComponents/user-support-comp/ContactUs";
-import FAQSection from "../../components/UserComponents/user-faq-comp/FAQSection";
-import { UserCredentials } from "../../components/UserComponents/user-account-comp/UserCredentials";
-import { AccountSettings } from "../../components/UserComponents/user-account-comp/AccountSetting";
-import UserCirculationHistory from "../../components/UserComponents/user-account-comp/UserCirculationHistory";
 import { AdminSettings } from "../components/admin-account-settings-comp/AdminSettings";
 import { AdminCredentials } from "../components/admin-account-settings-comp/AdminCredentials";
+import Title from "../components/main-comp/Title";
 
 const AAccountSettings = () => {
     return (
         <div className="min-h-screen bg-light-white">
-            <Title>Account Settings</Title>
+            <Title>Account Settings </Title>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Content Container */}

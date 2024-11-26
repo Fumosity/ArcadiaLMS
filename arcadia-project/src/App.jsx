@@ -49,6 +49,7 @@ import UserInformations from './components/admin-user-account-view-comp/UserInfo
 import AAccountView from './admin-account-view/AAccountView';
 import UAccountProfile from './UserPages/user-account-page/UAccountProfile';
 import UBkCatalog from './UserPages/user-book-catalog-page/UBkCatalog';
+import AAccountSettings from './admin-account-page/AAccountSettings';
 
 function App() {
   return (
@@ -76,6 +77,7 @@ function App() {
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
               <Route path="/user/accountview" element={<UAccountProfile />} />
+              
             </Routes>
             <UFooter />
             <UCopyright />
@@ -110,6 +112,9 @@ function App() {
               <Route path="supportticket" element={<ASupportViewPage />} />
               <Route path="useraccounts/viewusers" element={<AUAccView />} />
               <Route path="useraccounts/viewadmins" element={<AAccountView />} />
+              <Route path="accountview" element={<AAccountSettings />} />
+
+
             </Routes>
             <Footer />
             <Copyright />
