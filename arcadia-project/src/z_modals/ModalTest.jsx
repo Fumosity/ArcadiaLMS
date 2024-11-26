@@ -19,6 +19,7 @@ import ModifySchedule from './ModifySchedule';
 import AddEvents from './AddEvents';
 import RemoveEvent from './RemoveEvent';
 import ModifyEvents from './ModifyEvents';
+import UpdateProfilePic from './UpdateProfilePic';
 
 function ModalTest() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +29,7 @@ function ModalTest() {
       <button onClick={() => setIsModalOpen(true)} className="btn">
         Open Research Upload Modal
       </button>
-      <ModifySchedule isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <UpdateProfilePic isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }

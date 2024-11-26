@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "/src/supabaseClient.js";
 
 const FileATix = () => {
@@ -8,6 +8,14 @@ const FileATix = () => {
     const [subject, setSubject] = useState("");
     const [content, setContent] = useState("");
     const [userID, setUserID] = useState(null);
+
+    // Set default values from query parameters
+    useEffect(() => {
+        const defaultType = searchParams.get("type");
+        const defaultSubject = searchParams.get("subject");
+        if (defaultType) setType(defaultType);
+        if (defaultSubject) setSubject(defaultSubject);
+    }, [searchParams]);
 
     // Retrieve the user_ID from localStorage
     useEffect(() => {
@@ -33,7 +41,7 @@ const FileATix = () => {
 
         const { error } = await supabase.from("support_ticket").insert([
             {
-                user_ID: userID, // Include the user_ID here
+                user_ID: userID,
                 type,
                 status: "Ongoing",
                 date,
@@ -67,9 +75,9 @@ const FileATix = () => {
                     <option value="select-type" className="text-center text-grey">
                         Select Type
                     </option>
-                    <option value="system" className="text-center">Account</option>
-                    <option value="book" className="text-center">Book</option>
-                    <option value="feedback" className="text-center">Research</option>
+                    <option value="Account" className="text-center">Account</option>
+                    <option value="Book" className="text-center">Book</option>
+                    <option value="Research" className="text-center">Research</option>
                 </select>
 
                 <label className="text-sm ml-4 mr-2 font-semibold">Subject:</label>

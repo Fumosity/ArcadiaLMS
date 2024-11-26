@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabaseClient.js";
 
-export default function LoginForm() {
+export default function LoginForm({ setUserForModal }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -40,6 +40,11 @@ export default function LoginForm() {
 
       // Save user data in local storage
       localStorage.setItem("user", JSON.stringify(loginData));
+
+      // Pass user data to the modal
+      if (setUserForModal) {
+        setUserForModal(loginData);
+      }
 
       // Redirect based on user type
       if (
