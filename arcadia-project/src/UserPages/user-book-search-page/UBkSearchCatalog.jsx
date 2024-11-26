@@ -5,16 +5,9 @@ import Title from "../../components/main-comp/Title";
 import FilterSidebar from "../../components/UserComponents/user-book-search-comp/FilterSidebar";
 import SimBooks from "../../components/UserComponents/user-book-search-comp/SimBooks";
 import BkSearchResults from "../../components/UserComponents/user-book-search-comp/BkSearchResults";
-import Recommended from "../../components/UserComponents/user-home-comp/Recommended";
-import MostPopular from "../../components/UserComponents/user-home-comp/MostPopular";
-import HighlyRated from "../../components/UserComponents/user-home-comp/HighlyRated";
-import NewlyAdded from "../../components/UserComponents/user-book-catalog-comp/NewlyAdded";
-import ReleasedThisYear from "../../components/UserComponents/user-book-catalog-comp/ReleasedThisYear";
-import Fiction from "../../components/UserComponents/user-book-catalog-comp/Fiction";
-import Nonfiction from "../../components/UserComponents/user-book-catalog-comp/Nonfiction";
 
 
-const UBkCatalog = () => {
+const UBkSearchCatalog = () => {
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />
@@ -32,15 +25,10 @@ const UBkCatalog = () => {
                     {/* Main Content */}
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
                         {/* Hero Section */}
-                        <Recommended />
+                        <SimBooks />
 
-                        <MostPopular />
-                        <HighlyRated />
-                        <NewlyAdded />
-                        <ReleasedThisYear />
-                        <Fiction />
-                        <Nonfiction />
-                        
+                        {/* News and Updates */}
+                        <BkSearchResults />
 
                     </div>
                 </div>
@@ -51,4 +39,4 @@ const UBkCatalog = () => {
     )
 };
 
-export default UBkCatalog;
+export default UBkSearchCatalog;

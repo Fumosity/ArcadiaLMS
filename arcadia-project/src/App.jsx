@@ -28,7 +28,7 @@ import UFooter from './components/UserComponents/user-main-comp/UFooter';
 import UHeader from './components/UserComponents/user-main-comp/UHeader';
 import UHomePage from './UserPages/user-home-page/UHomePage';
 import UCopyright from './components/UserComponents/user-main-comp/UCopyright';
-import UBkCatalog from './UserPages/user-book-catalog-page/UBkCatalog';
+import UBkSearchCatalog from './UserPages/user-book-search-page/UBkSearchCatalog';
 import URsrchCatalog from './UserPages/user-rsrch-catalog-page/URsrchCatalog';
 import UNewsNUpd from './UserPages/user-news-and-updates-page/UNewsNUpd';
 import UDiscussionReserv from './UserPages/user-room-reserv-page/UDiscussionReserv';
@@ -48,6 +48,7 @@ import AUAccView from './admin-user-account-view/AUAccView';
 import UserInformations from './components/admin-user-account-view-comp/UserInformations';
 import AAccountView from './admin-account-view/AAccountView';
 import UAccountProfile from './UserPages/user-account-page/UAccountProfile';
+import UBkCatalog from './UserPages/user-book-catalog-page/UBkCatalog';
 
 function App() {
   return (
@@ -65,7 +66,8 @@ function App() {
               <Route path="/user/register" element={<UsrRegistration />} />
               <Route path="/user/login" element={<ULogin />} />
               <Route path="/user/register" element={<URegister />} />
-              <Route path="/user/bookmanagement" element={<UBkCatalog />} />
+              <Route path="/user/bookmanagement" element={<UBkSearchCatalog />} />
+              <Route path="/user/bookcatalog" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
               <Route path="/user/newsupdates" element={<UNewsNUpd />} />
               <Route path="/user/reservations" element={<UDiscussionReserv />} />

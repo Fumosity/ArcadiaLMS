@@ -1,7 +1,7 @@
 import React from "react"
-import Language from "../user-book-catalog-comp/Language"
+import Language from "../user-book-search-comp/Language"
 import CollegeAndDept from "./CollegeAndDept"
-import PublicationYear from "../user-book-catalog-comp/PublicationYear"
+import PublicationYear from "../user-book-search-comp/PublicationYear"
 
 export default function URFilterSidebar() {
     return (
