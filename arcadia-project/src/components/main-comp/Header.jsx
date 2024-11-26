@@ -11,7 +11,7 @@ const AdminHeader = () => {
   //Logout Function
   const handleLogout = () => {
     localStorage.removeItem("user");
-    navigate("/admin/login");
+    navigate("/user/login");
   };
 
   const showDropdown = () => {

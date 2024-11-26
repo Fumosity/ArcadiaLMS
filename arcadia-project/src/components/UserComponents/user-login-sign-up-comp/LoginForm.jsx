@@ -44,9 +44,9 @@ export default function LoginForm() {
       }
 
       localStorage.setItem("user", JSON.stringify(loginData)); //Set persistence to logged on user
-      if (loginData.userRole === "Admin" || "Superadmin" || "Intern") {
+      if (loginData.userAccountType === "Admin" || loginData.userAccountType === "Superadmin" || loginData.userAccountType === "Intern") {
         navigate("/admin"); // Redirect to admin dashboard
-      } else if (loginData.userRole === "Student" || "Teacher") {
+      } else if (loginData.userAccountType === "Student" || loginData.userAccountType === "Teacher") {
         navigate("/"); // Redirect to user homepage
       } else {
         window.alert("Unknown account type. Contact support.");
