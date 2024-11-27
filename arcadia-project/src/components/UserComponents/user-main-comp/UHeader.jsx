@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiUser } from 'react-icons/fi';
 import { Link, useNavigate } from "react-router-dom";
 
 const UHeader = () => {
-  const navigate = useNavigate(); //Command to navigate to a desired page
-  const user = JSON.parse(localStorage.getItem("user")); //Get currently logged on user
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   let dropdownTimeout;
 
-  //Logout Function
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("user");
+    setUser(null);
     navigate("/user/login");
   };
 
@@ -20,12 +27,12 @@ const UHeader = () => {
   };
 
   const hideDropdown = () => {
-    dropdownTimeout = setTimeout(() => setIsDropdownVisible(false), 500); // 500ms delay before hiding
+    dropdownTimeout = setTimeout(() => setIsDropdownVisible(false), 500);
   };
 
   return (
     <header className="bg-arcadia-red shadow">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center w-full">
         {/* Left-aligned Logo and Text */}
         <div className="flex items-center">
           <img src="/image/arcadia.png" alt="Arcadia logo" className="h-8 w-8 mr-2" />
@@ -33,21 +40,29 @@ const UHeader = () => {
         </div>
 
         {/* Right-aligned User Info */}
-        <div className="ml-auto flex items-center relative">
+        <div className="flex items-center space-x-4">
           {user ? (
             <div
-              className="relative group"
+              className="relative group flex items-center space-x-3"
               onMouseEnter={showDropdown}
               onMouseLeave={hideDropdown}
             >
               <span className="mr-2 text-white cursor-pointer">
                 {user.userFName} {user.userLName}
               </span>
-              <FiUser className="h-6 w-6 text-gray-300" />
+              {user.userPicture ? (
+                <img 
+                  src={user.userPicture} 
+                  alt={`${user.userFName}'s profile`} 
+                  className="h-8 w-8 rounded-full object-cover"
+                />
+              ) : (
+                <FiUser className="h-6 w-6 text-gray-300" />
+              )}
 
               {/* Dropdown Menu */}
               {isDropdownVisible && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg z-10">
                   <ul className="py-1">
                     <li>
                       <Link
@@ -70,12 +85,10 @@ const UHeader = () => {
               )}
             </div>
           ) : (
-            <>
-              <Link to="/user/login" className="mr-2 text-white">
-                Login
-              </Link>
+            <Link to="/user/login" className="flex items-center text-white">
+              <span className="mr-2">Login</span>
               <FiUser className="h-6 w-6 text-gray-300" />
-            </>
+            </Link>
           )}
         </div>
       </div>
@@ -84,3 +97,4 @@ const UHeader = () => {
 };
 
 export default UHeader;
+

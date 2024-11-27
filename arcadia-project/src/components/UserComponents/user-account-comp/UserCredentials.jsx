@@ -8,6 +8,7 @@ const defaultUser = {
   email: "shiori.novella@punetwork.edu.ph",
   accountType: "Student",
   photoUrl: "/placeholder.svg?height=100&width=100",
+  userPicture: "/placeholder.svg?height=100&width=100",
 };
 
 export function UserCredentials({ user = defaultUser }) {
@@ -24,6 +25,7 @@ export function UserCredentials({ user = defaultUser }) {
         email: storedUser.userEmail,
         accountType: storedUser.userAccountType,
         photoUrl: storedUser.photoUrl || "/placeholder.svg?height=100&width=100",
+        userPicture: storedUser.userPicture || "/placeholder.svg?height=100&width=100",
       });
     }
   }, []);
@@ -34,7 +36,7 @@ export function UserCredentials({ user = defaultUser }) {
       <div className="flex flex-col items-center mb-8">
         <div className="w-24 h-24 border border-grey rounded-full overflow-hidden mb-4">
           <img
-            src={currentUser.photoUrl}
+            src={currentUser.userPicture || currentUser.photoUrl}
             alt={`${currentUser.name}'s profile photo`}
             className="w-full h-full object-cover"
           />
