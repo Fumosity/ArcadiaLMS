@@ -1,50 +1,35 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabaseClient.js";
+import { useUser } from "../../../backend/UserContext"; // Adjust the path based on your folder structure
 
-export default function LoginForm({ setUserForModal }) {
+export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { updateUser } = useUser(); // Get updateUser from UserContext
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      // Check if email exists
-      const { data: emailCheck, error: emailError } = await supabase
-        .from("user_accounts")
-        .select("*")
-        .eq("userEmail", email)
-        .single();
-
-      if (emailError || !emailCheck) {
-        window.alert("This email does not exist. Please register or try again.");
-        return;
-      }
-
-      // Check if password matches
+      // Verify user credentials
       const { data: loginData, error: loginError } = await supabase
         .from("user_accounts")
         .select("*")
         .eq("userEmail", email)
-        .eq("userPassword", password) // Consider hashing passwords for production
+        .eq("userPassword", password) // Use hashed passwords in production
         .single();
 
       if (loginError || !loginData) {
-        window.alert("Incorrect password. Please try again.");
+        alert("Incorrect email or password. Please try again.");
         return;
       }
 
-      // Save user data in local storage
-      localStorage.setItem("user", JSON.stringify(loginData));
-
-      // Pass user data to the modal
-      if (setUserForModal) {
-        setUserForModal(loginData);
-      }
+      // Update user state globally
+      updateUser(loginData);
 
       // Redirect based on user type
       if (
@@ -59,7 +44,7 @@ export default function LoginForm({ setUserForModal }) {
       ) {
         navigate("/");
       } else {
-        window.alert("Unknown account type. Contact support.");
+        alert("Unknown account type. Please contact support.");
       }
     } catch (err) {
       setError("Unable to connect to the server. Please check your network.");
@@ -70,7 +55,7 @@ export default function LoginForm({ setUserForModal }) {
     <div className="uMain-cont max-w-md mx-auto p-8 bg-white rounded-2xl">
       <div className="flex justify-center mb-6">
         <div className="flex items-center gap-1">
-          <img src="/image/arcadia.png" alt="Book icon" className="h-13 w-13" />
+          <img src="/image/arcadia.png" alt="Arcadia logo" className="h-13 w-13" />
           <h1 className="text-5xl font-semibold">Arcadia</h1>
         </div>
       </div>
@@ -89,29 +74,26 @@ export default function LoginForm({ setUserForModal }) {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+            className="w-full px-3 py-1 border border-gray rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
         <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password:
-            </label>
-            <Link to="/forgot-password" className="text-sm text-a-t-red hover:underline">
-              Forgot password?
-            </Link>
-          </div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            Password:
+          </label>
           <input
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+            className="w-full px-3 py-1 border border-gray rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
-        <div className="flex gap-4 justify-center items-center">
+        <div className="flex justify-center items-center gap-4">
           <Link to="/user/register" className="registerBtn">
             Register
           </Link>
@@ -120,11 +102,6 @@ export default function LoginForm({ setUserForModal }) {
           </button>
         </div>
       </form>
-
-      <div className="mt-6 space-y-4 flex flex-col items-center text-center">
-        <div className="text-sm text-gray-600">Or you may also browse as a guest!</div>
-        <button className="genWhiteButtons">Browse as guest</button>
-      </div>
     </div>
   );
 }

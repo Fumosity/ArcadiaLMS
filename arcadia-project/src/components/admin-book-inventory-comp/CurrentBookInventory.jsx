@@ -18,7 +18,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         const fetchBooks = async () => {
             setTimeout(async () => {
                 const { data, error } = await supabase
-                    .from("book")
+                    .from("book_titles")
                     .select("*");
                 if (error) {
                     console.error("Error fetching books:", error);
@@ -137,7 +137,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                             ))
                         ) : (
                             uniqueBooks.map((item, index) => {
-                                const genres = item.genre ? item.genre.split(";") : [];
+                                const genres = typeof item.genre === "string" ? item.genre.split(";") : [];
 
                                 return (
                                     <tr

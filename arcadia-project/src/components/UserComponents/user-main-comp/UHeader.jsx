@@ -1,23 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { FiUser } from 'react-icons/fi';
+import React, { useState } from "react";
+import { FiUser } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../../../backend/UserContext"; // Adjust path as needed
 
 const UHeader = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user, updateUser } = useUser(); // Global user state from context
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   let dropdownTimeout;
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-    }
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
+    updateUser(null); // Clear user state globally
     navigate("/user/login");
   };
 
@@ -51,9 +44,9 @@ const UHeader = () => {
                 {user.userFName} {user.userLName}
               </span>
               {user.userPicture ? (
-                <img 
-                  src={user.userPicture} 
-                  alt={`${user.userFName}'s profile`} 
+                <img
+                  src={user.userPicture}
+                  alt={`${user.userFName}'s profile`}
                   className="h-8 w-8 rounded-full object-cover"
                 />
               ) : (
@@ -97,4 +90,3 @@ const UHeader = () => {
 };
 
 export default UHeader;
-
