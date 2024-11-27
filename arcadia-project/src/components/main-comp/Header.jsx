@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { FiUser } from 'react-icons/fi';
+import { FiUser } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../../backend/UserContext"; // Adjust path as needed
 
-const AdminHeader = () => {
-  const navigate = useNavigate(); //Command to navigate to a desired page
-  const admin = JSON.parse(localStorage.getItem("user")); //Get currently logged-on admin
+const Header = () => {
+  const navigate = useNavigate();
+  const { user, updateUser } = useUser(); // Global user state from context
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   let dropdownTimeout;
 
-  //Logout Function
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    updateUser(null);
     navigate("/user/login");
   };
 
@@ -20,57 +20,51 @@ const AdminHeader = () => {
   };
 
   const hideDropdown = () => {
-    dropdownTimeout = setTimeout(() => setIsDropdownVisible(false), 500); // 500ms delay before hiding
+    dropdownTimeout = setTimeout(() => setIsDropdownVisible(false), 500);
   };
+
+  
 
   return (
     <header className="bg-white shadow">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center w-full">
         {/* Left-aligned Logo and Text */}
         <div className="flex items-center">
           <img src="/image/arcadia.png" alt="Arcadia logo" className="h-8 w-8 mr-2" />
           <span className="text-xl font-semibold text-arcadia-red">Arcadia Admin</span>
         </div>
 
-        {/* Right-aligned Admin Info */}
-        <div className="ml-auto flex items-center relative">
-          {admin ? (
+        {/* Right-aligned User Info */}
+        <div className="flex items-center space-x-4">
+          {user ? (
             <div
-              className="relative group"
+              className="relative group flex items-center space-x-3"
               onMouseEnter={showDropdown}
               onMouseLeave={hideDropdown}
             >
-              <span className="mr-2 cursor-pointer text-arcadia-red font-medium">
-                {admin.userFName} {admin.userLName}
+              <span className="mr-2 text-arcadia-red font-medium cursor-pointer">
+                {user.userFName} {user.userLName}
               </span>
-              <FiUser className="h-6 w-6 text-gray-500" />
+              {user.userPicture ? (
+                <img
+                  src={user.userPicture}
+                  alt={`${user.userFName}'s profile`}
+                  className="h-8 w-8 border border-grey rounded-full object-cover"
+                />
+              ) : (
+                <FiUser className="h-6 w-6 text-gray-300" />
+              )}
 
               {/* Dropdown Menu */}
               {isDropdownVisible && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg z-10">
                   <ul className="py-1">
-                  <li>
-                      <Link
-                        to="accountview"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      >
-                        Account Settings
-                      </Link>
-                    </li>
                     <li>
                       <Link
-                        to="/admin/dashboard"
+                        to="/user/accountview"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       >
-                        Dashboard
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/admin/settings"
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                      >
-                        Settings
+                        Manage Account
                       </Link>
                     </li>
                     <li>
@@ -86,12 +80,10 @@ const AdminHeader = () => {
               )}
             </div>
           ) : (
-            <>
-              <Link to="/admin/login" className="mr-2 text-arcadia-red font-medium">
-                Login
-              </Link>
-              <FiUser className="h-6 w-6 text-gray-500" />
-            </>
+            <Link to="/user/login" className="flex items-center text-white">
+              <span className="mr-2">Login</span>
+              <FiUser className="h-6 w-6 text-gray-300" />
+            </Link>
           )}
         </div>
       </div>
@@ -99,4 +91,4 @@ const AdminHeader = () => {
   );
 };
 
-export default AdminHeader;
+export default Header;

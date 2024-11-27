@@ -10,7 +10,7 @@ const UHeader = () => {
   let dropdownTimeout;
 
   const handleLogout = () => {
-    updateUser(null); // Clear user state globally
+    updateUser(null);
     navigate("/user/login");
   };
 
@@ -22,6 +22,8 @@ const UHeader = () => {
   const hideDropdown = () => {
     dropdownTimeout = setTimeout(() => setIsDropdownVisible(false), 500);
   };
+
+  
 
   return (
     <header className="bg-arcadia-red shadow">
