@@ -14,33 +14,33 @@ import AdminInformations from "../components/admin-account-view-comp/AdminInform
 const AAccountView = () => {
     const location = useLocation();
     const user = location.state?.user || {};
-    return(
-    <div className="min-h-screen bg-gray-100">
-        {/* Main header */}
+    return (
+        <div className="min-h-screen bg-gray-100">
+            {/* Main header */}
 
-        <Title>Admin Account Viewer</Title>
+            <Title>Admin Account Viewer</Title>
 
-        {/* Main content section */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid grid-cols-3 gap-8">
-                <div className="col-span-2 space-y-8">
-                    {/* Left side content */}
-                    <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                        <AdminInformations user={user} />
+            {/* Main content section */}
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="grid grid-cols-3 gap-8">
+                    <div className="col-span-2 space-y-8">
+                        {/* Left side content */}
+                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
+                            <AdminInformations user={user} />
+                        </div>
+                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
+                            <AAListAdmin user={user} />
+                        </div>
                     </div>
-                    <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                        <AAListAdmin user={user} />
+
+                    {/* Right side content */}
+                    <div className="lg:col-span-1 space-y-8">
+                        <Blacklist user={user} />
+                        <Whitelist user={user} />
                     </div>
                 </div>
-
-                {/* Right side content */}
-                <div className="lg:col-span-1 space-y-8">
-                    <Blacklist user={user} />
-       fau          <Whitelist user={user}/>
-                </div>
-            </div>
-        </main>
-    </div>
+            </main>
+        </div>
     );
 };
 

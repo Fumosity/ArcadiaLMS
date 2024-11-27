@@ -61,7 +61,7 @@ const Header = () => {
                   <ul className="py-1">
                     <li>
                       <Link
-                        to="/user/accountview"
+                        to="accountview"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       >
                         Manage Account
