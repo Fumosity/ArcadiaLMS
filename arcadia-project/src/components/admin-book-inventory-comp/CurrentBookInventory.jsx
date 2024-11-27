@@ -16,21 +16,62 @@ const CurrentBookInventory = ({ onBookSelect }) => {
 
     useEffect(() => {
         const fetchBooks = async () => {
-            setTimeout(async () => {
-                const { data, error } = await supabase
+            setIsLoading(true);
+            try {
+                // First, fetch the book titles
+                const { data: bookTitles, error: titleError } = await supabase
                     .from("book_titles")
-                    .select("*");
-                if (error) {
-                    console.error("Error fetching books:", error);
-                } else {
-                    console.log("Fetched books:", data); // Log the fetched data
-                    setInventoryData(data);
+                    .select("category, title, author, originalPubDate, genre, titleID");
+
+                if (titleError) {
+                    console.error("Error fetching book titles:", titleError.message);
+                    return;
                 }
-                setIsLoading(false); // Data fetching complete
-            }, 1500); // 1.5 seconds delay
+
+                console.log("Fetched book titles:", bookTitles);
+
+                // If no titles are found, exit early
+                if (!bookTitles || bookTitles.length === 0) {
+                    console.log("No book titles found.");
+                    return;
+                }
+
+                // Now, fetch the corresponding book details using the titleID
+                const bookIDs = bookTitles.map((book) => book.titleID);
+                const { data: books, error: bookError } = await supabase
+                    .from("book")
+                    .select("bookID, titleID")
+                    .in("titleID", bookIDs);  // Fetch books matching the titleIDs
+
+                if (bookError) {
+                    console.error("Error fetching books:", bookError.message);
+                    return;
+                }
+
+                console.log("Fetched book details (bookID):", books);
+
+                // Combine book titles and book details using titleID
+                const combinedData = bookTitles.map((book) => {
+                    const matchedBook = books.find((b) => b.titleID === book.titleID);
+                    return {
+                        ...book,
+                        bookID: matchedBook ? matchedBook.bookID : null, // Add bookID if found
+                    };
+                });
+
+                console.log("Combined data:", combinedData); // Inspect the combined data
+                setInventoryData(combinedData);
+
+            } catch (error) {
+                console.error("An unexpected error occurred:", error);
+            } finally {
+                setIsLoading(false);
+            }
         };
+
         fetchBooks();
     }, []);
+
 
     const handleRowClick = (book) => {
         setSelectedBook(book);
@@ -137,7 +178,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                             ))
                         ) : (
                             uniqueBooks.map((item, index) => {
-                                const genres = typeof item.genre === "string" ? item.genre.split(";") : [];
+                                const genres = Array.isArray(item.genre) ? item.genre : (typeof item.genre === "string" ? item.genre.split(";") : []);
 
                                 return (
                                     <tr
@@ -179,7 +220,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                 </div>
                                             )}
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
+                                        <td className="px-4 py-4 text-sm truncate max-w-xs">
                                             <Link
                                                 to={`/admin/abviewer?bookID=${encodeURIComponent(item.bookID)}`} // Change to bookID
                                                 className="text-blue-600 hover:underline"
@@ -191,7 +232,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                             {item.author}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                            {item.bookID}
+                                            {item.bookID || 'N/A'} {/* Fallback to N/A if bookID is missing */}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
                                             {item.originalPubDate}
@@ -212,11 +253,13 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 </table>
             </div>
 
-            <BookCopies
-                isOpen={isModalOpen}
-                onClose={closeModal}
-                bookCopies={selectedBook ? selectedBook.bookCopies : []} // Pass an empty array if undefined
-            />
+            {isModalOpen && (
+                <BookCopies
+                    bookID={selectedBook.bookID}
+                    bookTitle={selectedBook.title}
+                    closeModal={closeModal}
+                />
+            )}
         </div>
     );
 };
