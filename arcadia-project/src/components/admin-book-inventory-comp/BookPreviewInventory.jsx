@@ -66,10 +66,14 @@ const BookPreviewInventory = ({ book }) => {
     datePublished: book.originalPubDate,
     republished: book.currentPubDate,
     quantity: book.quantity,
+    procurementDate: book.procDate,  
+    cover: book.cover,
+    titleID: book.titleID,  
   };
 
   // Create a function to handle navigation
   const handleModifyBook = () => {
+    console.log("Title ID in BookPreviewInventory:", bookDetails.titleID);
     const queryParams = new URLSearchParams(bookDetails).toString();
     navigate(`/admin/bookmodify?${queryParams}`);
   };

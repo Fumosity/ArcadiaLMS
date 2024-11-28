@@ -1,9 +1,34 @@
 import React, { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
 
 const BookModify = ({ formData, setFormData, onSave }) => {
   const fileInputRef = useRef(null);
+  const location = useLocation();
+
+  console.log("Title ID in BookModify:", formData.titleID);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const initialFormData = {
+        title: params.get("title") || "",
+        author: params.get("author") || [],
+        genre: params.get("genre") || [],
+        category: params.get("category") || [],
+        publisher: params.get("publisher") || "",
+        synopsis: params.get("synopsis") || "",
+        keyword: params.get("keywords") || [],
+        currentPubDate: params.get("republished") || "",
+        originalPubDate: params.get("datePublished") || "",
+        quantity: params.get("quantity") || 0,
+        procDate: params.get("procurementDate") || "",  
+        cover: params.get("cover") || "",
+        titleID: params.get("titleID") || null,
+    };
+
+      setFormData(initialFormData);
+  }, [location.search, setFormData]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,12 +61,29 @@ const BookModify = ({ formData, setFormData, onSave }) => {
   };
 
   const handleSave = async () => {
-    const { title, bookID, ...updateData } = formData;
+    if (!formData || !formData.titleID) {
+      console.error("Invalid form data or missing titleID");
+      return;
+    }
+
+    const { titleID, ...rest } = formData;
+
+    const updateData = Object.fromEntries(
+      Object.entries(rest).map(([key, value]) => {
+          if (["author", "genre", "category", "keyword"].includes(key)) {
+              // Convert string to an array if it's not already an array
+              return [key, Array.isArray(value) ? value : value.split(";").map((v) => v.trim())];
+          }
+          return [key, value];
+      })
+  );
+
+    console.log("Update Data:", updateData);
 
     const { data, error } = await supabase
-      .from("book") 
+      .from("book_titles") 
       .update(updateData)
-      .match({ bookID }); 
+      .match({ titleID }); 
 
     if (error) {
       console.error("Error updating book: ", error);
@@ -163,46 +205,6 @@ const BookModify = ({ formData, setFormData, onSave }) => {
                   name="procDate"
                   className="input-field w-2/3 p-2 border border-gray-400 rounded-xl"
                   value={formData.procDate}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Location:</label>
-                <input
-                  type="text"
-                  name="location"
-                  className="input-field w-2/3 p-2 border border-gray-400 rounded-xl"
-                  value={formData.location}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Database ID*:</label>
-                <input
-                  type="text"
-                  name="bookID"
-                  className="input-field w-2/3 p-2 border border-gray-400 rounded-xl"
-                  value={formData.bookID}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">ARC ID:</label>
-                <input
-                  type="text"
-                  name="arcID"
-                  className="input-field w-2/3 p-2 border border-gray-400 rounded-xl"
-                  value={formData.arcID}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">ISBN:</label>
-                <input
-                  type="text"
-                  name="isbn"
-                  className="input-field w-2/3 p-2 border border-gray-400 rounded-xl"
-                  value={formData.isbn}
                   onChange={handleChange}
                 />
               </div>
