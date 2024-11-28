@@ -21,7 +21,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 // First, fetch the book titles
                 const { data: bookTitles, error: titleError } = await supabase
                     .from("book_titles")
-                    .select("category, title, author, originalPubDate, genre, titleID");
+                    .select("titleID, title, quantity, author, genre, category, synopsis, keyword, publisher, currentPubDate, originalPubDate, procDate, cover");
 
                 if (titleError) {
                     console.error("Error fetching book titles:", titleError.message);
@@ -137,7 +137,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            {["Category", "Genres", "Book Title", "Author", "Book ID", "Original Pub. Date", "Copies"].map(
+                            {["Category", "Genres", "Book Title", "Author", "Title ID", "Original Pub. Date", "Copies"].map(
                                 (header) => (
                                     <th
                                         key={header}
@@ -232,7 +232,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                             {item.author}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                            {item.bookID || 'N/A'} {/* Fallback to N/A if bookID is missing */}
+                                            {item.titleID || 'N/A'} {/* Fallback to N/A if bookID is missing */}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
                                             {item.originalPubDate}

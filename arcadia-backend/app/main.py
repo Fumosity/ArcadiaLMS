@@ -23,6 +23,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+import os
+print("Current Working Directory:", os.getcwd())
 
 # Load the dataset
 df = pd.read_csv('app/research_corpus.csv')
@@ -86,11 +88,13 @@ def remove_sections(text):
 
         # Determine if we're entering an excluded section
         if any(excluded_header.lower() in line_lower for excluded_header in excluded_sections):
+            print("SKIPPING SECTION", line_lower)
             inside_excluded_section = True
             continue
 
         # Determine if we're in a resume section and should start including again
         if any(resume_header.lower() in line_lower for resume_header in resume_sections):
+            print("RESUMING SECTION", line_lower)
             inside_excluded_section = False
             apply_period_joining = True
 
@@ -174,7 +178,7 @@ def preprocess_text(text):
     cleaned_lines = []
     for line in lines:
         # Remove extra whitespace and lowercase the line
-        cleaned_line = re.sub(r"\s+", " ", line).strip().lower()
+        cleaned_line = re.sub(r"\s+‘~", " ", line).strip().lower()
         
         # Append if the line has content to avoid empty lines
         if cleaned_line:
@@ -182,7 +186,7 @@ def preprocess_text(text):
     
     # Join lines back into a single string with double newlines to separate chunks
     cleaned_text = "\n\n".join(cleaned_lines)
-    
+
     return cleaned_text
 
 # Classification function using the new model
@@ -319,28 +323,49 @@ async def extract_text(files: List[UploadFile] = File(...)):
         toc_keywords = ["table of contents", "contents"]
 
         for file in files:
+            # Initialize text for each file
+            file_text = ""
+
+            # Handle PDF files
             if file.content_type == "application/pdf":
-                pdf_text = ""
                 pdf_data = await file.read()
                 pdf_doc = fitz.open(stream=pdf_data, filetype="pdf")
+                print(f"Processing file: {file.filename}, type: {file.content_type}")
+
                 total_pages += pdf_doc.page_count
-                
-                for page_num in range(15):  # Limit to 15 pages
-                    page = pdf_doc.load_page(page_num)
-                    page_text = page.get_text("text")
+
+                # Convert each page to an image and apply OCR
+                for page_num in range(min(15, pdf_doc.page_count)):
+                    page = pdf_doc[page_num]
+                    pix = page.get_pixmap(dpi=300)
+                    img = Image.open(io.BytesIO(pix.tobytes("png")))
+
+                    # Apply OCR to the page image
+                    page_text = pytesseract.image_to_string(img, lang='eng')
+
+                    # Stop if Table of Contents detected
                     if any(keyword.lower() in page_text.lower() for keyword in toc_keywords):
                         break
-                    pdf_text += page_text + "\n\n"
-                total_text += pdf_text + "\n\n"
+
+                    file_text += page_text + "\n\n"
+
+            # Handle image files directly
             else:
                 image = Image.open(io.BytesIO(await file.read()))
                 text = pytesseract.image_to_string(image)
-                total_text += text + "\n\n"
+                file_text += text + "\n\n"
                 total_pages += 1
+
+            # Append processed text for the current file
+            total_text += file_text + "\n\n"
 
         # Preprocess and classify text
         presectioned_text, original_text, department = remove_sections(total_text)
         cleaned_text = preprocess_text(presectioned_text)
+
+        print("\n====TOTALTEXT====\n\n",total_text)
+        print("\n====PRESECTIONEDTEXT====\n\n",presectioned_text)
+        print("\n====CLEANEDTEXT====\n\n",cleaned_text)
 
         """
         ===LABELING AND FEATURE EXTRACTION===
