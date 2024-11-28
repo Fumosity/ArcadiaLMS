@@ -63,12 +63,8 @@ const BookPreviewInventory = ({ book }) => {
     publisher: book.publisher,
     synopsis: book.synopsis,
     keywords: book.keyword,
-    datePublished: book.currentPubDate,
-    republished: book.originalPubDate,
-    location: book.location,
-    databaseID: book.bookID,
-    arcID: book.arcID,
-    isbn: book.isbn,
+    datePublished: book.originalPubDate,
+    republished: book.currentPubDate,
     quantity: book.quantity,
   };
 
