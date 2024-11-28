@@ -4,6 +4,12 @@ import { v4 as uuidv4 } from "uuid";
 import { addResearch, newThesisIDGenerator } from "../../backend/ARAddBackend.jsx";
 import ResearchUploadModal from '../../z_modals/ResearchUploadModal';
 import ARAddPreview from "../admin-research-add-comp/ARAddPreview";
+import { getDocument } from 'pdfjs-dist';
+import * as pdfjsLib from 'pdfjs-dist';
+import { GlobalWorkerOptions } from 'pdfjs-dist';
+
+// Set the worker source explicitly
+GlobalWorkerOptions.workerSrc = '/pdfjs-dist/pdf.worker.min.js';
 
 //Main Function
 const ARAdding = ({ formData, setFormData }) => {
@@ -76,12 +82,96 @@ const ARAdding = ({ formData, setFormData }) => {
   };
 
   // Separate function to handle file uploads
-  const handleFileSelect = (files) => {
+  const handleFileSelect = async (files) => {
     console.log("Files received in handleFileSelect:", files);
-
-    setUploadedFiles(Array.isArray(files) ? files : []);
-    setPageCount(Array.isArray(files) ? files.length : 0);
+  
+    if (!Array.isArray(files)) {
+      setUploadedFiles([]);
+      setPageCount(0);
+      return;
+    }
+  
+    setUploadedFiles(files);
+    setPageCount(files.length);
+  
+    // Check for the first file and set it as the cover
+    const firstFile = files[0];
+    if (!firstFile) return;
+  
+    try {
+      // If the first file is an image
+      if (firstFile.type.startsWith("image/")) {
+        const filePath = `${uuidv4()}_${firstFile.name}`;
+        const { error } = await supabase.storage.from("research-covers").upload(filePath, firstFile, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+  
+        if (error) {
+          console.error("Error uploading image cover: ", error);
+        } else {
+          const { data: publicData, error: urlError } = supabase.storage.from("research-covers").getPublicUrl(filePath);
+          if (urlError) {
+            console.error("Error getting public URL for cover image: ", urlError.message);
+          } else {
+            setFormData((prevData) => ({
+              ...prevData,
+              cover: publicData.publicUrl, // Set the public URL as the cover
+            }));
+          }
+        }
+      }
+      // If the first file is a PDF
+      else if (firstFile.type === "application/pdf") {
+        // Extract the first page of the PDF as an image (requires a library like `pdfjs-dist`)
+        const fileReader = new FileReader();
+        fileReader.onload = async () => {
+          const pdfData = new Uint8Array(fileReader.result);
+  
+          // Use pdfjs-dist to load the PDF and render the first page as an image
+          const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+          const page = await pdf.getPage(1);
+          const viewport = page.getViewport({ scale: 1.5 });
+  
+          // Render the page to a canvas
+          const canvas = document.createElement("canvas");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+  
+          const context = canvas.getContext("2d");
+          await page.render({ canvasContext: context, viewport }).promise;
+  
+          // Convert canvas to a Blob (image)
+          canvas.toBlob(async (blob) => {
+            const filePath = `${uuidv4()}_cover.jpg`;
+            const { error } = await supabase.storage.from("research-covers").upload(filePath, blob, {
+              cacheControl: "3600",
+              upsert: false,
+            });
+  
+            if (error) {
+              console.error("Error uploading cover from PDF: ", error);
+            } else {
+              const { data: publicData, error: urlError } = supabase.storage.from("research-covers").getPublicUrl(filePath);
+              if (urlError) {
+                console.error("Error getting public URL for cover image: ", urlError.message);
+              } else {
+                setFormData((prevData) => ({
+                  ...prevData,
+                  cover: publicData.publicUrl, // Set the public URL as the cover
+                }));
+              }
+            }
+          }, "image/jpeg");
+        };
+  
+        fileReader.readAsArrayBuffer(firstFile);
+      }
+    } catch (error) {
+      console.error("Error processing cover file:", error);
+    }
   };
+  
 
   // Function to handle extracted data and update formData
   const handleExtractedData = (data) => {
@@ -98,10 +188,23 @@ const ARAdding = ({ formData, setFormData }) => {
   const handleSubmit = async () => {
     
     const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "thesisID", "arcID"];
-    const hasEmptyFields = requiredFields.some(field => !formData[field]);
 
-    if (hasEmptyFields) {
-      alert("Please fill in all required fields.");
+    // Ensure formData is fully updated
+    const updatedFormData = { ...formData }; // Capture current formData
+
+    // Check for missing fields
+    const missingFields = requiredFields.filter(
+      (field) => !updatedFormData[field] || 
+                  (typeof updatedFormData[field] === "string" && !updatedFormData[field].trim())
+    );
+    if (missingFields.length > 0) {
+      alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
+      return;
+    }
+
+    const arcIdRegex = /^LPUCAV\d{6}$/;
+    if (!arcIdRegex.test(formData.arcID)) {
+      alert("ARC ID must follow the format (e.g., LPUCAV012345).");
       return;
     }
     

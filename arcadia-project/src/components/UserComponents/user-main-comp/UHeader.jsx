@@ -30,8 +30,7 @@ const UHeader = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center w-full">
         {/* Left-aligned Logo and Text */}
         <div className="flex items-center">
-          <img src="/image/arcadia.png" alt="Arcadia logo" className="h-8 w-8 mr-2" />
-          <span className="text-xl font-semibold text-white">Arcadia</span>
+          <img src="/image/logo_user.png" alt="Arcadia logo" className="h-8 mr-2" />
         </div>
 
         {/* Right-aligned User Info */}

@@ -16,8 +16,16 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
-    setUploadedFiles(files);
+    const validFiles = files.filter(file =>
+      ['application/pdf', 'image/png', 'image/jpeg'].includes(file.type)
+    );
+  
+    if (validFiles.length !== files.length) {
+      alert("Some files were rejected due to invalid formats.");
+    }
+    setUploadedFiles(validFiles);
   };
+  
 
   const handleUpload = async () => {
     try {
@@ -53,21 +61,16 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
       onFileSelect(uploadedFiles); // Add extractedData here
       onExtractedData(extractedData); // <-- Add this line
 
-      // Count the number of pages from the response
-      uploadedFiles.forEach((file) => {
-        if (file.type === "application/pdf") {
-          // Add logic to determine page count based on file
-          totalPages = response.data.total_pages; // assuming the backend gives pageCount for PDFs
-        } else {
-          totalPages += 1; // Each image counts as 1 page
-        }
-      });
+      totalPages = response.data.total_pages || uploadedFiles.length;
+      onPageCountChange(totalPages);
+
       console.log(response.data)
       // Set the total page count
       onPageCountChange(totalPages);
 
     } catch (error) {
       console.error("Error extracting text:", error);
+      alert("Failed to extract text. Please try again or check your file format.");
     }
   };
 
@@ -106,6 +109,7 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
             <label
               htmlFor="file-upload"
               className="inline-block mt-2 px-4 py-2 border border-gray-700 rounded-full text-gray-900 cursor-pointer"
+              aria-label="Upload research pages in PDF or image formats"
             >
               Upload Pages
               <input
