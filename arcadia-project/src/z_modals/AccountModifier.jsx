@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { supabase } from "./../supabaseClient";
-import DemoteToAdmin from "../z_modals/attention-modals/DemoteToAdmin";
+import { supabase } from "../supabaseClient";
+import DemoteToAdmin from "./attention-modals/DemoteToAdmin";
 import PromoteToSuperadmin from "./attention-modals/PromoteToSuperadmin";
 import PromoteAdminModal from "./PromoteAdmin";
 import WrngDemote from "./warning-modals/WrngDemote";
 
-const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
+const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
   if (!isOpen) return null;
 
   const [modifiedUser, setModifiedUser] = useState({
@@ -167,7 +167,7 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
               <input
                 type="text"
                 name="userId"
-                value={modifiedUser.userId}
+                value={modifiedUser.userId || modifiedUser.userID}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -178,7 +178,7 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
               <input
                 type="text"
                 name="schoolId"
-                value={modifiedUser.schoolId}
+                value={modifiedUser.schoolId || modifiedUser.userLPUID}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -213,7 +213,7 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
               <input
                 type="text"
                 name="college"
-                value={modifiedUser.college}
+                value={modifiedUser.college || modifiedUser.userCollege}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -224,7 +224,7 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
               <input
                 type="text"
                 name="department"
-                value={modifiedUser.department}
+                value={modifiedUser.department || modifiedUser.userDepartment}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -235,7 +235,7 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
               <input
                 type="email"
                 name="email"
-                value={modifiedUser.email}
+                value={modifiedUser.email || modifiedUser.userEmail}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -247,7 +247,7 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
                 <input
                   type={isPasswordVisible ? "text" : "password"}
                   name="password"
-                  value={modifiedUser.password}
+                  value={modifiedUser.password || modifiedUser.userPassword}
                   onChange={handleInputChange}
                   className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                   placeholder="Enter new password"
@@ -306,4 +306,4 @@ const AdminAccount = ({ isOpen, onClose, user, onUpdate }) => {
   );
 };
 
-export default AdminAccount;
+export default AccountModifier;

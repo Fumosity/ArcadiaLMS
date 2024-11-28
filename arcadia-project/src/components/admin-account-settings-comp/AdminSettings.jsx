@@ -1,23 +1,25 @@
-import React, { useState } from 'react';
-import { ChevronRight } from 'lucide-react';
-import UpdateProfilePic from '../../z_modals/UpdateProfilePic'; // Adjust the import path as needed
+import React, { useState } from "react";
+import { ChevronRight } from "lucide-react";
+import UpdateProfilePic from "../../z_modals/UpdateProfilePic"; // Adjust the import path as needed
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useUser } from "../../backend/UserContext"; // Adjust the path
 
 // Settings options with actions and links
 const settingsOptions = [
   {
     title: "Update Profile Photo",
     description: "Change your profile photo.",
-    action: "openModal" // Modal for updating profile picture
+    action: "openModal", // Modal for updating profile photo
   },
   {
     title: "Change Password",
     description: "Change your password through your registered email account.",
-    href: "/change-password" // Redirect to change password page
+    href: "/change-password", // Redirect to change password page
   },
   {
     title: "Update User Data",
-    description: "Change your password through your registered email account.",
-    href: "useraccounts/viewadmins" // Support ticket for updating data
+    description: "Edit your user data.",
+    href: "/admin/useraccounts/viewadmins", // Navigate to AdminInformations
   },
 ];
 
@@ -36,19 +38,29 @@ const SettingsOption = ({ title, description, onClick }) => (
 );
 
 export const AdminSettings = ({ options = settingsOptions }) => {
+  const { user } = useUser(); // Access the current user
+  const navigate = useNavigate(); // Initialize useNavigate
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOptionClick = (option) => {
     if (option.action === "openModal") {
       setIsModalOpen(true); // Open modal for updating profile photo
     } else if (option.href) {
-      window.location.href = option.href; // Redirect to the provided link
+      if (option.href === "/admin/useraccounts/viewadmins") {
+        // Navigate to AdminInformations and pass the complete user data
+        navigate(option.href, { state: { user } });
+      } else {
+        // Redirect to the provided link
+        navigate(option.href);
+      }
     }
   };
 
   return (
     <div className="uMain-cont">
-      <h2 className="text-xl font-medium text-arcadia-black mb-6">Account Settings</h2>
+      <h2 className="text-xl font-medium text-arcadia-black mb-6">
+        Account Settings
+      </h2>
       <div className="space-y-4">
         {options.map((option) => (
           <SettingsOption

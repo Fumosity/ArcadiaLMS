@@ -70,7 +70,7 @@ const ListOfAdminAcc = () => {
         const nameParts = user.name.split(' ');
         const userLName = nameParts.pop(); // Last part is last name
         const userFName = nameParts.join(' '); // Join remaining parts as first name
-
+    
         navigate("/admin/useraccounts/viewadmins", {
             state: {
                 user: {
