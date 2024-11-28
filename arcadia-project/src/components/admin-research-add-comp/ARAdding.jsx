@@ -294,7 +294,7 @@ const ARAdding = ({ formData, setFormData }) => {
             <div className="relative bg-gray-100 p-4 h-50 border border-gray-400 rounded-lg hover:bg-grey
             " onClick={ handleCoverClick }>
               <img
-                src={formData.cover || "image/researchcover.png"}
+                src={formData.cover || "/image/book_research_placeholder.png"}
                 alt="Research cover placeholder"
                 className="h-full w-full object-contain mb-2"
               />

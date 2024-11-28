@@ -287,7 +287,7 @@ const ABAdding = ({ formData, setFormData }) => {
             <p className="font-bold text-lg mb-2">Book Cover*</p>
             <div className="relative bg-gray-100 p-4 h-50 border rounded-lg" onClick={ handleDivClick }>   
               <img
-                src= { formData.cover || 'N/A'}
+                src= { formData.cover || '/image/book_research_placeholder.png'}
                 alt="Book cover placeholder"
                 className="h-full w-full object-contain mb-2"
               />

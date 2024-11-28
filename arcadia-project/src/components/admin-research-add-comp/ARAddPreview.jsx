@@ -35,7 +35,7 @@ const ARAddPreview = ({ formData }) => {
       {/* Book Front Page */}
       <h3 className="text-xl font-semibold mb-3">About</h3>
       <div className="relative bg-white p-2 mb-4 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
-        <img src={cover || "image/bkfrontpg.png"} alt="Thesis cover" className="h-200 w-150 mx-auto mb-2 rounded" />
+        <img src={cover || "/image/book_research_placeholder.png"} alt="Thesis cover" className="h-200 w-150 mx-auto mb-2 rounded" />
         <p className="text-xs text-gray-500 mb-2 text-center">Click to update book cover</p>
       </div>
 

@@ -23,7 +23,7 @@ const ABAddPreview = ({ formData }) => {
     <div className="bg-white p-4 rounded-lg shadow-md" style={{ maxWidth: "350px", margin: "0 auto" }}>
       <h3 className="text-xl font-semibold mb-3">Preview</h3>
       <div className="relative bg-white p-2 mb-4 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
-        <img src={bookDetails.cover || "image/bkfrontpg.png"} alt="Book cover" className="h-200 w-150 mx-auto mb-2 rounded" />
+        <img src={bookDetails.cover || "/image/book_research_placeholder.png"} alt="Book cover" className="h-200 w-150 mx-auto mb-2 rounded" />
       </div>
 
       <table className="min-w-full border-collapse">
