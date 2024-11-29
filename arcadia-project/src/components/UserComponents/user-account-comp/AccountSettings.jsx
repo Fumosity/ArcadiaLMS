@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
-import UpdateProfilePic from '../../../z_modals/UpdateProfilePic'; // Adjust the import path as needed
+import UpdateProfilePic from '../../../z_modals/UpdateProfilePic';
+import UserChangePass from '../../../z_modals/UserChangePass';
 
 const settingsOptions = [
   {
     title: "Update Profile Photo",
     description: "Change your profile photo.",
-    action: "openModal" // We'll handle this with a custom action
+    action: "openProfilePicModal"
   },
   {
     title: "Change Password",
     description: "Change your password through your registered email account.",
-    href: "/change-password"
+    action: "openChangePassModal"
   },
   {
     title: "Update User Data",
@@ -26,7 +27,7 @@ const settingsOptions = [
 ];
 
 // Individual settings option component
-const SettingsOption = ({ title, description, onClick, href }) => (
+const SettingsOption = ({ title, description, onClick }) => (
   <div
     onClick={onClick}
     className="flex items-center border border-grey justify-between p-4 rounded-2xl hover:bg-light-gray transition-colors group cursor-pointer"
@@ -39,19 +40,17 @@ const SettingsOption = ({ title, description, onClick, href }) => (
   </div>
 );
 
-// Main AccountSettings component
 export const AccountSettings = ({ options = settingsOptions }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState(() => {
-    // Retrieve user data from localStorage or API
-    return JSON.parse(localStorage.getItem("user")) || null;
-  });
+  const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false);
+  const [isChangePassModalOpen, setIsChangePassModalOpen] = useState(false);
 
   const handleOptionClick = (option) => {
-    if (option.action === "openModal") {
-      setIsModalOpen(true);
+    if (option.action === "openProfilePicModal") {
+      setIsProfilePicModalOpen(true);
+    } else if (option.action === "openChangePassModal") {
+      setIsChangePassModalOpen(true);
     } else if (option.href) {
-      window.location.href = option.href; // Keep other links working as expected
+      window.location.href = option.href;
     }
   };
 
@@ -65,17 +64,23 @@ export const AccountSettings = ({ options = settingsOptions }) => {
             title={option.title}
             description={option.description}
             onClick={() => handleOptionClick(option)}
-            href={option.href}
           />
         ))}
       </div>
 
-      {/* Render the modal */}
-      {isModalOpen && (
+      {/* Profile Picture Modal */}
+      {isProfilePicModalOpen && (
         <UpdateProfilePic
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          user={currentUser}
+          isOpen={isProfilePicModalOpen}
+          onClose={() => setIsProfilePicModalOpen(false)}
+        />
+      )}
+
+      {/* Change Password Modal */}
+      {isChangePassModalOpen && (
+        <UserChangePass
+          isOpen={isChangePassModalOpen}
+          onClose={() => setIsChangePassModalOpen(false)}
         />
       )}
     </div>

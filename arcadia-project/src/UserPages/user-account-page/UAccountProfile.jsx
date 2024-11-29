@@ -14,7 +14,7 @@ import SupportCont from "../../components/UserComponents/user-support-comp/Suppo
 import ContactUs from "../../components/UserComponents/user-support-comp/ContactUs";
 import FAQSection from "../../components/UserComponents/user-faq-comp/FAQSection";
 import { UserCredentials } from "../../components/UserComponents/user-account-comp/UserCredentials";
-import { AccountSettings } from "../../components/UserComponents/user-account-comp/AccountSetting";
+import { AccountSettings } from "../../components/UserComponents/user-account-comp/AccountSettings";
 import UserCirculationHistory from "../../components/UserComponents/user-account-comp/UserCirculationHistory";
 
 const UAccountProfile = () => {

@@ -500,3 +500,7 @@
   width: 155px;
   font-size: 12px;
 }
+
+.resendCode {
+  @apply text-sm w-[200px] whitespace-nowrap border border-grey rounded-full px-2.5 py-0.5 hover:border-red hover:text-red;
+}
