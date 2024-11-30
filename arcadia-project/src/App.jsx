@@ -50,10 +50,18 @@ import AAccountView from './admin-account-view/AAccountView';
 import UAccountProfile from './UserPages/user-account-page/UAccountProfile';
 import UBkCatalog from './UserPages/user-book-catalog-page/UBkCatalog';
 import AAccountSettings from './admin-account-page/AAccountSettings';
+import UFAQs from './UserPages/user-freq-questions-page/UFAQs';
+import UMostPop from './UserPages/user-most-popular-page/UMostPop';
+
+import ScrollToTop from './ScrollToTop';
+import UHighlyRated from './UserPages/user-highly-rated-page/UHighlyRated';
+
 
 function App() {
   return (
+    
     <Routes>
+      
       {/* User Route */}
       {/* <Route path="*" element={<UHomePage/>}/> */}
 
@@ -77,6 +85,10 @@ function App() {
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
               <Route path="/user/accountview" element={<UAccountProfile />} />
+              <Route path="/user/faqs" element={<UFAQs />} />
+              <Route path="/user/mostpopularbooks" element={<UMostPop />} />
+              <Route path="/user/highlyratedbooks" element={<UHighlyRated />} />
+              
               
             </Routes>
             <UFooter />

@@ -16,7 +16,7 @@ const Recommended = () => {
     ];
 
     return (
-        <div className="uMain-cont">
+        <div className="cred-cont">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Recommended for You</h2>
                 <button className="uSee-more">

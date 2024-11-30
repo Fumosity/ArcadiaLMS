@@ -3,8 +3,6 @@ import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import USearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
 import Title from "../../components/main-comp/Title";
 import FilterSidebar from "../../components/UserComponents/user-book-search-comp/FilterSidebar";
-import SimBooks from "../../components/UserComponents/user-book-search-comp/SimBooks";
-import BkSearchResults from "../../components/UserComponents/user-book-search-comp/BkSearchResults";
 import Recommended from "../../components/UserComponents/user-home-comp/Recommended";
 import MostPopular from "../../components/UserComponents/user-home-comp/MostPopular";
 import HighlyRated from "../../components/UserComponents/user-home-comp/HighlyRated";

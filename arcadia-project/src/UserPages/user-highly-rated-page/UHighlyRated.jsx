@@ -24,7 +24,7 @@ const UHighlyRated = () => {
         {/* Content Container */}
         <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
           {/* Sidebar */}
-          <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4 mr-5">
+          <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mr-5">
             <ArcOpHr />
             <UpEvents />
             <Services />

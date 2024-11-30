@@ -14,7 +14,6 @@ export default function Navbar(){
         <CustomLink to="/admin/useraccounts" className="nav-link">User Accounts</CustomLink>
         <CustomLink to="/admin/support" className="nav-link">Support</CustomLink>
         <CustomLink to="/admin/reservations" className="nav-link">Reservations</CustomLink>
-        <CustomLink to="/admin/cafe" className="nav-link">Cafe</CustomLink>
       </div>
     </nav>
   </div>)
