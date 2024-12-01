@@ -1,4 +1,3 @@
-// USearchBar.js
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../../supabaseClient";
 import Trie from "../../../backend/trie";
@@ -31,6 +30,7 @@ const USearchBar = ({ placeholder, structureType, onSearch }) => {
             onSearch(input); // Send query to parent component
         } else {
             setSuggestions([]);
+            onSearch(""); // Notify parent to clear the query
         }
     };
 

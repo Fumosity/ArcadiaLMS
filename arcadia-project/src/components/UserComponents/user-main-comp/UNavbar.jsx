@@ -6,7 +6,7 @@ export default function UNavbar() {
     <div className="userNavbar-cont bg-white shadow-md">
       <nav className="flex justify-center items-center">
         <div className="userNavbar-content flex">
-          <CustomLink to="/" className="userNav-link w-[150px] text-center hover:text-white">Home</CustomLink>
+          <CustomLink to="/" className="userNav-link w-[150px] text-center">Home</CustomLink>
           <CustomLink to="/user/bookmanagement" className="userNav-link w-[150px] text-center">Book Catalog</CustomLink>
           <CustomLink to="/user/researchmanagement" className="userNav-link w-[150px] text-center">Research Catalog</CustomLink>
           <CustomLink to="/user/newsupdates" className="userNav-link w-[150px] text-center">News and Updates</CustomLink>

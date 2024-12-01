@@ -1,4 +1,3 @@
-// UBkCatalog.js
 import React, { useState } from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import USearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
@@ -28,7 +27,8 @@ const UBkCatalog = () => {
                         <FilterSidebar />
                     </div>
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
-                        <UBkResults query={query} />
+                        {/* Only render UBkResults if query has a value */}
+                        {query.trim() && <UBkResults query={query} />}
                         <Recommended />
                         <MostPopular />
                         <HighlyRated />
