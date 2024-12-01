@@ -16,7 +16,7 @@ const SimRsrch = () => {
     ];
 
     return (
-        <div className="uHero-cont">
+        <div className="uMain-cont">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Similar Research</h2>
             </div>

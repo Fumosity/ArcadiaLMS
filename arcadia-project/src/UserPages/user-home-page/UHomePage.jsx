@@ -37,7 +37,7 @@ const UHomePage = () => {
             
             {/* News and Updates */}
             <LatestNews />
-            <div className="mt-[32px]"></div>
+            
             {/* Recommended for You */}
             <Recommended />
 
