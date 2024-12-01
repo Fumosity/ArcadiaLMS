@@ -1,6 +1,6 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import USearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
+import USearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import UHero from "../../components/UserComponents/user-home-comp/UHero";
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";

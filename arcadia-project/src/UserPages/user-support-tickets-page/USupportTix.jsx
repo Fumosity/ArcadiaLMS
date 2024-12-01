@@ -1,6 +1,6 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import UsearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
+import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import Title from "../../components/main-comp/Title";
 import SupportTixStatus from "../../components/UserComponents/user-support-tix-comp/SupportTixStatus";
 import FileATix from "../../components/UserComponents/user-support-tix-comp/FileATix";

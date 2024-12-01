@@ -1,6 +1,6 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import USearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
+import USearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import Title from "../../components/main-comp/Title";
 import URFilterSidebar from "../../components/UserComponents/user-rsrch-catalog-comp/URFilterSidebar";
 import SimRsrch from "../../components/UserComponents/user-rsrch-catalog-comp/SimRsrch";

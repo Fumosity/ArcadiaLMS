@@ -1,18 +1,18 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import UsearchBar from "../../components/UserComponents/user-main-comp/USerachBar";
 import Title from "../../components/main-comp/Title";
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
 import UHero from "../../components/UserComponents/user-home-comp/UHero";
 import FAQSection from "../../components/UserComponents/user-faq-comp/FAQSection";
+import USearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 
 const UFAQs = () => {
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />
-            <UsearchBar />
+            <USearchBar />
             <Title>Frequently Asked Questions</Title>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
