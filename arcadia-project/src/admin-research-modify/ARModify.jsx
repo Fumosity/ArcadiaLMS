@@ -2,28 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import MainHeader from "../components/main-comp/MainHeader";
 import Title from "../components/main-comp/Title";
-import BookModify from "../components/admin-book-modify/BookModify";
+import ResearchModify from "../components/admin-research-modify/ResearchModify";
 
-const ABModify = () => {
+const ARModify = () => {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
   
-  // Retrieve book details from query params
+  // Retrieve research details from query params
   const formData = {
     title: queryParams.get("title") || '',
     author: queryParams.get("author") || '',
-    genre: queryParams.get("genre") || '',
-    category: queryParams.get("category") || '',
-    publisher: queryParams.get("publisher") || '',
-    synopsis: queryParams.get("synopsis") || '',
-    keyword: queryParams.get("keywords") || '',
-    currentPubDate: queryParams.get("datePublished") || '',
-    originalPubDate: queryParams.get("republished") || '',
+    college: queryParams.get("college") || '',
+    department: queryParams.get("department") || '',
+    abstract: queryParams.get("abstract") || '',
+    keyword: queryParams.get("keyword") || '',
+    pubDate: queryParams.get("pubDate") || '',
     location: queryParams.get("location") || '',
-    bookID: queryParams.get("databaseID") || '',
+    thesisID: queryParams.get("thesisID") || '',
     arcID: queryParams.get("arcID") || '',
-    isbn: queryParams.get("isbn") || '',
-    cover: '', // Adjust if cover needs to be passed
+    cover: queryParams.get("cover") || '',
   };
 
   const [formDataState, setFormData] = useState(formData);
@@ -32,12 +29,12 @@ const ABModify = () => {
     <div className="min-h-screen bg-gray-100">
       {/* Main header */}
       <MainHeader />
-      <Title>Modify Book</Title>
+      <Title>Modify Research</Title>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-3 gap-8">
           <div className="col-span-2 space-y-8">
-            {/* Pass formDataState and setFormData to BookModify */}
-            <BookModify formData={formDataState} setFormData={setFormData} />
+            {/* Pass formDataState and setFormData to ResearchModify */}
+            <ResearchModify formData={formDataState} setFormData={setFormData} />
           </div>
         </div>
       </main>
@@ -45,4 +42,4 @@ const ABModify = () => {
   );
 };
 
-export default ABModify;
+export default ARModify;

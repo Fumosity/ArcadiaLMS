@@ -20,6 +20,7 @@ import ARAdd from './admin-research-add/ARAdd';
 import ABViewer from './admin-book-viewer/ABViewer';
 import ARViewer from './admin-research-viewer/ARViewer';
 import ABModify from './admin-book-modify/ABModify';
+import ARModify from './admin-research-modify/ARModify';
 import ASchedule from './admin-schedule-page/ASchedule'
 
 // User Components
@@ -120,6 +121,7 @@ function App() {
               <Route path="abviewer" element={<ABViewer />} />
               <Route path="arviewer" element={<ARViewer />} />
               <Route path="bookmodify" element={<ABModify />} />
+              <Route path="researchmodify" element={<ARModify />} />
               <Route path="reportticket" element={<AReportViewPage />} />
               <Route path="supportticket" element={<ASupportViewPage />} />
               <Route path="useraccounts/viewusers" element={<AUAccView />} />
