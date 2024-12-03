@@ -1,18 +1,17 @@
 import React from "react";
-import RoomReserv from "../components/admin-lib-analytics-comp/RoomReserv";
 import TodayReserv from "../components/admin-reserv-comp/TodayReserv";
 import MainHeader from "../components/main-comp/MainHeader";
 import Title from "../components/main-comp/Title";
-import RoomBooking from ".././components/UserComponents/user-room-reser-comp/RoomBooking";
 import ARoomBooking from "../components/admin-room-reserv-comp/ARoomBooking";
 import ARoomReservations from "../components/admin-room-reserv-comp/ARoomReservations";
+import ReservInformation from "../components/admin-room-reserv-comp/ReservInformation";
 
 
-const AReserv = () => (
+const AReservView = () => (
     <div className="min-h-screen bg-gray-100">
         {/* Main header */}
         <MainHeader />
-        <Title>Reservations</Title>
+        <Title>Reservations View</Title>
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="grid grid-cols-3 gap-8">
@@ -20,8 +19,7 @@ const AReserv = () => (
                         {/* Main content for adding research */}
                         
                         <div className="bg-white overflow-hidden rounded-lg w-full">
-                        <ARoomBooking />
-                        <ARoomReservations />
+                        <ReservInformation />
                         </div>
                             
 
@@ -37,4 +35,4 @@ const AReserv = () => (
     </div>
 );
 
-export default AReserv;
+export default AReservView;

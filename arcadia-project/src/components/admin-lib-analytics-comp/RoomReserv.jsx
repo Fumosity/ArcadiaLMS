@@ -38,7 +38,7 @@ export default function RoomReserv() {
         <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold ">Room Reservations</h2>
-                <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                <button className="px-2.5 py-0.5 border border-grey text-grey rounded-full hover:bg-blue-600 transition-colors">
                     Go to Reservations
                 </button>
             </div>

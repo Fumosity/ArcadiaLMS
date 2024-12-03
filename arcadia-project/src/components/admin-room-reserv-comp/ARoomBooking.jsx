@@ -1,8 +1,8 @@
-export default function Component() {
+
+export default function ARoomBooking() {
     return (
-      <div className="uMain-cont">
-  
-        <h2 className="text-2xl font-semibold mb-2">Booking</h2>
+        <div className="bg-white overflow-hidden border border-grey mb-8 p-6 rounded-lg   w-full">
+            <h2 className="text-2xl font-semibold mb-2">Booking</h2>
         <div className="grid grid-cols-2 gap-x-16 gap-y-4">
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-4">
@@ -106,7 +106,6 @@ export default function Component() {
             Reserve a Room
           </button>
         </div>
-      </div>
+        </div>
     );
-  }
-  
+}

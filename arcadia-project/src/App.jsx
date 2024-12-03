@@ -56,6 +56,7 @@ import UMostPop from './UserPages/user-most-popular-page/UMostPop';
 
 import ScrollToTop from './ScrollToTop';
 import UHighlyRated from './UserPages/user-highly-rated-page/UHighlyRated';
+import AReservView from './admin-reserv-page/AReservView';
 
 
 function App() {
@@ -127,6 +128,7 @@ function App() {
               <Route path="useraccounts/viewusers" element={<AUAccView />} />
               <Route path="useraccounts/viewadmins" element={<AAccountView />} />
               <Route path="accountview" element={<AAccountSettings />} />
+              <Route path="reservations-view" element={<AReservView />} />
               
 
 

@@ -8,7 +8,7 @@ const TodayReserv = () => {
     ];
     return (
         <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-xl font-semibold mb-4">Most Popular Books</h3>
+            <h3 className="text-xl font-semibold mb-4">Today's Reservations</h3>
             <table className="w-full text-left">
                 <thead>
                     <tr>
