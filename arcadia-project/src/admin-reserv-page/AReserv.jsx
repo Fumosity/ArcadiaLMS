@@ -21,6 +21,12 @@ const AReserv = () => (
                 </div>
                 {/* Preview section */}
                 <div className="lg:col-span-1 space-y-8">
+                    <button 
+                        className="add-book mb-4 px-4 py-2 rounded-full border-grey hover:bg-blue-600 transition"
+                        onClick={() => navigate('/admin/bookadding')} // Navigate to ABAdd on click
+                    >
+                        Reserve a Room
+                    </button>  
                         <TodayReserv />
                     </div>
             </div>

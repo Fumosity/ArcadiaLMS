@@ -2,13 +2,13 @@ import React from "react";
 
 const TodayReserv = () => {
     const roomRes = [
-        { room: "Von Fadri", time: "1D3", booker: "Ligma Balks" },
-        { room: "Von Fadri", time: "1D3", booker: "Ligma Balks"  },
-        { room: "Von Fadri", time: "1D3", booker: "Ligma Balks"  }
+        { room: "Cafe-Left", time: "11:00-12:00", booker: "Von Fadri" },
+        { room: "Cafe-Left", time: "11:00-12:00", booker: "Von Fadri" },
+        { room: "Cafe-Left", time: "11:00-12:00", booker: "Von Fadri" },
     ];
     return (
         <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-xl font-semibold mb-4">Most Popular Books</h3>
+            <h3 className="text-xl font-semibold mb-4">Today's Reservations</h3>
             <table className="w-full text-left">
                 <thead>
                     <tr>

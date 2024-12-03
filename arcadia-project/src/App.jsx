@@ -22,6 +22,7 @@ import ARViewer from './admin-research-viewer/ARViewer';
 import ABModify from './admin-book-modify/ABModify';
 import ARModify from './admin-research-modify/ARModify';
 import ASchedule from './admin-schedule-page/ASchedule'
+import ASystemReports from './admin-system-reports-page/ASystemReport.jsx'
 
 // User Components
 import UsrRegistration from './UserPages/user-registration-page/UsrRegistration';
@@ -127,7 +128,8 @@ function App() {
               <Route path="useraccounts/viewusers" element={<AUAccView />} />
               <Route path="useraccounts/viewadmins" element={<AAccountView />} />
               <Route path="accountview" element={<AAccountSettings />} />
-              
+              <Route path="schedule" element={<ASchedule />} />
+              <Route path="systemreports" element={<ASystemReports />} />
 
 
             </Routes>
