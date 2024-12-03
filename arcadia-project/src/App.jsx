@@ -22,6 +22,7 @@ import ARViewer from './admin-research-viewer/ARViewer';
 import ABModify from './admin-book-modify/ABModify';
 import ARModify from './admin-research-modify/ARModify';
 import ASchedule from './admin-schedule-page/ASchedule'
+import ASystemReports from './admin-system-reports-page/ASystemReport.jsx'
 
 // User Components
 import UsrRegistration from './UserPages/user-registration-page/UsrRegistration';

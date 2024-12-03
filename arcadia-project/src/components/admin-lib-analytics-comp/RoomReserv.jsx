@@ -58,6 +58,7 @@ export default function RoomReserv() {
                         Annual
                     </button>
                 </div>
+                
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" />

@@ -2,9 +2,9 @@ import React from "react";
 
 const TodayReserv = () => {
     const roomRes = [
-        { room: "Von Fadri", time: "1D3", booker: "Ligma Balks" },
-        { room: "Von Fadri", time: "1D3", booker: "Ligma Balks"  },
-        { room: "Von Fadri", time: "1D3", booker: "Ligma Balks"  }
+        { room: "Cafe-Left", time: "11:00-12:00", booker: "Von Fadri" },
+        { room: "Cafe-Left", time: "11:00-12:00", booker: "Von Fadri" },
+        { room: "Cafe-Left", time: "11:00-12:00", booker: "Von Fadri" },
     ];
     return (
         <div className="bg-white p-6 rounded-lg shadow">
