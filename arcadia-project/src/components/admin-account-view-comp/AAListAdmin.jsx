@@ -186,7 +186,8 @@ const AAListAdmin = ({ user }) => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-center">
-                        {paginatedData.map((book, index) => (
+                    {paginatedData.length > 0 ? (
+                        paginatedData.map((book, index) => (
                             <tr key={index} className="hover:bg-gray-100">
                                 <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
                                     ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}>
@@ -212,7 +213,14 @@ const AAListAdmin = ({ user }) => {
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
                             </tr>
-                        ))}
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="6" className="px-4 py-2 text-center">
+                                No data available.
+                            </td>
+                        </tr>
+                    )}
                     </tbody>
                 </table>
             </div>

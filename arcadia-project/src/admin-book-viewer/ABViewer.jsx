@@ -13,19 +13,21 @@ import { supabase } from '/src/supabaseClient.js'; // Import Supabase client
 export default function ABViewer() {
   const location = useLocation();
   const [book, setBook] = useState(null); // State to hold the fetched book details
+  const [titleID, setTitleID] = useState(null); // State to store the titleID
   const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     const fetchBookDetails = async () => {
       const query = new URLSearchParams(location.search);
-      const titleID = query.get('titleID'); // Get bookID from query params
+      const fetchedTitleID = query.get('titleID'); // Get bookID from query params
 
-      if (titleID) {
-        console.log(titleID)
+
+      if (fetchedTitleID) {
+        console.log("fetchedTitleID", fetchedTitleID)
         const { data, error } = await supabase
           .from('book_titles')
           .select('*')
-          .eq('titleID', titleID) // Fetch the book with the matching bookID
+          .eq('titleID', fetchedTitleID) // Fetch the book with the matching bookID
           .single(); // Ensure we get a single result
 
         if (error) {
@@ -36,6 +38,7 @@ export default function ABViewer() {
           setTimeout(() => {
             setBook(data); // Set the fetched book details in state
             setLoading(false); 
+            setTitleID(fetchedTitleID);
           }, 1000); 
         }
       } else {
@@ -53,7 +56,7 @@ export default function ABViewer() {
         <div className="grid grid-cols-3 gap-8">
           <div className="col-span-2 space-y-8">
             <BookInfo book={book} loading={loading} /> {/* Pass loading prop */}
-            <Analytics />
+            <Analytics titleID={book?.titleID || titleID} />
             <PastReviews />
           </div>
           <div className="lg:col-span-1 space-y-8">

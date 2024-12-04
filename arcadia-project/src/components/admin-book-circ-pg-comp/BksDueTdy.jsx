@@ -7,7 +7,7 @@ const BksDueTdy = () => {
     useEffect(() => {
         const fetchBooksDueToday = async () => {
             try {
-                // Fetch the data from Supabase
+                const today = new Date();
                 const { data, error } = await supabase
                     .from('book_transactions')
                     .select(`
@@ -33,18 +33,18 @@ const BksDueTdy = () => {
                             userLName,
                             userLPUID
                         )`)
-                    .eq('deadline', new Date().toISOString().split('T')[0]);
+                    .eq('deadline', today.toISOString().split('T')[0]);
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
                 } else {
                     console.log("Raw data from Supabase:", data); // Debugging: raw data from Supabase
 
-
                     const formattedData = data.map(item => {
                         const bookDetails = item.book_indiv?.book_titles || {};
 
                         const deadline = new Date(item.deadline).toLocaleDateString('en-US', {month: 'long',day: 'numeric'});
+                        console.log("deadline today", item.deadline)
 
                         return {
                             bookTitle: bookDetails.title,

@@ -9,27 +9,30 @@ const data = [
   { name: 'Sep 20', value: 33.5 },
 ];
 
-const Analytics = () => (
-  <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full"> {/* Removed height constraints */}
-    <h3 className="text-xl font-semibold mb-4">Analytics</h3>
+const Analytics = ({ titleID }) => {
+  console.log("Analytics received titleID:", titleID); // Debug log to confirm
+  return(
+    <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full"> {/* Removed height constraints */}
+      <h3 className="text-xl font-semibold mb-4">Analytics</h3>
 
-    {/* Ensure chart container is responsive and grows based on content */}
-    <div className="w-full mb-6">
-      <ResponsiveContainer width="100%" aspect={2}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="value" stroke="#8884d8" />
-        </LineChart>
-      </ResponsiveContainer>
+      {/* Ensure chart container is responsive and grows based on content */}
+      <div className="w-full mb-6">
+        <ResponsiveContainer width="100%" aspect={2}>
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="value" stroke="#8884d8" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Ensure SnglBkCrcltn adjusts its height based on content */}
+      <SnglBkCrcltn titleID={titleID}/>
     </div>
-
-    {/* Ensure SnglBkCrcltn adjusts its height based on content */}
-    <SnglBkCrcltn />
-  </div>
-);
+  );
+};
 
 export default Analytics;

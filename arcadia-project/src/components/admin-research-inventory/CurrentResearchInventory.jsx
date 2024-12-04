@@ -19,7 +19,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
             try { 
                 const { data, error } = await supabase  
                 .from('research') // Fetch from 'research' table
-                .select("thesisID, title, college, department, abstract, location, arcID, pubDate, cover, author, keyword");
+                .select("researchID, title, college, department, abstract, location, researchARCID, pubDate, cover, author, keyword");
 
                 if (error) {
                     console.error("Error fetching research:", error);
@@ -101,7 +101,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                                 (header) => (
                                     <th
                                         key={header}
-                                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         {header}
                                     </th>
@@ -137,18 +137,18 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                             paginatedData.map((item, index) => (
                                 <tr
                                     key={index}
-                                    className={`hover:bg-gray-100 cursor-pointer ${
-                                        selectedResearch?.thesisID === item.thesisID ? "bg-gray-200" : ""
+                                    className={`hover:bg-light-gray cursor-pointer ${
+                                        selectedResearch?.researchID === item.researchID ? "bg-gray-200" : ""
                                     }`}
                                     onClick={() => handleRowClick(item)} // Row click event
                                 >
-                                    <td className="px-4 py-4 text-sm text-gray-900">
+                                    <td className="px-4 py-4 text-center text-sm text-gray-900">
                                         {item.college}
                                     </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900">
+                                    <td className="px-4 py-4 text-center text-sm text-gray-900">
                                         {item.department}
                                     </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
+                                    <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate max-w-xs">
                                         <Link
                                             to={`/arviewer?thesisID=${encodeURIComponent(item.thesisID)}`}
                                             className="text-blue-600 hover:underline"
@@ -159,10 +159,10 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                                     <td className="px-4 py-4 text-sm text-gray-900">
                                         {item.author}
                                     </td>
-                                    <td className="px-4 py-4 text-sm text-gray-500">
-                                        {item.thesisID}
+                                    <td className="px-4 py-4 text-center text-sm text-gray-500">
+                                        {item.researchARCID}
                                     </td>
-                                    <td className="px-4 py-4 text-sm text-gray-500">
+                                    <td className="px-4 py-4 text-center text-sm text-gray-500">
                                         {item.pubDate}
                                     </td>
                                 </tr>

@@ -136,7 +136,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                 (header) => (
                                     <th
                                         key={header}
-                                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         {header}
                                     </th>
@@ -178,7 +178,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                 return (
                                     <tr
                                         key={index}
-                                        className="hover:bg-gray-100 cursor-pointer"
+                                        className="hover:bg-light-gray cursor-pointer"
                                         onClick={() => handleRowClick(item)} // Row click event
                                     >
                                         <td className="px-4 py-4 text-sm text-gray-900">
@@ -215,8 +215,8 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                 </div>
                                             )}
                                         </td>
-                                        <td className="px-4 py-4 text-sm truncate max-w-xs">
-                                            <Link
+                                        <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate max-w-xs">
+                                        <Link
                                                 to={`/admin/abviewer?titleID=${encodeURIComponent(item.titleID)}`}
                                                 className="text-blue-600 hover:underline"
                                             >
@@ -228,10 +228,15 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                 <span key={i} className="inline-block mr-1">{author}</span>
                                             ))}
                                         </td>
+<<<<<<< Updated upstream
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
                                             {item.titleID}
+=======
+                                        <td className="px-4 py-4 text-center text-sm text-gray-500 truncate max-w-xs">
+                                            {item.titleID || 'N/A'} {/* Fallback to N/A if bookID is missing */}
+>>>>>>> Stashed changes
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
+                                        <td className="px-4 py-4 text-center text-sm text-gray-500 truncate max-w-xs">
                                             {item.originalPubDate}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">

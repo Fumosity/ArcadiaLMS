@@ -6,10 +6,10 @@ const ARTitle = ({ researchData }) => {
     return (
         <>
             <div className="space-y-4">
-                <h1 className="text-zinc-900 text-4xl font-['Zen Antique'] leading-tight">
+                <h1 className="text-zinc-900 text-3xl font-ZenSerif font-medium leading-tight">
                     {title}
                 </h1>
-                <h2 className="text-zinc-900 text-2xl font-medium font-['Zen Kaku Gothic Antique'] leading-snug">
+                <h2 className="text-zinc-900 text-xl font-medium leading-snug">
                     {author}
                 </h2>
             </div>

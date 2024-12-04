@@ -80,7 +80,7 @@ const OverdueBks = () => {
                             borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                             bookTitle: bookDetails.title,
                             bookId: item.bookID,
-                            user_id: item.userID,
+                            userId: item.userID,
                             titleID: bookDetails.titleID,
                             deadline: item.deadline
                         };
@@ -104,10 +104,11 @@ const OverdueBks = () => {
         });
 
         const handleUserClick = (book) => {
+            console.log("userid", book.userId, "user", book.borrower, book)
             navigate("/admin/useraccounts/viewusers", {
-                state: { userId: book.user_id },
+              state: { userId: book.userId, user: book },
             });
-        };
+          };
     
         const truncateTitle = (title, maxLength = 25) => {
             return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
@@ -202,7 +203,8 @@ const OverdueBks = () => {
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 text-center">
-                    {overdueData.slice((currentPage - 1) * Number(entries), currentPage * Number(entries)).map((book, index) => (
+                {overdueData.length > 0 ? (
+                    overdueData.slice((currentPage - 1) * Number(entries), currentPage * Number(entries)).map((book, index) => (
                             <tr key={index}>
                                 <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
                                     ${book.type === "Overdue" ? "bg-red" : ""}`}>{book.type}</td>
@@ -227,7 +229,14 @@ const OverdueBks = () => {
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{formatDate(book.deadline)}</td>
                             </tr>
-                        ))}
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="6" className="px-4 py-2 text-center">
+                                No data available.
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
 

@@ -74,7 +74,7 @@ const BCHistory = () => {
                             borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                             bookTitle: bookDetails.title,
                             bookId: item.bookID,
-                            user_id: item.userID,
+                            userId: item.userID,
                             titleID: bookDetails.titleID,
                         };
                     });
@@ -107,10 +107,11 @@ const BCHistory = () => {
     const paginatedData = sortedData.slice((currentPage - 1) * entries, currentPage * entries);
 
     const handleUserClick = (book) => {
+        console.log("userid", book.userId, "user", book.borrower, book)
         navigate("/admin/useraccounts/viewusers", {
-            state: { userId: book.user_id },
+          state: { userId: book.userId, user: book },
         });
-    };
+      };
 
     const truncateTitle = (title, maxLength = 25) => {
         return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
@@ -198,7 +199,8 @@ const BCHistory = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-center">
-                        {paginatedData.map((book, index) => (
+                        {paginatedData.length > 0 ? (
+                            paginatedData.map((book, index) => (
                             <tr key={index} className="hover:bg-gray-100">
                                 <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
                                     ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}>
@@ -224,7 +226,14 @@ const BCHistory = () => {
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
                             </tr>
-                        ))}
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="6" className="px-4 py-2 text-center">
+                                    No data available.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>

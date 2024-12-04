@@ -27,8 +27,9 @@ export default {
     extend: {
       fontFamily: {
         'Zen': ['"Zen Kaku Gothic Antique"', '"Zen Kaku Gothic New"', 'sans-serif'],
+        'ZenSerif': ['"Zen Antique"', 'serif'],
       },
-    },
+    }, 
   },
   plugins: [],
 } 
