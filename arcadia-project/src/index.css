@@ -313,6 +313,11 @@
   width: 100px;
 }
 
+.deleteButton {
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-grey hover:text-black focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width: 100px;
+}
+
 .reservButton {
   @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-grey hover:text-black focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
   width: auto;

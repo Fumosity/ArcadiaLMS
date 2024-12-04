@@ -1,179 +1,114 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import ModifySchedule from '../../z_modals/ModifySchedule'; // Import the modal component
+import { supabase } from '../../supabaseClient'; // Import your Supabase client
+
+const localizer = momentLocalizer(moment);
 
 export default function WeeklySched() {
-    // Weekly schedule data
-    const [weeklySchedule] = useState([
-        {
-            dates: [
-                "01 January 2024",
-                "02 January 2024",
-                "03 January 2024",
-                "04 January 2024",
-                "05 January 2024",
-                "06 January 2024",
-                "07 January 2024",
-            ],
-            slots: [
-                { time: "7:00AM-5:00PM", status: "open" },
-                { time: "Closed", status: "closed" }, // Example for Saturday and Sunday being closed
+    const [events, setEvents] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
-            ],
-        },
-        {
-            dates: [
-                "08 January 2024",
-                "09 January 2024",
-                "10 January 2024",
-                "11 January 2024",
-                "12 January 2024",
-                "13 January 2024",
-                "14 January 2024",
-            ],
-            slots: [
-                { time: "7:00AM-5:00PM", status: "open" },
-                { time: "Closed", status: "closed" },
-            ],
-        },
-        {
-            dates: [
-                "15 January 2024",
-                "16 January 2024",
-                "17 January 2024",
-                "18 January 2024",
-                "19 January 2024",
-                "20 January 2024",
-                "21 January 2024",
-            ],
-            slots: [
-                { time: "7:00AM-5:00PM", status: "open" },
-                { time: "Closed", status: "closed" },
-                { time: "7:00AM-12:00PM", status: "" },
-            ],
-        },
-        {
-            dates: [
-                "22 January 2024",
-                "23 January 2024",
-                "24 January 2024",
-                "25 January 2024",
-                "26 January 2024",
-                "27 January 2024",
-                "28 January 2024",
-            ],
-            slots: [
-                { time: "7:00AM-5:00PM", status: "open" },
-                { time: "Closed", status: "closed" },
-            ],
-        },
-    ]);
+    // Fetch schedule from Supabase on mount
+    useEffect(() => {
+        const fetchSchedule = async () => {
+            const { data, error } = await supabase
+                .from('schedule')
+                .select('event_data'); // Fetch the event_data JSONB object
 
-    const isHalfDate = (date) => {
-        const halfDates = [
+            if (error) {
+                console.error('Error fetching schedule:', error);
+                return;
+            }
 
-            "20 January 2024",
-        ];
-        return halfDates.includes(date);
+            // Format the data into the correct structure for the calendar
+            const formattedEvents = data.map((event) => {
+                const { date, time, event: eventName } = event.event_data; // Destructure the event_data object
+                const [startTime, endTime] = time.split(' to '); // Split the time string into start and end times
+
+                // Construct the start and end date objects
+                const start = moment(`${date} ${startTime}`).toDate(); // Combine date and startTime
+                const end = moment(`${date} ${endTime}`).toDate(); // Combine date and endTime
+
+                return {
+                    title: eventName,
+                    start,
+                    end
+                };
+            });
+
+            setEvents(formattedEvents); // Update the state with formatted events
+        };
+
+        fetchSchedule(); // Call the function to fetch events
+    }, []); // Empty dependency array to run only once when the component mounts
+
+
+    const handleSelect = ({ start, end }) => {
+        const event = events.find((e) => e.start.getTime() === start.getTime() && e.end.getTime() === end.getTime());
+        if (event) {
+            setSelectedEvent(event);
+        } else {
+            setSelectedEvent({
+                title: 'New Event',
+                start,
+                end,
+                notes: '' // You can also handle other fields like notes
+            });
+        }
+        setIsModalOpen(true); // Open the modal
     };
 
-    const isClosedDate = (date) => {
-        const closedDates = [
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
-            "07 January 2024",
-            "14 January 2024",
-            "21 January 2024",
-            "25 January 2024",
-            "26 January 2024",
-            "27 January 2024",
-            "28 January 2024",
-        ];
-        return closedDates.includes(date);
+    const handleModifySchedule = (modifiedEvent) => {
+        setEvents((prev) => {
+            const existingEventIndex = prev.findIndex((event) =>
+                event.start.getTime() === modifiedEvent.start.getTime() && event.end.getTime() === modifiedEvent.end.getTime()
+            );
+            if (existingEventIndex !== -1) {
+                const updatedEvents = [...prev];
+                updatedEvents[existingEventIndex] = modifiedEvent; // Replace the old event with the modified one
+                return updatedEvents;
+            } else {
+                return [...prev, modifiedEvent]; // Add the new event if it's not found
+            }
+        });
+        handleCloseModal(); // Close the modal after saving
+    };
+
+    const handleDeleteSchedule = (eventToDelete) => {
+        setEvents((prev) => prev.filter((event) => event.start.getTime() !== eventToDelete.start.getTime() || event.end.getTime() !== eventToDelete.end.getTime()));
+        handleCloseModal(); // Close the modal after deleting
     };
 
     return (
-        <div className="space-y-8 p-4">
-            {/* ARC Weekly Schedule */}
-            <div className="aMain-cont overflow-hidden">
-                <div className="p-4">
-                    <h2 className="text-lg font-semibold text-arcadia-black">
-                        ARC Weekly Schedule
-                    </h2>
-                </div>
-                <div className="p-4">
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200 border border-grey dark:divide-gray-700">
-                            <thead className="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Week
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Monday
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Tuesday
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Wednesday
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Thursday
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Friday
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Saturday
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Sunday
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Notes
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                {weeklySchedule.map((week, weekIndex) => (
-                                    <tr key={weekIndex}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">
-                                            {weekIndex + 1}
-                                        </td>
-                                        {week.dates.map((date, dateIndex) => (
-                                            <td
-                                                key={dateIndex}
-                                                className={`px-6 py-4 whitespace-nowrap text-center text-sm ${isClosedDate(date)
-                                                    ? "text-black bg-gray-100"
-                                                    : "text-black"
-                                                    }`}
-                                            >
-                                                <div className="text-xs mb-1">{date}</div>
-                                                {isClosedDate(date) ? (
-                                                    <div className="p-2 rounded bg-red text-arcadia-red">
-                                                        Closed
-                                                    </div>
-                                                ) : isHalfDate(date) ? (
-                                                    <div className="p-2 rounded bg-pastel-yellow text-yellow">
-                                                        {week.slots[0].time}</div> // Half Day message
-                                                ) : (
-                                                    <div className="bg-green text-dark-green p-2 rounded">
-                                                        {week.slots[0].time}
-                                                    </div>
-                                                )}
-                                            </td>
-                                        ))}
-                                        <td className="px-6 py-4 whitespace-normal break-words text-sm text-gray-500 dark:text-gray-300 max-w-[200px] truncate">
-                                            {weekIndex === 2 &&
-                                                "Half day on Jan 20 due to an event"}
-                                            {weekIndex === 3 &&
-                                                "Closed from Jan 25 to Jan 27 for maintenance"}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div>
+            <h2>Weekly Schedule</h2>
+            <Calendar
+                localizer={localizer}
+                events={events}
+                startAccessor="start"
+                endAccessor="end"
+                style={{ height: 500 }}
+                selectable
+                onSelectSlot={handleSelect}
+                onSelectEvent={handleSelect}
+            />
+            {isModalOpen && (
+                <ModifySchedule
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    event={selectedEvent}
+                    onModify={handleModifySchedule}
+                    onDelete={handleDeleteSchedule}
+                />
+            )}
         </div>
     );
 }

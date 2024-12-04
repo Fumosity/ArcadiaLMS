@@ -10,11 +10,8 @@ const AAccountSettings = () => {
     return (
         <div className="min-h-screen bg-light-white">
             <Title>Schedule</Title>
-
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Responsive Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Main Content */}
                     <div className="md:col-span-2 space-y-8">
                         <WeeklySched />
                         <CalendarEvents />
