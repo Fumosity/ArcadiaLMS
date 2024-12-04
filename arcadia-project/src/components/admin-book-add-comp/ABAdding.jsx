@@ -105,7 +105,9 @@ const ABAdding = ({ formData, setFormData }) => {
       bookID: '',
       arcID: '',
       isbn: '',
-      cover: ''
+      cover: '',
+      price: '',
+      titleARCID: '',
     });
 
     setCover('');
@@ -264,6 +266,15 @@ const ABAdding = ({ formData, setFormData }) => {
                 />
               </div>
               <div className="flex justify-between items-center">
+                <label className="w-1/4">Title ARC ID:</label>
+                <input type="text" name="titleARCID" required 
+                  className="input-field w-2/3 p-2 border"
+                  value={formData.titleARCID} 
+                  onChange={handleChange} 
+                  style={ validationErrors.titleARCID ? errorStyle : {} }
+                />
+              </div>
+              <div className="flex justify-between items-center">
                 <label className="w-1/4">ISBN:</label>
                 <input type="text" name="isbn" required 
                   className="input-field w-2/3 p-2 border"
@@ -272,6 +283,15 @@ const ABAdding = ({ formData, setFormData }) => {
                   style={ validationErrors.isbn ? errorStyle : {} }
                 />
               </div>
+              <div className="flex justify-between items-center">
+              <label className="w-1/4">Price:</label>
+              <input type="text" name="price" required 
+                className="input-field w-2/3 p-2 border"
+                value={formData.price} 
+                onChange={handleChange} 
+                style={ validationErrors.price ? errorStyle : {} }
+                />
+                </div>
             </form>
 
             {/* Add Book Button */}

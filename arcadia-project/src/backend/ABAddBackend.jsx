@@ -3,13 +3,12 @@ import { supabase } from "../supabaseClient.js";
 //Checks and adds a new entry or increments a current entry to the 'book_titles'
 export const checkAndAddBookTitle = async (bookData) => {
     try {
-        const { data, error } = await supabase.from('book_titles').select('titleID, quantity').eq('title', bookData.title).single();
+        const { data, error } = await supabase.from('book_titles').select('titleID').eq('title', bookData.title).single();
 
         if (error) {
             if (error.code === "PGRST116") {
                 const newTitleData = {
                     title: bookData.title,
-                    quantity: 1,
                     author: Array.isArray(bookData.author) ? bookData.author : bookData.author.split(';'),
                     genre: Array.isArray(bookData.genre) ? bookData.genre : bookData.genre.split(';'),
                     category: Array.isArray(bookData.category) ? bookData.category : bookData.category.split(';'),
@@ -18,8 +17,12 @@ export const checkAndAddBookTitle = async (bookData) => {
                     publisher: bookData.publisher,
                     currentPubDate: bookData.currentPubDate,
                     originalPubDate: bookData.originalPubDate,
-                    procDate: bookData.procDate,
+                    procurementDate: bookData.procDate,
                     cover: bookData.cover,
+                    ISBN: bookData.isbn,
+                    location: bookData.location,
+                    price: bookData.price,
+                    titleARCID: bookData.titleARCID,
                 };
 
                 const { data: newTitle, error: insertError } = await supabase.from('book_titles').insert([newTitleData]).select('titleID').single();
@@ -31,9 +34,7 @@ export const checkAndAddBookTitle = async (bookData) => {
             }
         }
 
-        const newQuantity = data.quantity + 1;
-        const { error: updateError } = await supabase.from('book_titles').update({ quantity: newQuantity }).eq('titleID', data.titleID);
-        if (updateError) throw updateError;
+        if (error) throw error;
 
         return data.titleID;
     } catch (err) {
@@ -55,14 +56,11 @@ export const addBook = async (bookData) => {
         const specificBookData = {
             bookID: bookData.bookID,
             titleID: titleID,
-            title: bookData.title,
-            arcID: bookData.arcID,
-            isbn: bookData.isbn,
-            location: bookData.location,
+            bookARCID: bookData.arcID,
         };
 
         // Insert into 'book' table
-        const { error: bookInsertError } = await supabase.from('book').insert([specificBookData]);
+        const { error: bookInsertError } = await supabase.from('book_indiv').insert([specificBookData]);
 
         if (bookInsertError) {
             console.error("Error adding book to 'book' table:", bookInsertError);
@@ -80,7 +78,7 @@ export const addBook = async (bookData) => {
 //Gets ALL the data from the book table
 export const fetchBooks = async () => {
     try {
-        const { data, error } = await supabase.from('book').select('*');
+        const { data, error } = await supabase.from('book_indiv').select('*');
         if (error) throw error;
         return data;
     } catch (error) {
@@ -91,7 +89,7 @@ export const fetchBooks = async () => {
 export const generateNewBookID = async (setFormData) => {
     try {
         const { data, error } = await supabase
-            .from('book')
+            .from('book_indiv')
             .select('bookID')
             .order('bookID', { ascending: false })
             .limit(1);

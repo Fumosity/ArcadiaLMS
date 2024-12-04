@@ -11,12 +11,14 @@ const ABAddPreview = ({ formData }) => {
     keyword: Array.isArray(formData.keyword) ? formData.keyword.join(',') : (formData.keyword ?? '').split(';').join(',') || '',
     currentPubDate: formData.currentPubDate || '',
     originalPubDate: formData.originalPubDate || '',
-    procDate: formData.procDate || '',
+    procurementDate: formData.procDate || '',
     location: formData.location || '',
     databaseID: formData.bookID || '',
     arcID: formData.arcID || '',
     isbn: formData.isbn || '',
-    cover: formData.cover || ''
+    cover: formData.cover || '',
+    price: formData.price || '',
+    titleARCID: formData.titleARCID || '',
   };
 
   return (
