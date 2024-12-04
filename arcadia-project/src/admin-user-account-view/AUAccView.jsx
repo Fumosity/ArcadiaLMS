@@ -16,6 +16,7 @@ const AUAccView = () => {
     const location = useLocation();
     const user = location.state?.user || {};
 
+    console.log("user", user)
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Main header */}
@@ -29,9 +30,7 @@ const AUAccView = () => {
                         <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
                             <UserInformations user={user} />
                         </div>
-                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                            <AUserCirc user={user} />
-                        </div>
+                        <AUserCirc user={user} />
                     </div>
 
                     {/* Right side content */}

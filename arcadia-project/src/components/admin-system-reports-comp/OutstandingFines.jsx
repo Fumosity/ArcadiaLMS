@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from "/src/supabaseClient.js";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function OutstandingFines() {
     const [bkhistoryData, setBkhistoryData] = useState([]);
@@ -94,6 +94,7 @@ function OutstandingFines() {
                             user_id: item.userID,
                             book_id: item.book_indiv.bookARCID,
                             book_title: bookDetails.title,
+                            book_title_id: bookDetails.titleID,
                             fine: fineAmount,
                             user_name: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                             school_id: item.user_accounts.userLPUID,
@@ -148,10 +149,8 @@ function OutstandingFines() {
         });
     };
 
-    const handleTitleClick = (record) => {
-        navigate("/admin/bookview/viewtitle", {
-            state: { title: record.title_id },
-        });
+    const truncateTitle = (title, maxLength = 25) => {
+        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
     };
 
     return (
@@ -296,12 +295,12 @@ function OutstandingFines() {
                                 <td className="px-4 py-2 text-center">₱{record.fine.toFixed(2)}</td>
                                 <td className="px-4 py-2 text-center">{record.book_id}</td>
                                 <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
-                                    <button
-                                        onClick={() => handleUserClick(record)}
-                                        className="text-blue-500 hover:underline"
+                                    <Link
+                                        to={`/admin/abviewer?titleID=${encodeURIComponent(record.book_title_id)}`}
+                                        className="text-blue-600 hover:underline"
                                     >
-                                        {record.book_title}
-                                    </button>
+                                        {truncateTitle(record.book_title)}
+                                    </Link>
                                 </td>
                                 <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
                                     <button

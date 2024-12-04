@@ -1,5 +1,6 @@
 import { supabase } from '../../supabaseClient';
 import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 const BCHistory = () => {
     const [sortOrder, setSortOrder] = useState("Descending");
@@ -11,26 +12,51 @@ const BCHistory = () => {
     const [bkhistoryData, setBkhistoryData] = useState([]);
     const totalEntries = bkhistoryData.length;
     const totalPages = Math.ceil(totalEntries / entries);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const { data, error } = await supabase
                     .from('book_transactions')
-                    .select('transaction_type, checkin_date, checkin_time, checkout_date, checkout_time, name, book_title, book_id');
+                    .select(`
+                        transaction_type, 
+                        checkin_date, 
+                        checkin_time, 
+                        checkout_date, 
+                        checkout_time, 
+                        userID, 
+                        bookID, 
+                        book_indiv(
+                            bookID,
+                            bookARCID,
+                            status,
+                            book_titles (
+                                titleID,
+                                title,
+                                price
+                            )
+                        ),
+                        user_accounts (
+                            userFName,
+                            userLName,
+                            userLPUID
+                        )`);
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
                 } else {
+                    console.log("History data from Supabase:", data); // Debugging: raw data from Supabase
+
                     const formattedData = data.map(item => {
                         const date = item.checkin_date || item.checkout_date;
                         const time = item.checkin_time || item.checkout_time;
-                    
+
                         let formattedTime = null;
                         if (time) {
                             // Ensure time is in the format HH:mm (24-hour format)
                             const timeString = time.includes(':') ? time : `${time.slice(0, 2)}:${time.slice(2)}`;
-                        
+
                             // Convert time into 12-hour format with AM/PM, no 'Z' for local time
                             formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString('en-PH', {
                                 hour: 'numeric',
@@ -38,14 +64,18 @@ const BCHistory = () => {
                                 hour12: true,
                             });
                         }
-                    
+
+                        const bookDetails = item.book_indiv?.book_titles || {};
+
                         return {
                             type: item.transaction_type,
                             date,
                             time: formattedTime,
-                            borrower: item.name,
-                            bookTitle: item.book_title,
-                            bookId: item.book_id,
+                            borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
+                            bookTitle: bookDetails.title,
+                            bookId: item.bookID,
+                            user_id: item.userID,
+                            titleID: bookDetails.titleID,
                         };
                     });
 
@@ -58,10 +88,6 @@ const BCHistory = () => {
 
         fetchData();
     }, []);
-
-    const truncateTitle = (title, maxLength = 25) => {
-        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
-    };
 
     // Filter and Sort logic
     const filteredData = bkhistoryData.filter(book =>
@@ -80,6 +106,16 @@ const BCHistory = () => {
 
     const paginatedData = sortedData.slice((currentPage - 1) * entries, currentPage * entries);
 
+    const handleUserClick = (book) => {
+        navigate("/admin/useraccounts/viewusers", {
+            state: { userId: book.user_id },
+        });
+    };
+
+    const truncateTitle = (title, maxLength = 25) => {
+        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
+    };
+    
     return (
         <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
             {/* Title */}
@@ -170,8 +206,22 @@ const BCHistory = () => {
                                 </td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{book.borrower}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{truncateTitle(book.bookTitle)}</td>
+                                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
+                                    <button
+                                        onClick={() => handleUserClick(book)}
+                                        className="text-blue-500 hover:underline"
+                                    >
+                                        {book.borrower}
+                                    </button>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
+                                    <Link
+                                        to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        {truncateTitle(book.bookTitle)}
+                                    </Link>
+                                </td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
                             </tr>
                         ))}

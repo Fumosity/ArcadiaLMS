@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../supabaseClient"; // Import Supabase client
+import { useNavigate, Link } from "react-router-dom";
 
 const BorrowedBks = () => {
     // State for sorting and filtering
@@ -11,6 +12,7 @@ const BorrowedBks = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [borrowedBooks, setBorrowedBooks] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     // Fetch borrowed books data from Supabase
     useEffect(() => {
@@ -18,12 +20,36 @@ const BorrowedBks = () => {
             setLoading(true);
             const { data, error } = await supabase
                 .from('book_transactions')
-                .select('transaction_type, checkout_date, checkout_time, name, book_title, book_id, deadline')
-                .eq('transaction_type', 'Borrowed'); // Only fetch 'Borrowed' transactions
+                .select(`
+                    transaction_type, 
+                    checkin_date, 
+                    checkin_time, 
+                    checkout_date, 
+                    checkout_time,
+                    deadline, 
+                    userID, 
+                    bookID, 
+                    book_indiv(
+                        bookID,
+                        bookARCID,
+                        status,
+                        book_titles (
+                            titleID,
+                            title,
+                            price
+                        )
+                    ),
+                    user_accounts (
+                        userFName,
+                        userLName,
+                        userLPUID
+                    )`).eq('transaction_type', 'Borrowed'); // Only fetch 'Borrowed' transactions
 
             if (error) {
                 console.error("Error fetching data:", error);
             } else {
+                console.log("Borrowed data from Supabase:", data); // Debugging: raw data from Supabase
+
                 // Format the fetched data
                 const formattedData = data.map(item => {
                     const date = item.checkout_date;
@@ -42,13 +68,17 @@ const BorrowedBks = () => {
                         });
                     }
 
+                    const bookDetails = item.book_indiv?.book_titles || {};
+
                     return {
                         type: item.transaction_type,
                         date,
                         time: formattedTime,
-                        borrower: item.name,
-                        bookTitle: item.book_title,
-                        bookId: item.book_id,
+                        borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
+                        bookTitle: bookDetails.title,
+                        bookId: item.bookID,
+                        user_id: item.userID,
+                        titleID: bookDetails.titleID,
                         deadline: item.deadline
                     };
                 });
@@ -66,6 +96,23 @@ const BorrowedBks = () => {
     const totalEntries = borrowedBooks.length; // Total number of entries
     const totalPages = Math.ceil(totalEntries / entries); // Total number of pages
 
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            month: 'long', // e.g., November
+            day: 'numeric', // e.g., 24
+        });
+    };
+
+    const handleUserClick = (book) => {
+        navigate("/admin/useraccounts/viewusers", {
+            state: { userId: book.user_id },
+        });
+    };
+
+    const truncateTitle = (title, maxLength = 25) => {
+        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
+    };
+    
     return (
         <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
             {/* Title */}
@@ -167,16 +214,30 @@ const BorrowedBks = () => {
                         {borrowedBooks.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
                             <tr key={index} className="hover:bg-gray-100">
                                 <td
-                                 className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
-                                    ${book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}> 
+                                    className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
+                                    ${book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}>
                                     {book.type}
-                                 </td>
+                                </td>
                                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.date}</td>
                                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.time}</td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.borrower}</td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.bookTitle}</td>
+                                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
+                                    <button
+                                        onClick={() => handleUserClick(book)}
+                                        className="text-blue-500 hover:underline"
+                                    >
+                                        {book.borrower}
+                                    </button>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
+                                    <Link
+                                        to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        {truncateTitle(book.bookTitle)}
+                                    </Link>
+                                </td>
                                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.bookId}</td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.deadline}</td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{formatDate(book.deadline)}</td>
                             </tr>
                         ))}
                     </tbody>

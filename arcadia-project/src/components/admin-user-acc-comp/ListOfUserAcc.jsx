@@ -69,8 +69,9 @@ const ListOfUserAcc = () => {
     const displayedUsers = filteredData.slice(startIndex, startIndex + entriesPerPage);
 
     const handleUserClick = (user) => {
+        console.log("user", user)
         navigate("/admin/useraccounts/viewusers", {
-            state: { userId: user.userId },
+            state: { userId: user.userId, user: user },
         });
     };
     

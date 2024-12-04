@@ -222,7 +222,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                         </td>
                                         <td className="px-4 py-4 text-sm truncate max-w-xs">
                                             <Link
-                                                to={`/admin/abviewer?bookID=${encodeURIComponent(item.bookID)}`} // Change to bookID
+                                                to={`/admin/abviewer?titleID=${encodeURIComponent(item.titleID)}`}
                                                 className="text-blue-600 hover:underline"
                                             >
                                                 {item.title}

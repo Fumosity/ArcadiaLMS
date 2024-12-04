@@ -1,5 +1,6 @@
 import { supabase } from '../../supabaseClient';
 import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 const ReturnedBks = () => {
     const [sortOrder, setSortOrder] = useState("Descending");
@@ -11,6 +12,7 @@ const ReturnedBks = () => {
     const [returnedData, setReturnedData] = useState([]);
     const totalEntries = returnedData.length;
     const totalPages = Math.ceil(totalEntries / entries);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Fetch Returned book data from Supabase
@@ -18,13 +20,36 @@ const ReturnedBks = () => {
             try {
                 const { data, error } = await supabase
                     .from('book_transactions')
-                    .select('transaction_type, checkin_date, checkin_time, name, book_title, book_id, deadline')
+                    .select(`
+                        transaction_type, 
+                        checkin_date, 
+                        checkin_time, 
+                        checkout_date, 
+                        checkout_time,
+                        deadline, 
+                        userID, 
+                        bookID, 
+                        book_indiv(
+                            bookID,
+                            bookARCID,
+                            status,
+                            book_titles (
+                                titleID,
+                                title,
+                                price
+                            )
+                        ),
+                        user_accounts (
+                            userFName,
+                            userLName,
+                            userLPUID
+                        )`)
                     .eq('transaction_type', 'Returned'); // Only fetch 'Returned' transactions
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
                 } else {
-                    console.log("Raw data from Supabase:", data); // Debugging: raw data from Supabase
+                    console.log("Returned data from Supabase:", data); // Debugging: raw data from Supabase
 
                     const formattedData = data.map(item => {
                         const date = item.checkin_date;
@@ -43,14 +68,18 @@ const ReturnedBks = () => {
                             });
                         }
 
+                        const bookDetails = item.book_indiv?.book_titles || {};
+
                         return {
                             type: item.transaction_type,
                             date,
                             time: formattedTime,
-                            borrower: item.name,
-                            bookTitle: item.book_title,
-                            bookId: item.book_id,
-                            deadline: item.deadline, // Use the deadline column from Supabase
+                            borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
+                            bookTitle: bookDetails.title,
+                            bookId: item.bookID,
+                            user_id: item.userID,
+                            titleID: bookDetails.titleID,
+                            deadline: item.deadline
                         };
                     });
 
@@ -64,17 +93,22 @@ const ReturnedBks = () => {
         fetchData();
     }, []); // Empty dependency array means this will run once when the component mounts
 
-    // Function to truncate the title if it's too long
-    const truncateTitle = (title, maxLength = 25) => {
-        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
-    };
-
     // Function to format the deadline to an English date
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             month: 'long', // e.g., November
             day: 'numeric', // e.g., 24
         });
+    };
+
+    const handleUserClick = (book) => {
+        navigate("/admin/useraccounts/viewusers", {
+            state: { userId: book.user_id },
+        });
+    };
+
+    const truncateTitle = (title, maxLength = 25) => {
+        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
     };
 
     return (
@@ -178,8 +212,22 @@ const ReturnedBks = () => {
                                 {book.type}</td>
                             <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
                             <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{book.borrower}</td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{truncateTitle(book.bookTitle)}</td>
+                            <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
+                                    <button
+                                        onClick={() => handleUserClick(book)}
+                                        className="text-blue-500 hover:underline"
+                                    >
+                                        {book.borrower}
+                                    </button>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
+                                    <Link
+                                        to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        {truncateTitle(book.bookTitle)}
+                                    </Link>
+                                </td>
                             <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
                             <td className="px-4 py-3 text-sm text-gray-900">{formatDate(book.deadline)}</td>
                         </tr>

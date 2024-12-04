@@ -10,22 +10,49 @@ const BksDueTdy = () => {
                 // Fetch the data from Supabase
                 const { data, error } = await supabase
                     .from('book_transactions')
-                    .select('book_title, name, book_id, deadline')
-                    .eq('deadline', new Date().toISOString().split('T')[0]); 
+                    .select(`
+                        transaction_type, 
+                        checkin_date, 
+                        checkin_time, 
+                        checkout_date, 
+                        checkout_time, 
+                        userID, 
+                        bookID, 
+                        book_indiv(
+                            bookID,
+                            bookARCID,
+                            status,
+                            book_titles (
+                                titleID,
+                                title,
+                                price
+                            )
+                        ),
+                        user_accounts (
+                            userFName,
+                            userLName,
+                            userLPUID
+                        )`)
+                    .eq('deadline', new Date().toISOString().split('T')[0]);
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
                 } else {
-                    // Format the data to match the required structure
-                    const formattedData = data.map(item => ({
-                        bookTitle: item.book_title,
-                        borrower: item.name,
-                        bookId: item.book_id,
-                        due: new Date(item.deadline).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                        }),
-                    }));
+                    console.log("Raw data from Supabase:", data); // Debugging: raw data from Supabase
+
+
+                    const formattedData = data.map(item => {
+                        const bookDetails = item.book_indiv?.book_titles || {};
+
+                        const deadline = new Date(item.deadline).toLocaleDateString('en-US', {month: 'long',day: 'numeric'});
+
+                        return {
+                            bookTitle: bookDetails.title,
+                            borrower: item.name,
+                            bookId: item.bookID,
+                            due: deadline,
+                        };
+                    });
 
                     setBooksDueToday(formattedData);
                 }

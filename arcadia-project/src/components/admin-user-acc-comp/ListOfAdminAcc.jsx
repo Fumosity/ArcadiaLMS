@@ -69,11 +69,7 @@ const ListOfAdminAcc = () => {
 
     const handleUserClick = (user) => {
         navigate("/admin/useraccounts/viewadmins", {
-            state: {
-                user: {
-                    userId: user.userId
-                }
-            }
+            state: { userId: user.userId, user: user }
         });
     };
 
