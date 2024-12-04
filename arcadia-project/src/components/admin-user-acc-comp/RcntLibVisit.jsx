@@ -124,7 +124,7 @@ export default function RcntLibVisit() {
   }
   
   return (
-    <div className="space-y-6">
+    <div className=" overflow-hidden border border-grey p-6 rounded-lg w-full">
 
       {/* Pie Charts */}
       <div className="bg-white border border-grey p-6 rounded-lg mb-6">
