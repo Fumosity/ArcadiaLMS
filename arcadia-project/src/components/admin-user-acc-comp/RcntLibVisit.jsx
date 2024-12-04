@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
-import { supabase } from "../../supabaseClient"
+import { useEffect, useState } from "react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { supabase } from "../../supabaseClient";
 
 const COLORS = [
   "hsl(215, 90%, 50%)",
@@ -11,11 +11,11 @@ const COLORS = [
   "hsl(40, 80%, 50%)",
   "hsl(280, 60%, 60%)",
   "hsl(190, 70%, 50%)",
-]
+];
 
 export default function RcntLibVisit() {
-  const [collegeData, setCollegeData] = useState([])
-  const [departmentData, setDepartmentData] = useState([])
+  const [collegeData, setCollegeData] = useState([]);
+  const [departmentData, setDepartmentData] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -25,100 +25,122 @@ export default function RcntLibVisit() {
           .select(`
             transaction_type,
             checkout_date,
+            checkin_date,
             user_accounts!inner (
               userCollege,
               userDepartment
             )
           `)
-          .order('checkout_date', { ascending: false })
+          .order("checkout_date", { ascending: false });
 
         if (error) {
-          console.error("Error fetching data:", error)
-          return
+          console.error("Error fetching data:", error);
+          return;
         }
 
-        const processedData = processTransactions(data)
-        setCollegeData(processedData.collegeData)
-        setDepartmentData(processedData.departmentData)
+        const processedData = processTransactions(data);
+        setCollegeData(processedData.collegeData);
+        setDepartmentData(processedData.departmentData);
       } catch (error) {
-        console.error("Unexpected error:", error)
+        console.error("Unexpected error:", error);
       }
     }
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   function processTransactions(transactions) {
-    const now = new Date()
-    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
-
-    const collegeMap = new Map()
-    const departmentMap = new Map()
-
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  
+    const collegeMap = new Map();
+    const departmentMap = new Map();
+  
     transactions.forEach((transaction) => {
-      const { userCollege, userDepartment } = transaction.user_accounts
-      const transactionDate = new Date(transaction.checkout_date)
-
-      // Process college data
+      const { userCollege, userDepartment } = transaction.user_accounts;
+      const transactionDate = new Date(transaction.checkout_date);
+      const isReturned = transaction.checkin_date != null;
+  
+      // --- College Aggregation ---
       if (!collegeMap.has(userCollege)) {
         collegeMap.set(userCollege, {
           name: userCollege,
-          value: 0,
+          borrows: 0,
+          returns: 0,
           thisWeekBorrows: 0,
           thisWeekReturns: 0,
           lastWeekBorrows: 0,
-          lastWeekReturns: 0
-        })
+          lastWeekReturns: 0,
+        });
       }
-      const collegeData = collegeMap.get(userCollege)
-      collegeData.value++
-
-      // Process department data
-      if (!departmentMap.has(userDepartment)) {
-        departmentMap.set(userDepartment, {
-          name: userDepartment,
-          value: 0,
-          thisWeekBorrows: 0,
-          thisWeekReturns: 0,
-          lastWeekBorrows: 0,
-          lastWeekReturns: 0
-        })
-      }
-      const departmentData = departmentMap.get(userDepartment)
-      departmentData.value++
-
-      // Process weekly data
+  
+      const collegeData = collegeMap.get(userCollege);
+  
+      // Increment overall college borrows/returns
+      collegeData.borrows++;
+      if (isReturned) collegeData.returns++;
+  
+      // Increment college-specific time period counts
       if (transactionDate >= oneWeekAgo) {
-        if (transaction.transaction_type === 'Borrowed') {
-          collegeData.thisWeekBorrows++
-          departmentData.thisWeekBorrows++
-        } else if (transaction.transaction_type === 'Returned') {
-          collegeData.thisWeekReturns++
-          departmentData.thisWeekReturns++
-        }
+        collegeData.thisWeekBorrows++;
+        if (isReturned) collegeData.thisWeekReturns++;
       } else if (transactionDate >= twoWeeksAgo) {
-        if (transaction.transaction_type === 'Borrowed') {
-          collegeData.lastWeekBorrows++
-          departmentData.lastWeekBorrows++
-        } else if (transaction.transaction_type === 'Returned') {
-          collegeData.lastWeekReturns++
-          departmentData.lastWeekReturns++
-        }
+        collegeData.lastWeekBorrows++;
+        if (isReturned) collegeData.lastWeekReturns++;
       }
-    })
-
+  
+      // --- Department Aggregation ---
+      if (userDepartment) {
+        if (!departmentMap.has(userDepartment)) {
+          departmentMap.set(userDepartment, {
+            name: userDepartment,
+            borrows: 0,
+            returns: 0,
+            thisWeekBorrows: 0,
+            thisWeekReturns: 0,
+            lastWeekBorrows: 0,
+            lastWeekReturns: 0,
+            college: userCollege, // Associate department with its parent college
+          });
+        }
+  
+        const departmentData = departmentMap.get(userDepartment);
+  
+        // Increment department borrows/returns
+        departmentData.borrows++;
+        if (isReturned) departmentData.returns++;
+  
+        // Increment department-specific time period counts
+        if (transactionDate >= oneWeekAgo) {
+          departmentData.thisWeekBorrows++;
+          if (isReturned) departmentData.thisWeekReturns++;
+        } else if (transactionDate >= twoWeeksAgo) {
+          departmentData.lastWeekBorrows++;
+          if (isReturned) departmentData.lastWeekReturns++;
+        }
+  
+        // Ensure department data also updates parent college
+        collegeData.borrows++; // Ensure total college borrows reflect department borrows
+      }
+    });
+  
     return {
       collegeData: Array.from(collegeMap.values()),
-      departmentData: Array.from(departmentMap.values())
-    }
+      departmentData: Array.from(departmentMap.values()),
+    };
   }
+  
+  
 
   return (
     <div className="space-y-6">
+
+      {/* Pie Charts */}
       <div className="bg-white border border-grey p-6 rounded-lg mb-6">
         <h2 className="text-xl font-semibold mb-4">Library Book Records</h2>
         <div className="flex justify-around">
+          {/* College Data Chart */}
           <div className="h-[300px] w-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -129,7 +151,7 @@ export default function RcntLibVisit() {
                   labelLine={false}
                   outerRadius={80}
                   fill="#8884d8"
-                  dataKey="value"
+                  dataKey="borrows"
                 >
                   {collegeData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -140,6 +162,7 @@ export default function RcntLibVisit() {
               </PieChart>
             </ResponsiveContainer>
           </div>
+          {/* Department Data Chart */}
           <div className="h-[300px] w-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -150,7 +173,7 @@ export default function RcntLibVisit() {
                   labelLine={false}
                   outerRadius={80}
                   fill="#8884d8"
-                  dataKey="value"
+                  dataKey="borrows"
                 >
                   {departmentData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -164,6 +187,7 @@ export default function RcntLibVisit() {
         </div>
       </div>
 
+      {/* By College Section */}
       <div className="bg-white border border-grey p-6 rounded-lg mb-6">
         <h2 className="text-xl font-semibold mb-4 text-left">By College</h2>
         <div className="border border-grey rounded-lg px-5 py-5 flex gap-10 items-center justify-center">
@@ -225,6 +249,7 @@ export default function RcntLibVisit() {
         </div>
       </div>
 
+      {/* By Department Section */}
       <div className="bg-white border border-grey p-6 rounded-lg mb-6">
         <h2 className="text-xl font-semibold mb-4 text-left">By Department</h2>
         <div className="border border-grey rounded-lg px-5 py-5 flex gap-10 items-center justify-center">
@@ -286,6 +311,5 @@ export default function RcntLibVisit() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
