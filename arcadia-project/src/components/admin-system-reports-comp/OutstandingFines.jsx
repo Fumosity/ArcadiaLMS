@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from "/src/supabaseClient.js";
+import { useNavigate } from "react-router-dom";
 
 function OutstandingFines() {
     const [bkhistoryData, setBkhistoryData] = useState([]);
     const [damageFinesData, setDamageFinesData] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,13 +42,13 @@ function OutstandingFines() {
                                 school_id: item.user_accounts.userLPUID,
                                 books_borrowed: 0,
                                 total_fine: 0,
-                                incurred_per_day: 0, 
+                                incurred_per_day: 0,
                             };
                         }
 
                         acc[userId].books_borrowed += 1;
                         acc[userId].total_fine += totalFineForBook;
-                        acc[userId].incurred_per_day += penaltyPerDay; 
+                        acc[userId].incurred_per_day += penaltyPerDay;
 
                         return acc;
                     }, {});
@@ -140,6 +142,18 @@ function OutstandingFines() {
     const damagedStartIndex = (damagedPage - 1) * damagedEntriesPerPage;
     const damagedDisplayedData = damagedSortedData.slice(damagedStartIndex, damagedStartIndex + damagedEntriesPerPage);
 
+    const handleUserClick = (record) => {
+        navigate("/admin/useraccounts/viewusers", {
+            state: { userId: record.user_id },
+        });
+    };
+
+    const handleTitleClick = (record) => {
+        navigate("/admin/bookview/viewtitle", {
+            state: { title: record.title_id },
+        });
+    };
+
     return (
         <div className="aMain-cont">
             <h2 className="text-xl font-semibold mb-4">Accounts With Outstanding Fines</h2>
@@ -153,7 +167,7 @@ function OutstandingFines() {
                 <div className="flex items-center space-x-2">
                     <span className="font-medium text-sm">Sort By:</span>
                     <button
-                        className="px-3 py-1 bg-gray-200 rounded"
+                        className="px-3 py-1 bg-gray-200 border border-gray-300 rounded-md text-sm"
                         onClick={() =>
                             setOutstandingSortOrder(outstandingSortOrder === 'Descending' ? 'Ascending' : 'Descending')
                         }
@@ -162,7 +176,7 @@ function OutstandingFines() {
                     </button>
                     <span className="font-medium text-sm">Filter:</span>
                     <select
-                        className="px-3 py-1 bg-gray-200 rounded"
+                        className="text-sm px-3 py-1 bg-gray-200 border border-gray-300 rounded-md "
                         value={outstandingSortBy}
                         onChange={(e) => setOutstandingSortBy(e.target.value)}
                     >
@@ -196,7 +210,14 @@ function OutstandingFines() {
                                 <td className="px-4 py-2 text-center">₱{record.total_fine.toFixed(2)}</td>
                                 <td className="px-4 py-2 text-center">₱{record.incurred_per_day.toFixed(2)}/day</td>
                                 <td className="px-4 py-2 text-center">{record.books_borrowed}</td>
-                                <td className="px-4 py-2 text-center">{record.user_name}</td>
+                                <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
+                                    <button
+                                        onClick={() => handleUserClick(record)}
+                                        className="text-blue-500 hover:underline"
+                                    >
+                                        {record.user_name}
+                                    </button>
+                                </td>
                                 <td className="px-4 py-2 text-center">{record.user_id}</td>
                                 <td className="px-4 py-2 text-center">{record.school_id}</td>
                             </tr>
@@ -238,7 +259,7 @@ function OutstandingFines() {
                 <div className="flex items-center space-x-2">
                     <span className="font-medium text-sm">Sort By:</span>
                     <button
-                        className="px-3 py-1 bg-gray-200 rounded"
+                        className="px-3 py-1 bg-gray-200 border border-gray-300 rounded-md text-sm"
                         onClick={() =>
                             setDamagedSortOrder(damagedSortOrder === 'Descending' ? 'Ascending' : 'Descending')
                         }
@@ -247,7 +268,7 @@ function OutstandingFines() {
                     </button>
                     <span className="font-medium text-sm">Filter:</span>
                     <select
-                        className="px-3 py-1 bg-gray-200 rounded"
+                        className="text-sm px-3 py-1 bg-gray-200 border border-gray-300 rounded-md "
                         value={damagedSortBy}
                         onChange={(e) => setDamagedSortBy(e.target.value)}
                     >
@@ -274,8 +295,22 @@ function OutstandingFines() {
                             <tr key={index} className="whitespace-nowrap">
                                 <td className="px-4 py-2 text-center">₱{record.fine.toFixed(2)}</td>
                                 <td className="px-4 py-2 text-center">{record.book_id}</td>
-                                <td className="px-4 py-2 text-center">{record.book_title}</td>
-                                <td className="px-4 py-2 text-center">{record.user_name}</td>
+                                <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
+                                    <button
+                                        onClick={() => handleUserClick(record)}
+                                        className="text-blue-500 hover:underline"
+                                    >
+                                        {record.book_title}
+                                    </button>
+                                </td>
+                                <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
+                                    <button
+                                        onClick={() => handleUserClick(record)}
+                                        className="text-blue-500 hover:underline"
+                                    >
+                                        {record.user_name}
+                                    </button>
+                                </td>
                                 <td className="px-4 py-2 text-center">{record.user_id}</td>
                                 <td className="px-4 py-2 text-center">{record.school_id}</td>
                             </tr>

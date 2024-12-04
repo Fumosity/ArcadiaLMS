@@ -21,7 +21,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 // First, fetch the book titles
                 const { data: bookTitles, error: titleError } = await supabase
                     .from("book_titles")
-                    .select("titleID, title, quantity, author, genre, category, synopsis, keyword, publisher, currentPubDate, originalPubDate, procDate, cover");
+                    .select("titleID, title, author, genre, category, synopsis, keyword, publisher, currentPubDate, originalPubDate, procurementDate, cover");
 
                 if (titleError) {
                     console.error("Error fetching book titles:", titleError.message);
@@ -39,7 +39,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 // Now, fetch the corresponding book details using the titleID
                 const bookIDs = bookTitles.map((book) => book.titleID);
                 const { data: books, error: bookError } = await supabase
-                    .from("book")
+                    .from("book_indiv")
                     .select("bookID, titleID")
                     .in("titleID", bookIDs);  // Fetch books matching the titleIDs
 
