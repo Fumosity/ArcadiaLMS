@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from "/src/supabaseClient.js";
 
 const finesData = [
     {
@@ -47,6 +48,36 @@ function OutstandingFines() {
     const [sortOrder, setSortOrder] = useState('Descending');
     const [sortBy, setSortBy] = useState('totalFine'); // Default sort by 'totalFine'
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('book_transactions')
+                    .select('transactionID, userID, bookID, deadline');
+    
+                if (error) {
+                    console.error("Error fetching data: ", error.message);
+                } else {
+                    const formattedData = data.map(item => {
+                    
+                        return {
+                            transaction_id: item.transactionID,
+                            user_id: item.userID,
+                            book_id: item.bookID,
+                            deadline: item.deadline,
+                        };
+                    });
+    
+                    setBkhistoryData(formattedData);
+                }
+            } catch (error) {
+                console.error("Error: ", error);
+            }
+        };
+    
+        fetchData();
+    }, []);
+    
     // Handle sorting logic
     const sortedData = [...finesData].sort((a, b) => {
         if (sortOrder === 'Descending') {

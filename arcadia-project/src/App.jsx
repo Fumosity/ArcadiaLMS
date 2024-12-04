@@ -129,8 +129,9 @@ function App() {
               <Route path="useraccounts/viewusers" element={<AUAccView />} />
               <Route path="useraccounts/viewadmins" element={<AAccountView />} />
               <Route path="accountview" element={<AAccountSettings />} />
-              <Route path="reservations-view" element={<AReservView />} />
-              
+              <Route path="reservationsview" element={<AReservView />} />
+              <Route path="schedule" element={<ASchedule />} />
+              <Route path="systemreports" element={<ASystemReports />} />
 
 
             </Routes>
