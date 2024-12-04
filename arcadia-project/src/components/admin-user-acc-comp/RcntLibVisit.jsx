@@ -1,21 +1,8 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
-
-const collegeData = [
-  { name: "CTHM", value: 25 },
-  { name: "COECSA", value: 20 },
-  { name: "CBA", value: 15 },
-  { name: "CEAS", value: 20 },
-  { name: "CLAE", value: 20 },
-]
-
-const departmentData = [
-  { name: "DOE", value: 23.59 },
-  { name: "DOM", value: 16.53 },
-  { name: "DOL", value: 13.18 },
-  { name: "DCS", value: 25.52 },
-  { name: "DOA", value: 12.47 },
-  { name: "Others", value: 8.71 },
-]
+import { supabase } from "../../supabaseClient";
 
 const COLORS = [
   "hsl(215, 90%, 50%)",
@@ -27,6 +14,84 @@ const COLORS = [
 ]
 
 export default function RcntLibVisit() {
+  const [collegeData, setCollegeData] = useState([])
+  const [departmentData, setDepartmentData] = useState([])
+
+  useEffect(() => {
+    async function fetchData() {
+      const { data, error } = await supabase
+        .from('book_transactions')
+        .select('*')
+        .order('checkout_date', { ascending: false })
+        .limit(1000)
+
+      if (error) {
+        console.error('Error fetching data:', error)
+        return
+      }
+
+      const transactions = data
+      const processedData = processTransactions(transactions)
+      setCollegeData(processedData.collegeData)
+      setDepartmentData(processedData.departmentData)
+    }
+
+    fetchData()
+  }, [])
+
+  function processTransactions(transactions) {
+    const now = new Date()
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+
+    const collegeMap = new Map()
+    const departmentMap = new Map()
+
+    transactions.forEach(transaction => {
+      const college = transaction.userID.substring(0, 4) // Assuming college code is first 4 characters of userID
+      const department = transaction.userID.substring(0, 3) // Assuming department code is first 3 characters of userID
+      const transactionDate = new Date(transaction.checkout_date)
+
+      // Process college data
+      if (!collegeMap.has(college)) {
+        collegeMap.set(college, { name: college, value: 0, thisWeekBorrows: 0, thisWeekReturns: 0, lastWeekBorrows: 0, lastWeekReturns: 0 })
+      }
+      const collegeData = collegeMap.get(college)
+      collegeData.value++
+
+      // Process department data
+      if (!departmentMap.has(department)) {
+        departmentMap.set(department, { name: department, value: 0, thisWeekBorrows: 0, thisWeekReturns: 0, lastWeekBorrows: 0, lastWeekReturns: 0 })
+      }
+      const departmentData = departmentMap.get(department)
+      departmentData.value++
+
+      // Process weekly data
+      if (transactionDate >= oneWeekAgo) {
+        if (transaction.transaction_type === 'borrow') {
+          collegeData.thisWeekBorrows++
+          departmentData.thisWeekBorrows++
+        } else if (transaction.transaction_type === 'return') {
+          collegeData.thisWeekReturns++
+          departmentData.thisWeekReturns++
+        }
+      } else if (transactionDate >= twoWeeksAgo) {
+        if (transaction.transaction_type === 'borrow') {
+          collegeData.lastWeekBorrows++
+          departmentData.lastWeekBorrows++
+        } else if (transaction.transaction_type === 'return') {
+          collegeData.lastWeekReturns++
+          departmentData.lastWeekReturns++
+        }
+      }
+    })
+
+    return {
+      collegeData: Array.from(collegeMap.values()),
+      departmentData: Array.from(departmentMap.values())
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="bg-white border border-grey p-6 rounded-lg mb-6">
@@ -110,8 +175,8 @@ export default function RcntLibVisit() {
                 <tbody>
                   {collegeData.map((college) => (
                     <tr key={college.name}>
-                      <td className="text-center px-6">323</td>
-                      <td className="text-center px-6">12,532</td>
+                      <td className="text-center px-6">{college.thisWeekBorrows}</td>
+                      <td className="text-center px-6">{college.thisWeekReturns}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -129,8 +194,8 @@ export default function RcntLibVisit() {
                 <tbody>
                   {collegeData.map((college) => (
                     <tr key={college.name}>
-                      <td className="text-center px-6">323</td>
-                      <td className="text-center px-6">12,532</td>
+                      <td className="text-center px-6">{college.lastWeekBorrows}</td>
+                      <td className="text-center px-6">{college.lastWeekReturns}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -138,7 +203,6 @@ export default function RcntLibVisit() {
             </div>
           </div>
         </div>
-
 
         <div className="bg-white border border-grey p-6 rounded-lg mb-6">
           <h2 className="text-xl font-semibold mb-4 text-left">By Department</h2>
@@ -172,8 +236,8 @@ export default function RcntLibVisit() {
                 <tbody>
                   {departmentData.map((dept) => (
                     <tr key={dept.name}>
-                      <td className="text-center px-6">323</td>
-                      <td className="text-center px-6">12,532</td>
+                      <td className="text-center px-6">{dept.thisWeekBorrows}</td>
+                      <td className="text-center px-6">{dept.thisWeekReturns}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -191,8 +255,8 @@ export default function RcntLibVisit() {
                 <tbody>
                   {departmentData.map((dept) => (
                     <tr key={dept.name}>
-                      <td className="text-center px-6">323</td>
-                      <td className="text-center px-6">12,532</td>
+                      <td className="text-center px-6">{dept.lastWeekBorrows}</td>
+                      <td className="text-center px-6">{dept.lastWeekReturns}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -200,11 +264,8 @@ export default function RcntLibVisit() {
             </div>
           </div>
         </div>
-
-        
       </div>
-
-
     </div>
   )
 }
+
