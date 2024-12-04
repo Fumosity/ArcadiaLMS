@@ -18,7 +18,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         const fetchBooks = async () => {
             setIsLoading(true);
             try {
-                // First, fetch the book titles
+                // Fetch from `book_titles` table
                 const { data: bookTitles, error: titleError } = await supabase
                     .from("book_titles")
                     .select("titleID, title, author, genre, category, synopsis, keyword, publisher, currentPubDate, originalPubDate, procurementDate, cover");
@@ -28,11 +28,10 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                     return;
                 }
 
-                console.log("Fetched book titles:", bookTitles);
-
-                // If no titles are found, exit early
+                // Exit early if no titles are found
                 if (!bookTitles || bookTitles.length === 0) {
                     console.log("No book titles found.");
+                    setInventoryData([]);
                     return;
                 }
 
@@ -43,25 +42,22 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                     .select("bookID, titleID")
                     .in("titleID", bookIDs);  // Fetch books matching the titleIDs
 
-                if (bookError) {
-                    console.error("Error fetching books:", bookError.message);
+                if (indivError) {
+                    console.error("Error fetching book_indiv:", indivError.message);
                     return;
                 }
 
-                console.log("Fetched book details (bookID):", books);
-
-                // Combine book titles and book details using titleID
-                const combinedData = bookTitles.map((book) => {
-                    const matchedBook = books.find((b) => b.titleID === book.titleID);
+                // Combine `book_titles` and `book_indiv` using `titleID`
+                const combinedData = bookTitles.map((title) => {
+                    const books = bookIndiv.filter((b) => b.titleID === title.titleID);
                     return {
-                        ...book,
-                        bookID: matchedBook ? matchedBook.bookID : null, // Add bookID if found
+                        ...title,
+                        copies: books, // Attach all copies related to the title
                     };
                 });
 
-                console.log("Combined data:", combinedData); // Inspect the combined data
+                console.log("Combined data:", combinedData); // Debugging
                 setInventoryData(combinedData);
-
             } catch (error) {
                 console.error("An unexpected error occurred:", error);
             } finally {
@@ -71,7 +67,6 @@ const CurrentBookInventory = ({ onBookSelect }) => {
 
         fetchBooks();
     }, []);
-
 
     const handleRowClick = (book) => {
         setSelectedBook(book);
@@ -228,21 +223,26 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                 {item.title}
                                             </Link>
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
-                                            {item.author}
+                                        <td className="px-4 py-4 text-sm truncate max-w-xs">
+                                            {item.author?.map((author, i) => (
+                                                <span key={i} className="inline-block mr-1">{author}</span>
+                                            ))}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                            {item.titleID || 'N/A'} {/* Fallback to N/A if bookID is missing */}
+                                            {item.titleID}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
                                             {item.originalPubDate}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
                                             <button
-                                                className="border rounded-full px-4 py-1"
-                                                onClick={() => handleViewClick(item)}
+                                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Prevent row click
+                                                    handleViewClick(item);
+                                                }}
                                             >
-                                                View
+                                                View Copies
                                             </button>
                                         </td>
                                     </tr>
@@ -252,12 +252,11 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                     </tbody>
                 </table>
             </div>
-
-            {isModalOpen && (
+            {isModalOpen && selectedBook && (
                 <BookCopies
-                    bookID={selectedBook.bookID}
-                    bookTitle={selectedBook.title}
-                    closeModal={closeModal}
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    bookCopies={selectedBook.copies}
                 />
             )}
         </div>
@@ -265,3 +264,4 @@ const CurrentBookInventory = ({ onBookSelect }) => {
 };
 
 export default CurrentBookInventory;
+

@@ -1,7 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import UNavbar from "../components/UserComponents/user-main-comp/UNavbar";
 
 const ErrorPage = () => {
+    const navigate = useNavigate(); // Initialize the navigate function
+
+    const handleReturnHome = () => {
+        navigate("/"); // Navigate to the home page
+    };
+
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />
@@ -16,7 +23,7 @@ const ErrorPage = () => {
                     </p>
 
                     <div>
-                        <button className="whiteButtons">
+                        <button className="whiteButtons" onClick={handleReturnHome}>
                             Return to Home
                         </button>
                     </div>

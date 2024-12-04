@@ -5,6 +5,7 @@ const CheckingContainer = () => {
   const [checkMode, setCheckMode] = useState('Check Out');
   const [isSubmitting, setIsSubmitting] = useState(false); // State for loading indicator
   const [emptyFields, setEmptyFields] = useState({}); // Track empty fields
+  const [isDamaged, setIsDamaged] = useState(false); // Track if the book is marked as damaged
 
   // Function to get the PC's current local time
   const getLocalTime = () => {
@@ -91,13 +92,16 @@ const CheckingContainer = () => {
     }
   }, [formData.userID]);
 
+  const [bookCover, setBookCover] = useState(''); // State for the book cover image URL
+
   useEffect(() => {
     if (formData.bookID) {
       const fetchBookData = async () => {
         try {
+          // Fetch title and cover from the book_titles table using titleID from book_indiv
           const { data, error } = await supabase
-            .from('book')
-            .select('title')
+            .from('book_indiv')
+            .select('book_titles(title, cover)') // Include the cover field
             .eq('bookID', formData.bookID)
             .single();
 
@@ -106,11 +110,13 @@ const CheckingContainer = () => {
               ...prev,
               bookTitle: '',
             }));
+            setBookCover(''); // Clear cover if no book data found
           } else {
             setFormData((prev) => ({
               ...prev,
-              bookTitle: data.title,
+              bookTitle: data.book_titles.title, // Set the title value
             }));
+            setBookCover(data.book_titles.cover); // Set the cover URL
           }
         } catch (error) {
           console.error('Error fetching book data:', error);
@@ -123,6 +129,7 @@ const CheckingContainer = () => {
         ...prev,
         bookTitle: '',
       }));
+      setBookCover(''); // Clear cover if no bookID is provided
     }
   }, [formData.bookID]);
 
@@ -166,64 +173,50 @@ const CheckingContainer = () => {
     setEmptyFields({}); // Reset empty fields before submission
 
     try {
-      const { userID, schoolNo, name, college, department, bookID, bookTitle, date, time, deadline } = formData;
+      const { userID, bookID, schoolNo, name, college, department, bookTitle, date, time, deadline } = formData;
       const currentTime = getLocalTime();
 
       const transactionType = checkMode === 'Check Out' ? 'Borrowed' : 'Returned';
 
-      // Check if there's an existing transaction with the same userID, bookID, and bookTitle
-      const { data: existingTransaction, error: fetchError } = await supabase
-        .from('book_transactions')
-        .select('transaction_type')
-        .eq('book_id', bookID)
-        .eq('user_id', userID)
-        .eq('book_title', bookTitle)
-        .order('checkout_date', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching existing transaction:', fetchError);
-      }
-
-      // If a matching transaction exists and is 'Borrowed', update it to 'Returned' and remove the deadline
-      if (existingTransaction && existingTransaction.transaction_type === 'Borrowed' && checkMode === 'Check In') {
-        const { error: updateError } = await supabase
+      // If the mode is 'Check Out', perform the checkout logic
+      if (checkMode === 'Check Out') {
+        const { data: existingTransaction, error: fetchError } = await supabase
           .from('book_transactions')
-          .update({
-            transaction_type: 'Returned',
-            checkin_date: date,
-            checkin_time: time,
-            deadline: null, // Remove the deadline when returning the book
-          })
-          .eq('book_id', bookID)
-          .eq('user_id', userID)
-          .eq('book_title', bookTitle)
-          .eq('transaction_type', 'Borrowed');
+          .select('transaction_type')
+          .eq('bookID', bookID)
+          .eq('transaction_type', 'Borrowed') // Check if the book is already borrowed
+          .order('checkout_date', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (fetchError) {
+          console.error('Error fetching existing transaction:', fetchError);
+        }
+
+        // Prevent checkout if a "Borrowed" transaction exists
+        if (existingTransaction) {
+          alert('This book is already borrowed. You cannot check it out again.');
+          return; // Exit the function if the book is already borrowed
+        }
+
+        // Update the status to 'Unavailable' when checking out
+        const { error: updateError } = await supabase
+          .from('book_indiv')
+          .update({ status: 'Unavailable' })
+          .eq('bookID', bookID);
 
         if (updateError) {
-          console.error('Error updating transaction:', updateError);
-          alert('Error updating the transaction. Please try again.');
-          return;
-        } else {
-          alert('Transaction updated to "Returned" successfully!');
+          console.error('Error updating book status to Unavailable:', updateError);
+          return; // Exit if there's an error updating the status
         }
-      } else {
-        // Insert a new transaction for Check Out or Check In
+
+        // Insert a new transaction for Check Out
         const transactionData = {
-          user_id: userID,
-          school_id: schoolNo,
-          name: name,
-          college: college,
-          department: department,
-          book_id: bookID,
-          book_title: bookTitle,
-          checkout_date: checkMode === 'Check Out' ? date : null,
-          checkout_time: checkMode === 'Check Out' ? time : null,
-          checkin_date: checkMode === 'Check In' ? date : null,
-          checkin_time: checkMode === 'Check In' ? time : null,
-          ...(checkMode === 'Check Out' && { deadline }),
-          book_cover: '/path-to-book-cover.jpg',
+          userID: userID,
+          bookID: bookID,
+          checkout_date: date,
+          checkout_time: time,
+          deadline: deadline,
           transaction_type: transactionType,
         };
 
@@ -237,6 +230,60 @@ const CheckingContainer = () => {
           alert('Transaction completed successfully!');
         }
       }
+
+      // If the mode is 'Check In', perform the check-in logic
+      if (checkMode === 'Check In') {
+        const { data: existingTransaction, error: fetchError } = await supabase
+          .from('book_transactions')
+          .select('*')
+          .eq('bookID', bookID)
+          .eq('userID', userID)
+          .eq('transaction_type', 'Borrowed') // Only allow check-in if the book is borrowed
+          .order('checkout_date', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (fetchError) {
+          console.error('Error fetching existing transaction:', fetchError);
+        }
+
+        // Prevent check-in if the book is not currently borrowed
+        if (!existingTransaction) {
+          alert('This book is not marked as borrowed or has already been checked in.');
+          return; // Exit the function if the book is not currently borrowed
+        }
+
+        // Update the transaction with check-in details (checkin_date and checkin_time)
+        const { error: updateTransactionError } = await supabase
+          .from('book_transactions')
+          .update({
+            checkin_date: date,
+            checkin_time: time,
+            transaction_type: 'Returned', // Change transaction type to 'Returned'
+          })
+          .eq('transactionID', existingTransaction.transactionID); // Use the existing transactionID
+
+        if (updateTransactionError) {
+          console.error('Error updating transaction:', updateTransactionError);
+          return; // Exit if there's an error updating the transaction
+        }
+
+        // If the book is marked as damaged, update the status to 'Damaged'
+        const updatedStatus = isDamaged ? 'Damaged' : 'Available';
+
+        // Update the book status to 'Available' or 'Damaged' when checking in
+        const { error: checkinUpdateError } = await supabase
+          .from('book_indiv')
+          .update({ status: updatedStatus })
+          .eq('bookID', bookID);
+
+        if (checkinUpdateError) {
+          console.error('Error updating book status:', checkinUpdateError);
+          return; // Exit if there's an error updating the status
+        }
+
+        alert('Book checked in successfully and transaction updated!');
+      }
     } catch (error) {
       console.error('Error processing transaction:', error);
       alert('An error occurred. Please try again.');
@@ -244,8 +291,6 @@ const CheckingContainer = () => {
       setIsSubmitting(false); // Set submitting state back to false when done
     }
   };
-
-
 
   return (
     <div className="max-w-6xl mx-auto p-4 bg-white shadow-lg rounded-lg">
@@ -314,12 +359,38 @@ const CheckingContainer = () => {
           );
         })}
       </div>
+      <div className="flex items-center mb-5">
+        {checkMode === 'Check In' && (
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={isDamaged}
+              onChange={() => setIsDamaged(!isDamaged)}
+              className="mr-2"
+            />
+            Mark as Damaged
+          </label>
+        )}
+      </div>
+      {/* Book Cover Image Section */}
+      <div className="flex flex-col items-center mb-5">
+        <label className="text-sm font-medium mb-2">Book Cover:</label>
+        {formData.bookID && formData.bookTitle && (
+          <div className="w-full flex justify-center">
+            <img
+              src={bookCover}
+              alt="Book Cover"
+              className="w-35 h-52 object-cover rounded-lg"
+            />
+          </div>
+        )}
+      </div>
 
       <div className="flex justify-center mb-4">
         <button
           onClick={handleSubmit}
           className="border px-4 py-2 rounded-full"
-          disabled={isSubmitting} // Disable button while submitting
+          disabled={isSubmitting}
         >
           {isSubmitting ? 'Submitting...' : 'Submit'}
         </button>

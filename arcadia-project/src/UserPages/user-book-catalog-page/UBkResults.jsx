@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import Trie from "../../backend/trie";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const UBkResults = ({ query }) => {
     const [books, setBooks] = useState([]);
@@ -8,38 +9,42 @@ const UBkResults = ({ query }) => {
     const [trie, setTrie] = useState(new Trie());
     const [currentPage, setCurrentPage] = useState(1);
     const entriesPerPage = 4;
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         const fetchBooks = async () => {
             const { data, error } = await supabase.from("book_titles").select("*");
-
+    
             if (error) {
                 console.error("Error fetching books:", error);
             } else {
-                setBooks(data);
-
+                // Map the books to include the cover URL directly from the cover column
+                const booksWithImages = data.map((book) => {
+                    return { ...book, image_url: book.cover || null }; // Use cover column directly
+                });
+    
+                setBooks(booksWithImages);
+    
+                // Insert books and authors into the Trie
                 const newTrie = new Trie();
-                data.forEach((book) => {
-                    // Insert the title into the Trie
+                booksWithImages.forEach((book) => {
                     newTrie.insert(book.title.toLowerCase());
-
+    
                     // Extract and insert authors if present in jsonb[] format
                     if (book.author && Array.isArray(book.author)) {
                         const authorNames = book.author
-                            .map((author) => author.name ? author.name.toLowerCase() : "")
+                            .map((author) => (author.name ? author.name.toLowerCase() : ""))
                             .filter((name) => name !== ""); // Filter out empty names
                         const authorString = authorNames.join(", ");
-                        // Insert the combined author names into the Trie
                         newTrie.insert(authorString.toLowerCase());
                     }
                 });
                 setTrie(newTrie);
             }
         };
-
+    
         fetchBooks();
     }, []);
-
 
     useEffect(() => {
         if (query) {
@@ -48,7 +53,6 @@ const UBkResults = ({ query }) => {
             const results = books.filter((book) => {
                 const titleMatch = book.title.toLowerCase().includes(searchQuery);
 
-                // Process the author field (assuming it's an array of strings)
                 const authorString = book.author && Array.isArray(book.author)
                     ? book.author.join(", ").toLowerCase()
                     : "";
@@ -62,9 +66,6 @@ const UBkResults = ({ query }) => {
             setFilteredBooks([]);
         }
     }, [query, books]);
-
-
-
 
     const totalPages = Math.ceil(filteredBooks.length / entriesPerPage);
     const displayedBooks = filteredBooks.slice(
@@ -88,7 +89,7 @@ const UBkResults = ({ query }) => {
                 <div key={index} className="genCard-cont flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg mb-6">
                     <div className="flex-shrink-0 w-[200px]">
                         <img
-                            src={book.image_url || "https://via.placeholder.com/150x300"}
+                            src={book.img || "https://via.placeholder.com/150x300"}
                             alt={book.title}
                             className="w-full h-[300px] bg-grey object-cover border border-grey rounded-md"
                         />
@@ -100,23 +101,26 @@ const UBkResults = ({ query }) => {
                             <p><span>Author(s):</span> <b>{book.author && book.author.join(", ")}</b></p>
                             <div className="flex space-x-6 mt-3">
                                 <p><span>Category:</span> <b>{book.category}</b></p>
-                                <p><span>Published:</span> <b>{book.published}</b></p>
+                                <p><span>Published:</span> <b>{new Date(book.originalPubDate).getFullYear()}</b></p>
                             </div>
                         </div>
 
                         <p className="text-sm text-gray-600 mt-3">
-                            {book.description || "No description available"}
+                            {book.synopsis || "No synopsis available"}
                         </p>
-
-                        <div className="flex align-baseline items-center justify-end gap-4 mt-2">
-                            <button className="viewRsrch-btn">
+                        <div className="flex align-baseline items-center justify-end gap-2 mt-2">
+                            <span className="text-sm text-green-700 font-semibold ml-2 text-green">✓</span>
+                            <span className="text-sm text-green-700 font-semibold">Is Available</span>
+                            <button
+                                className="viewRsrch-btn"
+                                onClick={() => navigate(`/user/bookview?titleID=${book.titleID}`)} // Navigate with title_id
+                            >
                                 View Book
                             </button>
                         </div>
                     </div>
                 </div>
             ))}
-
 
             {filteredBooks.length > 0 && (
                 <div className="flex justify-center items-center mt-6 space-x-4">

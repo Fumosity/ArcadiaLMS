@@ -51,18 +51,20 @@ export default function RcntLibVisit() {
 
   function processTransactions(transactions) {
     const now = new Date();
-    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const oneWeekAgo = new Date(now.setDate(now.getDate() - 7));
+    const twoWeeksAgo = new Date(now.setDate(now.getDate() - 14));
   
     const collegeMap = new Map();
     const departmentMap = new Map();
   
     transactions.forEach((transaction) => {
-      const { userCollege, userDepartment } = transaction.user_accounts;
+      const { userCollege, userDepartment } = transaction.user_accounts || {};
+      if (!userCollege) return;
+  
       const transactionDate = new Date(transaction.checkout_date);
       const isReturned = transaction.checkin_date != null;
   
-      // --- College Aggregation ---
+      // College Aggregation
       if (!collegeMap.has(userCollege)) {
         collegeMap.set(userCollege, {
           name: userCollege,
@@ -74,23 +76,20 @@ export default function RcntLibVisit() {
           lastWeekReturns: 0,
         });
       }
-  
       const collegeData = collegeMap.get(userCollege);
+      collegeData.borrows += 1;
+      if (isReturned) collegeData.returns += 1;
   
-      // Increment overall college borrows/returns
-      collegeData.borrows++;
-      if (isReturned) collegeData.returns++;
-  
-      // Increment college-specific time period counts
+      // Time-based Aggregation
       if (transactionDate >= oneWeekAgo) {
-        collegeData.thisWeekBorrows++;
-        if (isReturned) collegeData.thisWeekReturns++;
+        collegeData.thisWeekBorrows += 1;
+        if (isReturned) collegeData.thisWeekReturns += 1;
       } else if (transactionDate >= twoWeeksAgo) {
-        collegeData.lastWeekBorrows++;
-        if (isReturned) collegeData.lastWeekReturns++;
+        collegeData.lastWeekBorrows += 1;
+        if (isReturned) collegeData.lastWeekReturns += 1;
       }
   
-      // --- Department Aggregation ---
+      // Department Aggregation
       if (userDepartment) {
         if (!departmentMap.has(userDepartment)) {
           departmentMap.set(userDepartment, {
@@ -101,27 +100,20 @@ export default function RcntLibVisit() {
             thisWeekReturns: 0,
             lastWeekBorrows: 0,
             lastWeekReturns: 0,
-            college: userCollege, // Associate department with its parent college
+            college: userCollege,
           });
         }
-  
         const departmentData = departmentMap.get(userDepartment);
+        departmentData.borrows += 1;
+        if (isReturned) departmentData.returns += 1;
   
-        // Increment department borrows/returns
-        departmentData.borrows++;
-        if (isReturned) departmentData.returns++;
-  
-        // Increment department-specific time period counts
         if (transactionDate >= oneWeekAgo) {
-          departmentData.thisWeekBorrows++;
-          if (isReturned) departmentData.thisWeekReturns++;
+          departmentData.thisWeekBorrows += 1;
+          if (isReturned) departmentData.thisWeekReturns += 1;
         } else if (transactionDate >= twoWeeksAgo) {
-          departmentData.lastWeekBorrows++;
-          if (isReturned) departmentData.lastWeekReturns++;
+          departmentData.lastWeekBorrows += 1;
+          if (isReturned) departmentData.lastWeekReturns += 1;
         }
-  
-        // Ensure department data also updates parent college
-        collegeData.borrows++; // Ensure total college borrows reflect department borrows
       }
     });
   
@@ -131,8 +123,6 @@ export default function RcntLibVisit() {
     };
   }
   
-  
-
   return (
     <div className="space-y-6">
 

@@ -27,7 +27,6 @@ const UBkCatalog = () => {
                         <FilterSidebar />
                     </div>
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
-                        {/* Only render UBkResults if query has a value */}
                         {query.trim() && <UBkResults query={query} />}
                         <Recommended />
                         <MostPopular />
