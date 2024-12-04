@@ -69,20 +69,11 @@ const ListOfUserAcc = () => {
     const displayedUsers = filteredData.slice(startIndex, startIndex + entriesPerPage);
 
     const handleUserClick = (user) => {
-        const nameParts = user.name.split(' ');
-        const userLName = nameParts.pop(); // Last part is last name
-        const userFName = nameParts.join(' '); // Join remaining parts as first name
-
         navigate("/admin/useraccounts/viewusers", {
-            state: {
-                user: {
-                    ...user,
-                    userFName,
-                    userLName,
-                }
-            }
+            state: { userId: user.userId },
         });
     };
+    
 
     if (loading) {
         return <p>Loading data...</p>;
@@ -139,7 +130,7 @@ const ListOfUserAcc = () => {
                 </div>
 
                 {/* Table */}
-                <table className="w-full table-auto">
+                <table className="w-full table-auto divide-y-2">
                     <thead>
                         <tr>
                             <th className="text-left py-2">Type</th>
@@ -153,14 +144,21 @@ const ListOfUserAcc = () => {
                     </thead>
                     <tbody>
                         {displayedUsers.map((user, index) => (
-                            <tr key={index} className="hover:bg-gray-100 cursor-pointer" onClick={() => handleUserClick(user)}>
+                            <tr key={index} className="hover:bg-gray-100">
                                 <td className="py-2">
                                     <span className="px-2 py-1 bg-gray-200 rounded-full text-xs">
                                         {user.type}
                                     </span>
                                 </td>
                                 <td className="py-2">{user.email}</td>
-                                <td className="py-2">{user.name}</td>
+                                <td className="py-2">
+                                    <button
+                                        onClick={() => handleUserClick(user)}
+                                        className="text-blue-500 hover:underline"
+                                    >
+                                        {user.name}
+                                    </button>
+                                </td>
                                 <td className="py-2">{user.userId}</td>
                                 <td className="py-2">{user.schoolId}</td>
                                 <td className="py-2">{user.college}</td>

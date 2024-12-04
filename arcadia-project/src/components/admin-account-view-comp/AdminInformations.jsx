@@ -14,12 +14,28 @@ const AdminInformations = () => {
   const [isSuperadminModalOpen, setIsSuperadminModalOpen] = useState(false);
 
   useEffect(() => {
-    if (location.state?.user) {
-      setUser(location.state.user); // Use the user passed from ListOfAdminAcc
-    } else {
-      // Fetch user if not passed through navigation
-      const fetchUserData = async () => {
-        const userId = location.pathname.split("/").pop(); // Assumes user ID is in the URL
+    const fetchUserData = async () => {
+      let userData;
+      if (location.state?.user) {
+        if (location.state.user.userID) {
+          // Data is already complete, use it directly
+          userData = location.state.user;
+        } else {
+          // Fetch data based on userId
+          const { data, error } = await supabase
+            .from("user_accounts")
+            .select("*")
+            .eq("userID", location.state.user.userId)
+            .single();
+
+          if (error) {
+            console.error("Error fetching user data:", error);
+            return;
+          }
+          userData = data;
+        }
+      } else {
+        const userId = location.pathname.split("/").pop();
         const { data, error } = await supabase
           .from("user_accounts")
           .select("*")
@@ -28,13 +44,15 @@ const AdminInformations = () => {
 
         if (error) {
           console.error("Error fetching user data:", error);
-        } else {
-          setUser(data);
+          return;
         }
-      };
+        userData = data;
+      }
 
-      fetchUserData();
-    }
+      setUser(userData);
+    };
+
+    fetchUserData();
   }, [location.state?.user, location.pathname]);
 
   if (!user) {
@@ -44,10 +62,10 @@ const AdminInformations = () => {
   const handleModify = () => setIsModalOpen(true);
 
   const handleDeleteAttempt = () => {
-    if (user.type === "Superadmin") {
-      setIsSuperadminModalOpen(true); // Open Superadmin modal
+    if (user.userAccountType === "Superadmin") {
+      setIsSuperadminModalOpen(true);
     } else {
-      setIsDeleteModalOpen(true); // Open Delete Admin modal
+      setIsDeleteModalOpen(true);
     }
   };
 
@@ -56,7 +74,7 @@ const AdminInformations = () => {
       const { data, error } = await supabase
         .from("user_accounts")
         .delete()
-        .eq("userID", user.userId);
+        .eq("userID", user.userID);
 
       if (error) {
         console.error("Error deleting user:", error);
@@ -81,10 +99,10 @@ const AdminInformations = () => {
         {/* Left Column */}
         <div className="space-y-4">
           {[
-            { label: "Type", value: user?.type || user?.userAccountType || "N/A" },
-            { label: "User ID", value: user?.userId || user?.userID || "N/A" },
-            { label: "School ID No.", value: user?.schoolId || user?.userLPUID|| "N/A" },
-            { label: "Name", value: `${user?.userFName || ""} ${user?.userLName || ""}`.trim() || "N/A" },
+            { label: "Type", value: user.userAccountType || "N/A" },
+            { label: "User ID", value: user.userID || "N/A" },
+            { label: "School ID No.", value: user.userLPUID || "N/A" },
+            { label: "Name", value: `${user.userFName || ""} ${user.userLName || ""}`.trim() || "N/A" },
           ].map(({ label, value }) => (
             <div className="flex items-center" key={label}>
               <label className="w-1/3 text-sm font-medium">{label}:</label>
@@ -100,9 +118,9 @@ const AdminInformations = () => {
         {/* Right Column */}
         <div className="space-y-4">
           {[
-            { label: "College", value: user?.college || user?.userCollege || "N/A" },
-            { label: "Department", value: user?.department || user?.userDepartment || "N/A" },
-            { label: "Email", value: user?.email || user?.userEmail || "N/A" },
+            { label: "College", value: user.userCollege || "N/A" },
+            { label: "Department", value: user.userDepartment || "N/A" },
+            { label: "Email", value: user.userEmail || "N/A" },
             { label: "Password", value: "********" },
           ].map(({ label, value }) => (
             <div className="flex items-center" key={label}>
@@ -134,6 +152,7 @@ const AdminInformations = () => {
         user={user}
         onUpdate={(updatedUser) => {
           console.log("User updated:", updatedUser);
+          setUser(updatedUser);
         }}
       />
       <DeleteAdminAcc
@@ -150,3 +169,4 @@ const AdminInformations = () => {
 };
 
 export default AdminInformations;
+

@@ -1,53 +1,56 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import UserInformationModal from "../../z_modals/UserInformationModal";
 import DeleteUserAcc from "../../z_modals/attention-modals/DeleteUserAcc"; // Ensure correct path
 import { supabase } from "../../supabaseClient"; // Ensure correct path
 
-const UserInformations = ({ user: initialUser }) => {
+const UserInformations = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(initialUser || {});
+  const location = useLocation();
+  const { userId } = location.state || {}; // Extract userId from route state
+  const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  if (!user || Object.keys(user).length === 0) {
-    navigate("/admin/userinformation");
-    return null;
-  }
+  // Fetch user data from Supabase
+  useEffect(() => {
+    if (!userId) {
+      navigate("/admin/userinformation");
+      return;
+    }
+    const fetchUser = async () => {
+      const { data, error } = await supabase
+        .from("user_accounts")
+        .select("*")
+        .eq("userID", userId)
+        .single();
+      if (error) {
+        console.error("Error fetching user data:", error);
+        navigate("/admin/userinformation");
+      } else {
+        setUser(data);
+      }
+    };
+    fetchUser();
+  }, [userId, navigate]);
 
-  const handleModify = () => {
-    setIsModalOpen(true);
-  };
+  if (!user) return <p>Loading user data...</p>;
+
+  const handleModify = () => setIsModalOpen(true);
 
   const handleDelete = async () => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("user_accounts")
         .delete()
-        .eq("userID", user.userId);
-
-      if (error) {
-        console.error("Error deleting user:", error);
-        alert("An error occurred while deleting the user.");
-        return;
-      }
-
-      console.log("User deleted:", data);
+        .eq("userID", user.userID);
+      if (error) throw error;
       alert("User account successfully deleted.");
-      setIsDeleteModalOpen(false);
-      navigate("/admin/useraccounts"); // Navigate back to the user list
+      navigate("/admin/useraccounts");
     } catch (error) {
       console.error("Unexpected error:", error);
       alert("An unexpected error occurred.");
     }
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleDeleteModalClose = () => {
-    setIsDeleteModalOpen(false);
   };
 
   const handleUserUpdate = (updatedUser) => {
@@ -66,7 +69,7 @@ const UserInformations = ({ user: initialUser }) => {
             <label className="w-1/3 text-sm font-medium">Type:</label>
             <input
               className="border border-gray-300 rounded-lg px-3 py-1 w-full"
-              value={user.type || ""}
+              value={user.userAccountType || ""}
               readOnly
             />
           </div>
@@ -74,7 +77,7 @@ const UserInformations = ({ user: initialUser }) => {
             <label className="w-1/3 text-sm font-medium">User ID:</label>
             <input
               className="border border-gray-300 rounded-lg px-3 py-1 w-full"
-              value={user.userId || ""}
+              value={user.userID || ""}
               readOnly
             />
           </div>
@@ -82,7 +85,7 @@ const UserInformations = ({ user: initialUser }) => {
             <label className="w-1/3 text-sm font-medium">School ID No.:</label>
             <input
               className="border border-gray-300 rounded-lg px-3 py-1 w-full"
-              value={user.schoolId || ""}
+              value={user.userLPUID || ""}
               readOnly
             />
           </div>
@@ -102,7 +105,7 @@ const UserInformations = ({ user: initialUser }) => {
             <label className="w-1/3 text-sm font-medium">College:</label>
             <input
               className="border border-gray-300 rounded-lg px-3 py-1 w-full"
-              value={user.college || ""}
+              value={user.userCollege || ""}
               readOnly
             />
           </div>
@@ -110,7 +113,7 @@ const UserInformations = ({ user: initialUser }) => {
             <label className="w-1/3 text-sm font-medium">Department:</label>
             <input
               className="border border-gray-300 rounded-lg px-3 py-1 w-full"
-              value={user.department || ""}
+              value={user.userDepartment || ""}
               readOnly
             />
           </div>
@@ -118,7 +121,7 @@ const UserInformations = ({ user: initialUser }) => {
             <label className="w-1/3 text-sm font-medium">Email:</label>
             <input
               className="border border-gray-300 rounded-lg px-3 py-1 w-full"
-              value={user.email || ""}
+              value={user.userEmail || ""}
               readOnly
             />
           </div>
@@ -149,14 +152,14 @@ const UserInformations = ({ user: initialUser }) => {
 
       <UserInformationModal
         isOpen={isModalOpen}
-        onClose={handleModalClose}
+        onClose={() => setIsModalOpen(false)}
         user={user}
         onUpdate={handleUserUpdate}
       />
 
       <DeleteUserAcc
         isOpen={isDeleteModalOpen}
-        onClose={handleDeleteModalClose}
+        onClose={() => setIsDeleteModalOpen(false)}
         onDelete={handleDelete}
       />
     </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight } from 'lucide-react';
 import UpdateProfilePic from "../../z_modals/UpdateProfilePic"; // Adjust the import path as needed
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../../backend/UserContext"; // Adjust the path
 
 // Settings options with actions and links
@@ -39,7 +39,7 @@ const SettingsOption = ({ title, description, onClick }) => (
 
 export const AdminSettings = ({ options = settingsOptions }) => {
   const { user } = useUser(); // Access the current user
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOptionClick = (option) => {
@@ -82,3 +82,4 @@ export const AdminSettings = ({ options = settingsOptions }) => {
     </div>
   );
 };
+

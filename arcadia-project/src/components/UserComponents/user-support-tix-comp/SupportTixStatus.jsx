@@ -27,7 +27,7 @@ const SupportTixStatus = () => {
             const { data, error } = await supabase
                 .from("support_ticket")
                 .select("ticket_id, type, status, subject, date, time")
-                .eq("user_ID", userID); // Filter by user_ID
+                .eq("userID", userID); // Filter by user_ID
 
             if (error) throw error;
 

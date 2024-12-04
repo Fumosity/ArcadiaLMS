@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { supabase } from "../supabaseClient";
 import DemoteToAdmin from "./attention-modals/DemoteToAdmin";
+import DeleteSupadminAcc from "./attention-modals/DeleteSupadminAcc";
 import PromoteToSuperadmin from "./attention-modals/PromoteToSuperadmin";
 import PromoteAdminModal from "./PromoteAdmin";
 import WrngDemote from "./warning-modals/WrngDemote";
@@ -10,68 +11,56 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
 
   const [modifiedUser, setModifiedUser] = useState({
     ...user,
-    name: `${user.userFName} ${user.userLName}`,
-    password: '',
+    userID: user.userID || '',
+    userLPUID: user.userLPUID || '',
+    userFName: user.userFName || '',
+    userLName: user.userLName || '',
+    userEmail: user.userEmail || '',
+    userPassword: user.userPassword || '',
+    userCollege: user.userCollege || '',
+    userDepartment: user.userDepartment || '',
+    userAccountType: user.userAccountType || '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isDemoteModalOpen, setIsDemoteModalOpen] = useState(false);
-  const [isDDemoteToInternModalOpen, setIsDemoteToInternModalOpen] = useState(false);
+  const [isDemoteToInternModalOpen, setIsDemoteToInternModalOpen] = useState(false);
   const [isPromoteToSuperadminModalOpen, setIsPromoteToSuperadminModalOpen] = useState(false);
   const [isPromoteToAdminModalOpen, setIsPromoteToAdminModalOpen] = useState(false);
-  const [pendingSubmit, setPendingSubmit] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const handleChangeType = (e) => {
     const newType = e.target.value;
-
     setModifiedUser((prevUser) => ({
       ...prevUser,
-      type: newType,
+      userAccountType: newType,
     }));
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "name") {
-      const nameParts = value.split(" ");
-      const userLName = nameParts.pop();
-      const userFName = nameParts.join(" ");
-      setModifiedUser((prevUser) => ({
-        ...prevUser,
-        userFName,
-        userLName,
-        name: value,
-      }));
-    } else {
-      setModifiedUser((prevUser) => ({
-        ...prevUser,
-        [name]: value,
-      }));
-    }
+    setModifiedUser((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async () => {
-    if (modifiedUser.type === "Admin" && user.type === "Superadmin") {
-      setPendingSubmit(true); // Wait for demotion confirmation
+    if (modifiedUser.userAccountType === "Admin" && user.userAccountType === "Superadmin") {
       setIsDemoteModalOpen(true);
       return;
     }
 
-    if (modifiedUser.type === "Intern" && (user.type === "Superadmin" || user.type === "Admin")) {
-      setPendingSubmit(true); // Wait for demotion confirmation
+    if (modifiedUser.userAccountType === "Intern" && (user.userAccountType === "Superadmin" || user.userAccountType === "Admin")) {
       setIsDemoteToInternModalOpen(true);
       return;
     }
 
-    if (modifiedUser.type === "Superadmin" && user.type === "Admin") {
-      setPendingSubmit(true); // Wait for promotion confirmation
+    if (modifiedUser.userAccountType === "Superadmin" && user.userAccountType === "Admin") {
       setIsPromoteToSuperadminModalOpen(true);
       return;
     }
 
-    if (modifiedUser.type === "Admin" && user.type === "Intern") {
-      setPendingSubmit(true); // Wait for promotion confirmation
+    if (modifiedUser.userAccountType === "Admin" && user.userAccountType === "Intern") {
       setIsPromoteToAdminModalOpen(true);
       return;
     }
@@ -105,31 +94,30 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
       const { data, error } = await supabase
         .from("user_accounts")
         .update({
-          userAccountType: modifiedUser.type,
+          userID: modifiedUser.userID,
+          userLPUID: modifiedUser.userLPUID,
           userFName: modifiedUser.userFName,
           userLName: modifiedUser.userLName,
-          userCollege: modifiedUser.college,
-          userDepartment: modifiedUser.department,
-          userEmail: modifiedUser.email,
+          userEmail: modifiedUser.userEmail,
+          userPassword: modifiedUser.userPassword,
+          userCollege: modifiedUser.userCollege,
+          userDepartment: modifiedUser.userDepartment,
+          userAccountType: modifiedUser.userAccountType,
         })
-        .eq("userID", modifiedUser.userId);
-      
-        if (modifiedUser.password) {
-          updateData.userPassword = modifiedUser.password;
-        }
+        .eq("userID", user.userID);
 
       if (error) {
-        console.error("Error updating user:", error);
-        alert("An error occurred while updating the user.");
+        console.error("Supabase update error:", error.message);
+        alert(`Failed to save changes: ${error.message}`);
         return;
       }
 
-      console.log("User updated:", data);
+      console.log("User successfully updated:", data);
       onUpdate(modifiedUser);
       onClose();
     } catch (error) {
       console.error("Unexpected error:", error);
-      alert("An unexpected error occurred.");
+      alert("An unexpected error occurred while saving changes.");
     } finally {
       setIsLoading(false);
     }
@@ -143,7 +131,7 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-4xl p-8 sm:p-10">
         <h2 className="text-2xl font-semibold mb-8 text-center">
-          Modify User Account Information
+          Modify Admin Account Information
         </h2>
 
         <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
@@ -151,8 +139,8 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
             <div className="flex items-center">
               <span className="w-32 text-sm font-medium">Type:</span>
               <select
-                name="type"
-                value={modifiedUser.type || modifiedUser.userAccountType}
+                name="userAccountType"
+                value={modifiedUser.userAccountType}
                 onChange={handleChangeType}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
               >
@@ -166,8 +154,8 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
               <span className="w-32 text-sm font-medium">User ID:</span>
               <input
                 type="text"
-                name="userId"
-                value={modifiedUser.userId || modifiedUser.userID}
+                name="userID"
+                value={modifiedUser.userID}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -177,8 +165,8 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
               <span className="w-32 text-sm font-medium">School ID No.:</span>
               <input
                 type="text"
-                name="schoolId"
-                value={modifiedUser.schoolId || modifiedUser.userLPUID}
+                name="userLPUID"
+                value={modifiedUser.userLPUID}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -189,22 +177,22 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
               <input
                 type="text"
                 name="userFName"
-                value={modifiedUser.userFName || ""}
-                className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="flex items-center">
-              <span className="w-32 text-sm font-medium">Last Name:</span>
-              <input
-                type="text"
-                name="userLName"
-                value={modifiedUser.userLName || ""}
+                value={modifiedUser.userFName}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
             </div>
 
+            <div className="flex items-center">
+              <span className="w-32 text-sm font-medium">Last Name:</span>
+              <input
+                type="text"
+                name="userLName"
+                value={modifiedUser.userLName}
+                className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
+                onChange={handleInputChange}
+              />
+            </div>
           </div>
 
           <div className="flex-1 space-y-4 min-w-0">
@@ -212,8 +200,8 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
               <span className="w-32 text-sm font-medium">College:</span>
               <input
                 type="text"
-                name="college"
-                value={modifiedUser.college || modifiedUser.userCollege}
+                name="userCollege"
+                value={modifiedUser.userCollege}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -223,8 +211,8 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
               <span className="w-32 text-sm font-medium">Department:</span>
               <input
                 type="text"
-                name="department"
-                value={modifiedUser.department || modifiedUser.userDepartment}
+                name="userDepartment"
+                value={modifiedUser.userDepartment}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -234,8 +222,8 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
               <span className="w-32 text-sm font-medium">Email:</span>
               <input
                 type="email"
-                name="email"
-                value={modifiedUser.email || modifiedUser.userEmail}
+                name="userEmail"
+                value={modifiedUser.userEmail}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                 onChange={handleInputChange}
               />
@@ -246,8 +234,8 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
               <div className="flex-1 flex items-center relative">
                 <input
                   type={isPasswordVisible ? "text" : "password"}
-                  name="password"
-                  value={modifiedUser.password || modifiedUser.userPassword}
+                  name="userPassword"
+                  value={modifiedUser.userPassword}
                   onChange={handleInputChange}
                   className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
                   placeholder="Enter new password"
@@ -272,7 +260,9 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
           >
             {isLoading ? "Saving..." : "Modify"}
           </button>
-          <button className="cancelButton" onClick={onClose}>
+          <button
+            className="cancelButton"
+            onClick={onClose}>
             Cancel
           </button>
         </div>
@@ -285,7 +275,7 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
       />
 
       <WrngDemote
-        isOpen={isDDemoteToInternModalOpen}
+        isOpen={isDemoteToInternModalOpen}
         onClose={() => setIsDemoteToInternModalOpen(false)}
         userFName={modifiedUser.userFName}
         userLName={modifiedUser.userLName}
@@ -297,6 +287,7 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
         onClose={() => setIsPromoteToSuperadminModalOpen(false)}
         onPromote={handlePromoteToSuperadminConfirm}
       />
+
       <PromoteAdminModal
         isOpen={isPromoteToAdminModalOpen}
         onClose={() => setIsPromoteToAdminModalOpen(false)}
@@ -307,3 +298,4 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
 };
 
 export default AccountModifier;
+

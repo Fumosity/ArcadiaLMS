@@ -17,7 +17,7 @@ const ListOfAdminAcc = () => {
             setLoading(true);
             const { data, error } = await supabase
                 .from("user_accounts")
-                .select("userAccountType, userEmail, userFName, userLName, userID, userLPUID")
+                .select("*")
                 .in("userAccountType", ["Admin","Superadmin","Intern"]); // Adjusted to fetch only Admins for now
 
             if (error) {
@@ -29,6 +29,7 @@ const ListOfAdminAcc = () => {
                     name: `${user.userFName} ${user.userLName}`,
                     userId: user.userID,
                     schoolId: user.userLPUID,
+                    userPass: user.userPassword,
                 }));
                 setUserData(formattedData);
             }
@@ -67,16 +68,10 @@ const ListOfAdminAcc = () => {
     const displayedUsers = filteredData.slice(startIndex, startIndex + entriesPerPage);
 
     const handleUserClick = (user) => {
-        const nameParts = user.name.split(' ');
-        const userLName = nameParts.pop(); // Last part is last name
-        const userFName = nameParts.join(' '); // Join remaining parts as first name
-    
         navigate("/admin/useraccounts/viewadmins", {
             state: {
                 user: {
-                    ...user,
-                    userFName,
-                    userLName,
+                    userId: user.userId
                 }
             }
         });

@@ -1,26 +1,25 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabaseClient.js";
-import { useUser } from "../../../backend/UserContext"; // Adjust the path based on your folder structure
+import { useUser } from "../../../backend/UserContext";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { updateUser } = useUser(); // Get updateUser from UserContext
+  const { updateUser } = useUser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      // Verify user credentials
       const { data: loginData, error: loginError } = await supabase
         .from("user_accounts")
         .select("*")
         .eq("userEmail", email)
-        .eq("userPassword", password) // Use hashed passwords in production
+        .eq("userPassword", password) // Replace with hashing in production
         .single();
 
       if (loginError || !loginData) {
@@ -28,20 +27,11 @@ export default function LoginForm() {
         return;
       }
 
-      // Update user state globally
-      updateUser(loginData);
+      updateUser(loginData); // Persist user globally
 
-      // Redirect based on user type
-      if (
-        loginData.userAccountType === "Admin" ||
-        loginData.userAccountType === "Superadmin" ||
-        loginData.userAccountType === "Intern"
-      ) {
+      if (["Admin", "Superadmin", "Intern"].includes(loginData.userAccountType)) {
         navigate("/admin");
-      } else if (
-        loginData.userAccountType === "Student" ||
-        loginData.userAccountType === "Teacher"
-      ) {
+      } else if (["Student", "Teacher"].includes(loginData.userAccountType)) {
         navigate("/");
       } else {
         alert("Unknown account type. Please contact support.");
