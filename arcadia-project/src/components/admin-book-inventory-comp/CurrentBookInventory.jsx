@@ -228,13 +228,8 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                 <span key={i} className="inline-block mr-1">{author}</span>
                                             ))}
                                         </td>
-<<<<<<< Updated upstream
-                                        <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
-                                            {item.titleID}
-=======
                                         <td className="px-4 py-4 text-center text-sm text-gray-500 truncate max-w-xs">
                                             {item.titleID || 'N/A'} {/* Fallback to N/A if bookID is missing */}
->>>>>>> Stashed changes
                                         </td>
                                         <td className="px-4 py-4 text-center text-sm text-gray-500 truncate max-w-xs">
                                             {item.originalPubDate}
