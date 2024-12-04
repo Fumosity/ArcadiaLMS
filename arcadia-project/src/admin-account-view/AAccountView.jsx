@@ -14,6 +14,9 @@ import AdminInformations from "../components/admin-account-view-comp/AdminInform
 const AAccountView = () => {
     const location = useLocation();
     const user = location.state?.user || {};
+
+    console.log("admin", user)
+
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Main header */}
@@ -28,9 +31,7 @@ const AAccountView = () => {
                         <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
                             <AdminInformations user={user} />
                         </div>
-                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                            <AAListAdmin user={user} />
-                        </div>
+                        <AAListAdmin user={user} />
                     </div>
 
                     {/* Right side content */}
