@@ -17,26 +17,24 @@ export default function WeeklySched() {
         const fetchSchedule = async () => {
             const { data, error } = await supabase
                 .from('schedule')
-                .select('event_data'); // Fetch the event_data JSONB object
+                .select('eventID, event_data'); // Include eventID in the select
 
             if (error) {
                 console.error('Error fetching schedule:', error);
                 return;
             }
 
-            // Format the data into the correct structure for the calendar
             const formattedEvents = data.map((event) => {
-                const { date, time, event: eventName } = event.event_data; // Destructure the event_data object
-                const [startTime, endTime] = time.split(' to '); // Split the time string into start and end times
-
-                // Construct the start and end date objects
-                const start = moment(`${date} ${startTime}`).toDate(); // Combine date and startTime
-                const end = moment(`${date} ${endTime}`).toDate(); // Combine date and endTime
+                const { date, time, event: eventName } = event.event_data;
+                const [startTime, endTime] = time.split(' to ');
+                const start = moment(`${date} ${startTime}`).toDate();
+                const end = moment(`${date} ${endTime}`).toDate();
 
                 return {
                     title: eventName,
                     start,
-                    end
+                    end,
+                    eventID: event.eventID // Ensure eventID is included
                 };
             });
 
@@ -48,18 +46,21 @@ export default function WeeklySched() {
 
 
     const handleSelect = ({ start, end }) => {
-        const event = events.find((e) => e.start.getTime() === start.getTime() && e.end.getTime() === end.getTime());
+        const event = events.find(
+            (e) => e.start.getTime() === start.getTime() && e.end.getTime() === end.getTime()
+        );
+
         if (event) {
-            setSelectedEvent(event);
+            setSelectedEvent(event); // Pass the full event, including eventID
         } else {
             setSelectedEvent({
                 title: 'New Event',
                 start,
                 end,
-                notes: '' // You can also handle other fields like notes
+                eventID: null // New events won't have an eventID
             });
         }
-        setIsModalOpen(true); // Open the modal
+        setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
@@ -82,9 +83,34 @@ export default function WeeklySched() {
         handleCloseModal(); // Close the modal after saving
     };
 
-    const handleDeleteSchedule = (eventToDelete) => {
-        setEvents((prev) => prev.filter((event) => event.start.getTime() !== eventToDelete.start.getTime() || event.end.getTime() !== eventToDelete.end.getTime()));
-        handleCloseModal(); // Close the modal after deleting
+    const handleDeleteSchedule = async (eventToDelete) => {
+        if (!eventToDelete.eventID) {
+            console.error('Error: eventID is undefined. Cannot delete event.');
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('schedule')
+                .delete()
+                .match({ eventID: eventToDelete.eventID }); // Use the eventID to delete
+
+            if (error) {
+                console.error('Error deleting event:', error);
+            } else {
+                setEvents((prev) =>
+                    prev.filter(
+                        (event) =>
+                            event.start.getTime() !== eventToDelete.start.getTime() ||
+                            event.end.getTime() !== eventToDelete.end.getTime()
+                    )
+                );
+            }
+        } catch (err) {
+            console.error('Unexpected error deleting event:', err);
+        } finally {
+            handleCloseModal(); // Close the modal after deleting
+        }
     };
 
     return (

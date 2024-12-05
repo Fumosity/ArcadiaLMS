@@ -4,7 +4,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import { supabase } from '../supabaseClient'; // Import your Supabase client
 
 const ModifySchedule = ({ isOpen, onClose, event, onModify, onDelete }) => {
-    const [dateRange, setDateRange] = useState([event?.start || new Date(), event?.end || new Date()]);
+    // Ensure the event object is not null and initialize date range properly
+    const [dateRange, setDateRange] = useState([
+        event?.start || new Date(), // Fallback to current date if start is undefined
+        event?.end || new Date()    // Fallback to current date if end is undefined
+    ]);
+    
     const [startDate, endDate] = dateRange;
     const [startTime, setStartTime] = useState(event?.startTime || '07:00');
     const [endTime, setEndTime] = useState(event?.endTime || '17:00');
@@ -28,45 +33,79 @@ const ModifySchedule = ({ isOpen, onClose, event, onModify, onDelete }) => {
     ));
 
     const handleSave = async () => {
-        // Check if startDate is defined
-        if (!startDate) {
-            console.error("Start date is not defined.");
-            return;  // Exit the function if the date is not defined
+        // Ensure startDate and endDate are properly defined
+        if (!startDate || !endDate) {
+            console.error("Start date or end date is not defined.");
+            return;  // Exit if dates are invalid
         }
-    
-        const modifiedEvent = { 
-            ...event, 
-            startTime, 
-            endTime, 
-            start: startDate, 
-            end: endDate, 
-            title: eventTitle 
+
+        // Prepare the modified event data (only modify time, title, and date range)
+        const modifiedEvent = {
+            ...event, // Preserve the existing event properties
+            startTime,
+            endTime,
+            start: startDate,
+            end: endDate,
+            title: eventTitle
         };
-    
+
         // Prepare the data to be saved in the Supabase 'schedule' table as a JSONB object
         const eventData = {
             date: startDate.toISOString().split('T')[0], // Format to yyyy-mm-dd
             time: `${startTime} to ${endTime}`,
             event: eventTitle, // Only the title of the event
         };
-    
-        // Now perform an upsert operation to replace the existing event if it already exists
-        const { data, error } = await supabase
-            .from('schedule')
-            .upsert([{
-                event_data: eventData,
-                // Optionally, use a unique identifier to match the event
-                // For example, you could match by date and time or use an event ID if available.
-            }], { onConflict: ['event_data'] });  // This will replace the existing record if a conflict is found on event_data
-    
-        if (error) {
-            console.error("Error saving event:", error.message);
-        } else {
-            // Pass the modified event back to the parent if needed
-            onModify(modifiedEvent);
+
+        // Prepare the data object for the upsert
+        const upsertData = {
+            event_data: eventData,
+        };
+
+        if (event?.eventID) {
+            // If eventID exists, this is an update, so include the eventID for update
+            upsertData.eventID = event.eventID;
         }
+
+        // Log eventID and event data to confirm what we're passing
+        console.log("upsert data:", upsertData);
+
+        try {
+            // Step 1: Check if the event already exists
+            if (event?.eventID) {
+                // If eventID exists, this is an update
+                const { data, error } = await supabase
+                    .from('schedule')
+                    .update(upsertData)
+                    .eq('eventID', event.eventID);
+
+                if (error) {
+                    console.error("Error updating event:", error.message);
+                } else {
+                    console.log("Event updated:", data);
+                    onModify(modifiedEvent);
+                }
+            }
+            else {
+                // Step 2: If eventID doesn't exist, insert a new event
+                const { data, error } = await supabase
+                    .from('schedule')
+                    .insert([upsertData]); // Insert new event if eventID is missing
+
+                if (error) {
+                    console.error("Error inserting event:", error.message);
+                } else {
+                    console.log("Event inserted:", data);
+                    onModify(modifiedEvent); // Pass the modified event to parent to update state
+                }
+            }
+        } catch (error) {
+            console.error("Unexpected error:", error);
+        }
+
+        // Close modal after saving
+        handleCloseModal();
     };
-    
+
     const handleDelete = () => {
         onDelete(event); // Pass the event to the parent to be deleted
     };
