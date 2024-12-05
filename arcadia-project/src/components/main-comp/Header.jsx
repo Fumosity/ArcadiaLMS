@@ -79,7 +79,7 @@ const Header = () => {
               )}
             </div>
           ) : (
-            <Link to="/user/login" className="flex items-center text-white">
+            <Link to="/user/login" className="flex items-center text-black">
               <span className="mr-2">Login</span>
               <FiUser className="h-6 w-6 text-gray-300" />
             </Link>
