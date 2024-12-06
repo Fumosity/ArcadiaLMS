@@ -7,12 +7,12 @@ const ARAddPreview = ({ formData }) => {
     college = "N/A",
     department = "N/A",
     abstract = "N/A",
-    page = "N/A",
+    pages = "N/A",
     keyword = "N/A",
     pubDate = "N/A",
     location = "N/A",
-    thesisID = "N/A",
-    arcID = "N/A",
+    researchID = "N/A",
+    researchARCID = "N/A",
     cover
   } = formData;
 
@@ -22,12 +22,12 @@ const ARAddPreview = ({ formData }) => {
     college,
     department,
     abstract,
-    pages: page,
+    pages,
     keywords: keyword,
     datePublished: pubDate,
     location,
-    databaseID: thesisID,
-    arcID,
+    databaseID: researchID,
+    researchARCID,
   };
 
   return (
@@ -35,8 +35,8 @@ const ARAddPreview = ({ formData }) => {
       {/* Book Front Page */}
       <h3 className="text-xl font-semibold mb-3">About</h3>
       <div className="relative bg-white p-2 mb-4 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
-        <img src={cover || "/image/book_research_placeholder.png"} alt="Thesis cover" className="h-200 w-150 mx-auto mb-2 rounded" />
-        <p className="text-xs text-gray-500 mb-2 text-center">Thesis Cover Preview</p>
+        <img src={cover || "/image/book_research_placeholder.png"} alt="Thesis cover" className="h-200 w-150 mx-auto mb-2 rounded border border-grey" />
+        <p className="text-xs text-gray-500 mb-2 text-center">Research Cover Preview</p>
       </div>
 
       <table className="min-w-full border-collapse">

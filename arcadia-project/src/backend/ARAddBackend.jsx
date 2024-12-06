@@ -21,25 +21,25 @@ export const addResearch = async (formData) => {
     }
 };
 
-//Checks the latest thesisID number and generates new ones
+//Checks the latest researchID number and generates new ones
 export const newThesisIDGenerator = async (formData, setFormData) => {
-    const { data, error } = await supabase.from('research').select('thesisID').order('thesisID', { ascending: false }).limit(1);
+    const { data, error } = await supabase.from('research').select('researchID').order('researchID', { ascending: false }).limit(1);
 
     if (error) {
         console.error("Error retrieving thesis ID: ", error);
     } else if (data && data.length > 0) {
-        const newID = data[0].thesisID + 1;
+        const newID = data[0].researchID + 1;
 
         setFormData ({
             ...formData,
-            thesisID: newID,
+            researchID: newID,
         });
     } else {
         const newID = 1;
 
         setFormData ({
             ...formData,
-            thesisID: newID,
+            researchID: newID,
         });
     };
 }

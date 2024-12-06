@@ -9,7 +9,7 @@ import Title from "../components/main-comp/Title";
 
 const ARAdd = () => {
   const [formData, setFormData] = useState({
-    thesisID: '',
+    researchID: '',
     title: '',
     author: [],
     college: '',
@@ -17,7 +17,7 @@ const ARAdd = () => {
     abstract: '',
     keyword: [],
     location: '',
-    arcID: '',
+    researchARCID: '',
     pubDate: '',
     cover: '',
     pdf: ''

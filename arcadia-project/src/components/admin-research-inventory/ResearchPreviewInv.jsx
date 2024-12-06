@@ -61,12 +61,12 @@ const ResearchPreviewInv = ({ research }) => {
     college: research.college,
     department: research.department,
     abstract: research.abstract,
+    pages: research.pages,
     keyword: research.keyword,
     pubDate: research.pubDate,
     location: research.location,
-    thesisID: research.thesisID,
-    arcID: research.arcID,
-    cover: research.cover
+    researchID: research.researchID,
+    researchARCID: research.researchARCID,
   };
 
   // Navigate to modify research page with query parameters
@@ -82,19 +82,26 @@ const ResearchPreviewInv = ({ research }) => {
         <img
           src={research.cover || "image/researchcover.png"}
           alt="Research cover"
-          className="h-200 w-150 mx-auto mb-2 rounded"
+          className="h-200 w-150 mx-auto mb-2 rounded border border-grey"
         />
-        <p className="text-xs text-gray-500 mb-2 text-center">Click to update research cover</p>
+        <p className="text-xs text-gray-500 mb-2 text-center">Research Cover</p>
       </div>
 
       <table className="min-w-full border-collapse">
         <tbody>
           {Object.entries(researchDetails).map(([key, value], index) => (
             <tr key={index} className="border-b border-grey">
-              <td className="px-1 py-1 font-semibold capitalize" style={{ width: "40%" }}>
-                {key.replace(/([A-Z])/g, ' $1')}:
+              <td className="px-1 py-1 font-semibold capitalize" style={{ width: "45%" }}>
+              {key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b([a-z]+)([A-Z]{2,})\b/g, (match, p1, p2) => p1 + ' ' + p2).replace(/\b([A-Z]{2,})\b/g, (match) => match.toUpperCase())}
               </td>
-              <td className="px-1 py-1 text-sm">{value}</td>
+              <td className="px-1 py-1 text-sm flex justify-between items-center">
+                {(key === "abstract") && value && (
+                  <button className="border border-grey px-2 py-0.5 rounded-xl hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
+                    View
+                  </button>
+                )}
+                <span>{key === "abstract" ? "" : value || "N/A"}</span>
+              </td>
             </tr>
           ))}
         </tbody>

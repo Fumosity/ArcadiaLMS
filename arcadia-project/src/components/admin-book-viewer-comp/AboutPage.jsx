@@ -45,7 +45,7 @@ const AboutPage = ({ book }) => {
           className="max-h-200 w-150 mx-auto mb-2 rounded"
         />
         <p className="text-xs text-gray-500 mb-2 text-center">
-          Click to update book cover
+          Book Cover
         </p>
       </div>
       <table className="min-w-full border-collapse">

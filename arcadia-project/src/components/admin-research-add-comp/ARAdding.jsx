@@ -9,7 +9,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { GlobalWorkerOptions } from 'pdfjs-dist';
 
 // Set the worker source explicitly
-GlobalWorkerOptions.workerSrc = '/pdfjs-dist/pdf.worker.min.js';
+GlobalWorkerOptions.workerSrc = '/pdfjs-dist/pdf.worker.min.mjs';
 
 //Main Function
 const ARAdding = ({ formData, setFormData }) => {
@@ -117,6 +117,7 @@ const ARAdding = ({ formData, setFormData }) => {
             setFormData((prevData) => ({
               ...prevData,
               cover: publicData.publicUrl, // Set the public URL as the cover
+              pages: files.length, 
             }));
           }
         }
@@ -130,6 +131,9 @@ const ARAdding = ({ formData, setFormData }) => {
   
           // Use pdfjs-dist to load the PDF and render the first page as an image
           const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+
+          const totalPages = pdf.numPages;
+          
           const page = await pdf.getPage(1);
           const viewport = page.getViewport({ scale: 1.5 });
   
@@ -159,6 +163,7 @@ const ARAdding = ({ formData, setFormData }) => {
                 setFormData((prevData) => ({
                   ...prevData,
                   cover: publicData.publicUrl, // Set the public URL as the cover
+                  pages: totalPages,
                 }));
               }
             }
@@ -187,7 +192,7 @@ const ARAdding = ({ formData, setFormData }) => {
   //Handles the submission to the database
   const handleSubmit = async () => {
     
-    const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "thesisID", "arcID"];
+    const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "researchID", "researchARCID", "pages",];
 
     // Ensure formData is fully updated
     const updatedFormData = { ...formData }; // Capture current formData
@@ -203,7 +208,7 @@ const ARAdding = ({ formData, setFormData }) => {
     }
 
     const arcIdRegex = /^LPUCAV\d{6}$/;
-    if (!arcIdRegex.test(formData.arcID)) {
+    if (!arcIdRegex.test(formData.researchARCID)) {
       alert("ARC ID must follow the format (e.g., LPUCAV012345).");
       return;
     }
@@ -248,10 +253,10 @@ const ARAdding = ({ formData, setFormData }) => {
       images: imageUrls.join(', '),
     }));
 
-    await addResearch({ ...formData, pdf: pdfUrls.join(', '), images: imageUrls.join(', ') });
+    await addResearch({ ...formData, pdf: pdfUrls.join(', '), images: imageUrls.join(', '), pages: formData.pages });
 
     setFormData({
-      thesisID: '',
+      researchID: '',
       title: '',
       author: [],
       college: '',
@@ -259,11 +264,12 @@ const ARAdding = ({ formData, setFormData }) => {
       abstract: '',
       keywords: [],
       location: '',
-      arcID: '',
+      researchARCID: '',
       pubDate: '',
       cover: '',
       pdf: '',
-      images: ''
+      images: '',
+      pages: ''
     });
 
     setUploadedFiles([]);
@@ -271,7 +277,7 @@ const ARAdding = ({ formData, setFormData }) => {
     setIsSubmitting(false);
   };
 
-  //Generate a new thesisID
+  //Generate a new researchID
   useEffect(() => { newThesisIDGenerator(formData, setFormData) }, []);
 
   //Form
@@ -361,7 +367,7 @@ const ARAdding = ({ formData, setFormData }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Pages:</label>
-                <input type="number" name="page" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={pageCount} placeholder="No. of pages" required/>
+                <input type="number" name="pages" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={pageCount} placeholder="No. of pages" required/>
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
@@ -377,11 +383,11 @@ const ARAdding = ({ formData, setFormData }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Database ID*:</label>
-                <input type="number" name="thesisID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.thesisID } onChange={ handleChange } required />
+                <input type="number" name="researchID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.researchID } onChange={ handleChange } required />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">ARC ID:</label>
-                <input type="text" name="arcID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.arcID } onChange={ handleChange } placeholder="ARC Issued ID, eg. LPUCAV012345" required />
+                <input type="text" name="researchARCID" className="input-field w-2/3 p-2 border border-gray-400 rounded-xl" value={ formData.researchARCID } onChange={ handleChange } placeholder="ARC Issued ID, eg. LPUCAV012345" required />
               </div>
             </form>
 

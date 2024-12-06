@@ -14,20 +14,26 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
     college: ''
   });
 
+  const [isUploading, setIsUploading] = useState(false); // Track if uploading is in progress
+  const [uploadComplete, setUploadComplete] = useState(false); // Track upload completion
+
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
     const validFiles = files.filter(file =>
       ['application/pdf', 'image/png', 'image/jpeg'].includes(file.type)
     );
-  
+
     if (validFiles.length !== files.length) {
       alert("Some files were rejected due to invalid formats.");
     }
     setUploadedFiles(validFiles);
   };
-  
+
 
   const handleUpload = async () => {
+    setIsUploading(true); // Set uploading to true
+    setUploadComplete(false); // Reset the completion status
+
     try {
       const formData = new FormData();
       let totalPages = 0;  // Initialize total pages count
@@ -54,9 +60,9 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
         keyword: response.data.keywords,
         pubDate: reformatPubDate,
         department: response.data.department,
-        college: response.data.college
+        college: response.data.college,
       };
-  
+
       setExtractedData(extractedData);
       onFileSelect(uploadedFiles); // Add extractedData here
       onExtractedData(extractedData); // <-- Add this line
@@ -68,9 +74,13 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
       // Set the total page count
       onPageCountChange(totalPages);
 
+      setUploadComplete(true);
+
     } catch (error) {
       console.error("Error extracting text:", error);
       alert("Failed to extract text. Please try again or check your file format.");
+    } finally {
+      setIsUploading(false); // Set uploading to false when done
     }
   };
 
@@ -98,75 +108,83 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
         </header>
 
         <section>
-          <div className="mb-4">
-            <p className="text-gray-800">
-              Upload research pages for autofill. The uploaded pages should
-              include the following: Title Page, Abstract, Keywords.
-              <br />
-              <br />
-              Accepted formats: (A PDF, or an image format: PNG, JPEG)
-            </p>
-            <label
-              htmlFor="file-upload"
-              className="inline-block mt-2 px-4 py-2 border border-gray-700 rounded-full text-gray-900 cursor-pointer"
-              aria-label="Upload research pages in PDF or image formats"
-            >
-              Upload Pages
-              <input
-                id="file-upload"
-                type="file"
-                multiple
-                accept=".pdf,.png,.jpeg,.jpg"
-                onChange={handleFileUpload}
-                className="hidden"
-                aria-label="Upload research pages"
-              />
-            </label>
-          </div>
-
           <div className="space-y-3">
-            <div>
-              <label className="text-gray-800">Files uploaded:</label>
-              <input
-                type="text"
-                value={uploadedFiles.length > 0 ? uploadedFiles.map((file) => file.name).join(', ') : 'No files uploaded'}
-                readOnly
-                className="w-full mt-1 p-2 border rounded-md"
-              />
-            </div>
 
-            <div className="flex items-center">
-              <label htmlFor="preview-checkbox" className="text-gray-800 mr-2">
-                Show Research Preview? (PDF only)
-              </label>
-              <input
-                type="checkbox"
-                id="preview-checkbox"
-                checked={showPreview}
-                onChange={(e) => setShowPreview(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-700"
-              />
-            </div>
+            <div className="flex-col justify-center mt-4">
+              {isUploading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="loader"></div>
+                  <span>Uploading...</span>
+                </div>
+              ) : uploadComplete ? (
+                <div className="flex-col justify-center">
+                  <div className="text-green-500 text-center">Upload Complete! You can now close the modal.</div>
+                  <div className="flex justify-center mt-2">
+                    <button
+                      onClick={handleCancel}
+                      className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white"
+                      aria-label="Cancel upload"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-4">
+                    <p className="text-gray-800">
+                      Upload research pages for autofill. The uploaded pages should
+                      include the following: Title Page, Abstract, Keywords.
+                      <br />
+                      <br />
+                      Accepted formats: (A PDF, or an image format: PNG, JPEG)
+                    </p>
+                    <label
+                      htmlFor="file-upload"
+                      className="inline-block mt-2 px-4 py-2 border border-gray-700 rounded-full text-gray-900 cursor-pointer"
+                      aria-label="Upload research pages in PDF or image formats"
+                    >
+                      Upload Pages
+                      <input
+                        id="file-upload"
+                        type="file"
+                        multiple
+                        accept=".pdf,.png,.jpeg,.jpg"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        aria-label="Upload research pages"
+                      />
+                    </label>
+                  </div>
+                  <div>
+                    <label className="text-gray-800">Files uploaded:</label>
+                    <input
+                      type="text"
+                      value={uploadedFiles.length > 0 ? uploadedFiles.map((file) => file.name).join(', ') : 'No files uploaded'}
+                      readOnly
+                      className="w-full mt-1 p-2 border rounded-md"
+                    />
+                    <div className='flex items-center justify-center mt-2'>
+                      <button
+                        onClick={handleUpload}
+                        className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white"
+                        aria-label="Upload files"
+                      >
+                        Upload
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white ml-2"
+                        aria-label="Cancel upload"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
 
-            <p className="text-sm text-gray-600">
-              A Research Preview adds a PDF Viewer into the Research View of this paper. Requires a PDF file to be uploaded.
-            </p>
 
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={handleUpload}
-                className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white"
-                aria-label="Upload files"
-              >
-                Upload
-              </button>
-              <button
-                onClick={handleCancel}
-                className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white ml-2"
-                aria-label="Cancel upload"
-              >
-                Cancel
-              </button>
+                </>
+              )}
             </div>
           </div>
         </section>

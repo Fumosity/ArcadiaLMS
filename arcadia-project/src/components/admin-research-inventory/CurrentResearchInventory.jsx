@@ -19,7 +19,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
             try { 
                 const { data, error } = await supabase  
                 .from('research') // Fetch from 'research' table
-                .select("researchID, title, college, department, abstract, location, researchARCID, pubDate, cover, author, keyword");
+                .select("researchID, title, college, department, abstract, location, researchARCID, pubDate, cover, author, keyword, pages");
 
                 if (error) {
                     console.error("Error fetching research:", error);
@@ -150,7 +150,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                                     </td>
                                     <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate max-w-xs">
                                         <Link
-                                            to={`/arviewer?thesisID=${encodeURIComponent(item.thesisID)}`}
+                                            to={`/admin/arviewer?researchID=${encodeURIComponent(item.researchID)}`}
                                             className="text-blue-600 hover:underline"
                                         >
                                             {item.title}

@@ -12,7 +12,7 @@ import { useLocation } from "react-router-dom";
 const ARViewer = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const thesisID = queryParams.get('thesisID'); // Get thesisID from query params
+    const researchID = queryParams.get('researchID'); // Get researchID from query params
 
     const [researchData, setResearchData] = useState(null);
 
@@ -21,20 +21,21 @@ const ARViewer = () => {
             const { data, error } = await supabase
                 .from('research')
                 .select('*')
-                .eq('thesisID', thesisID)
+                .eq('researchID', researchID)
                 .single(); // Fetch the single research record
 
             if (error) {
                 console.error("Error fetching research details:", error);
             } else {
                 setResearchData(data);
+                console.log("research data", data)
             }
         };
 
-        if (thesisID) {
+        if (researchID) {
             fetchResearchDetails();
         }
-    }, [thesisID]);
+    }, [researchID]);
 
     if (!researchData) {
         return <div>Loading...</div>; // Show loading while fetching data
@@ -53,7 +54,7 @@ const ARViewer = () => {
                             <ARTitle researchData={researchData} /> {/* Pass research data to ARTitle */}
                         </div>
                         <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                            <ARFullText />
+                            <ARFullText researchData={researchData}/>
                         </div>
                         <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
                             <ARPastReview />

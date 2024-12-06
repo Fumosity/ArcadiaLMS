@@ -15,7 +15,7 @@ const ARTitle = ({ researchData }) => {
             </div>
 
             <div className="space-y-4 mt-6">
-                <div className="w-full max-w-2xl">
+                <div className="w-full">
                     <strong className="text-zinc-900 text-base font-bold">
                         Abstract:
                     </strong>
@@ -24,7 +24,7 @@ const ARTitle = ({ researchData }) => {
                     </p>
                 </div>
 
-                <div className="w-full max-w-lg">
+                <div className="w-full">
                     <strong className="text-zinc-900 text-base font-bold">
                         Keywords:
                     </strong>

@@ -537,3 +537,17 @@
 .resendCode {
   @apply text-sm w-[200px] whitespace-nowrap border border-grey rounded-full px-2.5 py-0.5 hover:border-red hover:text-red;
 }
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #902424;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
