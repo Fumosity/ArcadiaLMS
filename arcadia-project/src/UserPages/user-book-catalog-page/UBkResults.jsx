@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import Trie from "../../backend/trie";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const UBkResults = ({ query }) => {
     const [books, setBooks] = useState([]);
@@ -9,41 +9,95 @@ const UBkResults = ({ query }) => {
     const [trie, setTrie] = useState(new Trie());
     const [currentPage, setCurrentPage] = useState(1);
     const entriesPerPage = 4;
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
+
+    // Helper function to render star ratings with average rating number
+    const renderStars = (averageRating) => {
+        const fullStars = Math.floor(averageRating); // Number of full stars
+        const halfStar = averageRating % 1 >= 0.5 ? 1 : 0; // One half-star if needed
+        const emptyStars = 5 - fullStars - halfStar; // Remaining empty stars
+    
+        return (
+            <span className="flex items-center">
+                {[...Array(fullStars)].map((_, i) => (
+                    <span key={`full-${i}`} className="text-yellow-500 text-lg">★</span>
+                ))}
+                {halfStar === 1 && <span className="text-yellow-500 text-lg">☆</span>}
+                {[...Array(emptyStars)].map((_, i) => (
+                    <span key={`empty-${i}`} className="text-gray-300 text-lg">☆</span>
+                ))}
+                <span className="ml-2 text-gray-700 text-sm">
+                    {averageRating ? averageRating.toFixed(1) : "0.0"} / 5
+                </span>
+            </span>
+        );
+    };
+    
 
     useEffect(() => {
-        const fetchBooks = async () => {
-            const { data, error } = await supabase.from("book_titles").select("*");
-    
-            if (error) {
-                console.error("Error fetching books:", error);
-            } else {
-                // Map the books to include the cover URL directly from the cover column
-                const booksWithImages = data.map((book) => {
-                    return { ...book, image_url: book.cover || null }; // Use cover column directly
+        const fetchBooksAndRatings = async () => {
+            try {
+                // Fetch books from the book_titles table
+                const { data: booksData, error: booksError } = await supabase
+                    .from("book_titles")
+                    .select("*");
+                if (booksError) throw booksError;
+
+                // Fetch ratings from the ratings table
+                const { data: ratingsData, error: ratingsError } = await supabase
+                    .from("ratings")
+                    .select("titleID, ratingValue");
+                if (ratingsError) throw ratingsError;
+
+                // Calculate the average rating for each book using titleID
+                const averageRatings = ratingsData.reduce((acc, curr) => {
+                    if (!acc[curr.titleID]) {
+                        acc[curr.titleID] = { sum: 0, count: 0 };
+                    }
+                    if (curr.ratingValue !== null && !isNaN(curr.ratingValue)) {
+                        acc[curr.titleID].sum += curr.ratingValue;
+                        acc[curr.titleID].count += 1;
+                    }
+                    return acc;
+                }, {});
+
+                const booksWithDetails = booksData.map((book) => {
+                    const avgRating =
+                        averageRatings[book.titleID]?.count > 0
+                            ? averageRatings[book.titleID].sum /
+                              averageRatings[book.titleID].count
+                            : 0; // Default to 0 if no ratings available
+
+                    return {
+                        ...book,
+                        image_url: book.cover || "https://via.placeholder.com/150x300", // Default placeholder
+                        averageRating: avgRating,
+                    };
                 });
-    
-                setBooks(booksWithImages);
-    
+
+                setBooks(booksWithDetails);
+
                 // Insert books and authors into the Trie
                 const newTrie = new Trie();
-                booksWithImages.forEach((book) => {
+                booksWithDetails.forEach((book) => {
                     newTrie.insert(book.title.toLowerCase());
-    
-                    // Extract and insert authors if present in jsonb[] format
+
+                    // Insert authors into the Trie
                     if (book.author && Array.isArray(book.author)) {
                         const authorNames = book.author
                             .map((author) => (author.name ? author.name.toLowerCase() : ""))
-                            .filter((name) => name !== ""); // Filter out empty names
+                            .filter((name) => name !== "");
                         const authorString = authorNames.join(", ");
                         newTrie.insert(authorString.toLowerCase());
                     }
                 });
                 setTrie(newTrie);
+            } catch (error) {
+                console.error("Error fetching books or ratings:", error);
             }
         };
-    
-        fetchBooks();
+
+        fetchBooksAndRatings();
     }, []);
 
     useEffect(() => {
@@ -85,11 +139,11 @@ const UBkResults = ({ query }) => {
                 <p className="text-lg text-gray-500 mb-4">No results for "{query}"</p>
             )}
 
-            {filteredBooks.map((book, index) => (
+            {displayedBooks.map((book, index) => (
                 <div key={index} className="genCard-cont flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg mb-6">
                     <div className="flex-shrink-0 w-[200px]">
                         <img
-                            src={book.img || "https://via.placeholder.com/150x300"}
+                            src={book.image_url}
                             alt={book.title}
                             className="w-full h-[300px] bg-grey object-cover border border-grey rounded-md"
                         />
@@ -103,6 +157,9 @@ const UBkResults = ({ query }) => {
                                 <p><span>Category:</span> <b>{book.category}</b></p>
                                 <p><span>Published:</span> <b>{new Date(book.originalPubDate).getFullYear()}</b></p>
                             </div>
+                            <p className="mt-3 text-yellow-600 font-semibold flex items-center">
+                                <span>Average Rating:</span> {renderStars(book.averageRating)}
+                            </p>
                         </div>
 
                         <p className="text-sm text-gray-600 mt-3">
