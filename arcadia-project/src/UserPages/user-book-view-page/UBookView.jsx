@@ -32,22 +32,22 @@ const UBookView = () => {
         .eq("titleID", titleId)
         .single();
 
-      if (error) {
-        console.error("Error fetching book details:", error);
-        setError("Failed to fetch book details");
-      } else {
-        const publishedYear = data.originalPubDate
-          ? new Date(data.originalPubDate).getFullYear()
-          : "Unknown Year";
-        
-        // Ensure the cover image URL is included in bookDetails
-        setBookDetails({
-          ...data,
-          image_url: data.cover || "https://via.placeholder.com/150x300", // Use the cover field if present
-          publishedYear,
-        });
+      if (error || !data) {
+        console.error("Error fetching or no data:", error);
+        setError("Failed to fetch book details or book not found");
+        setLoading(false);
+        return;
       }
 
+      const publishedYear = data.originalPubDate
+        ? new Date(data.originalPubDate).getFullYear()
+        : "Unknown Year";
+
+      setBookDetails({
+        ...data,
+        image_url: data.cover || "https://via.placeholder.com/150x300",
+        publishedYear,
+      });
       setLoading(false);
     };
 
@@ -79,23 +79,21 @@ const UBookView = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
           <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4 mr-5">
-            <BookAvailability isAvailable={bookDetails.isAvailable} />
+            <BookAvailability isAvailable={bookDetails?.isAvailable || false} />
           </div>
 
           <div className="userMain-content lg:w-3/4 w-full mt-4 ml-5">
             <ReturnToSearch />
-            {/* Pass bookDetails to BookInformation */}
             <BookInformation
               book={bookDetails}
-              publishedYear={bookDetails.publishedYear}
+              publishedYear={bookDetails?.publishedYear || "Unknown"}
             />
-            <SimBooks category={bookDetails.category} />
+            <SimBooks category={bookDetails?.category || "General"} />
           </div>
         </div>
       </main>
     </div>
   );
 };
-
 
 export default UBookView;
