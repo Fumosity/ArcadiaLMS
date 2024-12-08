@@ -1,13 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
 import { Star } from "lucide-react";
+import { supabase } from "../../../supabaseClient"; // Import your Supabase client
+import { useUser } from "../../../backend/UserContext"; // Import UserContext
 
 export default function BookInformation({ book }) {
+    const { user } = useUser(); // Access user from context
+    const [selectedRating, setSelectedRating] = useState(0); // Track selected rating
+    const [message, setMessage] = useState(""); // Feedback message
+
     if (!book) {
         return <p className="text-center text-gray-500">No book information available.</p>;
     }
 
-    // Helper function to safely join array fields
     const joinArray = (arr) => (Array.isArray(arr) ? arr.join("; ") : "");
+
+    const handleStarClick = (rating) => {
+        setSelectedRating(rating); // Set the clicked rating
+        setMessage(""); // Clear any previous message
+    };
+
+    const handleSubmitRating = async () => {
+        if (selectedRating === 0) {
+            setMessage("Please select a rating before submitting!");
+            return;
+        }
+
+        if (!user || !user.userID) {
+            setMessage("You must be logged in to rate!");
+            return;
+        }
+
+        try {
+            const { data, error: insertError } = await supabase
+                .from("ratings")
+                .insert({
+                    ratingDateTime: new Date().toISOString(), // Current timestamp
+                    ratingValue: selectedRating,
+                    titleID: book.titleID,
+                    userID: user.userID, // Use the logged-in user's ID
+                })
+                .select()
+                .single();
+
+            if (insertError) {
+                console.error("Error submitting new rating:", insertError);
+                setMessage("Error submitting rating. Please try again.");
+            } else {
+                setMessage("Rating submitted successfully!");
+            }
+        } catch (err) {
+            console.error("Unexpected error:", err);
+            setMessage("Unexpected error occurred. Please try again.");
+        }
+    };
 
     return (
         <div className="uMain-cont">
@@ -35,12 +80,22 @@ export default function BookInformation({ book }) {
 
                     <div className="flex items-center justify-start gap-1 mt-2">
                         {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`w-4 h-4 ${i < Math.floor(book.rating) ? " fill-bright-yellow" : "fill-grey"}`} />
+                            <Star
+                                key={i}
+                                className={`w-4 h-4 cursor-pointer ${
+                                    i < selectedRating ? "fill-bright-yellow" : "fill-grey"
+                                }`}
+                                onClick={() => handleStarClick(i + 1)} // Update rating on star click
+                            />
                         ))}
-                        <span className="text-sm text-gray-600 ml-1">{book.rating}</span>
-
-                        <button className="viewBk-btn ml-3">Rate</button>
+                        <span className="text-sm text-gray-600 ml-1">{selectedRating || "No rating selected"}</span>
                     </div>
+
+                    <button className="viewBk-btn ml-3" onClick={handleSubmitRating}>
+                        Rate
+                    </button>
+
+                    {message && <p className="text-sm text-center mt-2 text-gray-500">{message}</p>}
                 </div>
             </div>
 
@@ -58,7 +113,7 @@ export default function BookInformation({ book }) {
                     <br />
                     <p><span className="font-semibold">Location:</span> {book.location || "No location available"}</p>
                     <br />
-                    <p><span className="font-semibold">ISBN:</span> {joinArray(book.isbn) || "No ISBN available"}</p>
+                    <p><span className="font-semibold">ISBN:</span> {book.ISBN || "No ISBN available"}</p>
                     <br />
                     <p><span className="font-semibold">Language:</span> {book.language || "No information available"}</p>
                 </div>
