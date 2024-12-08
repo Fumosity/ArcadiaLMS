@@ -1,157 +1,130 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { supabase } from '../supabaseClient'; // Import your Supabase client
+import moment from "moment";
 
 const ModifySchedule = ({ isOpen, onClose, event, onModify, onDelete }) => {
-    // Ensure the event object is not null and initialize date range properly
-    const [dateRange, setDateRange] = useState([
-        event?.start || new Date(), // Fallback to current date if start is undefined
-        event?.end || new Date()    // Fallback to current date if end is undefined
-    ]);
-    
-    const [startDate, endDate] = dateRange;
-    const [startTime, setStartTime] = useState(event?.startTime || '07:00');
-    const [endTime, setEndTime] = useState(event?.endTime || '17:00');
-    const [eventTitle, setEventTitle] = useState(event?.title || '');
+    const [startDate, setStartDate] = useState(event?.start || new Date());
+    const [endDate, setEndDate] = useState(event?.end || event?.start || new Date());
+    const [startTime, setStartTime] = useState(event?.start ? moment(event.start).format("HH:mm") : "07:00");
+    const [endTime, setEndTime] = useState(event?.end ? moment(event.end).format("HH:mm") : "17:00");
+    const [eventTitle, setEventTitle] = useState(event?.title || "");
+    const [isMultiDay, setIsMultiDay] = useState(
+        moment(event?.start).format("YYYY-MM-DD") !== moment(event?.end).format("YYYY-MM-DD")
+    );
 
     useEffect(() => {
         if (event) {
-            console.log('Event:', event); // Check event structure
-            setStartTime(event.startTime || '07:00');
-            setEndTime(event.endTime || '17:00');
-            setDateRange([event.start || new Date(), event.end || new Date()]);
+            setStartDate(event.start || new Date());
+            setEndDate(event.end || event.start || new Date());
+            setStartTime(moment(event.start).format("HH:mm"));
+            setEndTime(moment(event.end).format("HH:mm"));
+            setEventTitle(event.title || "");
+            setIsMultiDay(moment(event.start).format("YYYY-MM-DD") !== moment(event.end).format("YYYY-MM-DD"));
         }
     }, [event]);
 
-    if (!isOpen || !event) return null;
+    const handleMultiDayToggle = (checked) => {
+        setIsMultiDay(checked);
+        if (!checked) {
+            setEndDate(startDate); // Reset endDate to match startDate when multi-day is unchecked
+        }
+    };
+
+    const handleSave = () => {
+        const modifiedEvent = {
+            ...event,
+            title: eventTitle,
+            start: moment(startDate).set({
+                hour: parseInt(startTime.split(":")[0]),
+                minute: parseInt(startTime.split(":")[1]),
+            }).toDate(),
+            // Add 1 day for multi-day events to include the last day
+            end: isMultiDay
+                ? moment(endDate).set({
+                    hour: parseInt(endTime.split(":")[0]),
+                    minute: parseInt(endTime.split(":")[1]),
+                }).add(1, 'days').toDate()  // Add 1 day to include the entire day
+                : moment(endDate).set({
+                    hour: parseInt(endTime.split(":")[0]),
+                    minute: parseInt(endTime.split(":")[1]),
+                }).toDate(),
+            isMultiDay,
+        };
+    
+        onModify(modifiedEvent);
+        onClose();
+    };
+
+    if (!isOpen) return null;
 
     const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
         <button ref={ref} className="inputBox text-left" onClick={onClick}>
-            {value || "Select date range"}
+            {value || "Select date"}
         </button>
     ));
-
-    const handleSave = async () => {
-        // Ensure startDate and endDate are properly defined
-        if (!startDate || !endDate) {
-            console.error("Start date or end date is not defined.");
-            return;  // Exit if dates are invalid
-        }
-
-        // Prepare the modified event data (only modify time, title, and date range)
-        const modifiedEvent = {
-            ...event, // Preserve the existing event properties
-            startTime,
-            endTime,
-            start: startDate,
-            end: endDate,
-            title: eventTitle
-        };
-
-        // Prepare the data to be saved in the Supabase 'schedule' table as a JSONB object
-        const eventData = {
-            date: startDate.toISOString().split('T')[0], // Format to yyyy-mm-dd
-            time: `${startTime} to ${endTime}`,
-            event: eventTitle, // Only the title of the event
-        };
-
-        // Prepare the data object for the upsert
-        const upsertData = {
-            event_data: eventData,
-        };
-
-        if (event?.eventID) {
-            // If eventID exists, this is an update, so include the eventID for update
-            upsertData.eventID = event.eventID;
-        }
-
-        // Log eventID and event data to confirm what we're passing
-        console.log("upsert data:", upsertData);
-
-        try {
-            // Step 1: Check if the event already exists
-            if (event?.eventID) {
-                // If eventID exists, this is an update
-                const { data, error } = await supabase
-                    .from('schedule')
-                    .update(upsertData)
-                    .eq('eventID', event.eventID);
-
-                if (error) {
-                    console.error("Error updating event:", error.message);
-                } else {
-                    console.log("Event updated:", data);
-                    onModify(modifiedEvent);
-                }
-            }
-            else {
-                // Step 2: If eventID doesn't exist, insert a new event
-                const { data, error } = await supabase
-                    .from('schedule')
-                    .insert([upsertData]); // Insert new event if eventID is missing
-
-                if (error) {
-                    console.error("Error inserting event:", error.message);
-                } else {
-                    console.log("Event inserted:", data);
-                    onModify(modifiedEvent); // Pass the modified event to parent to update state
-                }
-            }
-        } catch (error) {
-            console.error("Unexpected error:", error);
-        }
-
-        // Close modal after saving
-        handleCloseModal();
-    };
-
-    const handleDelete = () => {
-        onDelete(event); // Pass the event to the parent to be deleted
-    };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl w-full max-w-2xl p-8">
                 <h2 className="text-2xl font-semibold mb-4 text-left">Modify Schedule</h2>
                 <p className="text-sm text-gray-600 mb-6 ml-3 text-left">
-                    Note: After selecting the first date, hover to another date to complete the date range.
+                    Note: Check the box below to make it a multi-day event.
                 </p>
 
                 <div className="space-y-4">
                     <div className="flex items-center">
-                        <span className="w-32 text-sm font-medium">Date Range:</span>
-                        <div className="flex-1 flex justify-end">
+                        <span className="w-32 text-sm font-medium">Date:</span>
+                        <div className="flex-1 flex justify-end items-center space-x-2">
                             <DatePicker
-                                selectsRange
-                                startDate={startDate || new Date()}
-                                endDate={endDate || new Date()}
-                                onChange={(update) => setDateRange(update)}
+                                selected={startDate}
+                                onChange={(date) => {
+                                    setStartDate(date);
+                                    if (!isMultiDay) setEndDate(date); // Ensure start and end dates match for single day
+                                }}
                                 customInput={<CustomInput />}
                             />
+                            {isMultiDay && (
+                                <DatePicker
+                                    selected={endDate}
+                                    onChange={(date) => setEndDate(date)}
+                                    minDate={startDate}
+                                    customInput={<CustomInput />}
+                                />
+                            )}
                         </div>
                     </div>
 
-                    {/* Operating Time selection */}
-                    <div className="flex items-center">
-                        <span className="w-32 text-sm font-medium">Operating Times:</span>
-                        <div className="flex space-x-4 right-0">
-                            <input
-                                type="time"
-                                value={startTime}
-                                onChange={(e) => setStartTime(e.target.value || '07:00')}  // Always update with valid value
-                                className="inputBox"
-                            />
-                            <input
-                                type="time"
-                                value={endTime}
-                                onChange={(e) => setEndTime(e.target.value || '17:00')}  // Always update with valid value
-                                className="inputBox"
-                            />
-                        </div>
+                    <div className="flex items-center mt-2">
+                        <span className="w-32 text-sm font-medium">Multi-day:</span>
+                        <input
+                            type="checkbox"
+                            checked={isMultiDay}
+                            onChange={(e) => handleMultiDayToggle(e.target.checked)}
+                            className="form-checkbox h-5 w-5 text-blue-600"
+                        />
                     </div>
 
-                    {/* Event section */}
+                    {!isMultiDay && (
+                        <div className="flex items-center mt-2">
+                            <span className="w-32 text-sm font-medium">Operating Time:</span>
+                            <div className="flex space-x-4">
+                                <input
+                                    type="time"
+                                    value={startTime}
+                                    onChange={(e) => setStartTime(e.target.value)}
+                                    className="inputBox"
+                                />
+                                <input
+                                    type="time"
+                                    value={endTime}
+                                    onChange={(e) => setEndTime(e.target.value)}
+                                    className="inputBox"
+                                />
+                            </div>
+                        </div>
+                    )}
+                    
                     <div className="flex items-center">
                         <span className="w-32 text-sm font-medium">Event:</span>
                         <input
@@ -168,7 +141,7 @@ const ModifySchedule = ({ isOpen, onClose, event, onModify, onDelete }) => {
                     <button className="modifyButton" onClick={handleSave}>
                         Modify
                     </button>
-                    <button className="deleteButton" onClick={handleDelete}>
+                    <button className="deleteButton" onClick={() => onDelete(event)}>
                         Delete
                     </button>
                     <button className="cancelButton" onClick={onClose}>

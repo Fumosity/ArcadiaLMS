@@ -93,8 +93,6 @@ function App() {
               <Route path="/user/mostpopularbooks" element={<UMostPop />} />
               <Route path="/user/highlyratedbooks" element={<UHighlyRated />} />
               <Route path="/user/bookview" element={<UBookView />} />
-              
-              
             </Routes>
             <UFooter />
             <UCopyright />
