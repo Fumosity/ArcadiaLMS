@@ -41,6 +41,7 @@ import UReports from './UserPages/user-report-page/UReports';
 import AReportViewPage from './admin-report/AReportViewPage';
 import ASupportViewPage from './admin-report/ASupportViewPage';
 import ULogin from './UserPages/user-log-sign-page/ULogin';
+import UBookView from './UserPages/user-book-view-page/UBookView.jsx';
 
 // Testing modals
 import ModalTest from './z_modals/ModalTest';
@@ -91,6 +92,7 @@ function App() {
               <Route path="/user/faqs" element={<UFAQs />} />
               <Route path="/user/mostpopularbooks" element={<UMostPop />} />
               <Route path="/user/highlyratedbooks" element={<UHighlyRated />} />
+              <Route path="/user/bookview" element={<UBookView />} />
             </Routes>
             <UFooter />
             <UCopyright />
