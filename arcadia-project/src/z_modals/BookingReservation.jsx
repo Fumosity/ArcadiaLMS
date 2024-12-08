@@ -3,11 +3,17 @@ import React from 'react';
 const BookingReservation = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
+  const currentDate = new Date(); // Set to today's date
+  const formattedDate = currentDate.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric"
+  });
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-3xl p-8">
         <h2 className="text-2xl font-semibold mb-6 text-center">Modify Booking Reservation</h2>
-        
+
         <div className="flex gap-12">
           <div className="flex-1 space-y-4">
             <div className="flex items-center">
@@ -79,7 +85,7 @@ const BookingReservation = ({ isOpen, onClose }) => {
               <span className="w-32 text-sm font-medium">Date:</span>
               <input
                 type="text"
-                defaultValue="August 23"
+                value={formattedDate}  // Display in a readable format like "December 8"
                 className="inputBox"
                 readOnly
               />
@@ -125,8 +131,6 @@ const BookingReservation = ({ isOpen, onClose }) => {
             </div>
           </div>
         </div>
-
-        
 
         <div className="flex justify-center space-x-4 mt-8">
           <button

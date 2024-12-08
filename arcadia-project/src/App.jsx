@@ -91,8 +91,6 @@ function App() {
               <Route path="/user/faqs" element={<UFAQs />} />
               <Route path="/user/mostpopularbooks" element={<UMostPop />} />
               <Route path="/user/highlyratedbooks" element={<UHighlyRated />} />
-              
-              
             </Routes>
             <UFooter />
             <UCopyright />

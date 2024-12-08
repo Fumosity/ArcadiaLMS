@@ -524,7 +524,7 @@
 }
 
 .input-space{
-  @apply px-3 py-0.5 border border-grey rounded-full text-right;
+  @apply px-3 py-0.5 border border-grey rounded-full text-left;
   width: 260px;
 }
 
@@ -550,4 +550,8 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.fc-license-message {
+  display: none;
 }

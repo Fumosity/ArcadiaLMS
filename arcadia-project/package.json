@@ -12,6 +12,12 @@
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/resource-timeline": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
     "@mui/material": "^6.1.6",
     "@mui/x-date-pickers": "^7.22.2",
     "@supabase/supabase-js": "^2.45.6",
