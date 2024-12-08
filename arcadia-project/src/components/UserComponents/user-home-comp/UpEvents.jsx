@@ -1,14 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
-import 'react-calendar/dist/Calendar.css'; // Import the CSS for the calendar
+import 'react-calendar/dist/Calendar.css';
+import moment from 'moment';
+import { supabase } from '../../../supabaseClient';
 
 const UpEvents = () => {
   const [date, setDate] = useState(new Date());
-  const events = [
-    { title: "Midterm Exams", dateRange: "Nov. 5th - Nov. 12th" },
-    { title: "ARC Week", dateRange: "Nov. 15th - Nov. 21st" },
-    { title: "TOEIC Certification", dateRange: "Dec. 3 - Dec. 5" },
-  ];
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    const { data, error } = await supabase
+      .from('schedule')
+      .select('eventID, event_data');
+
+    if (error) {
+      console.error('Error fetching events:', error);
+      return;
+    }
+
+    const formattedEvents = data.map((event) => {
+      const { event: title, start, end, isMultiDay, allDays } = event.event_data;
+      
+      if (isMultiDay && allDays) {
+        const firstDay = allDays[0];
+        const lastDay = allDays[allDays.length - 1];
+        return {
+          title,
+          dateRange: `${moment(firstDay.date).format('MMM D')} - ${moment(lastDay.date).format('MMM D')}`,
+          start: moment(firstDay.date).toDate(),
+          end: moment(lastDay.date).toDate(),
+        };
+      }
+
+      return {
+        title,
+        dateRange: moment(start).isSame(end, 'day') 
+          ? moment(start).format('MMM D')
+          : `${moment(start).format('MMM D')} - ${moment(end).format('MMM D')}`,
+        start: moment(start).toDate(),
+        end: moment(end).toDate(),
+      };
+    });
+
+    setEvents(formattedEvents);
+  };
+
+  const tileClassName = ({ date, view }) => {
+    if (view === 'month') {
+      const hasEvent = events.some(event => 
+        moment(date).isBetween(event.start, event.end, 'day', '[]')
+      );
+      return hasEvent ? 'bg-blue-200 text-blue-800' : '';
+    }
+  };
 
   return (
     <div className="uSidebar-filter">
@@ -19,9 +67,7 @@ const UpEvents = () => {
           onChange={setDate}
           value={date}
           className="mx-auto"
-          tileClassName={({ date, view }) =>
-            view === "month" && (date.getDay() === 0 ? "text-red-500" : "")
-          }
+          tileClassName={tileClassName}
         />
       </div>
       
@@ -47,3 +93,4 @@ const UpEvents = () => {
 };
 
 export default UpEvents;
+

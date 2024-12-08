@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import ModifySchedule from '../../z_modals/ModifySchedule'; // Import the modal component
-import { supabase } from '../../supabaseClient'; // Import your Supabase client
+import ModifySchedule from '../../z_modals/ModifySchedule';
+import { supabase } from '../../supabaseClient';
 
 const localizer = momentLocalizer(moment);
 
@@ -12,38 +12,33 @@ export default function WeeklySched() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
 
-    // Fetch schedule from Supabase on mount
+    const fetchSchedule = async () => {
+        const { data, error } = await supabase
+            .from('schedule')
+            .select('eventID, event_data');
+
+        if (error) {
+            console.error('Error fetching schedule:', error);
+            return;
+        }
+
+        const formattedEvents = data.map((event) => {
+            const { event: eventName, start, end, isMultiDay } = event.event_data;
+            return {
+                title: eventName,
+                start: moment(start).toDate(),
+                end: moment(end).toDate(),
+                eventID: event.eventID,
+                isMultiDay: isMultiDay || false
+            };
+        });
+
+        setEvents(formattedEvents);
+    };
+
     useEffect(() => {
-        const fetchSchedule = async () => {
-            const { data, error } = await supabase
-                .from('schedule')
-                .select('eventID, event_data'); // Include eventID in the select
-
-            if (error) {
-                console.error('Error fetching schedule:', error);
-                return;
-            }
-
-            const formattedEvents = data.map((event) => {
-                const { date, time, event: eventName } = event.event_data;
-                const [startTime, endTime] = time.split(' to ');
-                const start = moment(`${date} ${startTime}`).toDate();
-                const end = moment(`${date} ${endTime}`).toDate();
-
-                return {
-                    title: eventName,
-                    start,
-                    end,
-                    eventID: event.eventID // Ensure eventID is included
-                };
-            });
-
-            setEvents(formattedEvents); // Update the state with formatted events
-        };
-
-        fetchSchedule(); // Call the function to fetch events
-    }, []); // Empty dependency array to run only once when the component mounts
-
+        fetchSchedule();
+    }, []);
 
     const handleSelect = ({ start, end }) => {
         const event = events.find(
@@ -51,13 +46,14 @@ export default function WeeklySched() {
         );
 
         if (event) {
-            setSelectedEvent(event); // Pass the full event, including eventID
+            setSelectedEvent(event);
         } else {
             setSelectedEvent({
                 title: 'New Event',
                 start,
                 end,
-                eventID: null // New events won't have an eventID
+                eventID: null,
+                isMultiDay: false
             });
         }
         setIsModalOpen(true);
@@ -65,22 +61,58 @@ export default function WeeklySched() {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
+        setSelectedEvent(null);
     };
 
-    const handleModifySchedule = (modifiedEvent) => {
-        setEvents((prev) => {
-            const existingEventIndex = prev.findIndex((event) =>
-                event.start.getTime() === modifiedEvent.start.getTime() && event.end.getTime() === modifiedEvent.end.getTime()
-            );
-            if (existingEventIndex !== -1) {
-                const updatedEvents = [...prev];
-                updatedEvents[existingEventIndex] = modifiedEvent; // Replace the old event with the modified one
-                return updatedEvents;
+    const handleModifySchedule = async (modifiedEvent) => {
+        const eventToSave = {
+            event: modifiedEvent.title,
+            start: moment(modifiedEvent.start).format('YYYY-MM-DD HH:mm'),
+            end: moment(modifiedEvent.end).format('YYYY-MM-DD HH:mm'),
+            isMultiDay: modifiedEvent.isMultiDay
+        };
+
+        try {
+            let updatedEvent;
+            if (modifiedEvent.eventID) {
+                const { data, error } = await supabase
+                    .from('schedule')
+                    .update({ event_data: eventToSave })
+                    .eq('eventID', modifiedEvent.eventID)
+                    .select();
+                if (error) throw error;
+                updatedEvent = data[0];
             } else {
-                return [...prev, modifiedEvent]; // Add the new event if it's not found
+                const { data, error } = await supabase
+                    .from('schedule')
+                    .insert({ event_data: eventToSave })
+                    .select();
+                if (error) throw error;
+                updatedEvent = data[0];
             }
-        });
-        handleCloseModal(); // Close the modal after saving
+
+            const formattedEvent = {
+                ...modifiedEvent,
+                eventID: updatedEvent.eventID,
+                start: moment(updatedEvent.event_data.start).toDate(),
+                end: moment(updatedEvent.event_data.end).toDate(),
+            };
+
+            setEvents((prev) => {
+                const existingEventIndex = prev.findIndex((e) => e.eventID === formattedEvent.eventID);
+                if (existingEventIndex !== -1) {
+                    const updatedEvents = [...prev];
+                    updatedEvents[existingEventIndex] = formattedEvent;
+                    return updatedEvents;
+                } else {
+                    return [...prev, formattedEvent];
+                }
+            });
+        } catch (error) {
+            console.error('Error saving event:', error);
+        }
+
+        handleCloseModal();
     };
 
     const handleDeleteSchedule = async (eventToDelete) => {
@@ -93,23 +125,15 @@ export default function WeeklySched() {
             const { error } = await supabase
                 .from('schedule')
                 .delete()
-                .match({ eventID: eventToDelete.eventID }); // Use the eventID to delete
+                .match({ eventID: eventToDelete.eventID });
 
-            if (error) {
-                console.error('Error deleting event:', error);
-            } else {
-                setEvents((prev) =>
-                    prev.filter(
-                        (event) =>
-                            event.start.getTime() !== eventToDelete.start.getTime() ||
-                            event.end.getTime() !== eventToDelete.end.getTime()
-                    )
-                );
-            }
+            if (error) throw error;
+
+            setEvents((prev) => prev.filter((event) => event.eventID !== eventToDelete.eventID));
         } catch (err) {
-            console.error('Unexpected error deleting event:', err);
+            console.error('Error deleting event:', err);
         } finally {
-            handleCloseModal(); // Close the modal after deleting
+            handleCloseModal();
         }
     };
 
@@ -138,3 +162,4 @@ export default function WeeklySched() {
         </div>
     );
 }
+
