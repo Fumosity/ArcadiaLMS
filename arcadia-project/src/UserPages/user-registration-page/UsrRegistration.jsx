@@ -84,8 +84,7 @@ const UsrRegistration = () => {
         userDepartment: department,
         userEmail: `${email}@lpunetwork.edu.ph`,
         userPassword: hashedPassword,
-        userAccountType: "User",
-        userARCID: Math.random().toString(36).substr(2, 9),
+        userAccountType: "Student",
         userCreationDate: new Date().toISOString().slice(0, 10),
         userUpdateDate: new Date().toISOString().slice(0, 10),
       };
@@ -100,7 +99,7 @@ const UsrRegistration = () => {
         body: JSON.stringify({
           email: `${email}@lpunetwork.edu.ph`,
           firstName,
-          arcId: newUser.userARCID,
+          lpuID: newUser.userLPUID,
         }),
       });
   
@@ -186,7 +185,7 @@ const UsrRegistration = () => {
                 onChange={ handlePasswordChange }
                 className="overflow-hidden gap-2.5 self-stretch px-2.5 py-0.5 mt-2.5 w-full whitespace-nowrap rounded-2xl border border-solid border-zinc-300"
               />
-              <PasswordStrengthBar password={password} />
+              <PasswordStrengthBar password={ password } />
             </div>
             {/* Confirm Password Field */}
             <div className="flex overflow-hidden flex-col w-full max-md:max-w-full">

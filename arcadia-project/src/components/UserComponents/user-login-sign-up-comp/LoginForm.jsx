@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabaseClient.js";
 import { useUser } from "../../../backend/UserContext";
+import bcrypt from "bcryptjs";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -19,13 +20,18 @@ export default function LoginForm() {
         .from("user_accounts")
         .select("*")
         .eq("userEmail", email)
-        .eq("userPassword", password) // Replace with hashing in production
         .single();
 
       if (loginError || !loginData) {
         alert("Incorrect email or password. Please try again.");
         return;
       }
+
+      const passwordMatches = bcrypt.compareSync(password, loginData.userPassword);
+      if (!passwordMatches) {
+        alert("Incorrect email or password. Please try again.");
+        return;
+      } 
 
       updateUser(loginData); // Persist user globally
 

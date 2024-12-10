@@ -5,7 +5,6 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { supabase } from "../supabaseClient.js";
-import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
@@ -27,8 +26,10 @@ const transporter = nodemailer.createTransport({
   service: 'Gmail', // Use your email provider (e.g., Gmail, Outlook)
   auth: {
     user: process.env.EMAIL_USER, // Your email
-    pass: process.env.EMAIL_PASS, // App password
+    pass: process.env.EMAIL_PASS // App password
   },
+  debug: true,
+  logger: true,
 });
 
 transporter.verify((error, success) => {
@@ -46,17 +47,16 @@ function generateToken(payload) {
 // Endpoint to send email
 app.post('/send-email', async (req, res) => {
   console.log('Received request body:', req.body);
-  const { email, firstName, arcId } = req.body;
+  const { email, firstName, lpuID } = req.body;
 
-  if (!email || !firstName || !arcId) {
+  if (!email || !firstName || !lpuID) {
     console.error('Missing required fields:', req.body);
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const token = generateToken({ arcId, email });
+  const token = generateToken({ lpuID, email });
 
-  const verificationLink = `http://localhost:5000/verify?token=${token}`;
-
+  const verificationLink = `http://localhost:5173/auth-complete?token=${token}`;
 
   const mailOptions = {
   from: "parseefan@gmail.com",
@@ -84,8 +84,11 @@ app.get('/verify', async (req, res) => {
 
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    const { email } = payload;
+    const { email, lpuID } = payload;
+
     console.log('Verified token payload:', payload);
+
+    // Mark the user's account as verified
     const { data, error } = await supabase
       .from('user_accounts')
       .update({ userVerifyStatus: true })
@@ -102,7 +105,17 @@ app.get('/verify', async (req, res) => {
       return res.status(404).json({ error: 'User not found.' });
     }
 
-    res.status(200).json({ message: 'Account successfully verified.' });
+    // Generate a session token (JWT) for the verified user
+    const sessionToken = jwt.sign(
+      { email, lpuID },
+      JWT_SECRET,
+      { expiresIn: '7d' } // Set token expiration
+    );
+
+    res.status(200).json({
+      message: 'Account successfully verified.',
+      sessionToken, // Send session token back to the frontend
+    });
   } catch (error) {
     console.error('Token verification failed:', error.message);
     res.status(400).json({ error: 'Invalid or expired token.' });

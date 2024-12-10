@@ -61,7 +61,7 @@ import UHighlyRated from './UserPages/user-highly-rated-page/UHighlyRated';
 import AReservView from './admin-reserv-page/AReservView';
 import AdminErrorPage from './AdminErrorPage.jsx';
 import URsrchView from './UserPages/user-rsrch-view-page/URsrchView.jsx';
-
+import AuthComplete from './UserPages/AuthComplete.jsx';
 
 function App() {
   return (
@@ -93,6 +93,7 @@ function App() {
               <Route path="/user/bookview" element={<UBookView />} />
               <Route path="/user/researchview" element={<URsrchView/>} />
               <Route path="*" element={<ErrorPage />} /> 
+              <Route path="/auth-complete" element={<AuthComplete />} />
             </Routes>
             <UFooter />
             <UCopyright />
