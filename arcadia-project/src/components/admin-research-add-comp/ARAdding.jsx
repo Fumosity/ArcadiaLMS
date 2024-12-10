@@ -192,7 +192,7 @@ const ARAdding = ({ formData, setFormData }) => {
   //Handles the submission to the database
   const handleSubmit = async () => {
     
-    const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "researchID", "researchARCID", "pages",];
+    const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "researchID", "researchARCID",];
 
     // Ensure formData is fully updated
     const updatedFormData = { ...formData }; // Capture current formData

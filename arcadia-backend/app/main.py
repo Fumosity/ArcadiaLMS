@@ -14,7 +14,7 @@ import pandas as pd
 from pydantic import BaseModel
 import math
 from app.book_reco import get_recommendations
-
+from app.research_reco import get_rsrch_recommendations
 # Initialize FastAPI app
 app = FastAPI()
 
@@ -35,7 +35,7 @@ df = pd.read_csv('app/research_corpus.csv')
 # Display the first few rows to inspect the data
 print(df.head())
 
-excluded_sections = ["Approval Sheet", "Certificate of Originality", "Acknowledgement", "Table of Contents"]
+excluded_sections = ["Approval Sheet", "Certificate of Originality", "Acknowledgement", "Table of Contents", "Access Leaf", "Acceptance Sheet", "Author Permission Statement", "List of Tables", "List of Figures", "List of Appendices", "List of Abbreviations"]
 resume_sections = ["Abstract", "Keywords"]
 
 # Preprocessing and helper functions remain unchanged
@@ -323,7 +323,6 @@ async def extract_text(files: List[UploadFile] = File(...)):
     try:
         total_text = ""
         total_pages = 0
-        toc_keywords = ["table of contents", "contents"]
 
         for file in files:
             # Initialize text for each file
@@ -345,10 +344,6 @@ async def extract_text(files: List[UploadFile] = File(...)):
 
                     # Apply OCR to the page image
                     page_text = pytesseract.image_to_string(img, lang='eng')
-
-                    # Stop if Table of Contents detected
-                    if any(keyword.lower() in page_text.lower() for keyword in toc_keywords):
-                        break
 
                     file_text += page_text + "\n\n"
 
@@ -532,4 +527,20 @@ async def recommend(request: RecommendationRequest):
 
 
     # Return recommendations to UBookView
+    return {"recommendations": recommendations}
+
+class RsrchRecommendationRequest(BaseModel):
+    researchID: int
+
+@app.post("/research-recommend")
+async def recommend(request: RsrchRecommendationRequest):
+    research_id = request.researchID
+    print(f"Received researchID: {research_id}")  # Debug print
+
+    recommendations = get_rsrch_recommendations(research_id)
+
+    if isinstance(recommendations, pd.DataFrame):
+        recommendations = recommendations.to_dict(orient='records')
+
+    print("Recommendations Found:", recommendations)
     return {"recommendations": recommendations}

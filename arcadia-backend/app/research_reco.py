@@ -22,7 +22,7 @@ tfidf_matrix = tfidf.fit_transform(df['features'])
 # Calculate cosine similarity
 cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 
-def get_recommendations(researchID, cosine_sim=cosine_sim, df=df):
+def get_rsrch_recommendations(researchID, cosine_sim=cosine_sim, df=df):
     idx = df[df['researchID'] == researchID].index[0]
     sim_scores = list(enumerate(cosine_sim[idx]))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
@@ -32,11 +32,4 @@ def get_recommendations(researchID, cosine_sim=cosine_sim, df=df):
     print(f"Chosen Book (ID: {researchID}):")
     print(df[['title', 'college', 'department', 'keyword']].iloc[idx])
     print("\nRecommendations:")
-    return df[['title', 'college', 'department', 'keyword']].iloc[book_indices]
-
-# Get user input for researchID
-researchID_input = int(input("Enter the researchID for recommendations: "))
-
-# Example usage with researchID
-recommendations = get_recommendations(researchID_input)
-print(recommendations)
+    return df[['researchID', 'title', 'college', 'department', 'keyword']].iloc[book_indices]

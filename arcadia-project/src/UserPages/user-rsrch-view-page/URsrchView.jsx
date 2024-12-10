@@ -1,12 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import Title from "../../components/main-comp/Title";
 import ReturnToSearch from "../../components/UserComponents/user-book-view-comp/ReturnToSearch";
 import RsrchAvailability from "../../components/UserComponents/user-rsrch-view-comp/RsrchAvailability";
 import RsrchInformation from "../../components/UserComponents/user-rsrch-view-comp/RsrchInformation";
 import SimRsrch from "../../components/UserComponents/user-rsrch-catalog-comp/SimRsrch";
+import { supabase } from "./../../supabaseClient"; // Adjust path if necessary
+import { useLocation } from "react-router-dom";  // To read URL params
 
 const URsrchView = () => {
+  const [research, setResearch] = useState(null);
+
+  const { search } = useLocation();
+  const queryParams = new URLSearchParams(search);
+  const researchId = queryParams.get("researchID");
+
+  useEffect(() => {
+    const fetchResearchDetails = async () => {
+      if (researchId && !isNaN(researchId)) {
+        const { data, error } = await supabase
+          .from("research")
+          .select("*")
+          .eq("researchID", researchId)
+          .single();
+
+        if (error) {
+          console.error("Error fetching research:", error);
+        } else {
+          setResearch(data);
+        }
+        console.log(research)
+      } else {
+        console.error("Invalid or missing researchId");
+      }
+    };
+    fetchResearchDetails();
+  }, [researchId]);
+
   return (
     <div className="min-h-screen bg-light-white">
       <UNavbar />
@@ -19,8 +49,8 @@ const URsrchView = () => {
           </div>
           <div className="userMain-content lg:w-3/4 w-full mt-4 ml-5">
             <ReturnToSearch />
-            <RsrchInformation />
-            <SimRsrch />
+            <RsrchInformation research={research} />
+            <SimRsrch research={research} />
           </div>
         </div>
       </main>

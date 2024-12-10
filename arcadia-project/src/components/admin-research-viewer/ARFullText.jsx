@@ -66,7 +66,7 @@ const ARFullText = ({ researchData }) => {
                             {/* Loading Spinner */}
                             {isLoading && (
                                 <div className="absolute flex justify-center items-center w-full h-full bg-gray-100 opacity-75">
-                                    <div className="loader">Loading...</div>
+                                    <div className="loader"></div>
                                 </div>
                             )}
                             <Document

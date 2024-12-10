@@ -1,88 +1,93 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "../../../supabaseClient"; // Adjust path if necessary
 import { useLocation } from "react-router-dom";  // To read URL params
 import { Star } from "lucide-react";
+import { Document, Page, pdfjs } from "react-pdf"; 
+import { GlobalWorkerOptions } from "pdfjs-dist";
+import "react-pdf/dist/esm/Page/TextLayer.css";
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 
-export default function RsrchInformation() {
-    const [research, setResearch] = useState(null);
-    const { search } = useLocation();
-    const queryParams = new URLSearchParams(search);
-    const researchId = queryParams.get("researchID");
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs-dist/pdf.worker.min.mjs";
 
-    useEffect(() => {
-        const fetchResearchDetails = async () => {
-            if (researchId && !isNaN(researchId)) { 
-                const { data, error } = await supabase
-                    .from("research")
-                    .select("*")
-                    .eq("researchID", researchId)
-                    .single();
+export default function RsrchInformation({research}) {
+    const [pageNumber, setPageNumber] = useState(1);
+    const [numPages, setNumPages] = useState(10); 
+    const [isLoading, setIsLoading] = useState(true);
+
     
-                if (error) {
-                    console.error("Error fetching research:", error);
-                } else {
-                    setResearch(data);
-                }
-            } else {
-                console.error("Invalid or missing researchId");
-            }
-        };
-    
-        fetchResearchDetails();
-    }, [researchId]);
-    
+
+    const onLoadSuccess = ({ numPages }) => {
+        setNumPages(Math.min(numPages, 10)); 
+        setIsLoading(false); 
+    };
+
+    const onLoadError = (error) => {
+        console.error("Error loading PDF:", error);
+        setIsLoading(false);
+    };
+
+    const goToPrevPage = () => setPageNumber((prev) => Math.max(prev - 1, 1));
+    const goToNextPage = () => setPageNumber((prev) => Math.min(prev + 1, numPages));
 
     if (!research) {
-        return <p>Loading...</p>; // Show loading state until research data is fetched
+        return <p>Loading...</p>; 
     }
 
     return (
         <div className="uMain-cont">
-            {/* Main Research Info */}
             <div className="flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm mb-8">
-
                 <div className="flex-1">
                     <h3 className="text-lg font-semibold">{research.title}</h3>
-                    <div className="text-sm text-gray-700 mt-3">
-                        <p><span className="font-semibold">Authors:</span> <b>{research.author}</b></p>
-                        <div className="flex space-x-6 mt-3">
-                            <p><span className="font-semibold">Published:</span> <b>{research.pubDate}</b></p>
-                            <p><span className="font-semibold">College:</span> <b>{research.college}</b></p>
-                            <p><span className="font-semibold">Department:</span> <b>{research.department}</b></p>
-                        </div>
+                    <p className="text-sm text-gray-700 mt-3">
+                        <b>Authors:</b> {research.author}
+                    </p>
+                    <div className="flex space-x-6 mt-3">
+                        <p><b>Published:</b> {research.pubDate}</p>
+                        <p><b>College:</b> {research.college}</p>
+                        <p><b>Department:</b> {research.department}</p>
                     </div>
-
                     <p className="text-sm text-gray-600 mt-3">
                         {research.abstract || "No abstract available"}
                     </p>
-
-                    <p className="text-sm mt-3">{research.keywords}</p>
                 </div>
             </div>
 
-            {/* Additional Information Section */}
             <div className="mt-4 border-t border-grey">
-                <h4 className="text-lg font-semibold mt-4 mb-2">Research Preview</h4>
-                <div className="flex items-center justify-center">
-                    <img
-                        src={research.img}
-                        alt={`${research.title} Cover`}
-                        className="w-[520px] h-[836px] border-2 bg-grey object-cover border-black"
-                    />
+                <h4 className="text-lg font-semibold mt-4 mb-2">Full Text Preview</h4>
+                <div className="h-100 p-2.5 flex justify-center items-center">
+                    {research.pdf ? (
+                        <div className="p-2.5 pdf-viewer w-full max-w-4xl flex justify-center border border-grey rounded-lg" style={{ height: "725px" }}>
+                            {isLoading && (
+                                <div className="absolute flex justify-center items-center w-full h-full bg-gray-100 opacity-75">
+                                    <div className="loader"></div>
+                                </div>
+                            )}
+                            <Document
+                                file={research.pdf}
+                                loading="Loading PDF..."
+                                onLoadSuccess={onLoadSuccess}
+                                onLoadError={onLoadError}
+                            >
+                                <Page pageNumber={pageNumber} height={700} />
+                            </Document>
+                        </div>
+                    ) : (
+                        <p className="text-gray-500">No full-text preview available.</p>
+                    )}
                 </div>
-            </div>
 
-            {/* Additional Information Section for Research */}
-            <div className="mt-4 border-t border-grey">
-                <h4 className="text-lg font-semibold mt-4 mb-2">Additional Information</h4>
-                <div>
-                    <p><span className="font-semibold">Keywords:</span> {research.keyword || "No keywords available"}</p>
-                    <br />
-                    <p><span className="font-semibold">Location:</span> {research.location || "No location available"}</p>
-                    <br />
-                    <p><span className="font-semibold">Abstract:</span> {research.abstract || "No abstract available"}</p>
-                    <br />
-                </div>
+                {research.pdf && numPages && (
+                    <div className="flex justify-center gap-4 mt-4">
+                        <button onClick={goToPrevPage} disabled={pageNumber <= 1} className="uPage-btn px-4 py-2 bg-gray-200 text-sm rounded-md disabled:opacity-50">
+                            Previous
+                        </button>
+                        <span className="items-center flex text-sm font-medium">
+                            Page {pageNumber} of {numPages}
+                        </span>
+                        <button onClick={goToNextPage} disabled={pageNumber >= numPages} className="uPage-btn px-4 py-2 bg-gray-200 text-sm rounded-md disabled:opacity-50">
+                            Next
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
