@@ -1,35 +1,100 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "/src/supabaseClient.js";
+import { useUser } from "../../../backend/UserContext";
 
 const HighlyRated = () => {
     const [currentPage, setCurrentPage] = useState(1);
-    const totalEntries = 5; // Total number of books in Highly Rated
-    const entriesPerPage = 4; // Books per page
-    const totalPages = Math.ceil(totalEntries / entriesPerPage);
+    const [books, setBooks] = useState([]);
+    const [error, setError] = useState(null);
+    const { user, updateUser } = useUser();
 
-    // Placeholder book data for Highly Rated
-    const books = [
-        { title: "The War of the Worlds", author: "H.G. Wells", rating: 4.95, img: "https://via.placeholder.com/150x200", category: "Fiction; Novel, Science Fiction" },
-        { title: "No Longer Human", author: "Osamu Dazai", rating: 4.99, img: "https://via.placeholder.com/150x200", category: "Fiction; Short Story, Psychological" },
-        { title: "1984", author: "George Orwell", rating: 4.86, img: "https://via.placeholder.com/150x200", category: "Fiction; Novel, Political" },
-        { title: "Lord of the Flies", author: "William Golding", rating: 4.78, img: "https://via.placeholder.com/150x200", category: "Fiction; Novel, Survival" },
-        { title: "And Then There Were None", author: "Agatha Christie", rating: 4.67, img: "https://via.placeholder.com/150x200", category: "Fiction; Novel, Mystery" },
-    ];
+    const entriesPerPage = 5; // Books per page
+    const maxPages = 5; // Limit pagination to 5 pages
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch ratings along with book information
+                const { data, error } = await supabase
+                    .from("ratings")
+                    .select(`
+                        ratingValue,
+                        book_titles (titleID, title, author, category, cover)
+                    `)
+                    .order("ratingValue", { ascending: false }); // Order by ratingValue
+
+                if (error) throw error;
+
+                // Group ratings by book titleID
+                const groupedBooks = data.reduce((acc, { ratingValue, book_titles }) => {
+                    const { titleID, title, author, category, cover } = book_titles;
+                    if (!acc[titleID]) {
+                        acc[titleID] = {
+                            titleID,
+                            title,
+                            author,
+                            category,
+                            cover,
+                            ratings: [],
+                        };
+                    }
+                    acc[titleID].ratings.push(ratingValue);
+                    return acc;
+                }, {});
+
+                // Calculate weighted average for each book
+                const booksArray = Object.values(groupedBooks).map((book) => {
+                    const totalRatings = book.ratings.length;
+                    const sumRatings = book.ratings.reduce((sum, rating) => sum + rating, 0);
+                    const weightedAvg = sumRatings / totalRatings;
+                    return {
+                        ...book,
+                        weightedAvg,
+                        totalRatings, // Store total ratings to help with sorting
+                    };
+                });
+
+                // Sort books by weighted average (highest to lowest)
+                booksArray.sort((a, b) => b.weightedAvg - a.weightedAvg);
+
+                setBooks(booksArray); // Set the books data
+            } catch (error) {
+                setError(error.message); // Set error message in state
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Pagination logic
+    const totalEntries = books.length;
+    const totalPages = Math.min(Math.ceil(totalEntries / entriesPerPage), maxPages); // Limit total pages to 5
+    const paginatedBooks = books.slice(
+        (currentPage - 1) * entriesPerPage,
+        currentPage * entriesPerPage
+    );
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div className="uMain-cont">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Highly Rated</h2>
-                <button className="uSee-more">
-                    See more
-                </button>
+                <button className="uSee-more">See more</button>
             </div>
 
             {/* Book Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
-                {books.map((book, index) => (
-                    <a key={index} className="genCard-cont">
+                {paginatedBooks.map((book, index) => (
+                    <a key={index}
+                        href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`}
+                        className="block genCard-cont"
+                    >
                         <img
-                            src={book.img}
+                            src={book.cover || "https://via.placeholder.com/150x200"}
                             alt={book.title}
                             className="w-full h-40 object-cover rounded-lg mb-4"
                         />
@@ -38,7 +103,7 @@ const HighlyRated = () => {
                         <p className="text-xs text-gray-400 mb-2 truncate">{book.category}</p>
                         <div className="flex items-center space-x-1">
                             <span className="text-bright-yellow text-sm">★</span>
-                            <p className=" text-sm">{book.rating.toFixed(2)}</p>
+                            <p className="text-sm">{book.weightedAvg.toFixed(2)}</p>
                         </div>
                     </a>
                 ))}

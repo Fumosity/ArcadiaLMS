@@ -8,12 +8,13 @@ import BookAvailability from "../../components/UserComponents/user-book-view-com
 import ReturnToSearch from "../../components/UserComponents/user-book-view-comp/ReturnToSearch";
 import BookInformation from "../../components/UserComponents/user-book-view-comp/BookInformation";
 import SimBooks from "../../components/UserComponents/user-book-search-comp/SimBooks";
+import { useUser } from "../../backend/UserContext";
 
 const UBookView = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const titleId = queryParams.get("titleID");
-
+  const { user, updateUser } = useUser();
   const [bookDetails, setBookDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -88,7 +89,7 @@ const UBookView = () => {
               book={bookDetails}
               publishedYear={bookDetails?.publishedYear || "Unknown"}
             />
-            <SimBooks category={bookDetails?.category || "General"} />
+            <SimBooks titleID={titleId} userID={user.userID} category={bookDetails?.category} />
           </div>
         </div>
       </main>

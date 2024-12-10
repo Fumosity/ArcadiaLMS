@@ -35,6 +35,7 @@ tfidf_matrix = tfidf.fit_transform(books_df['features'])
 cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 
 def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df):
+    print("GETTING RECOMMENDATIONS TITLEID ", titleID, " USERID ", userID)
     if titleID is not None: # when titleID and userID is provided - hybrid
         idx = books_df[books_df['titleID'] == titleID].index[0]
 
@@ -97,7 +98,7 @@ def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_
         print(f"Average Rating: {books_df['average_rating'].iloc[idx]:.2f}\n")
 
         print("Recommendations:")
-        return books_df[['titleID', 'title', 'genre', 'category', 'keyword', 'average_rating']].iloc[book_indices]
+        return books_df[['titleID', 'title', 'genre', 'category', 'keyword', 'average_rating', 'cover']].iloc[book_indices]
     else: 
         #when titleID is not provided but userID is - collaborative
         user_college = users_df[users_df['userID'] == userID]['userCollege'].iloc[0]
@@ -129,15 +130,4 @@ def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_
         print('filtered_recommendations\n', filtered_recommendations)        
 
         print("Recommendations:")
-        return books_df[['titleID', 'title', 'genre', 'category', 'keyword', 'average_rating']].reindex(filtered_recommendations).dropna().head(5)
-
-# Get user input for titleID and userID
-titleID_input = input("Enter the titleID for recommendations: ")
-userID_input = input("Enter the userID for recommendations: ")
-
-titleID_input = int(titleID_input) if titleID_input else None
-userID_input = int(userID_input) if userID_input else None
-
-# Example usage with titleID and userID
-recommendations = get_recommendations(titleID_input, userID_input)
-print(recommendations)
+        return books_df[['titleID', 'title', 'genre', 'category', 'keyword', 'average_rating', 'cover']].reindex(filtered_recommendations).dropna().head(5)

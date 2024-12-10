@@ -1,19 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "/src/supabaseClient.js";
+import { useUser } from "../../../backend/UserContext";
 
 const NewlyAdded = () => {
     const [currentPage, setCurrentPage] = useState(1);
-    const totalEntries = 5; // Total number of books in Highly Rated
-    const entriesPerPage = 4; // Books per page
-    const totalPages = Math.ceil(totalEntries / entriesPerPage);
+    const [books, setBooks] = useState([]);
+    const [error, setError] = useState(null);
 
-    // Placeholder book data for Highly Rated
-    const books = [
-        { title: "The War of the Worlds", author: "H.G. Wells", rating: 4.95, img: "https://via.placeholder.com/150x200", category: "Fiction; Novel, Science Fiction" },
-        { title: "No Longer Human", author: "Osamu Dazai", rating: 4.99, img: "https://via.placeholder.com/150x200", category: "Fiction; Short Story, Psychological" },
-        { title: "1984", author: "George Orwell", rating: 4.86, img: "https://via.placeholder.com/150x200", category: "Fiction; Novel, Political" },
-        { title: "Lord of the Flies", author: "William Golding", rating: 4.78, img: "https://via.placeholder.com/150x200", category: "Fiction; Novel, Survival" },
-        { title: "And Then There Were None", author: "Agatha Christie", rating: 4.67, img: "https://via.placeholder.com/150x200", category: "Fiction; Novel, Mystery" },
-    ];
+    const [loading, setLoading] = useState(true);
+
+    const entriesPerPage = 5; // Books per page
+    const maxPages = 5; // Limit pagination to 5 pages
+
+    // Fetch books from Supabase
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from("book_titles")
+                    .select("*")
+                    .order("procurementDate", { ascending: false }); // Sort by procurementDate in descending order
+
+                if (error) {
+                    console.error("Error fetching books:", error);
+                } else {
+                    setBooks(data);
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.error("Unexpected error:", error);
+                setLoading(false);
+            }
+        };
+
+        fetchBooks();
+    }, []);
+
+    // Pagination logic
+    const totalEntries = books.length;
+    const totalPages = Math.min(Math.ceil(totalEntries / entriesPerPage), maxPages); // Limit total pages to 5
+    const paginatedBooks = books.slice(
+        (currentPage - 1) * entriesPerPage,
+        currentPage * entriesPerPage
+    );
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div className="uMain-cont">
@@ -26,10 +59,13 @@ const NewlyAdded = () => {
 
             {/* Book Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
-                {books.map((book, index) => (
-                    <a key={index} className="genCard-cont">
+                {paginatedBooks.map((book, index) => (
+                    <a key={index}
+                        href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`}
+                        className="block genCard-cont"
+                    >
                         <img
-                            src={book.img}
+                            src={book.cover || "https://via.placeholder.com/150x200"} // Adjust for cover field
                             alt={book.title}
                             className="w-full h-40 object-cover rounded-lg mb-4"
                         />
@@ -38,7 +74,7 @@ const NewlyAdded = () => {
                         <p className="text-xs text-gray-400 mb-2 truncate">{book.category}</p>
                         <div className="flex items-center space-x-1">
                             <span className="text-bright-yellow text-sm">★</span>
-                            <p className=" text-sm">{book.rating.toFixed(2)}</p>
+                            <p className=" text-sm">{book.rating?.toFixed(2)}</p>
                         </div>
                     </a>
                 ))}

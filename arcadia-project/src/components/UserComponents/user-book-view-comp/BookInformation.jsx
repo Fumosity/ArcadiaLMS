@@ -19,7 +19,7 @@ export default function BookInformation({ book }) {
             try {
                 const { data, error } = await supabase
                     .from("ratings")
-                    .select("id, ratingValue")
+                    .select("ratingID, ratingValue")
                     .eq("userID", user.userID)
                     .eq("titleID", book.titleID)
                     .single();

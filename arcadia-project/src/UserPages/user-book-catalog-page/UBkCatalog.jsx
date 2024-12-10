@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import USearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import Title from "../../components/main-comp/Title";
@@ -11,9 +11,58 @@ import ReleasedThisYear from "../../components/UserComponents/user-book-catalog-
 import Fiction from "../../components/UserComponents/user-book-catalog-comp/Fiction";
 import Nonfiction from "../../components/UserComponents/user-book-catalog-comp/Nonfiction";
 import UBkResults from "./UBkResults";
+import { useUser } from "../../backend/UserContext";
 
 const UBkCatalog = () => {
-    const [query, setQuery] = useState(""); 
+    const [query, setQuery] = useState("");
+    const { user, updateUser } = useUser();
+    const queryParams = new URLSearchParams(location.search);
+    const titleId = queryParams.get("titleID");
+    const [bookDetails, setBookDetails] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    console.log(user)
+
+    useEffect(() => {
+        const fetchBookDetails = async () => {
+            if (!titleId) {
+                setError("Title ID not provided");
+                setLoading(false);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from("book_titles")
+                .select("*")
+                .eq("titleID", titleId)
+                .single();
+
+            if (error || !data) {
+                console.error("Error fetching or no data:", error);
+                setError("Failed to fetch book details or book not found");
+                setLoading(false);
+                return;
+            }
+
+            const publishedYear = data.originalPubDate
+                ? new Date(data.originalPubDate).getFullYear()
+                : "Unknown Year";
+
+            setBookDetails({
+                ...data,
+                image_url: data.cover || "https://via.placeholder.com/150x300",
+                publishedYear,
+            });
+            setLoading(false);
+        };
+
+        fetchBookDetails();
+    }, [titleId]);
+
+    if (!user) {
+        return <div>Loading...</div>; // Or show a user-friendly message
+    }
 
     return (
         <div className="min-h-screen bg-light-white">
@@ -28,7 +77,7 @@ const UBkCatalog = () => {
                     </div>
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
                         {query.trim() && <UBkResults query={query} />}
-                        <Recommended />
+                        <Recommended titleID={titleId} userID={user.userID} category={bookDetails?.category || "General"} />
                         <MostPopular />
                         <HighlyRated />
                         <NewlyAdded />

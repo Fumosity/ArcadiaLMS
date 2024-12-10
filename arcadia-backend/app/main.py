@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Query
 from fastapi.responses import JSONResponse
 from PIL import Image
 import pytesseract
@@ -11,6 +11,9 @@ from joblib import load
 from datetime import datetime
 import numpy as np
 import pandas as pd
+from pydantic import BaseModel
+import math
+from app.book_reco import get_recommendations
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -69,18 +72,18 @@ def remove_sections(text):
         original_line = line
         line = line.strip()
 
-        if number_only_pattern.match(line):
+        if number_only_pattern.match(line): # skip page numbers
             continue
         
-        line_lower = line.lower()
+        line_lower = line.lower() # lowercase all
 
         if "bachelor of" in line_lower:
-            department = find_department(line_lower)
+            department = find_department(line_lower) # find department 
 
-        if line_lower.startswith("lyceum"):
+        if line_lower.startswith("lyceum"): # skip header
             continue
 
-        if line_lower.startswith("in partial fulfillment") or line_lower.startswith("an undergraduate"):
+        if line_lower.startswith("in partial fulfillment") or line_lower.startswith("an undergraduate"): # title page
             skip_current_paragraph = True
 
         if line in added_lines:
@@ -502,3 +505,31 @@ async def extract_text(files: List[UploadFile] = File(...)):
     
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+class RecommendationRequest(BaseModel):
+    userID: int
+    titleID: int | None
+
+@app.post("/book-recommend")
+async def recommend(request: RecommendationRequest):
+    user_id = request.userID
+    title_id = request.titleID
+    
+    # Call book_reco to get recommendations
+    recommendations = get_recommendations(title_id, user_id)
+
+    if isinstance(recommendations, pd.DataFrame):
+        recommendations = recommendations.to_dict(orient='records')
+
+    print(recommendations)  
+    for rec in recommendations:
+        # Handle NaN values in 'average_rating'
+        if isinstance(rec['average_rating'], float) and math.isnan(rec['average_rating']):
+            rec['average_rating'] = 0  # Or set a default value of your choice
+        
+        rec['titleID'] = int(rec['titleID'])
+        rec['rating'] = int(rec['average_rating'])  # Convert to int after handling NaN
+
+
+    # Return recommendations to UBookView
+    return {"recommendations": recommendations}
