@@ -39,13 +39,13 @@ export default function BookInformation({ book }) {
     }, [user, book]);
 
     const handleStarClick = (rating) => {
-        setSelectedRating(rating); // Set the clicked rating
-        setMessage(""); // Clear any previous message
+        setSelectedRating(rating); 
+        setMessage(""); 
     };
 
     const handleSubmitRating = async () => {
         if (!user) {
-            navigate("/user/login"); // Redirect to login if not logged in
+            navigate("/user/login"); 
             return;
         }
 

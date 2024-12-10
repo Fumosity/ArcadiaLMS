@@ -1,122 +1,71 @@
-"use client"
-
-import { useState } from "react"
-import { Clock, ChevronLeft, ChevronRight, Calendar } from "lucide-react"
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
+import { supabase } from "../../../supabaseClient";
 
 export default function Component() {
-  const [dateRange, setDateRange] = useState({
-    from: dayjs(),
-    to: dayjs().add(2, 'day')
-  })
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const [reservations, setReservations] = useState([]);
 
-  const timeSlots = [
-    "7:00AM", "8:00AM", "9:00AM", "10:00AM", "11:00AM", "12:00PM", "1:00PM"
-  ]
+  useEffect(() => {
+    async function fetchReservations() {
+      const { data, error } = await supabase
+        .from('reservation') // Replace with the actual table name
+        .select('reserve_data, userID') // Assuming the reserve data and user ID are in this table
+        .neq('reserve_data', null);
 
-  const rooms = [
-    { id: "A701-A", name: "Discussion Room 1 (A701-A)" },
-    { id: "A701-B", name: "Discussion Room 2 (A701-B)" }
-  ]
+      if (error) {
+        console.error('Error fetching reservations:', error);
+      } else {
+        const reservationData = await Promise.all(
+          data.map(async (reservation) => {
+            const { reserve_data, userID } = reservation;
+            
+            // Fetch user data
+            const { data: userData, error: userError } = await supabase
+              .from('user_accounts') // Replace with the actual table name
+              .select('userFName, userLName')
+              .eq('userID', userID)
+              .single();
 
-  const reservations = [
-    { room: "ARC-1", status: "Reserved", date: "August 23", period: "11:00AM - 12:00PM", borrower: "Henry Avery", purpose: "CS101 Group Study" },
-    { room: "ARC-1", status: "Finished", date: "August 23", period: "11:00AM - 12:00PM", borrower: "Henry Avery", purpose: "CS101 Group Study" },
-    { room: "ARC-1", status: "Finished", date: "August 23", period: "11:00AM - 12:00PM", borrower: "Henry Avery", purpose: "CS101 Group Study" },
-  ]
+            if (userError) {
+              console.error('Error fetching user data:', userError);
+            }
 
-  const handlePrevious = () => {
-    setDateRange(prev => ({
-      from: prev.from.subtract(1, 'day'),
-      to: prev.to.subtract(1, 'day')
-    }))
-  }
+            // Combine user first and last name
+            const borrower = `${userData?.userFName} ${userData?.userLName}`;
 
-  const handleNext = () => {
-    setDateRange(prev => ({
-      from: prev.from.add(1, 'day'),
-      to: prev.to.add(1, 'day')
-    }))
-  }
+            // Extract details from the reserve_data JSONB
+            const { room, startTime, endTime, date } = reserve_data;
 
-  const toggleCalendar = () => {
-    setIsCalendarOpen(!isCalendarOpen)
-  }
+            // Get the current date and time
+            const currentDateTime = new Date();
 
-  const handleDateChange = (newDate) => {
-    setDateRange(prev => ({
-      from: newDate,
-      to: newDate.add(2, 'day')
-    }))
-    setIsCalendarOpen(false)
-  }
+            // Combine the reservation date and time for comparison
+            const reservationStart = new Date(`${date} ${startTime}`);
+            const reservationEnd = new Date(`${date} ${endTime}`);
+
+            // Check if the reservation time has passed and update the status
+            const status = reservationEnd < currentDateTime ? "Finished" : "Reserved";
+
+            return {
+              room,
+              status,
+              date,
+              period: `${startTime} - ${endTime}`,
+              borrower
+            };
+          })
+        );
+
+        setReservations(reservationData);
+      }
+    }
+
+    fetchReservations();
+  }, []);
 
   return (
     <div className="uMain-cont p-6 space-y-8">
       <div>
         <h2 className="text-2xl font-semibold mb-4 text-arcadia-black">Current Reservations</h2>
-        <div className="flex items-center gap-4 mb-6">
-          <span className="text-dark-gray">
-            {`${dateRange.from.format('MMMM D, YYYY')} – ${dateRange.to.format('MMMM D, YYYY')}`}
-          </span>
-          <div className="flex items-center gap-2">
-            <button className="p-1 hover:bg-light-gray rounded" onClick={toggleCalendar}>
-              <Calendar className="w-4 h-4" />
-            </button>
-            <button className="p-1 hover:bg-light-gray rounded" onClick={handlePrevious}>
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button className="p-1 hover:bg-light-gray rounded" onClick={handleNext}>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {isCalendarOpen && (
-          <div className="absolute z-10 bg-white border rounded-lg shadow-lg p-4">
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateCalendar value={dateRange.from} onChange={handleDateChange} />
-            </LocalizationProvider>
-          </div>
-        )}
-
-        <div className="border rounded-lg">
-          <div className="grid grid-cols-[200px,1fr] border-b">
-            <div className="p-4 font-medium text-dark-gray">Space</div>
-            <div className="grid grid-cols-7 divide-x border-l">
-              {timeSlots.map((time) => (
-                <div key={time} className="p-4 text-center font-medium text-dark-gray">{time}</div>
-              ))}
-            </div>
-          </div>
-
-          <div className="border-b p-4">
-            <div className="flex items-center gap-2">
-              <input type="checkbox" className="rounded border-grey" defaultChecked />
-              <span className="font-medium text-arcadia-black">Discussion Rooms</span>
-            </div>
-          </div>
-
-          {rooms.map((room) => (
-            <div key={room.id} className="grid grid-cols-[200px,1fr] border-b last:border-b-0">
-              <div className="p-4 flex items-center gap-2">
-                <div className="w-6 h-6 bg-dark-blue rounded flex items-center justify-center text-white">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <span className="text-dark-blue hover:underline cursor-pointer">{room.name}</span>
-              </div>
-              <div className="grid grid-cols-7 divide-x border-l">
-                {timeSlots.map((time) => (
-                  <div key={`${room.id}-${time}`} className="p-4 bg-light-gray"></div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
 
         <div className="flex gap-6 mt-4">
           <div className="flex items-center gap-2">
@@ -125,7 +74,7 @@ export default function Component() {
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-arcadia-yellow rounded"></div>
-            <span className="text-sm text-dark-gray">Your Reservation</span>
+            <span className="text-sm text-dark-gray">Reserved</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-a-t-red rounded"></div>
@@ -142,7 +91,6 @@ export default function Component() {
                 <th className="text-left py-2 px-4 font-medium text-dark-gray">Date</th>
                 <th className="text-left py-2 px-4 font-medium text-dark-gray">Period</th>
                 <th className="text-left py-2 px-4 font-medium text-dark-gray">Borrower</th>
-                <th className="text-left py-2 px-4 font-medium text-dark-gray">Purpose</th>
               </tr>
             </thead>
             <tbody>
@@ -151,8 +99,8 @@ export default function Component() {
                   <td className="py-2 px-4 bg-light-gray font-medium">{reservation.room}</td>
                   <td className="py-2 px-4">
                     <span className={`px-3 py-1 rounded-full text-sm ${
-                      reservation.status === "Reserved" 
-                        ? "bg-dark-yellow text-dark-gray" 
+                      reservation.status === "Reserved"
+                        ? "bg-dark-yellow text-dark-gray"
                         : "bg-green text-dark-gray"
                     }`}>
                       {reservation.status}
@@ -161,7 +109,6 @@ export default function Component() {
                   <td className="py-2 px-4">{reservation.date}</td>
                   <td className="py-2 px-4">{reservation.period}</td>
                   <td className="py-2 px-4">{reservation.borrower}</td>
-                  <td className="py-2 px-4">{reservation.purpose}</td>
                 </tr>
               ))}
             </tbody>
@@ -169,5 +116,5 @@ export default function Component() {
         </div>
       </div>
     </div>
-  )
+  );
 }

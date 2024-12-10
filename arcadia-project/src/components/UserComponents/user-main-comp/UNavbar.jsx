@@ -29,7 +29,7 @@ function CustomLink({ to, children, className, ...props }) {
       {...props}
       className={`userNav-link px-2 py-3 text-white transition duration-200 ${
         isActive
-        ? "bg-red text-white font-semibold !text-white" //Force text-white with !text-white
+        ? "bg-red font-semibold !text-white" //Force text-white with !text-white
         : "hover:bg-grey hover:text-black" // Hover styling
       } ${className}`}
     >

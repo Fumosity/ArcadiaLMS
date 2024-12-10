@@ -8,7 +8,6 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar'
 import dayjs from 'dayjs'
 
 export default function ReservInformation() {
-    // Existing states from ARoomReservations
     const [dateRange, setDateRange] = useState({
         from: dayjs(),
         to: dayjs().add(2, 'day')
@@ -22,7 +21,6 @@ export default function ReservInformation() {
     const [showBookingForm, setShowBookingForm] = useState(false)
     const entriesPerPage = 5
 
-    // Booking form states
     const [bookingData, setBookingData] = useState({
         userId: "1-00923",
         schoolId: "2021-2-01090",

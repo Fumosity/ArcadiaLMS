@@ -18,7 +18,7 @@ export default function CollegeAndDept() {
 
     return (
         <div className="uSidebar-filter">
-            <h2 className="font-semibold mb-2">Collage and Department</h2>
+            <h2 className="font-semibold mb-2">College and Department</h2>
             <div className="space-y-2">
                 <h4 className="mb-2">College</h4>
                 {collegeOptions.map((option) => (

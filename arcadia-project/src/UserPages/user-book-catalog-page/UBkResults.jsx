@@ -37,19 +37,15 @@ const UBkResults = ({ query }) => {
     useEffect(() => {
         const fetchBooksAndRatings = async () => {
             try {
-                // Fetch books from the book_titles table
                 const { data: booksData, error: booksError } = await supabase
                     .from("book_titles")
                     .select("*");
                 if (booksError) throw booksError;
-
-                // Fetch ratings from the ratings table
                 const { data: ratingsData, error: ratingsError } = await supabase
                     .from("ratings")
                     .select("titleID, ratingValue");
                 if (ratingsError) throw ratingsError;
 
-                // Calculate the average rating for each book using titleID
                 const averageRatings = ratingsData.reduce((acc, curr) => {
                     if (!acc[curr.titleID]) {
                         acc[curr.titleID] = { sum: 0, count: 0 };
@@ -66,7 +62,7 @@ const UBkResults = ({ query }) => {
                         averageRatings[book.titleID]?.count > 0
                             ? averageRatings[book.titleID].sum /
                               averageRatings[book.titleID].count
-                            : 0; // Default to 0 if no ratings available
+                            : 0; 
 
                     return {
                         ...book,
@@ -77,12 +73,11 @@ const UBkResults = ({ query }) => {
 
                 setBooks(booksWithDetails);
 
-                // Insert books and authors into the Trie
+             
                 const newTrie = new Trie();
                 booksWithDetails.forEach((book) => {
                     newTrie.insert(book.title.toLowerCase());
 
-                    // Insert authors into the Trie
                     if (book.author && Array.isArray(book.author)) {
                         const authorNames = book.author
                             .map((author) => (author.name ? author.name.toLowerCase() : ""))

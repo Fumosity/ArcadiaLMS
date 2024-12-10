@@ -2,7 +2,6 @@ import React from "react";
 
 const TicketResponse = () => {
     return (
-
             <div>
             <h3 className="text-lg font-semibold mb-4">Response</h3>
             <div className="items-center">
@@ -14,10 +13,6 @@ const TicketResponse = () => {
             </div>
 
             </div>
-            
-            
-
     )
 };
-
 export default TicketResponse;

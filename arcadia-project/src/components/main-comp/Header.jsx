@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FiUser } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
-import { useUser } from "../../backend/UserContext"; // Adjust path as needed
+import { useUser } from "../../backend/UserContext"; 
 
 const Header = () => {
   const navigate = useNavigate();

@@ -22,7 +22,7 @@ const ABInventory = () => {
 
       <div className="flex justify-center items-start space-x-2 pb-12 py-8">
         <div className="flex-shrink-0">
-          <CurrentBookInventory onBookSelect={handleBookSelect} /> {/* Pass the handler to CurrentBookInventory */}
+          <CurrentBookInventory onBookSelect={handleBookSelect} />
         </div>
         <div className="hidden lg:flex flex-col items-start flex-shrink-0">
           {/* Circular Add Book Button */}

@@ -60,16 +60,13 @@ import ScrollToTop from './ScrollToTop';
 import UHighlyRated from './UserPages/user-highly-rated-page/UHighlyRated';
 import AReservView from './admin-reserv-page/AReservView';
 import AdminErrorPage from './AdminErrorPage.jsx';
+import URsrchView from './UserPages/user-rsrch-view-page/URsrchView.jsx';
 
 
 function App() {
   return (
     
     <Routes>
-      
-      {/* User Route */}
-      {/* <Route path="*" element={<UHomePage/>}/> */}
-
       <Route
         path="/*"
         element={
@@ -94,6 +91,8 @@ function App() {
               <Route path="/user/mostpopularbooks" element={<UMostPop />} />
               <Route path="/user/highlyratedbooks" element={<UHighlyRated />} />
               <Route path="/user/bookview" element={<UBookView />} />
+              <Route path="/user/researchview" element={<URsrchView/>} />
+              <Route path="*" element={<ErrorPage />} /> 
             </Routes>
             <UFooter />
             <UCopyright />
@@ -134,8 +133,7 @@ function App() {
               <Route path="schedule" element={<ASchedule />} />
               <Route path="systemreports" element={<ASystemReports />} />
               <Route path="adminerrorpage" element={<AdminErrorPage />} />
-
-
+              <Route path="*" element={<AdminErrorPage />} />
             </Routes>
             <Footer />
             <Copyright />
