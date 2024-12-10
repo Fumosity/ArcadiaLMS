@@ -6,7 +6,7 @@ const AdminErrorPage = () => {
     const navigate = useNavigate(); // Initialize the navigate function
 
     const handleReturnHome = () => {
-        navigate("/"); // Navigate to the home page
+        navigate("/admin"); // Navigate to the home page
     };
 
     return (
