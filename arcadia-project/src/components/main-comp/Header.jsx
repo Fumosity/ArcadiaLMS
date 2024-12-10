@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiUser } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../backend/UserContext"; 
@@ -8,6 +8,12 @@ const Header = () => {
   const { user, updateUser } = useUser(); // Global user state from context
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   let dropdownTimeout;
+
+  useEffect(() => {
+    if (!user || user.userAccountType !== "Admin") {
+      navigate("/"); // Redirect to home or another page
+    }
+  }, [user, navigate]);
 
   const handleLogout = () => {
     updateUser(null);
