@@ -59,6 +59,7 @@ import UMostPop from './UserPages/user-most-popular-page/UMostPop';
 import ScrollToTop from './ScrollToTop';
 import UHighlyRated from './UserPages/user-highly-rated-page/UHighlyRated';
 import AReservView from './admin-reserv-page/AReservView';
+import AdminErrorPage from './AdminErrorPage.jsx';
 
 
 function App() {
@@ -132,6 +133,7 @@ function App() {
               <Route path="reservationsview" element={<AReservView />} />
               <Route path="schedule" element={<ASchedule />} />
               <Route path="systemreports" element={<ASystemReports />} />
+              <Route path="adminerrorpage" element={<AdminErrorPage />} />
 
 
             </Routes>
