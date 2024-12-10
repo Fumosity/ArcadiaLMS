@@ -18,8 +18,8 @@ export default function ARoomReservations({ events }) {
         resources={[
           { id: "A701-A", title: "Discussion Room 1 (A701-A)" },
           { id: "A701-B", title: "Discussion Room 2 (A701-B)" },
-          { id: "A701-C", title: "Discussion Room 2 (A701-C)" },
-          { id: "A701-D", title: "Discussion Room 2 (A701-D)" },
+          { id: "A701-C", title: "Discussion Room 3 (A701-C)" },
+          { id: "A701-D", title: "Discussion Room 4 (A701-D)" },
         ]}
         events={events}
         editable
