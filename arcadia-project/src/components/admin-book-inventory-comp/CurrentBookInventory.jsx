@@ -18,7 +18,6 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         const fetchBooks = async () => {
             setIsLoading(true);
             try {
-                // Fetch from `book_titles` table
                 const { data: bookTitles, error: titleError } = await supabase
                     .from("book_titles")
                     .select("titleID, title, author, genre, category, synopsis, keyword, publisher, currentPubDate, originalPubDate, procurementDate, cover");
@@ -28,35 +27,32 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                     return;
                 }
 
-                // Exit early if no titles are found
                 if (!bookTitles || bookTitles.length === 0) {
                     console.log("No book titles found.");
                     setInventoryData([]);
                     return;
                 }
 
-                // Now, fetch the corresponding book details using the titleID
                 const bookIDs = bookTitles.map((book) => book.titleID);
                 const { data: bookIndiv, error: bookError } = await supabase
                     .from("book_indiv")
                     .select("bookID, titleID")
-                    .in("titleID", bookIDs);  // Fetch books matching the titleIDs
+                    .in("titleID", bookIDs);
 
                 if (bookError) {
                     console.error("Error fetching book_indiv:", bookError.message);
                     return;
                 }
 
-                // Combine `book_titles` and `book_indiv` using `titleID`
                 const combinedData = bookTitles.map((title) => {
                     const books = bookIndiv.filter((b) => b.titleID === title.titleID);
                     return {
                         ...title,
-                        copies: books, // Attach all copies related to the title
+                        copies: books,
                     };
                 });
 
-                console.log("Combined data:", combinedData); // Debugging
+                console.log("Combined data:", combinedData);
                 setInventoryData(combinedData);
             } catch (error) {
                 console.error("An unexpected error occurred:", error);
@@ -70,7 +66,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
 
     const handleRowClick = (book) => {
         setSelectedBook(book);
-        onBookSelect(book); // Pass the selected book to BookPreviewInventory
+        onBookSelect(book);
     };
 
     const handleViewClick = (book) => {
@@ -83,7 +79,6 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         setSelectedBook(null);
     };
 
-    // Get unique books based on title
     const uniqueBooks = Array.from(new Set(inventoryData.map(item => item.title)))
         .map(title => inventoryData.find(item => item.title === title));
 
@@ -91,7 +86,6 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         <div className="bg-white p-6 rounded-lg shadow-md mr-5">
             <h3 className="text-xl font-semibold mb-4">Current Inventory</h3>
             <div className="flex flex-wrap items-center mb-6 space-x-4">
-                {/* Sorting and Filtering Controls */}
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Sort By:</span>
                     <button
@@ -179,7 +173,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                     <tr
                                         key={index}
                                         className="hover:bg-light-gray cursor-pointer"
-                                        onClick={() => handleRowClick(item)} // Row click event
+                                        onClick={() => handleRowClick(item)}
                                     >
                                         <td className="px-4 py-4 text-sm text-gray-900">
                                             <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full p-2">
@@ -216,7 +210,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                             )}
                                         </td>
                                         <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate max-w-xs">
-                                        <Link
+                                            <Link
                                                 to={`/admin/abviewer?titleID=${encodeURIComponent(item.titleID)}`}
                                                 className="text-blue-600 hover:underline"
                                             >
@@ -229,16 +223,16 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                             ))}
                                         </td>
                                         <td className="px-4 py-4 text-center text-sm text-gray-500 truncate max-w-xs">
-                                            {item.titleID || 'N/A'} {/* Fallback to N/A if bookID is missing */}
+                                            {item.titleID || 'N/A'}
                                         </td>
                                         <td className="px-4 py-4 text-center text-sm text-gray-500 truncate max-w-xs">
                                             {item.originalPubDate}
                                         </td>
                                         <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
                                             <button
-                                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+                                                className="bg-blue-500 hover:bg-blue-700 text-black font-bold py-1 px-3 rounded"
                                                 onClick={(e) => {
-                                                    e.stopPropagation(); // Prevent row click
+                                                    e.stopPropagation();
                                                     handleViewClick(item);
                                                 }}
                                             >
@@ -256,7 +250,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 <BookCopies
                     isOpen={isModalOpen}
                     onClose={closeModal}
-                    bookCopies={selectedBook.copies}
+                    titleID={selectedBook.titleID}
                 />
             )}
         </div>

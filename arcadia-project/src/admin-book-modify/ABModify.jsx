@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import MainHeader from "../components/main-comp/MainHeader";
 import Title from "../components/main-comp/Title";
 import BookModify from "../components/admin-book-modify/BookModify";
+import BookCopiesIndiv from "../components/admin-book-modify/BookCopiesIndiv";
 
 const ABModify = () => {
   const { search } = useLocation();
@@ -35,9 +36,14 @@ const ABModify = () => {
       <Title>Modify Book</Title>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-3 gap-8">
-          <div className="col-span-2 space-y-8">
+        <div className="col-span-2 space-y-8">
             {/* Pass formDataState and setFormData to BookModify */}
             <BookModify formData={formDataState} setFormData={setFormData} />
+            
+          </div>
+          <div className="col-span-2 space-y-8">
+            
+            
           </div>
         </div>
       </main>

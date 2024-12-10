@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
+import BookCopiesIndiv from "./BookCopiesIndiv";
 
 const BookModify = ({ formData, setFormData, onSave }) => {
   const fileInputRef = useRef(null);
@@ -12,23 +13,25 @@ const BookModify = ({ formData, setFormData, onSave }) => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const initialFormData = {
-        title: params.get("title") || "",
-        author: params.get("author") || [],
-        genre: params.get("genre") || [],
-        category: params.get("category") || [],
-        publisher: params.get("publisher") || "",
-        synopsis: params.get("synopsis") || "",
-        keyword: params.get("keywords") || [],
-        currentPubDate: params.get("republished") || "",
-        originalPubDate: params.get("datePublished") || "",
-        quantity: params.get("quantity") || 0,
-        procDate: params.get("procurementDate") || "",  
-        cover: params.get("cover") || "",
-        titleID: params.get("titleID") || null,
+      title: params.get("title") || "",
+      author: params.get("author") || [],
+      genre: params.get("genre") || [],
+      category: params.get("category") || [],
+      publisher: params.get("publisher") || "",
+      synopsis: params.get("synopsis") || "",
+      keyword: params.get("keywords") || [],
+      currentPubDate: params.get("republished") || "",
+      originalPubDate: params.get("datePublished") || "",
+      quantity: params.get("quantity") || 0,
+      procDate: params.get("procurementDate") || "",
+      cover: params.get("cover") || "",
+      titleID: params.get("titleID") || null,
+      bookARCID: params.get("bookARCID") || null, // New parameter
     };
 
-      setFormData(initialFormData);
+    setFormData(initialFormData);
   }, [location.search, setFormData]);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -70,26 +73,22 @@ const BookModify = ({ formData, setFormData, onSave }) => {
 
     const updateData = Object.fromEntries(
       Object.entries(rest).map(([key, value]) => {
-          if (["author", "genre", "category", "keyword"].includes(key)) {
-              // Convert string to an array if it's not already an array
-              return [key, Array.isArray(value) ? value : value.split(";").map((v) => v.trim())];
-          }
-          return [key, value];
+        if (["author", "genre", "category", "keyword"].includes(key)) {
+          return [key, Array.isArray(value) ? value : value.split(";").map((v) => v.trim())];
+        }
+        return [key, value];
       })
-  );
-
-    console.log("Update Data:", updateData);
+    );
 
     const { data, error } = await supabase
-      .from("book_titles") 
+      .from("book_titles")
       .update(updateData)
-      .match({ titleID }); 
+      .match({ titleID });
 
     if (error) {
       console.error("Error updating book: ", error);
     } else {
       console.log("Book updated successfully:", data);
-      // Optionally call onSave if provided
       if (onSave) {
         await onSave(formData);
       }
@@ -245,6 +244,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
           </div>
         </div>
       </div>
+      {formData.titleID && <BookCopiesIndiv titleID={formData.titleID} />}
     </div>
   );
 };
