@@ -1,0 +1,79 @@
+import { useState } from "react"
+import { Link } from "react-router-dom"
+
+export default function DataPrivacy() {
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!termsAccepted || !privacyAccepted) {
+      alert("Please accept both Terms and Conditions and Data Privacy Agreement to continue.")
+      return
+    }
+    // Add your logic here for what happens after successful submission
+  }
+
+  const isContinueEnabled = termsAccepted && privacyAccepted
+
+  return (
+    <div className="uMain-cont flex h-[600px]">
+      <div className="max-w-md mx-auto p-8 bg-white flex flex-col items-center text-center">
+        <div className="mb-6">
+          <h1 className="text-5xl font-semibold">Before we end...</h1>
+        </div>
+
+        <p className="text-black mb-6">
+          Please read the Terms and Conditions and the <br />
+          Data Privacy Agreement to continue.
+        </p>
+
+        <div className="flex items-center gap-2 mb-4">
+          <input
+            type="checkbox"
+            id="termsCheckbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            className="w-5 h-5 accent-arcadia-red cursor-pointer"
+          />
+          <label htmlFor="termsCheckbox" className="text-black text-sm cursor-pointer">
+            I read the Terms and Conditions
+          </label>
+        </div>
+
+        <div className="flex items-center gap-2 mb-4">
+          <input
+            type="checkbox"
+            id="privacyCheckbox"
+            checked={privacyAccepted}
+            onChange={(e) => setPrivacyAccepted(e.target.checked)}
+            className="w-5 h-5 accent-arcadia-red cursor-pointer"
+          />
+          <label htmlFor="privacyCheckbox" className="text-black text-sm cursor-pointer">
+            I read the Data Privacy Agreement
+          </label>
+        </div>
+
+        <div className="flex justify-center items-center gap-4">
+          <Link to="/user/register" className="registerBtn">
+            Return
+          </Link>
+          <button
+            onClick={handleSubmit}
+            disabled={!isContinueEnabled}
+            className={`genRedBtns ${!isContinueEnabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <div className="w-1/2 relative bg-grey rounded-2xl">
+        <div className="absolute inset-0 flex items-end p-12">
+          <h2 className="text-white text-4xl text-right font-semibold">Knowledge that empowers.</h2>
+        </div>
+      </div>
+    </div>
+  )
+}
+

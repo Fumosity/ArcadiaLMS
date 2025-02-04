@@ -67,6 +67,10 @@ function App() {
   return (
     
     <Routes>
+
+      <Route path="/user/login" element={<ULogin />}/>
+      <Route path="/user/register" element={<URegister />} />
+      
       <Route
         path="/*"
         element={
@@ -75,8 +79,7 @@ function App() {
             <Routes>
               <Route path="/" element={<UHomePage />} />
               <Route path="/user/register" element={<UsrRegistration />} />
-              <Route path="/user/login" element={<ULogin />} />
-              <Route path="/user/register" element={<URegister />} />
+              
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
               <Route path="/user/bookcatalog" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />

@@ -487,6 +487,12 @@
   font-size: 12px;
 }
 
+.guestBtn {
+  @apply px-2.5 py-1 text-center border border-a-t-red text-a-t-red rounded-full hover:bg-red hover:border-red hover:text-white focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
+  width:200px;
+  font-size: 12px;
+}
+
 .registerBtn{
   @apply px-2.5 py-1 text-center border border-a-t-red text-a-t-red rounded-full hover:bg-red hover:border-red hover:text-white focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
   width:100px;
