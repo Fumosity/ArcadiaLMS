@@ -117,7 +117,7 @@ def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_
 
         # Combine college-specific ratings with overall average ratings
         combined_avg_ratings = (college_avg_ratings + books_df['average_rating']) / 2
-#        Chosen user information
+        # Chosen user information
         chosen_user = users_df[users_df['userID'] == userID].iloc[0]
         print(f"Chosen User: {chosen_user['userFName']} (ID: {userID}), College: {chosen_user['userCollege']}, Department: {chosen_user['userDepartment']}\n")
 

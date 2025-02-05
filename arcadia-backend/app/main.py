@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from PIL import Image
 import pytesseract
 import io
-import fitz  # PyMuPDF for PDF handling
+import fitz 
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import re
@@ -15,10 +15,9 @@ from pydantic import BaseModel
 import math
 from app.book_reco import get_recommendations
 from app.research_reco import get_rsrch_recommendations
-# Initialize FastAPI app
+
 app = FastAPI()
 
-# Enable CORS for frontend interaction
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -29,16 +28,14 @@ app.add_middleware(
 import os
 print("Current Working Directory:", os.getcwd())
 
-# Load the dataset
+
 df = pd.read_csv('app/research_corpus.csv')
 
-# Display the first few rows to inspect the data
 print(df.head())
 
 excluded_sections = ["Approval Sheet", "Certificate of Originality", "Acknowledgement", "Table of Contents", "Access Leaf", "Acceptance Sheet", "Author Permission Statement", "List of Tables", "List of Figures", "List of Appendices", "List of Abbreviations"]
 resume_sections = ["Abstract", "Keywords"]
 
-# Preprocessing and helper functions remain unchanged
 title, authors, college, department, abstract, keywords, pubdate = "","","","","","","",
 
 def find_department(line):
@@ -89,19 +86,19 @@ def remove_sections(text):
         if line in added_lines:
             continue
 
-        # Determine if we're entering an excluded section
+        # see if excluded section
         if any(excluded_header.lower() in line_lower for excluded_header in excluded_sections):
             print("SKIPPING SECTION", line_lower)
             inside_excluded_section = True
             continue
 
-        # Determine if we're in a resume section and should start including again
+        # resume if included sectin
         if any(resume_header.lower() in line_lower for resume_header in resume_sections):
             print("RESUMING SECTION", line_lower)
             inside_excluded_section = False
             apply_period_joining = True
 
-            # Handle Keywords as a separate section
+            # keyword handling
             if "keywords" in line_lower:
                 is_keywords_section = True
                 if current_paragraph:
@@ -111,20 +108,20 @@ def remove_sections(text):
                     current_paragraph = []
                     original_paragraph = []
 
-                cleaned_lines.append(line)  # Add 'Keywords' title as a standalone line
+                cleaned_lines.append(line)  
                 original_lines.append(original_line)
                 continue
             else:
                 is_keywords_section = False
                 continue
 
-        # Skip lines inside the excluded section, resume adding lines otherwise
+        # skip exclude
         if inside_excluded_section:
             continue
 
         if line:
             if is_keywords_section:
-                # If inside the Keywords section, add each line distinctly
+              
                 if current_paragraph:
                     cleaned_lines.append(" ".join(current_paragraph).strip())
                     original_lines.append(" ".join(original_paragraph).strip())
@@ -140,12 +137,10 @@ def remove_sections(text):
             added_lines.add(line)
         else:
             if current_paragraph:
-                # Apply period-joining logic only if we're in sections after resume sections
                 cleaned_paragraph = " ".join(current_paragraph).strip()
                 original_paragraph_text = " ".join(original_paragraph).strip()
 
                 if not skip_current_paragraph:
-                    # If apply_period_joining is active, append to last item to keep it continuous
                     if apply_period_joining and cleaned_lines and cleaned_lines[-1] and '.' in cleaned_lines[-1]:
                         cleaned_lines[-1] += " " + cleaned_paragraph
                         original_lines[-1] += " " + original_paragraph_text
@@ -171,28 +166,24 @@ def remove_sections(text):
 
     presectioned_text = re.sub(r'[^\w\s.,\'"()-—:;/]', '', presectioned_text).strip()
 
-    # Return both the cleaned text and extracted metadata (publication date, keywords, college)
+    # return both the cleaned text and original
     return presectioned_text, original_text, department
 
 def preprocess_text(text):
-    # Split the text by lines to keep structural information intact
     lines = text.splitlines()
     
     cleaned_lines = []
     for line in lines:
-        # Remove extra whitespace and lowercase the line
+        # remove extra whitespace and lowercase the line
         cleaned_line = re.sub(r"\s+‘~", " ", line).strip().lower()
         
-        # Append if the line has content to avoid empty lines
         if cleaned_line:
             cleaned_lines.append(cleaned_line)
     
-    # Join lines back into a single string with double newlines to separate chunks
     cleaned_text = "\n\n".join(cleaned_lines)
 
     return cleaned_text
 
-# Classification function using the new model
 def replace_college_names(college_name):
   college_name = proper_case(college_name)
 
@@ -207,11 +198,11 @@ def replace_college_names(college_name):
       "Law": "COL"
   }
 
-  # Check if the college name is a key in the acronym map
+  # check if the college name is a key in the acronym map
   if college_name in acronym_map:
     return acronym_map[college_name]
 
-  # Check if the college name contains a key in the acronym map
+  # check if the college name contains a key in the acronym map
   for key in acronym_map:
     if key in college_name:
       return acronym_map[key]
@@ -219,41 +210,28 @@ def replace_college_names(college_name):
   return college_name
 
 def convert_date(date_str):
-    # Parse the input string using strptime to match the "Month Year" format
     month_year = datetime.strptime(date_str, "%b %Y")
     
-    # Format it to "YYYY-MM"
+    # format it to "YYYY-MM"
     return month_year.strftime("%Y-%m")
 
 def proper_case(name):
-    # List of words that should not be capitalized (unless they are the first or last word)
     lower_case_words = {
         "a", "an", "and", "but", "or", "for", "nor", "so", "the", "to", "up", "in", "on", 
         "at", "by", "with", "as", "of", "from", "about", "between", "during", "into", "through", "over", "under", "within", "is", "are", "was", "were", "be", "been", "being"
     }
     
-    # Split the name into words
     words = name.split()
     
-    # Capitalize the first word and any proper nouns
     for i in range(len(words)):
         if i == 0 or words[i].lower() not in lower_case_words:
             words[i] = words[i].capitalize()
         else:
             words[i] = words[i].lower()
     
-    # Join the words back into a string
     return ' '.join(words)
 
 def format_authors(authors_text):
-    """Formats authors' names into a semicolon-separated string.
-
-    Args:
-        authors_text: The raw author names string.
-
-    Returns:
-        A formatted string of author names.
-    """
 
     authors_text = re.sub(r'\s+', ' ', authors_text.strip())
     words = authors_text.split(" ")
@@ -264,19 +242,16 @@ def format_authors(authors_text):
     for i, word in enumerate(words):
         current_author.append(word)
 
-        # Check if the current word is preceded by a middle initial
         if i > 0 and re.match(r'^[A-Z]\.$', words[i-1]):
             formatted_authors.append(" ".join(current_author).strip())
             current_author = []
 
-    # Add the last author, even if it doesn't end with a middle initial
     if current_author:
         formatted_authors.append(" ".join(current_author).strip())
 
     return "; ".join(formatted_authors)
 
 def classify_text_chunks(preprocessed_text, original_text, pipeline):
-    # Split text into paragraphs or chunks
     preprocessed_chunks = preprocessed_text.split("\n\n")
     original_chunks = original_text.split("\n\n")
 
@@ -285,29 +260,29 @@ def classify_text_chunks(preprocessed_text, original_text, pipeline):
     classified_sections = {label: "" for label in ['title', 'authors', 'college', 'abstract', 'keywords', 'pubdate']}
 
     for i, chunk in enumerate(preprocessed_chunks):
-        # Reshape the chunk into a 2D array as expected by the pipeline (1 sample, 1 feature)
-        chunk_reshaped = np.array([chunk]).reshape(-1, 1)  # Ensures a 2D shape (1, 1)
+        # reshape chunk to 2d arr (1 sample, 1 feature)
+        chunk_reshaped = np.array([chunk]).reshape(-1, 1)  # ensures a 2D shape (1, 1)
 
-        # Manually calculate the text length for this chunk
-        text_length = np.array([[len(chunk)]])  # This will be a 2D array with shape (1, 1)
+        # calc the length of the chunk
+        text_length = np.array([[len(chunk)]])
 
-        # Combine the chunk and its length into a single array of features
-        combined_features = np.hstack([chunk_reshaped, text_length])  # Combine text and text length
+        # combine chunk and chunk len as arr of featrues
+        combined_features = np.hstack([chunk_reshaped, text_length])
 
-        # Convert the combined features to a DataFrame with appropriate column names
+        # convert to dataframe
         df_features = pd.DataFrame(combined_features, columns=['text', 'text_length'])
 
-        # Transform the chunk with TF-IDF and text length, and then predict the section label
+        # transform with tfidf and text len and predict label
         predicted_section = pipeline.predict(df_features)[0]
         
-        # Append the chunk to the appropriate section
+        # append the chunk to the classified section
         classified_sections[predicted_section] += original_chunks[i].strip() + " "
 
     print("=====Initial Classification=====")
     for section, content in classified_sections.items():
         print(f"{section.capitalize()}: {content.strip()}\n")
 
-    # Assign classified sections to respective variables
+    # assign classified sections to respective variables
     title = classified_sections.get('title', "").strip()
     authors = classified_sections.get('authors', "").strip()
     college = classified_sections.get('college', "").strip()
@@ -421,12 +396,11 @@ async def extract_text(files: List[UploadFile] = File(...)):
         classification_df["text"] = classification_df["text"].str.replace(r'[^\w\s.,\'"()-—:;/]', '', regex=True)  # Remove punctuation
         classification_df['text_length'] = classification_df['text'].apply(len)
 
-        # Function to return text length
+        # Text length
         def add_text_length(X):
             return np.array([[len(text)] for text in X])
 
-        # Prepare the data (ensure classification_df has 'text' and 'label' columns)
-        X = classification_df[['text', 'text_length']]  # Selecting both 'text' and 'text_length' columns
+        X = classification_df[['text', 'text_length']]
         y = classification_df['label']
 
         # Split the data into training and testing sets
@@ -459,7 +433,7 @@ async def extract_text(files: List[UploadFile] = File(...)):
         # Print evaluation results
         from sklearn.metrics import accuracy_score, classification_report
         print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
-        print(classification_report(y_test, y_pred))  # Set zero_division to handle undefined precision
+        print(classification_report(y_test, y_pred))
 
         title, authors, college, abstract, keywords, pubdate = classify_text_chunks(cleaned_text, original_text, pipeline)
 
@@ -520,13 +494,12 @@ async def recommend(request: RecommendationRequest):
     for rec in recommendations:
         # Handle NaN values in 'average_rating'
         if isinstance(rec['average_rating'], float) and math.isnan(rec['average_rating']):
-            rec['average_rating'] = 0  # Or set a default value of your choice
+            rec['average_rating'] = 0 
         
         rec['titleID'] = int(rec['titleID'])
-        rec['rating'] = int(rec['average_rating'])  # Convert to int after handling NaN
+        rec['rating'] = int(rec['average_rating']) 
 
 
-    # Return recommendations to UBookView
     return {"recommendations": recommendations}
 
 class RsrchRecommendationRequest(BaseModel):
