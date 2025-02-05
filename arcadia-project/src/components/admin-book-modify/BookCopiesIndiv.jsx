@@ -19,7 +19,7 @@ const BookCopiesIndiv = ({ titleID }) => {
 
         const { data: copies, error: copiesError } = await supabase
           .from("book_indiv")
-          .select("titleID, bookARCID, status")
+          .select("titleID, bookARCID, bookStatus") //no bookARCID in the column names. status should now be bookStatus
           .eq("titleID", titleID);
 
         if (copiesError) throw copiesError;
@@ -42,8 +42,8 @@ const BookCopiesIndiv = ({ titleID }) => {
     }
   }, [titleID]);
 
-  const getStatusStyle = (status) => {
-    switch (status) {
+  const getStatusStyle = (bookStatus) => {
+    switch (bookStatus) {
       case 'Available':
         return 'bg-green text-white';
       case 'Reserved':
@@ -83,10 +83,10 @@ const BookCopiesIndiv = ({ titleID }) => {
                 <span className="flex-1 text-center">{book.bookARCID}</span>
                 <span
                   className={`px-5 py-1 rounded-3xl text-sm font-semibold capitalize text-center ${getStatusStyle(
-                    book.status
+                    book.bookStatus
                   )}`}
                 >
-                  {book.status}
+                  {book.bookStatus}
                 </span>
                 <span className="flex-1 text-center">{book.procurementDate}</span>
               </div>

@@ -27,7 +27,7 @@ const genres = [
   { id: 23, name: "Language", category: "academic" },
 ]
 
-export default function UserInterests() {
+export default function UserInterests({ onBack, onContinue }) {
   const [selectedGenres, setSelectedGenres] = useState([])
 
   const toggleGenre = (genreId) => {
@@ -46,7 +46,7 @@ export default function UserInterests() {
   return (
     <div className="uMain-cont flex">
       <div className="w-1/2 p-12 flex flex-col">
-      <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-6">
           <div className="flex items-center gap-1">
             <h1 className="text-3xl font-semibold">Hello Shiori!</h1>
           </div>
@@ -61,10 +61,9 @@ export default function UserInterests() {
                 key={genre.id}
                 onClick={() => toggleGenre(genre.id)}
                 className={`px-4 py-2 rounded-full text-sm transition-colors
-                  ${
-                    selectedGenres.includes(genre.id)
-                      ? "bg-arcadia-red text-white"
-                      : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
+                  ${selectedGenres.includes(genre.id)
+                    ? "bg-arcadia-red text-white"
+                    : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
                   }`}
               >
                 {genre.name}
@@ -74,18 +73,14 @@ export default function UserInterests() {
         </div>
 
         <div className="flex justify-center items-center gap-4 mt-8">
-          <Link
-            to="/previous-step"
-            className="registerBtn"
-          >
+          <button onClick={onBack} className="registerBtn">
             Return
-          </Link>
+          </button>
           <button
-            onClick={handleContinue}
+            onClick={onContinue}
             disabled={selectedGenres.length < 5}
-            className={`genRedBtns ${
-              selectedGenres.length < 5 ? "bg-gray-400 cursor-not-allowed" : "bg-arcadia-red hover:bg-arcadia-red/90"
-            }`}
+            className={`genRedBtns ${selectedGenres.length < 5 ? "bg-gray-400 cursor-not-allowed" : "bg-arcadia-red hover:bg-arcadia-red/90"
+              }`}
           >
             Continue
           </button>

@@ -1,19 +1,129 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
-export default function RegisterForm() {
-  const [passwordStrength, setPasswordStrength] = useState(20);
+export default function RegisterForm({ onRegister }) {
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [passwordStrength, setPasswordStrength] = useState(0)
+  const [passwordError, setPasswordError] = useState("")
 
-  const checkPasswordStrength = (password) => { // Removed ": string"
-    // Simple password strength calculation
-    let strength = 0;
-    if (password.length >= 8) strength += 20;
-    if (password.match(/[a-z]/)) strength += 20;
-    if (password.match(/[A-Z]/)) strength += 20;
-    if (password.match(/[0-9]/)) strength += 20;
-    if (password.match(/[^a-zA-Z0-9]/)) strength += 20;
-    setPasswordStrength(strength);
+  const [firstName, setFirstName] = useState("first name")
+  const [lastName, setLastName] = useState("surname")
+  const [studentNumber, setStudentNumber] = useState("")
+  const [formattedStudentNumber, setFormattedStudentNumber] = useState("xxxx-2-xxxx")
+  const [email, setEmail] = useState("type email here")
+  const [college, setCollege] = useState("")
+  const [department, setDepartment] = useState("")
+
+  const colleges = [
+    "COECSA",
+    "CITHM",
+    "CEAS",
+    "CON",
+    "CBA",
+  ]
+
+  const departments = {
+    "COECSA": [
+      "Computer Science",
+      "Information Technology",
+      "Computer Engineering",
+      "Civil Engineering",
+      "Architecture",
+    ],
+    "CITHM": [],
+    "CEAS": [],
+    "CON": [],
+    "CBA": [],
+  }
+
+  useEffect(() => {
+    if (college !== "COECSA") {
+      setDepartment("No departments")
+    } else {
+      setDepartment("")
+    }
+  }, [college])
+
+  const handleRegister = (e) => {
+    e.preventDefault()
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match")
+      return
+    }
+    if (passwordStrength < 60) {
+      setPasswordError("Password is not strong enough")
+      return
+    }
+    onRegister()
   };
+
+  const checkPasswordStrength = (password) => {
+    let strength = 0
+    if (password.length >= 8) strength += 20
+    if (password.match(/[a-z]/)) strength += 20
+    if (password.match(/[A-Z]/)) strength += 20
+    if (password.match(/[0-9]/)) strength += 20
+    if (password.match(/[^a-zA-Z0-9]/)) strength += 20
+    setPasswordStrength(strength)
+    setPassword(password)
+    setPasswordError("")
+  }
+
+  const getStrengthColor = () => {
+    if (passwordStrength <= 20) return "bg-arcadia-red"
+    if (passwordStrength <= 40) return "bg-red"
+    if (passwordStrength <= 60) return "bg-yellow"
+    if (passwordStrength <= 80) return "bg-green"
+    return "bg-green-500"
+  }
+
+  const getStrengthText = () => {
+    if (passwordStrength <= 20) return "Very Weak"
+    if (passwordStrength <= 40) return "Weak"
+    if (passwordStrength <= 60) return "Medium"
+    if (passwordStrength <= 80) return "Strong"
+    return "Very Strong"
+  }
+
+  const handleInputFocus = (setter, defaultValue) => {
+    return (e) => {
+      if (e.target.value === defaultValue) {
+        setter("")
+      }
+    }
+  }
+
+  const handleInputBlur = (setter, defaultValue) => {
+    return (e) => {
+      if (e.target.value === "") {
+        setter(defaultValue)
+      }
+    }
+  }
+
+  const formatStudentNumber = (value) => {
+    const numbers = value.replace(/[^\d]/g, "")
+    const parts = [numbers.slice(0, 4), numbers.slice(4, 5), numbers.slice(5, 10)]
+
+    if (parts[0]) {
+      if (parts[1]) {
+        if (parts[2]) {
+          return `${parts[0]} - ${parts[1]} - ${parts[2]}`
+        }
+        return `${parts[0]} - ${parts[1]} -`
+      }
+      return `${parts[0]} -`
+    }
+    return ""
+  }
+
+  const handleStudentNumberChange = (e) => {
+    const input = e.target.value
+    const formatted = formatStudentNumber(input)
+    setStudentNumber(input.replace(/[^\d]/g, ""))
+    setFormattedStudentNumber(formatted || "xxxx-x-xxxxx")
+  }
 
   return (
     <div className="uMain-cont flex">
@@ -24,66 +134,104 @@ export default function RegisterForm() {
           </div>
         </div>
 
-        <form className="space-y-4">
+        <form onSubmit={handleRegister} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name:</label>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                First Name:
+              </label>
               <input
                 id="firstName"
-                defaultValue="first name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                onFocus={handleInputFocus(setFirstName, "first name")}
+                onBlur={handleInputBlur(setFirstName, "first name")}
                 className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                style={{ color: 'grey' }}
-                onFocus={(e) => e.target.style.color = 'arcadia-black'}
-                onBlur={(e) => e.target.value === '' ? e.target.style.color = 'grey' : e.target.style.color = 'arcadia-black'}
+                style={{ color: firstName === "first name" ? "gray" : "black" }}
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Last Name:</label>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                Last Name:
+              </label>
               <input
                 id="lastName"
-                defaultValue="surname"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                onFocus={handleInputFocus(setLastName, "surname")}
+                onBlur={handleInputBlur(setLastName, "surname")}
                 className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                style={{ color: 'grey' }}
-                onFocus={(e) => e.target.style.color = 'arcadia-black'}
-                onBlur={(e) => e.target.value === '' ? e.target.style.color = 'grey' : e.target.style.color = 'arcadia-black'}
+                style={{ color: lastName === "surname" ? "gray" : "black" }}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="studentNumber" className="block text-sm font-medium text-gray-700">Student Number:</label>
+            <label htmlFor="studentNumber" className="block text-sm font-medium text-gray-700">
+              Student Number:
+            </label>
             <input
               id="studentNumber"
-              defaultValue="xxxx-2-xxxx"
-              className="w-full px-2.5 py-1 border border-grey rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              style={{ color: 'grey' }}
-              onFocus={(e) => e.target.style.color = 'arcadia-black'}
-              onBlur={(e) => e.target.value === '' ? e.target.style.color = 'grey' : e.target.style.color = 'arcadia-black'}
+              value={formattedStudentNumber}
+              onChange={handleStudentNumberChange}
+              onFocus={() => {
+                if (formattedStudentNumber === "xxxx-x-xxxxx") {
+                  setFormattedStudentNumber("")
+                }
+              }}
+              onBlur={() => {
+                if (formattedStudentNumber === "") {
+                  setFormattedStudentNumber("xxxx-x-xxxxx")
+                }
+              }}
+              className="w-full px-2.5 py-1 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              style={{ color: formattedStudentNumber === "xxxx-x-xxxxx" ? "gray" : "black" }}
+              maxLength={16}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label htmlFor="college" className="block text-sm font-medium text-gray-700">College:</label>
-              <input
+              <label htmlFor="college" className="block text-sm font-medium text-gray-700">
+                College:
+              </label>
+              <select
                 id="college"
-                defaultValue="college"
-                className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                style={{ color: 'grey' }}
-                onFocus={(e) => e.target.style.color = 'arcadia-black'}
-                onBlur={(e) => e.target.value === '' ? e.target.style.color = 'grey' : e.target.style.color = 'arcadia-black'}
-              />
+                value={college}
+                onChange={(e) => setCollege(e.target.value)}
+                className="w-full px-2.5 py-1 border border-gray-300 rounded-full bg-gray-50 appearance-none"
+              >
+                <option value="">Select College</option>
+                {colleges.map((c, index) => (
+                  <option key={index} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
             </div>
+
             <div className="space-y-2">
-              <label htmlFor="department" className="block text-sm font-medium text-gray-700">Department:</label>
-              <input
+              <label htmlFor="department" className="block text-sm font-medium text-gray-700">
+                Department:
+              </label>
+              <select
                 id="department"
-                defaultValue="department"
-                className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                style={{ color: 'grey' }}
-                onFocus={(e) => e.target.style.color = 'arcadia-black'}
-                onBlur={(e) => e.target.value === '' ? e.target.style.color = 'grey' : e.target.style.color = 'arcadia-black'}
-              />
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                disabled={college !== "COECSA"}
+                className="w-full px-2.5 py-1 border border-gray-300 rounded-full bg-gray-50 appearance-none disabled:bg-gray-200 disabled:text-gray-500"
+              >
+                <option value="">Select Department</option>
+                {college === "COECSA" ? (
+                  departments[college].map((d, index) => (
+                    <option key={index} value={d}>
+                      {d}
+                    </option>
+                  ))
+                ) : (
+                  <option value="No departments">No departments</option>
+                )}
+              </select>
             </div>
           </div>
 
@@ -94,11 +242,12 @@ export default function RegisterForm() {
               </label>
               <input
                 id="emailPrefix"
-                defaultValue="type email here"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={handleInputFocus(setEmail, "type email here")}
+                onBlur={handleInputBlur(setEmail, "type email here")}
                 className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                style={{ color: 'grey' }}
-                onFocus={(e) => (e.target.style.color = 'arcadia-black')}
-                onBlur={(e) => (e.target.value === '' ? (e.target.style.color = 'grey') : (e.target.style.color = 'arcadia-black'))}
+                style={{ color: email === "type email here" ? "gray" : "black" }}
               />
             </div>
             <div className="space-y-2">
@@ -114,39 +263,40 @@ export default function RegisterForm() {
               </select>
             </div>
           </div>
-
-
-
-
           <div className="space-y-2">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password:</label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password:
+            </label>
             <input
               id="password"
               type="password"
               onChange={(e) => checkPasswordStrength(e.target.value)}
-              className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
             />
             <div className="space-y-1">
               <div className="h-2 bg-grey rounded-full">
                 <div
-                  className="h-full bg-red rounded-full transition-all duration-300 ease-in-out"
+                  className={`h-full ${getStrengthColor()} rounded-full transition-all duration-300 ease-in-out`}
                   style={{ width: `${passwordStrength}%` }}
                 ></div>
               </div>
-              <p className="text-sm text-gray-500">
-                Strength: {passwordStrength <= 20 ? "Weak" : "Strong"}
-              </p>
+              <p className="text-sm text-gray-500">Strength: {getStrengthText()}</p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password:</label>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-grey">
+              Confirm Password:
+            </label>
             <input
               id="confirmPassword"
               type="password"
-              className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
             />
           </div>
+
+          {passwordError && <p className="text-red text-sm">{passwordError}</p>}
 
           <div className="flex justify-center items-center gap-4">
             <Link to="/user/login" className="registerBtn">

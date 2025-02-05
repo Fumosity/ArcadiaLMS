@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 
-export default function DataPrivacy() {
+export default function DataPrivacy({ onBack, onContinue }) {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
 
@@ -55,11 +55,11 @@ export default function DataPrivacy() {
         </div>
 
         <div className="flex justify-center items-center gap-4">
-          <Link to="/user/register" className="registerBtn">
+        <button onClick={onBack} className="registerBtn">
             Return
-          </Link>
+          </button>
           <button
-            onClick={handleSubmit}
+            onClick={onContinue}
             disabled={!isContinueEnabled}
             className={`genRedBtns ${!isContinueEnabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
