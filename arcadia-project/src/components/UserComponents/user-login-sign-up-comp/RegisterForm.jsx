@@ -2,128 +2,83 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function RegisterForm({ onRegister }) {
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [new_data, setNewData] = useState({
+    firstName: "First Name",
+    lastName: "Last Name",
+    studentNumber: "",
+    formattedStudentNumber: "XXXX-X-XXXXX",
+    email: "Type email here",
+    emailSuffix: "@lpunetwork.edu.ph",
+    college: "",
+    department: "",
+    password: "",
+    confirmPassword: "",
+  });
+
   const [passwordStrength, setPasswordStrength] = useState(0)
   const [passwordError, setPasswordError] = useState("")
 
-  const [firstName, setFirstName] = useState("first name")
-  const [lastName, setLastName] = useState("surname")
-  const [studentNumber, setStudentNumber] = useState("")
-  const [formattedStudentNumber, setFormattedStudentNumber] = useState("xxxx-2-xxxx")
-  const [email, setEmail] = useState("type email here")
-  const [college, setCollege] = useState("")
-  const [department, setDepartment] = useState("")
-
-  const colleges = [
-    "COECSA",
-    "CITHM",
-    "CEAS",
-    "CON",
-    "CBA",
-  ]
+  const colleges = ["COECSA", "CITHM", "CAMS", "CON", "CBA",]
 
   const departments = {
-    "COECSA": [
-      "Computer Science",
-      "Information Technology",
-      "Computer Engineering",
-      "Civil Engineering",
-      "Architecture",
-    ],
+    "COECSA": ["DCS", "DOA", "DOE",],
     "CITHM": [],
-    "CEAS": [],
+    "CAMS": [],
     "CON": [],
     "CBA": [],
   }
 
   useEffect(() => {
-    if (college !== "COECSA") {
-      setDepartment("No departments")
-    } else {
-      setDepartment("")
-    }
-  }, [college])
+    setNewData((prev) => ({
+      ...prev,
+      department: prev.college === "COECSA" ? "" : "No departments",
+    }));
+  }, [new_data.college]);
 
-  const handleRegister = (e) => {
-    e.preventDefault()
-    if (password !== confirmPassword) {
-      setPasswordError("Passwords do not match")
-      return
-    }
-    if (passwordStrength < 60) {
-      setPasswordError("Password is not strong enough")
-      return
-    }
-    onRegister()
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setNewData((prev) => ({ ...prev, [id]: value }));
   };
 
   const checkPasswordStrength = (password) => {
-    let strength = 0
-    if (password.length >= 8) strength += 20
-    if (password.match(/[a-z]/)) strength += 20
-    if (password.match(/[A-Z]/)) strength += 20
-    if (password.match(/[0-9]/)) strength += 20
-    if (password.match(/[^a-zA-Z0-9]/)) strength += 20
-    setPasswordStrength(strength)
-    setPassword(password)
-    setPasswordError("")
-  }
+    let strength = 0;
+    if (password.length >= 8) strength += 20;
+    if (password.match(/[a-z]/)) strength += 20;
+    if (password.match(/[A-Z]/)) strength += 20;
+    if (password.match(/[0-9]/)) strength += 20;
+    if (password.match(/[^a-zA-Z0-9]/)) strength += 20;
+
+    setPasswordStrength(strength);
+    setNewData((prev) => ({ ...prev, password }));
+    setPasswordError("");
+  };
 
   const getStrengthColor = () => {
     if (passwordStrength <= 20) return "bg-arcadia-red"
     if (passwordStrength <= 40) return "bg-red"
-    if (passwordStrength <= 60) return "bg-yellow"
-    if (passwordStrength <= 80) return "bg-green"
-    return "bg-green-500"
+    if (passwordStrength <= 60) return "bg-orange"
+    if (passwordStrength <= 80) return "bg-yellow"
+    return "bg-green"
   }
 
-  const getStrengthText = () => {
-    if (passwordStrength <= 20) return "Very Weak"
-    if (passwordStrength <= 40) return "Weak"
-    if (passwordStrength <= 60) return "Medium"
-    if (passwordStrength <= 80) return "Strong"
-    return "Very Strong"
-  }
-
-  const handleInputFocus = (setter, defaultValue) => {
-    return (e) => {
-      if (e.target.value === defaultValue) {
-        setter("")
-      }
+  const handleRegister = (e) => {
+    e.preventDefault();
+    if (new_data.password !== new_data.confirmPassword) {
+      setPasswordError("Passwords do not match");
+      return;
     }
-  }
-
-  const handleInputBlur = (setter, defaultValue) => {
-    return (e) => {
-      if (e.target.value === "") {
-        setter(defaultValue)
-      }
+    if (passwordStrength < 60) {
+      setPasswordError("Password is not strong enough");
+      return;
     }
-  }
+    onRegister(new_data); // Send new_data on form submit
+  };
 
   const formatStudentNumber = (value) => {
-    const numbers = value.replace(/[^\d]/g, "")
-    const parts = [numbers.slice(0, 4), numbers.slice(4, 5), numbers.slice(5, 10)]
-
-    if (parts[0]) {
-      if (parts[1]) {
-        if (parts[2]) {
-          return `${parts[0]} - ${parts[1]} - ${parts[2]}`
-        }
-        return `${parts[0]} - ${parts[1]} -`
-      }
-      return `${parts[0]} -`
-    }
-    return ""
-  }
-
-  const handleStudentNumberChange = (e) => {
-    const input = e.target.value
-    const formatted = formatStudentNumber(input)
-    setStudentNumber(input.replace(/[^\d]/g, ""))
-    setFormattedStudentNumber(formatted || "xxxx-x-xxxxx")
-  }
+    const numbers = value.replace(/[^\d]/g, "");
+    const parts = [numbers.slice(0, 4), numbers.slice(4, 5), numbers.slice(5, 10)];
+    return parts.filter(Boolean).join(" - ") || "xxxx-x-xxxx";
+  };
 
   return (
     <div className="uMain-cont flex">
@@ -135,61 +90,55 @@ export default function RegisterForm({ onRegister }) {
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
+          {/* First Name & Last Name */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                First Name:
-              </label>
-              <input
-                id="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                onFocus={handleInputFocus(setFirstName, "first name")}
-                onBlur={handleInputBlur(setFirstName, "first name")}
-                className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                style={{ color: firstName === "first name" ? "gray" : "black" }}
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                Last Name:
-              </label>
-              <input
-                id="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                onFocus={handleInputFocus(setLastName, "surname")}
-                onBlur={handleInputBlur(setLastName, "surname")}
-                className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                style={{ color: lastName === "surname" ? "gray" : "black" }}
-              />
-            </div>
+            {["firstName", "lastName"].map((field) => (
+              <div key={field} className="space-y-2">
+                <label htmlFor={field} className="block text-sm font-medium text-gray-700">
+                  {field === "firstName" ? "First Name:" : "Last Name:"}
+                </label>
+                <input
+                  id={field}
+                  value={new_data[field]}
+                  onChange={(e) => setNewData((prev) => ({ ...prev, [field]: e.target.value }))}
+                  onFocus={(e) => {
+                    if (e.target.value === (field === "firstName" ? "First Name" : "Last Name")) {
+                      setNewData((prev) => ({ ...prev, [field]: "" }));
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (e.target.value === "") {
+                      setNewData((prev) => ({ ...prev, [field]: field === "firstName" ? "First Name" : "Last Name" }));
+                    }
+                  }}
+                  className="w-full px-2.5 py-1 border border-gray rounded-full"
+                />
+              </div>
+            ))}
           </div>
 
+          {/* Student Number */}
           <div className="space-y-2">
             <label htmlFor="studentNumber" className="block text-sm font-medium text-gray-700">
               Student Number:
             </label>
             <input
               id="studentNumber"
-              value={formattedStudentNumber}
-              onChange={handleStudentNumberChange}
-              onFocus={() => {
-                if (formattedStudentNumber === "xxxx-x-xxxxx") {
-                  setFormattedStudentNumber("")
-                }
+              value={new_data.formattedStudentNumber}
+              onChange={(e) => {
+                const formatted = formatStudentNumber(e.target.value);
+                setNewData((prev) => ({
+                  ...prev,
+                  studentNumber: e.target.value.replace(/[^\d]/g, ""),
+                  formattedStudentNumber: formatted,
+                }));
               }}
-              onBlur={() => {
-                if (formattedStudentNumber === "") {
-                  setFormattedStudentNumber("xxxx-x-xxxxx")
-                }
-              }}
-              className="w-full px-2.5 py-1 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              style={{ color: formattedStudentNumber === "xxxx-x-xxxxx" ? "gray" : "black" }}
+              className="w-full px-2.5 py-1 border border-gray rounded-full"
               maxLength={16}
             />
           </div>
 
+          {/* College & Department */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label htmlFor="college" className="block text-sm font-medium text-gray-700">
@@ -197,13 +146,13 @@ export default function RegisterForm({ onRegister }) {
               </label>
               <select
                 id="college"
-                value={college}
-                onChange={(e) => setCollege(e.target.value)}
-                className="w-full px-2.5 py-1 border border-gray-300 rounded-full bg-gray-50 appearance-none"
+                value={new_data.college}
+                onChange={(e) => setNewData((prev) => ({ ...prev, college: e.target.value }))}
+                className="w-full px-2.5 py-1 border border-gray-300 rounded-full"
               >
                 <option value="">Select College</option>
-                {colleges.map((c, index) => (
-                  <option key={index} value={c}>
+                {colleges.map((c) => (
+                  <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
@@ -216,83 +165,82 @@ export default function RegisterForm({ onRegister }) {
               </label>
               <select
                 id="department"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                disabled={college !== "COECSA"}
-                className="w-full px-2.5 py-1 border border-gray-300 rounded-full bg-gray-50 appearance-none disabled:bg-gray-200 disabled:text-gray-500"
+                value={new_data.department}
+                onChange={(e) => setNewData((prev) => ({ ...prev, department: e.target.value }))}
+                disabled={new_data.college !== "COECSA"}
+                className="w-full px-2.5 py-1 border border-gray-300 rounded-full"
               >
                 <option value="">Select Department</option>
-                {college === "COECSA" ? (
-                  departments[college].map((d, index) => (
-                    <option key={index} value={d}>
-                      {d}
-                    </option>
-                  ))
-                ) : (
-                  <option value="No departments">No departments</option>
-                )}
+                {departments[new_data.college]?.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
 
+          {/* Email */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label htmlFor="emailPrefix" className="block text-sm font-medium text-gray-700">
-                Email (LPU Account):
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email:
               </label>
               <input
-                id="emailPrefix"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onFocus={handleInputFocus(setEmail, "type email here")}
-                onBlur={handleInputBlur(setEmail, "type email here")}
-                className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                style={{ color: email === "type email here" ? "gray" : "black" }}
+                id="email"
+                value={new_data.email}
+                onChange={(e) => setNewData((prev) => ({ ...prev, email: e.target.value }))}
+                className="w-full px-2.5 py-1 border border-gray rounded-full"
               />
             </div>
+
             <div className="space-y-2">
               <label htmlFor="emailSuffix" className="block text-sm font-medium text-gray-700">
-                Suffix
+                Suffix:
               </label>
               <select
                 id="emailSuffix"
-                className="w-full px-2.5 py-1 border border-grey rounded-full bg-gray-50 appearance-none"
+                value={new_data.emailSuffix}
+                onChange={(e) => setNewData((prev) => ({ ...prev, emailSuffix: e.target.value }))}
+                className="w-full px-2.5 py-1 border border-gray rounded-full"
               >
                 <option>@lpunetwork.edu.ph</option>
-                <option>@lpu.edu.net</option>
+                <option>@lpu.edu.ph</option>
               </select>
             </div>
           </div>
+
+          {/* Password & Confirm Password */}
           <div className="space-y-2">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password:
-            </label>
+            <label htmlFor="password">Password:</label>
             <input
               id="password"
               type="password"
               onChange={(e) => checkPasswordStrength(e.target.value)}
-              className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
+              className="w-full px-2.5 py-1 border rounded"
             />
-            <div className="space-y-1">
-              <div className="h-2 bg-grey rounded-full">
-                <div
-                  className={`h-full ${getStrengthColor()} rounded-full transition-all duration-300 ease-in-out`}
-                  style={{ width: `${passwordStrength}%` }}
-                ></div>
-              </div>
-              <p className="text-sm text-gray-500">Strength: {getStrengthText()}</p>
+            <div className="h-2 bg-gray-200 rounded">
+              <div
+                className={`h-full ${getStrengthColor()} rounded transition-all`}
+                style={{ width: `${Math.max(passwordStrength, 10)}%` }} // Ensure minimum width
+              ></div>
             </div>
+            <p className="text-sm">
+              Password Strength:{" "}
+              {["Very Weak", "Weak", "Medium", "Strong", "Very Strong"][
+                Math.floor(passwordStrength / 20)
+              ]}
+            </p>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-grey">
-              Confirm Password:
-            </label>
+            <label htmlFor="confirmPassword">Confirm Password:</label>
             <input
               id="confirmPassword"
               type="password"
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-2.5 py-1 border border-grey rounded-full focus:outline-none focus:ring-2 focus:ring-blue focus:border-blue"
+              value={new_data.confirmPassword}
+              onChange={handleChange}
+              className="w-full px-2.5 py-1 border rounded"
             />
           </div>
 

@@ -9,7 +9,7 @@ const UInterests = () => {
         {/* Content Container */}
         <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
           {/* Sidebar */}
-          <UserInterests />
+          <UserInterests userData={new_data} />
         </div>
       </main>
       <UCopyright />

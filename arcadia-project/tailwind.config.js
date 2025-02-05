@@ -11,6 +11,7 @@ export default {
         "grey": '#D4D4D8',
         "arcadia-black": '#18181B',
         "yellow": '#e8d08d',
+        "orange": "#ff9800",
         "red": '#de6262',
         "bright-yellow": '#EEBA33',
         "dark-yellow": '#FFFF9F',
