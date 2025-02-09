@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import bcrypt from "bcryptjs"
 
 export default function RegisterForm({ onRegister }) {
   const [new_data, setNewData] = useState({
@@ -31,7 +32,7 @@ export default function RegisterForm({ onRegister }) {
   useEffect(() => {
     setNewData((prev) => ({
       ...prev,
-      department: prev.college === "COECSA" ? "" : "No departments",
+      department: prev.college === "COECSA" ? "" : "",
     }));
   }, [new_data.college]);
 
@@ -67,10 +68,13 @@ export default function RegisterForm({ onRegister }) {
       setPasswordError("Passwords do not match");
       return;
     }
-    if (passwordStrength < 60) {
+    if (passwordStrength < 80) {
       setPasswordError("Password is not strong enough");
       return;
     }
+
+    new_data.password = bcrypt.hashSync(new_data.password, 10) // Salt rounds: 10
+
     onRegister(new_data); // Send new_data on form submit
   };
 

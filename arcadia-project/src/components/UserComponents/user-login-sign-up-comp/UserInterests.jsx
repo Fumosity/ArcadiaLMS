@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { supabase } from "./../../../supabaseClient"; // Adjust path if necessary
+import { supabase } from "./../../../supabaseClient"; 
 
 export default function UserInterests({ userData, onBack, onContinue }) {
   const [genres, setGenres] = useState([])
   const [selectedGenres, setSelectedGenres] = useState([])
   const [loading, setLoading] = useState(true)
-  const [categoryFilter, setCategoryFilter] = useState(null); // To filter genres by category (Fiction/Non-fiction)
+  const [categoryFilter, setCategoryFilter] = useState(null);
+
+  console.log(userData)
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -35,7 +37,13 @@ export default function UserInterests({ userData, onBack, onContinue }) {
       return;
     }
     console.log("Selected genres:", selectedGenres);
-    onContinue(); // Continue to the next step
+
+    const selectedGenreNames = genres
+      .filter((genre) => selectedGenres.includes(genre.genreID))
+      .map((genre) => genre.genreName);
+
+    console.log("Selected genre names:", selectedGenreNames);
+    onContinue(selectedGenres);
   };
 
   // Filter genres based on the selected category
@@ -53,31 +61,28 @@ export default function UserInterests({ userData, onBack, onContinue }) {
         <div className="flex gap-4 mb-6">
           <button
             onClick={() => setCategoryFilter("Fiction")}
-            className={`px-6 py-2 rounded-full text-sm transition-colors ${
-              categoryFilter === "Fiction"
+            className={`px-6 py-2 rounded-full text-sm transition-colors ${categoryFilter === "Fiction"
                 ? "bg-arcadia-red text-white"
                 : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
-            }`}
+              }`}
           >
             Fiction
           </button>
           <button
             onClick={() => setCategoryFilter("Non-fiction")}
-            className={`px-6 py-2 rounded-full text-sm transition-colors ${
-              categoryFilter === "Non-fiction"
+            className={`px-6 py-2 rounded-full text-sm transition-colors ${categoryFilter === "Non-fiction"
                 ? "bg-arcadia-red text-white"
                 : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
-            }`}
+              }`}
           >
             Non-fiction
           </button>
           <button
             onClick={() => setCategoryFilter(null)} // Reset the filter
-            className={`px-6 py-2 rounded-full text-sm transition-colors ${
-              categoryFilter === null
+            className={`px-6 py-2 rounded-full text-sm transition-colors ${categoryFilter === null
                 ? "bg-arcadia-red text-white"
                 : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
-            }`}
+              }`}
           >
             All
           </button>
@@ -91,11 +96,10 @@ export default function UserInterests({ userData, onBack, onContinue }) {
               <button
                 key={genre.genreID}
                 onClick={() => toggleGenre(genre.genreID)}
-                className={`px-4 py-2 rounded-full text-sm transition-colors ${
-                  selectedGenres.includes(genre.genreID)
+                className={`px-4 py-2 rounded-full text-sm transition-colors ${selectedGenres.includes(genre.genreID)
                     ? "bg-arcadia-red text-white"
                     : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
-                }`}
+                  }`}
               >
                 {genre.genreName}
               </button>
