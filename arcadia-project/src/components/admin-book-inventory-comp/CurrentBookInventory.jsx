@@ -20,7 +20,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
             try {
                 const { data: bookTitles, error: titleError } = await supabase
                     .from("book_titles")
-                    .select("titleID, title, author, genre, category, synopsis, keyword, publisher, currentPubDate, originalPubDate, procurementDate, cover");
+                    .select("titleID, title, author, synopsis, keywords, publisher, currentPubDate, originalPubDate, procurementDate, cover");
 
                 if (titleError) {
                     console.error("Error fetching book titles:", titleError.message);
@@ -34,6 +34,18 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 }
 
                 const bookIDs = bookTitles.map((book) => book.titleID);
+
+                // Fetch book-genre relationships and join with genres table
+                const { data: bookGenres, error: genreError } = await supabase
+                    .from("book_genre_link")
+                    .select("titleID, genres(genreID, genreName, category)") // Join with genres table
+                    .in("titleID", bookIDs);
+
+                if (genreError) {
+                    console.error("Error fetching book genres:", genreError.message);
+                    return;
+                }
+
                 const { data: bookIndiv, error: bookError } = await supabase
                     .from("book_indiv")
                     .select("bookID, titleID")
@@ -44,11 +56,25 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                     return;
                 }
 
+                // Process genre data
+                const bookGenreMap = bookGenres.reduce((acc, item) => {
+                    if (!acc[item.titleID]) {
+                        acc[item.titleID] = { category: item.genres.category, genres: [] };
+                    }
+                    acc[item.titleID].genres.push(item.genres.genreName);
+                    return acc;
+                }, {});
+
+                // Combine all data
                 const combinedData = bookTitles.map((title) => {
                     const books = bookIndiv.filter((b) => b.titleID === title.titleID);
+                    const { category, genres } = bookGenreMap[title.titleID] || { category: "Uncategorized", genres: [] };
+
                     return {
                         ...title,
                         copies: books,
+                        category,
+                        genres, // Array of genre names
                     };
                 });
 
@@ -187,9 +213,9 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                     onMouseEnter={() => setHoveredGenreIndex(index)}
                                                     onMouseLeave={() => setHoveredGenreIndex(null)}
                                                 >
-                                                    {genres[0]}
+                                                    {item.genres.length > 0 ? item.genres[0] : "No Genre"}
                                                 </span>
-                                                {genres.length > 1 && (
+                                                {item.genres.length > 1 && (
                                                     <span
                                                         className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-grey p-2"
                                                         onMouseEnter={() => setHoveredGenreIndex(index)}
@@ -199,9 +225,9 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                     </span>
                                                 )}
                                             </div>
-                                            {hoveredGenreIndex === index && genres.length > 1 && (
+                                            {hoveredGenreIndex === index && item.genres.length > 1 && (
                                                 <div className="mt-1 transition-opacity duration-300 ease-in-out opacity-100">
-                                                    {genres.slice(1).map((genre, i) => (
+                                                    {item.genres.slice(1).map((genre, i) => (
                                                         <div key={i} className="bg-grey rounded-full p-2 mt-1 text-sm">
                                                             {genre}
                                                         </div>
@@ -209,6 +235,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                 </div>
                                             )}
                                         </td>
+
                                         <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate max-w-xs">
                                             <Link
                                                 to={`/admin/abviewer?titleID=${encodeURIComponent(item.titleID)}`}

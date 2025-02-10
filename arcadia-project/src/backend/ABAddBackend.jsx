@@ -5,38 +5,67 @@ export const checkAndAddBookTitle = async (bookData) => {
     try {
         const { data, error } = await supabase.from('book_titles').select('titleID').eq('title', bookData.title).single();
 
-        if (error) {
-            if (error.code === "PGRST116") {
-                const newTitleData = {
-                    title: bookData.title,
-                    author: Array.isArray(bookData.author) ? bookData.author : bookData.author.split(';'),
-                    genre: Array.isArray(bookData.genre) ? bookData.genre : bookData.genre.split(';'),
-                    category: Array.isArray(bookData.category) ? bookData.category : bookData.category.split(';'),
-                    synopsis: bookData.synopsis,
-                    keyword: Array.isArray(bookData.keyword) ? bookData.keyword : bookData.keyword.split(';'),
-                    publisher: bookData.publisher,
-                    currentPubDate: bookData.currentPubDate,
-                    originalPubDate: bookData.originalPubDate,
-                    procurementDate: bookData.procDate,
-                    cover: bookData.cover,
-                    ISBN: bookData.isbn,
-                    location: bookData.location,
-                    price: bookData.price,
-                    titleARCID: bookData.titleARCID,
-                };
+        if (data) return data.titleID;
 
-                const { data: newTitle, error: insertError } = await supabase.from('book_titles').insert([newTitleData]).select('titleID').single();
-                if (insertError) throw insertError;
+        const newTitleData = {
+            title: bookData.title,
+            author: Array.isArray(bookData.author) ? bookData.author : bookData.author.split(';'),
+            synopsis: bookData.synopsis,
+            keywords: Array.isArray(bookData.keyword) ? bookData.keyword : bookData.keyword.split(';'),
+            publisher: bookData.publisher,
+            currentPubDate: bookData.currentPubDate,
+            originalPubDate: bookData.originalPubDate,
+            procurementDate: bookData.procurementDate,
+            cover: bookData.cover,
+            isbn: bookData.isbn,
+            location: bookData.location,
+            price: bookData.price,
+            arcID: bookData.titleARCID,
+        };
 
-                return newTitle.titleID;
-            } else {
-                throw error;
+        const { data: newTitle, error: insertError } = await supabase.from('book_titles').insert([newTitleData]).select('titleID').single();
+        if (insertError) throw insertError;
+
+        const newTitleID = newTitle.titleID;
+        console.log("New titleID:", newTitleID);
+
+        console.log(bookData.genre)
+
+        // Fetch genre IDs from Supabase based on selected genre names
+        const { data: genreData, error: genreFetchError } = await supabase
+            .from("genres")
+            .select("genreID, genreName")
+            .in("genreName", bookData.genre); // bookData.genre contains ["Horror", "Mystery"]
+
+        if (genreFetchError) {
+            console.error("Error fetching genre IDs:", genreFetchError);
+            alert("Failed to fetch genres. Please try again.");
+        } else {
+            console.log("Fetched genre data:", genreData);
+
+            if (genreData.length > 0) {
+                // Map fetched genre IDs for insertion
+                const genreLinks = genreData.map((genre) => ({
+                    titleID: newTitleID,
+                    genreID: genre.genreID,
+                }));
+
+                // Insert the genre-title links
+                const { error: genreInsertError } = await supabase
+                    .from("book_genre_link")
+                    .insert(genreLinks);
+
+                if (genreInsertError) {
+                    console.error("Error inserting book genres:", genreInsertError);
+                    alert("Failed to save genres. Please try again.");
+                } else {
+                    console.log("Book genres added successfully!");
+                }
             }
         }
 
-        if (error) throw error;
 
-        return data.titleID;
+        return newTitle.titleID;
     } catch (err) {
         console.error("Error in checkAndAddBookTitle:", err);
         return null;
@@ -46,9 +75,10 @@ export const checkAndAddBookTitle = async (bookData) => {
 //Adds a new record to the book and book_update table
 export const addBook = async (bookData) => {
     try {
+        console.log("bookData", bookData)
         const titleID = await checkAndAddBookTitle(bookData);
 
-        if (!titleID) { 
+        if (!titleID) {
             console.error("Failed to retrieve the title ID for the book.");
             return false;
         }
@@ -56,7 +86,9 @@ export const addBook = async (bookData) => {
         const specificBookData = {
             bookID: bookData.bookID,
             titleID: titleID,
-            bookARCID: bookData.arcID,
+            bookARCID: bookData.bookARCID,
+            bookStatus: "Available",
+            bookAcqDate: bookData.procurementDate
         };
 
         // Insert into 'book' table
@@ -113,7 +145,7 @@ export const generateProcDate = (setFormData) => {
 
         setFormData((prevData) => ({
             ...prevData,
-            procDate: newProcDate,
+            procurementDate: newProcDate,
         }));
     } catch (error) {
         console.error("Error generating procDate:", error);

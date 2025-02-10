@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { supabase } from "./../../../supabaseClient"; 
+import { supabase } from "./../../../supabaseClient";
 
 export default function UserInterests({ userData, onBack, onContinue }) {
   const [genres, setGenres] = useState([])
@@ -62,8 +62,8 @@ export default function UserInterests({ userData, onBack, onContinue }) {
           <button
             onClick={() => setCategoryFilter("Fiction")}
             className={`px-6 py-2 rounded-full text-sm transition-colors ${categoryFilter === "Fiction"
-                ? "bg-arcadia-red text-white"
-                : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
+              ? "bg-arcadia-red text-white"
+              : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
               }`}
           >
             Fiction
@@ -71,8 +71,8 @@ export default function UserInterests({ userData, onBack, onContinue }) {
           <button
             onClick={() => setCategoryFilter("Non-fiction")}
             className={`px-6 py-2 rounded-full text-sm transition-colors ${categoryFilter === "Non-fiction"
-                ? "bg-arcadia-red text-white"
-                : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
+              ? "bg-arcadia-red text-white"
+              : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
               }`}
           >
             Non-fiction
@@ -80,8 +80,8 @@ export default function UserInterests({ userData, onBack, onContinue }) {
           <button
             onClick={() => setCategoryFilter(null)} // Reset the filter
             className={`px-6 py-2 rounded-full text-sm transition-colors ${categoryFilter === null
-                ? "bg-arcadia-red text-white"
-                : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
+              ? "bg-arcadia-red text-white"
+              : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
               }`}
           >
             All
@@ -97,8 +97,8 @@ export default function UserInterests({ userData, onBack, onContinue }) {
                 key={genre.genreID}
                 onClick={() => toggleGenre(genre.genreID)}
                 className={`px-4 py-2 rounded-full text-sm transition-colors ${selectedGenres.includes(genre.genreID)
-                    ? "bg-arcadia-red text-white"
-                    : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
+                  ? "bg-arcadia-red text-white"
+                  : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
                   }`}
               >
                 {genre.genreName}
