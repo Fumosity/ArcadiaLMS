@@ -1,6 +1,7 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import Recommended from "../../components/UserComponents/user-home-comp/Recommended";
+import InterestedGenre from "../../components/UserComponents/user-home-comp/InterestedGenre";
 import USearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import UHero from "../../components/UserComponents/user-home-comp/UHero";
 import LatestNews from "../../components/UserComponents/user-home-comp/LatestNews";
@@ -36,10 +37,13 @@ const UHomePage = () => {
             <UHero />
             
             {/* News and Updates */}
-            <LatestNews />
+            {/* <LatestNews /> */}
             
             {/* Recommended for You */}
             <Recommended />
+
+            {/* Because You Like Genre */}
+            <InterestedGenre />
 
             {/* Most Popular */}
             <MostPopular />
