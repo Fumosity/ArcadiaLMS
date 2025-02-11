@@ -182,10 +182,10 @@ const CheckingContainer = () => {
       if (checkMode === 'Check Out') {
         const { data: existingTransaction, error: fetchError } = await supabase
           .from('book_transactions')
-          .select('transaction_type')
+          .select('transactionType')
           .eq('bookID', bookID)
-          .eq('transaction_type', 'Borrowed') // Check if the book is already borrowed
-          .order('checkout_date', { ascending: false })
+          .eq('transactionType', 'Borrowed') // Check if the book is already borrowed
+          .order('checkoutDate', { ascending: false })
           .limit(1)
           .single();
 
@@ -202,7 +202,7 @@ const CheckingContainer = () => {
         // Update the status to 'Unavailable' when checking out
         const { error: updateError } = await supabase
           .from('book_indiv')
-          .update({ status: 'Unavailable' })
+          .update({ bookStatus: 'Unavailable' })
           .eq('bookID', bookID);
 
         if (updateError) {
@@ -214,10 +214,10 @@ const CheckingContainer = () => {
         const transactionData = {
           userID: userID,
           bookID: bookID,
-          checkout_date: date,
-          checkout_time: time,
+          checkoutDate: date,
+          checkoutTime: time,
           deadline: deadline,
-          transaction_type: transactionType,
+          transactionType: transactionType,
         };
 
         const { data, error } = await supabase.from('book_transactions').insert([transactionData]);
@@ -238,8 +238,8 @@ const CheckingContainer = () => {
           .select('*')
           .eq('bookID', bookID)
           .eq('userID', userID)
-          .eq('transaction_type', 'Borrowed') // Only allow check-in if the book is borrowed
-          .order('checkout_date', { ascending: false })
+          .eq('transactionType', 'Borrowed') // Only allow check-in if the book is borrowed
+          .order('checkoutDate', { ascending: false })
           .limit(1)
           .single();
 
@@ -257,9 +257,9 @@ const CheckingContainer = () => {
         const { error: updateTransactionError } = await supabase
           .from('book_transactions')
           .update({
-            checkin_date: date,
-            checkin_time: time,
-            transaction_type: 'Returned', // Change transaction type to 'Returned'
+            checkinDate: date,
+            checkinTime: time,
+            transactionType: 'Returned', // Change transaction type to 'Returned'
           })
           .eq('transactionID', existingTransaction.transactionID); // Use the existing transactionID
 
@@ -274,7 +274,7 @@ const CheckingContainer = () => {
         // Update the book status to 'Available' or 'Damaged' when checking in
         const { error: checkinUpdateError } = await supabase
           .from('book_indiv')
-          .update({ status: updatedStatus })
+          .update({ bookStatus: updatedStatus })
           .eq('bookID', bookID);
 
         if (checkinUpdateError) {

@@ -3,16 +3,10 @@ import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import Title from "../../components/main-comp/Title";
 
-import SimBooks from "../../components/UserComponents/user-book-search-comp/SimBooks";
-
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
-import UHero from "../../components/UserComponents/user-home-comp/UHero";
-import LibServ from "../../components/UserComponents/user-serv-comp/LibServ";
-import SupportCont from "../../components/UserComponents/user-support-comp/SupportCont";
-import ContactUs from "../../components/UserComponents/user-support-comp/ContactUs";
-import FAQSection from "../../components/UserComponents/user-faq-comp/FAQSection";
+
 import { UserCredentials } from "../../components/UserComponents/user-account-comp/UserCredentials";
 import { AccountSettings } from "../../components/UserComponents/user-account-comp/AccountSettings";
 import UserCirculationHistory from "../../components/UserComponents/user-account-comp/UserCirculationHistory";
