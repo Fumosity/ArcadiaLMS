@@ -26,7 +26,7 @@ const SupportTixStatus = () => {
             setIsLoading(true);
             const { data, error } = await supabase
                 .from("support_ticket")
-                .select("ticket_id, type, status, subject, date, time")
+                .select("ticketID, type, status, subject, date, time")
                 .eq("userID", userID); // Filter by user_ID
 
             if (error) throw error;
@@ -85,7 +85,7 @@ const SupportTixStatus = () => {
                             ))
                         ) : reportData.length > 0 ? (
                             reportData.map((report) => (
-                                <tr key={report.ticket_id}>
+                                <tr key={report.ticketID}>
                                     <td className="px-4 py-2 text-sm">
                                         <div className="text-center border rounded-xl text-arcadia-red">
                                             {report.type || "N/A"}
@@ -110,7 +110,7 @@ const SupportTixStatus = () => {
                                     <td className="px-4 py-2 text-sm">{report.date || "N/A"}</td>
                                     <td className="px-4 py-2 text-sm">{report.time || "N/A"}</td>
                                     <td className="px-4 py-2 text-sm text-red-600 font-medium hover:underline cursor-pointer">
-                                        {report.ticket_id || "N/A"}
+                                        {report.ticketID || "N/A"}
                                     </td>
                                 </tr>
                             ))

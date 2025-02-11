@@ -122,8 +122,12 @@ export default function Onboarding({ userData, selectedGenres }) {
                 </p>
 
                 <div className="flex justify-center">
-                    <button type="submit" className="genRedBtns" onClick={handleSubmit}>Continue</button>
+                    {/* <button type="submit" className="genRedBtns" onClick={handleSubmit}>Continue</button> */}
+                    <Link to="/user/login" className="genRedBtns" type="submit" onClick={handleSubmit}>
+                        Continue
+                    </Link>
                 </div>
+
             </div>
 
 

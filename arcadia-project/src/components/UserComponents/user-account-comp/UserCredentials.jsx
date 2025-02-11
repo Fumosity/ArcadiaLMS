@@ -16,7 +16,9 @@ export function UserCredentials({ user = defaultUser }) {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser && (storedUser.userAccountType === "Student" || storedUser.userAccountType === "Teacher")) {
+    if (storedUser && (storedUser.userAccountType === "Student" || storedUser.userAccountType === "Faculty" || storedUser.userAccountType === "Admin"
+       || storedUser.userAccountType === "Superadmin" || storedUser.userAccountType === "Intern"
+    )) {
       setCurrentUser({
         name: `${storedUser.userFName} ${storedUser.userLName}`,
         schoolId: storedUser.userLPUID,
