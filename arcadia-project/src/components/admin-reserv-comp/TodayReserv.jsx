@@ -1,47 +1,57 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from '../../supabaseClient';  // Adjust the path according to your project structure
+import { supabase } from "../../supabaseClient";
 
 const TodayReserv = () => {
   const [roomRes, setRoomRes] = useState([]);
 
   useEffect(() => {
     const fetchReservations = async () => {
-      // Fetch reservations from the 'reservation' table and filter by date inside the reserve_data JSONB column
+      const today = new Date().toISOString().split("T")[0]; // Get today's date (YYYY-MM-DD)
+      console.log("Today's Date:", today);
+
       const { data: reservations, error } = await supabase
-        .from('reservation')
-        .select('reserve_data, userID')
-        .filter('reserve_data->>date', 'eq', '2024-12-10');  // Corrected query to extract date from JSON
+        .from("reservation")
+        .select("reservationData, userID") 
+        .eq("reservationData->>date", today);   
 
       if (error) {
-        console.error('Error fetching reservations:', error);
+        console.error("Error fetching reservations:", error);
         return;
       }
 
-      // Fetch booker names from 'user_accounts' table based on userID
+      console.log("Fetched reservations:", reservations); // Check if data is fetched
+
+      if (!reservations || reservations.length === 0) {
+        console.warn("No reservations found for today.");
+        setRoomRes([]); // Set empty if no data
+        return;
+      }
+
+      // Fetch booker names based on userID
       const updatedReservations = await Promise.all(
         reservations.map(async (reservation) => {
           const { data: user, error: userError } = await supabase
-            .from('user_accounts')
-            .select('userFName, userLName')
-            .eq('userID', reservation.userID)
+            .from("user_accounts")
+            .select("userFName, userLName")
+            .eq("userID", reservation.userID)
             .single();
 
           if (userError) {
-            console.error('Error fetching user data:', userError);
+            console.error("Error fetching user data:", userError);
             return null;
           }
 
-          // Parse reserve_data JSON to extract the room and time range
-          const { room, startTime, endTime } = reservation.reserve_data;
-          const timeRange = `${startTime}-${endTime}`;
-          const booker = `${user.userFName} ${user.userLName}`;
-
-          return { room, time: timeRange, booker };
+          // Extract data from reservationData JSONB
+          const { room, startTime, endTime } = reservation.reservationData;
+          return {
+            room,
+            time: `${startTime}-${endTime}`,
+            booker: `${user.userFName} ${user.userLName}`,
+          };
         })
       );
 
-      // Filter out any null results in case of errors
-      setRoomRes(updatedReservations.filter((reservation) => reservation !== null));
+      setRoomRes(updatedReservations.filter((r) => r !== null)); // Remove null values
     };
 
     fetchReservations();

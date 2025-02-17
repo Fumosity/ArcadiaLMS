@@ -1,9 +1,42 @@
+import { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';  // Import the dayGrid plugin
+import { supabase } from "../../supabaseClient";
 
-export default function ARoomReservations({ events }) {
+export default function ARoomReservations() {
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    // Fetch data from Supabase
+    const fetchReservations = async () => {
+      const { data, error } = await supabase
+        .from('reservation')
+        .select('reservationData');  // Adjust the fields as needed
+
+      if (error) {
+        console.error('Error fetching reservations:', error);
+        return;
+      }
+
+      // Map reservation data to FullCalendar event format
+      const formattedEvents = data.map((reservation) => {
+        const { date, room, title, startTime, endTime } = reservation.reservationData;
+        return {
+          title,
+          start: `${date}T${startTime}`,  // Combine date and startTime
+          end: `${date}T${endTime}`,      // Combine date and endTime
+          resourceId: room,               // Use room as resourceId
+        };
+      });
+
+      setEvents(formattedEvents);
+    };
+
+    fetchReservations();
+  }, []);
+
   return (
     <div className="bg-white overflow-hidden border-gray-300 mb-8 p-6 rounded-lg w-full">
       <h2 className="text-2xl font-semibold mb-4 text-gray-900">Room Reservations</h2>

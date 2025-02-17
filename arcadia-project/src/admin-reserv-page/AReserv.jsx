@@ -11,35 +11,39 @@ const AReserv = () => {
   const [events, setEvents] = useState([]);
 
   // Fetch reservations from Supabase
-  useEffect(() => {
-    const fetchReservations = async () => {
-      try {
-        const { data, error } = await supabase.from("reservation").select("*");
-        if (error) {
-          console.error("Error fetching reservations:", error.message);
-        } else {
-          // Transform data into the format required by your calendar
-          const formattedEvents = data.map((reservation) => {
-            const { reserve_data } = reservation;
-            return {
-              resourceId: reserve_data.room,
-              title: reserve_data.title,
-              start: `${reserve_data.date}T${reserve_data.startTime}`,
-              end: `${reserve_data.date}T${reserve_data.endTime}`,
-            };
-          });
-          setEvents(formattedEvents);
-        }
-      } catch (error) {
+  const fetchReservations = async () => {
+    try {
+      const { data, error } = await supabase.from("reservation").select("*");
+      if (error) {
         console.error("Error fetching reservations:", error.message);
+      } else {
+        // Transform data into the format required by your calendar
+        const formattedEvents = data.map((reservation) => {
+          const { reserve_data } = reservation;
+          return {
+            resourceId: reserve_data.room,
+            title: reserve_data.title,
+            start: `${reserve_data.date}T${reserve_data.startTime}`,
+            end: `${reserve_data.date}T${reserve_data.endTime}`,
+          };
+        });
+        setEvents(formattedEvents);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching reservations:", error.message);
+    }
+  };
 
+  useEffect(() => {
     fetchReservations();
   }, []);
 
   const addReservation = (newEvent) => {
     setEvents((prevEvents) => [...prevEvents, newEvent]);
+  };
+
+  const handleRefresh = () => {
+    fetchReservations();
   };
 
   return (

@@ -8,15 +8,15 @@ export default function Component() {
     async function fetchReservations() {
       const { data, error } = await supabase
         .from('reservation') // Replace with the actual table name
-        .select('reserve_data, userID') // Assuming the reserve data and user ID are in this table
-        .neq('reserve_data', null);
+        .select('reservationData, userID') // Assuming the reserve data and user ID are in this table
+        .neq('reservationData', null);
 
       if (error) {
         console.error('Error fetching reservations:', error);
       } else {
         const reservationData = await Promise.all(
           data.map(async (reservation) => {
-            const { reserve_data, userID } = reservation;
+            const { reservationData, userID } = reservation;
             
             // Fetch user data
             const { data: userData, error: userError } = await supabase
@@ -33,7 +33,7 @@ export default function Component() {
             const borrower = `${userData?.userFName} ${userData?.userLName}`;
 
             // Extract details from the reserve_data JSONB
-            const { room, startTime, endTime, date } = reserve_data;
+            const { room, startTime, endTime, date } = reservationData;
 
             // Get the current date and time
             const currentDateTime = new Date();

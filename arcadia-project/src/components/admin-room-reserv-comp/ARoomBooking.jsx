@@ -84,11 +84,11 @@ export default function ARoomBooking({ addReservation }) {
     try {
       const { data, error } = await supabase
         .from("reservation")
-        .select("reserve_data")
-        .filter("reserve_data->>room", "eq", formData.room)
-        .filter("reserve_data->>date", "eq", formData.date)
-        .filter("reserve_data->>startTime", "lt", formData.endTime)
-        .filter("reserve_data->>endTime", "gt", formData.startTime);
+        .select("reservationData")
+        .filter("reservationData->>room", "eq", formData.room)
+        .filter("reservationData->>date", "eq", formData.date)
+        .filter("reservationData->>startTime", "lt", formData.endTime)
+        .filter("reservationData->>endTime", "gt", formData.startTime);
 
       if (error) {
         throw new Error(`Error checking existing reservations: ${error.message}`);
@@ -182,7 +182,7 @@ export default function ARoomBooking({ addReservation }) {
         .from("reservation")
         .insert({
           userID: formData.userId,
-          reserve_data: reserveData,
+          reservationData: reserveData,
         });
   
       if (error) {
