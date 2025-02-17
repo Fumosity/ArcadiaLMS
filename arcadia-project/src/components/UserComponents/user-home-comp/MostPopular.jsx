@@ -72,7 +72,8 @@ const fetchMostPopularBooks = async () => {
             };
         });
 
-        return booksWithDetails.sort((a, b) => b.borrowCount - a.borrowCount);
+        let books = booksWithDetails.sort((a, b) => b.borrowCount - a.borrowCount)
+        return { books };
     } catch (error) {
         console.error("Error fetching most popular books:", error);
         return [];

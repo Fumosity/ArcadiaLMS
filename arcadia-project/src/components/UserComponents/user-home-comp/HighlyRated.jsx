@@ -62,8 +62,10 @@ const fetchHighlyRatedBooks = async () => {
             };
         });
 
+        let books = booksWithDetails.sort((a, b) => b.weightedAvg - a.weightedAvg)
+
         // Step 7: Sort by highest weighted average rating
-        return booksWithDetails.sort((a, b) => b.weightedAvg - a.weightedAvg);
+        return { books };
     } catch (error) {
         console.error("Error fetching highly rated books:", error);
         return [];

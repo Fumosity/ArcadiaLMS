@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import BookCards from "./BookCards";
 import { useUser } from "../../../backend/UserContext"; // Adjust path as needed
+import { supabase } from "/src/supabaseClient.js";
 
 const fetchRecommendedBooks = async (userID, titleID) => {
     try {
@@ -54,6 +55,7 @@ const Recommended = ({ userID, titleID }) => {
         console.error("Recommended: userID is undefined!");
         return <p>Error: User not found.</p>;
     }
+
     return <BookCards title="Recommended for You" fetchBooks={() => fetchRecommendedBooks(userID, titleID)} />;
 };
 
