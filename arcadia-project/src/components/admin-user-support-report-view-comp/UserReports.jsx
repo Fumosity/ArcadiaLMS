@@ -38,7 +38,7 @@ const UserReports = () => {
         setIsLoading(true);
         const { data, error } = await supabase
           .from("report_ticket")
-          .select("report_id, type, status, subject, date, time, content");
+          .select("reportID, type, status, subject, date, time, content");
 
         if (error) throw error;
 
