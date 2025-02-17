@@ -51,7 +51,6 @@ export default function ReservInformation() {
         { room: "ARC-1", status: "Occupied", date: "August 23", period: "11:00AM - 12:00PM", borrower: "Henry Avery", purpose: "CS101 Group Study" },
     ]
 
-    // Existing filtering logic
     const filteredReservations = reservations
         .filter(reservation => {
             const matchesSearch = searchQuery === "" ||
@@ -73,7 +72,6 @@ export default function ReservInformation() {
     const startIndex = (currentPage - 1) * entriesPerPage
     const displayedReservations = filteredReservations.slice(startIndex, startIndex + entriesPerPage)
 
-    // Existing handlers
     const handlePrevious = () => {
         setDateRange(prev => ({
             from: prev.from.subtract(1, 'day'),
@@ -100,7 +98,6 @@ export default function ReservInformation() {
         setIsCalendarOpen(false)
     }
 
-    // New handlers for booking
     const handleInputChange = (e) => {
         const { name, value } = e.target
         setBookingData(prev => ({
@@ -110,18 +107,15 @@ export default function ReservInformation() {
     }
 
     const handleReserve = () => {
-        // Handle reservation logic
         console.log('Reservation data:', bookingData)
         setShowBookingForm(false)
     }
 
     const handleModifyReservation = () => {
-        // Handle modification logic
         console.log('Modifying reservation:', bookingData)
     }
 
     const handleRemoveReservation = () => {
-        // Handle removal logic
         console.log('Removing reservation:', bookingData)
         setShowBookingForm(false)
     }
@@ -142,7 +136,6 @@ export default function ReservInformation() {
                 </div>
 
                 {showBookingForm ? (
-                    // Booking Form
                     <div>
                         <div className="grid grid-cols-2 gap-x-16 gap-y-4">
                             <div className="space-y-4">

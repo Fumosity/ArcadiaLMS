@@ -20,17 +20,17 @@ const BCHistory = () => {
                 const { data, error } = await supabase
                     .from('book_transactions')
                     .select(`
-                        transaction_type, 
-                        checkin_date, 
-                        checkin_time, 
-                        checkout_date, 
-                        checkout_time, 
+                        transactionType, 
+                        checkinDate, 
+                        checkinTime, 
+                        checkoutDate, 
+                        checkoutTime, 
                         userID, 
                         bookID, 
                         book_indiv(
                             bookID,
                             bookARCID,
-                            status,
+                            bookStatus,
                             book_titles (
                                 titleID,
                                 title,

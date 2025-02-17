@@ -1,55 +1,66 @@
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { supabase } from "../../../supabaseClient.js"
-import { useUser } from "../../../backend/UserContext"
-import bcrypt from "bcryptjs"
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../../../supabaseClient.js";
+import { useUser } from "../../../backend/UserContext";
+import bcrypt from "bcryptjs";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const { updateUser } = useUser()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { updateUser } = useUser();
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      updateUser(storedUser);
+      navigateBasedOnRole(storedUser.userAccountType);
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     try {
       const { data: loginData, error: loginError } = await supabase
         .from("user_accounts")
         .select("*")
         .eq("userEmail", email)
-        .single()
+        .single();
 
       if (loginError || !loginData) {
-        alert("Incorrect email or password. Please try again.")
-        return
+        alert("Incorrect email or password. Please try again.");
+        return;
       }
 
-      const passwordMatches = bcrypt.compareSync(password, loginData.userPassword)
+      const passwordMatches = bcrypt.compareSync(password, loginData.userPassword);
       if (!passwordMatches) {
-        alert("Incorrect email or password. Please try again.")
-        return
+        alert("Incorrect email or password. Please try again.");
+        return;
       }
 
-      updateUser(loginData)
-
-      if (["Admin", "Superadmin", "Intern"].includes(loginData.userAccountType)) {
-        navigate("/admin")
-      } else if (["Student", "Teacher"].includes(loginData.userAccountType)) {
-        navigate("/")
-      } else {
-        alert("Unknown account type. Please contact support.")
-      }
+      updateUser(loginData);
+      localStorage.setItem("user", JSON.stringify(loginData)); // Store user session
+      navigateBasedOnRole(loginData.userAccountType);
     } catch (err) {
-      setError("Unable to connect to the server. Please check your network.")
+      setError("Unable to connect to the server. Please check your network.");
     }
-  }
+  };
+
+  const navigateBasedOnRole = (userAccountType) => {
+    if (["Admin", "Superadmin", "Intern"].includes(userAccountType)) {
+      navigate("/admin");
+    } else if (["Student", "Teacher"].includes(userAccountType)) {
+      navigate("/");
+    } else {
+      alert("Unknown account type. Please contact support.");
+    }
+  };
 
   return (
     <div className="uMain-cont flex h-[600px]">
-      {/* Left Section */}
       <div className="max-w-md mx-auto p-8 bg-white">
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-1">
@@ -59,7 +70,7 @@ export default function LoginForm() {
         </div>
 
         <p className="text-center text-gray-600 mb-6">Login to access all the features of Arcadia!</p>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -115,7 +126,5 @@ export default function LoginForm() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-

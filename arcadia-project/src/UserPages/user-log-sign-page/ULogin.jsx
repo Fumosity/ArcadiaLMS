@@ -5,9 +5,7 @@ const ULogin = () => {
   return (
     <div className="min-h-screen bg-red flex flex-col">
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Content Container */}
         <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
-          {/* Sidebar */}
           <LoginForm />
         </div>
       </main>

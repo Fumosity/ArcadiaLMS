@@ -8,19 +8,17 @@ import AccessTable from '../components/admin-home-page-comp/AccessTable';
 import ReservationsTable from '../components/admin-home-page-comp/ReservationsTable';
 import HighestRatedBooksTable from '../components/admin-home-page-comp/HighestRatedBooksTable';
 import PopularBooksTable from '../components/admin-home-page-comp/PopularBooksTable';
+import BCHistory from '../components/admin-book-circ-pg-comp/BCHistory';
 
 const AHomePage = () => {
   const navigate = useNavigate(); // Initialize the useNavigate hook
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <SearchBar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Book Circulation - Full width on large screens */}
           <div className="lg:col-span-2">
-            <BookCirculationTable />
-            {/* Move LibraryAnalyticsChart here directly below BookCirculationTable */}
+            <BCHistory />
             <div className="mt-4">
               <LibraryAnalyticsChart />
             </div>

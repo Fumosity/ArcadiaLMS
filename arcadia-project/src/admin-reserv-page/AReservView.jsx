@@ -10,7 +10,6 @@ import ReservInformation from "../components/admin-room-reserv-comp/ReservInform
 const AReservView = () => (
     <div className="min-h-screen bg-gray-100">
         {/* Main header */}
-        <MainHeader />
         <Title>Reservations View</Title>
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -21,13 +20,10 @@ const AReservView = () => (
                         <div className="bg-white overflow-hidden rounded-lg w-full">
                         <ReservInformation />
                         </div>
-                            
-
                     </div>
 
                     {/* Preview section */}
                     <div className="lg:col-span-1 space-y-8">
-
                             <TodayReserv />
                     </div>
                 </div>

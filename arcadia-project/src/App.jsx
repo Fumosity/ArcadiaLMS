@@ -55,8 +55,6 @@ import UBkCatalog from './UserPages/user-book-catalog-page/UBkCatalog';
 import AAccountSettings from './admin-account-page/AAccountSettings';
 import UFAQs from './UserPages/user-freq-questions-page/UFAQs';
 import UMostPop from './UserPages/user-most-popular-page/UMostPop';
-
-import ScrollToTop from './ScrollToTop';
 import UHighlyRated from './UserPages/user-highly-rated-page/UHighlyRated';
 import AReservView from './admin-reserv-page/AReservView';
 import AdminErrorPage from './AdminErrorPage.jsx';
@@ -79,7 +77,6 @@ function App() {
             <Routes>
               <Route path="/" element={<UHomePage />} />
               <Route path="/user/register" element={<UsrRegistration />} />
-              
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
               <Route path="/user/bookcatalog" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
