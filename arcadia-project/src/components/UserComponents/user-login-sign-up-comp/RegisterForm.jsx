@@ -193,7 +193,20 @@ export default function RegisterForm({ onRegister }) {
               <input
                 id="email"
                 value={new_data.email}
-                onChange={(e) => setNewData((prev) => ({ ...prev, email: e.target.value }))}
+                onChange={(e) => {
+                  const value = e.target.value.replace('@', '');
+                  setNewData((prev) => ({ ...prev, email: value }));
+                }}
+                onFocus={(e) => {
+                  if (e.target.value === "Type email here") {
+                    setNewData((prev) => ({ ...prev, email: "" }));
+                  }
+                }}
+                onBlur={(e) => {
+                  if (e.target.value === "") {
+                    setNewData((prev) => ({ ...prev, email: "Type email here" }));
+                  }
+                }}
                 className="w-full px-2.5 py-1 border border-gray rounded-full"
               />
             </div>
@@ -213,6 +226,7 @@ export default function RegisterForm({ onRegister }) {
               </select>
             </div>
           </div>
+
 
           {/* Password & Confirm Password */}
           <div className="space-y-2">
