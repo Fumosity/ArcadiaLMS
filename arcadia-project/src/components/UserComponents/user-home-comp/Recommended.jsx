@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import axios from "axios";
 import BookCards from "./BookCards";
 import { useUser } from "../../../backend/UserContext"; // Adjust path as needed
@@ -13,8 +13,6 @@ const fetchRecommendedBooks = async (userID, titleID) => {
 
         const recommendations = response.data.recommendations || [];
 
-        if (recommendations.length === 0) return [];
-
         // Fetch genres and categories from book_genre_link and genre tables
         const titleIDs = recommendations.map(book => book.titleID);
         const { data: genreData, error: genreError } = await supabase
@@ -26,11 +24,11 @@ const fetchRecommendedBooks = async (userID, titleID) => {
 
         // Map genres and categories to book titleIDs
         const genreMap = {};
-        genreData.forEach(({ titleID, genres }) => {
+        genreData.forEach(({ titleID, genre }) => {
             if (!genreMap[titleID]) {
-                genreMap[titleID] = { genres: [], category: genres.category };
+                genreMap[titleID] = { genres: [], category: genre.category };
             }
-            genreMap[titleID].genres.push(genres.genreName);
+            genreMap[titleID].genres.push(genre.genreName);
         });
 
         // Merge recommendations with genre and category data
@@ -45,17 +43,16 @@ const fetchRecommendedBooks = async (userID, titleID) => {
     }
 };
 
-const Recommended = ({ titleID }) => {
-    const { user } = useUser(); // Global user state from context
-    const [books, setBooks] = useState([]);
+const Recommended = ({ userID, titleID }) => {
+    const { user, updateUser } = useUser(); // Global user state from context
 
-    useEffect(() => {
-        if (!user || !user.userID) return; // Ensure user is loaded before fetching
-        fetchRecommendedBooks(user.userID, titleID).then(setBooks);
-    }, [user, titleID]);
+    console.log(user)
+    console.log(user.userID)
+    
+    userID = user.userID
 
-    if (!user || !user.userID) {
-        console.error("Recommended: userID is undefined or user is null!");
+    if (!userID) {
+        console.error("Recommended: userID is undefined!");
         return <p>Error: User not found.</p>;
     }
 
