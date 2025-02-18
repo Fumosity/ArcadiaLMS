@@ -5,6 +5,7 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -13,6 +14,7 @@ export const UserProvider = ({ children }) => {
       setUser(storedUser);
       navigateBasedOnRole(storedUser.userAccountType);
     }
+    setLoading(false); // Mark loading as complete
   }, []);
 
   const updateUser = (newUser) => {
@@ -23,7 +25,7 @@ export const UserProvider = ({ children }) => {
     } else {
       localStorage.removeItem("user");
       setUser(null);
-      navigate("/"); // Redirect to home if logged out
+      navigate("/");
     }
   };
 
@@ -37,6 +39,10 @@ export const UserProvider = ({ children }) => {
       navigate("/");
     }
   };
+
+  if (loading) {
+    return <p>Loading...</p>; // Prevent rendering until user is loaded
+  }
 
   return (
     <UserContext.Provider value={{ user, updateUser }}>

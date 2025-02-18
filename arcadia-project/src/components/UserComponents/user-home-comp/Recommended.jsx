@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BookCards from "./BookCards";
 import { useUser } from "../../../backend/UserContext"; // Adjust path as needed
-import { supabase } from "/src/supabaseClient.js";
+import { supabase } from "../../../supabaseClient";
 
 const fetchRecommendedBooks = async (userID, titleID) => {
     try {
@@ -12,6 +12,8 @@ const fetchRecommendedBooks = async (userID, titleID) => {
         });
 
         const recommendations = response.data.recommendations || [];
+
+        if (recommendations.length === 0) return [];
 
         // Fetch genres and categories from book_genre_link and genre tables
         const titleIDs = recommendations.map(book => book.titleID);
@@ -24,11 +26,11 @@ const fetchRecommendedBooks = async (userID, titleID) => {
 
         // Map genres and categories to book titleIDs
         const genreMap = {};
-        genreData.forEach(({ titleID, genre }) => {
+        genreData.forEach(({ titleID, genres }) => {
             if (!genreMap[titleID]) {
-                genreMap[titleID] = { genres: [], category: genre.category };
+                genreMap[titleID] = { genres: [], category: genres.category };
             }
-            genreMap[titleID].genres.push(genre.genreName);
+            genreMap[titleID].genres.push(genres.genreName);
         });
 
         // Merge recommendations with genre and category data
@@ -43,20 +45,21 @@ const fetchRecommendedBooks = async (userID, titleID) => {
     }
 };
 
-const Recommended = ({ userID, titleID }) => {
-    const { user, updateUser } = useUser(); // Global user state from context
+const Recommended = ({ titleID }) => {
+    const { user } = useUser(); // Global user state from context
+    const [books, setBooks] = useState([]);
 
-    console.log(user)
-    console.log(user.userID)
-    
-    userID = user.userID
+    useEffect(() => {
+        if (!user || !user.userID) return; // Ensure user is loaded before fetching
+        fetchRecommendedBooks(user.userID, titleID).then(setBooks);
+    }, [user, titleID]);
 
-    if (!userID) {
-        console.error("Recommended: userID is undefined!");
+    if (!user || !user.userID) {
+        console.error("Recommended: userID is undefined or user is null!");
         return <p>Error: User not found.</p>;
     }
 
-    return <BookCards title="Recommended for You" fetchBooks={() => fetchRecommendedBooks(userID, titleID)} />;
+    return <BookCards title="Recommended for You" books={books} />;
 };
 
 export default Recommended;
