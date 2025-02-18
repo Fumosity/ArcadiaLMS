@@ -164,6 +164,7 @@ const ABAdding = ({ formData, setFormData }) => {
       location: '',
       bookID: '',
       bookARCID: '',
+      bookBarcode: '',
       isbn: '',
       cover: '',
       price: '',
@@ -230,7 +231,7 @@ const ABAdding = ({ formData, setFormData }) => {
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Category:</label>
                 {/* Category selection buttons */}
-                <div className="flex gap-4 mb-6">
+                <div className="flex gap-4 w-2/3">
                   {["Fiction", "Non-fiction"].map((category) => (
                     <button
                       key={category}
@@ -238,7 +239,7 @@ const ABAdding = ({ formData, setFormData }) => {
                         e.preventDefault();
                         handleCategoryChange(category);
                       }}
-                      className={`px-6 py-2 rounded-full text-sm transition-colors ${categoryFilter === category ? "bg-arcadia-red text-white"
+                      className={`px-6 py-2 rounded-full w-full text-sm transition-colors ${categoryFilter === category ? "bg-arcadia-red border-arcadia-red border text-white"
                         : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
                         }`}
                     >
@@ -254,7 +255,7 @@ const ABAdding = ({ formData, setFormData }) => {
                 {loading ? (
                   <p>Loading genres...</p>
                 ) : (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 w-2/3">
                     {genres
                       .filter((genre) => genre.category === categoryFilter)
                       .map((genre) => (
@@ -264,7 +265,7 @@ const ABAdding = ({ formData, setFormData }) => {
                             e.preventDefault();
                             toggleGenre(genre.genreID);
                           }}
-                          className={`px-4 py-2 rounded-full text-sm transition-colors ${selectedGenres.includes(genre.genreID) ? "bg-arcadia-red text-white"
+                          className={`px-4 py-2 rounded-full text-sm transition-colors ${selectedGenres.includes(genre.genreID) ? "bg-arcadia-red border-arcadia-red border text-white"
                             : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
                             }`}
                         >
@@ -293,7 +294,7 @@ const ABAdding = ({ formData, setFormData }) => {
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Synopsis:</label>
                 <textarea name="synopsis" required
-                  className="input-field w-2/3 p-2 border"
+                  className="input-field w-2/3 p-2 border min-h-24"
                   rows="3"
                   value={formData.synopsis}
                   onChange={handleChange}
@@ -327,15 +328,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   style={validationErrors.originalPubDate ? errorStyle : {}}
                 />
               </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Date Procured:</label>
-                <input type="date" name="procurementDate" required
-                  className="input-field w-2/3 p-2 border"
-                  value={formData.procurementDate}
-                  onChange={handleChange}
-                  style={validationErrors.procurementDate ? errorStyle : {}}
-                />
-              </div>
+
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
                 <input type="text" name="location" required
@@ -366,15 +359,6 @@ const ABAdding = ({ formData, setFormData }) => {
                 />
               </div>
               <div className="flex justify-between items-center">
-                <label className="w-1/4">Book ARC ID:</label>
-                <input type="text" name="bookARCID" required
-                  className="input-field w-2/3 p-2 border"
-                  value={formData.bookARCID}
-                  onChange={handleChange}
-                  style={validationErrors.bookARCID ? errorStyle : {}}
-                />
-              </div>
-              <div className="flex justify-between items-center">
                 <label className="w-1/4">ISBN:</label>
                 <input type="text" name="isbn" required
                   className="input-field w-2/3 p-2 border"
@@ -392,6 +376,35 @@ const ABAdding = ({ formData, setFormData }) => {
                   style={validationErrors.price ? errorStyle : {}}
                 />
               </div>
+              <div>Book information of first instance:</div>
+              <div className="flex justify-between items-center">
+                <label className="w-1/4">Date Procured:</label>
+                <input type="date" name="procurementDate" required
+                  className="input-field w-2/3 p-2 border"
+                  value={formData.procurementDate}
+                  onChange={handleChange}
+                  style={validationErrors.procurementDate ? errorStyle : {}}
+                />
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="w-1/4">Call No.:</label>
+                <input type="text" name="bookARCID" required
+                  className="input-field w-2/3 p-2 border"
+                  value={formData.bookARCID}
+                  onChange={handleChange}
+                  style={validationErrors.bookARCID ? errorStyle : {}}
+                />
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="w-1/4">Barcode:</label>
+                <input type="text" name="bookBarcode" required
+                  className="input-field w-2/3 p-2 border"
+                  value={formData.bookBarcode}
+                  onChange={handleChange}
+                  style={validationErrors.bookBarcode ? errorStyle : {}}
+                />
+              </div>
+
             </form>
 
             {/* Add Book Button */}
@@ -411,7 +424,7 @@ const ABAdding = ({ formData, setFormData }) => {
                 alt="Book cover placeholder"
                 className="h-full w-full object-contain mb-2"
               />
-              <p className="text-xs text-gray-500 text-center">Click to update book cover</p>
+              <p className="text-xs text-gray-500 text-center">Click to change book cover</p>
             </div>
             <input type="file" ref={fileInputRef} required className="hidden" onChange={uploadCover} accept="image/png, image/jpeg, image/jpg" />
           </div>

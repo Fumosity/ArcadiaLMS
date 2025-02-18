@@ -88,7 +88,8 @@ export const addBook = async (bookData) => {
             titleID: titleID,
             bookARCID: bookData.bookARCID,
             bookStatus: "Available",
-            bookAcqDate: bookData.procurementDate
+            bookAcqDate: bookData.procurementDate,
+            bookBarcode: bookData.bookBarcode,
         };
 
         // Insert into 'book' table

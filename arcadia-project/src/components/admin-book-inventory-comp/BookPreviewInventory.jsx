@@ -18,13 +18,13 @@ const BookPreviewInventory = ({ book }) => {
 
   // Show a message if no book is selected
   if (!book) {
-    return <div className="bg-white p-4 rounded-lg shadow-md">Select a book to see details.</div>;
+    return <div className="bg-white p-4 rounded-lg border-grey border">Select a book to see details.</div>;
   }
 
   // Show skeletons while loading
   if (loading) {
     return (
-      <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="bg-white p-4 rounded-lg border-grey border">
         <h3 className="text-xl font-semibold mb-3">
           <Skeleton width={150} />
         </h3>
@@ -79,7 +79,7 @@ const BookPreviewInventory = ({ book }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md" style={{ maxWidth: "350px", margin: "0 auto" }}>
+    <div className="bg-white p-4 rounded-lg border-grey border" style={{ maxWidth: "350px", margin: "0 auto" }}>
       <h3 className="text-xl font-semibold mb-3">About</h3>
       <div className="relative bg-white p-2 mb-4 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
         <img src={book.cover || "image/bkfrontpg.png"} alt="Book cover" className="h-200 w-150 mx-auto mb-2 rounded" />

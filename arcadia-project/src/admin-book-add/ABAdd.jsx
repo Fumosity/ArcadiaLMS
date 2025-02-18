@@ -22,6 +22,7 @@ const [formData, setFormData] = useState({
   location: '',
   bookID: '',
   bookARCID: '',
+  bookBarcode: '',
   isbn: '',
   cover: '',
   price: '',

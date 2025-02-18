@@ -21,18 +21,19 @@ const ReturnedBks = () => {
                 const { data, error } = await supabase
                     .from('book_transactions')
                     .select(`
-                        transaction_type, 
-                        checkin_date, 
-                        checkin_time, 
-                        checkout_date, 
-                        checkout_time,
+                        transactionType, 
+                        checkinDate, 
+                        checkinTime, 
+                        checkoutDate, 
+                        checkoutTime,
                         deadline, 
                         userID, 
                         bookID, 
                         book_indiv(
                             bookID,
                             bookARCID,
-                            status,
+                            bookBarcode,
+                            bookStatus,
                             book_titles (
                                 titleID,
                                 title,
@@ -44,7 +45,7 @@ const ReturnedBks = () => {
                             userLName,
                             userLPUID
                         )`)
-                    .eq('transaction_type', 'Returned'); // Only fetch 'Returned' transactions
+                    .eq('transactionType', 'Returned'); // Only fetch 'Returned' transactions
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
@@ -52,8 +53,8 @@ const ReturnedBks = () => {
                     console.log("Returned data from Supabase:", data); // Debugging: raw data from Supabase
 
                     const formattedData = data.map(item => {
-                        const date = item.checkin_date;
-                        const time = item.checkin_time;
+                        const date = item.checkinDate;
+                        const time = item.checkinTime;
 
                         let formattedTime = null;
                         if (time) {
@@ -71,12 +72,12 @@ const ReturnedBks = () => {
                         const bookDetails = item.book_indiv?.book_titles || {};
 
                         return {
-                            type: item.transaction_type,
+                            type: item.transactionType,
                             date,
                             time: formattedTime,
                             borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                             bookTitle: bookDetails.title,
-                            bookId: item.bookID,
+                            bookBarcode: item.book_indiv.bookBarcode,
                             userId: item.userID,
                             titleID: bookDetails.titleID,
                             deadline: item.deadline
@@ -113,85 +114,10 @@ const ReturnedBks = () => {
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
+        <div className="bg-white p-4 rounded-lg border-grey border">
             {/* Title */}
-            <h3 className="text-xl font-semibold mb-4">Returned Books</h3>
+            <h3 className="text-xl font-semibold mb-2">Returned Books</h3>
 
-            {/* Controls: Type, Sort by, Date Range, No. of Entries, Search */}
-            <div className="flex flex-wrap items-center mb-6 space-x-4">
-                {/* Type */}
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Type:</span>
-                    <span
-                        className="bg-gray-200 border border-gray-300 py-1 px-3 rounded-full text-xs"
-                        style={{ borderRadius: "40px" }}
-                    >
-                        {typeOrder}
-                    </span>
-                </div>
-
-                {/* Sort by */}
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Sort By:</span>
-                    <button
-                        onClick={() =>
-                            setSortOrder(sortOrder === "Descending" ? "Ascending" : "Descending")
-                        }
-                        className="sort-by bg-gray-200 py-1 px-3 rounded-full text-xs"
-                        style={{ borderRadius: "40px" }}
-                    >
-                        {sortOrder}
-                    </button>
-                </div>
-
-                {/* Date Range */}
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Date Range:</span>
-                    <button
-                        onClick={() =>
-                            setDateRange(
-                                dateRange === "After 2020"
-                                    ? "After 2021"
-                                    : dateRange === "After 2021"
-                                    ? "After 2022"
-                                    : "After 2020"
-                            )
-                        }
-                        className="sort-by bg-gray-200 py-1 px-3 rounded-full text-xs"
-                        style={{ borderRadius: "40px" }}
-                    >
-                        {dateRange}
-                    </button>
-                </div>
-
-                {/* No. of Entries */}
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="entries" className="text-sm">No. of Entries:</label>
-                    <input
-                        type="number"
-                        id="entries"
-                        min="1"
-                        value={entries}
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm"
-                        style={{ borderRadius: "40px", width: "80px" }}
-                        onChange={(e) => setEntries(e.target.value)}
-                    />
-                </div>
-
-                {/* Search */}
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="search" className="text-sm">Search:</label>
-                    <input
-                        type="text"
-                        id="search"
-                        value={searchTerm}
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm"
-                        style={{ borderRadius: "40px" }}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Title, borrower, or ID"
-                    />
-                </div>
-            </div>
             <table className="min-w-full divide-y divide-gray-200 text-center">
                 <thead className="bg-gray-50 rounded-t-lg" style={{ borderRadius: "40px" }}>
                     <tr>
@@ -200,7 +126,7 @@ const ReturnedBks = () => {
                         <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Time</th>
                         <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Borrower</th>
                         <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book Title</th>
-                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book ID</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Barcode</th>
                         <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Deadline</th>
                     </tr>
                 </thead>
@@ -230,13 +156,13 @@ const ReturnedBks = () => {
                                         {truncateTitle(book.bookTitle)}
                                     </Link>
                                 </td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
+                            <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
                             <td className="px-4 py-3 text-sm text-gray-900">{formatDate(book.deadline)}</td>
                         </tr>
                     ))
                 ) : (
                     <tr>
-                        <td colSpan="6" className="px-4 py-2 text-center">
+                        <td colSpan="12" className="px-4 py-2 text-center">
                             No data available.
                         </td>
                     </tr>

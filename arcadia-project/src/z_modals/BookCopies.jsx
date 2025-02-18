@@ -20,7 +20,7 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
 
         const { data: copies, error: copiesError } = await supabase
           .from("book_indiv")
-          .select("titleID, bookARCID, status")
+          .select("bookBarcode, bookARCID, bookStatus")
           .eq("titleID", titleID);
 
         if (copiesError) throw copiesError;
@@ -43,16 +43,18 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
     }
   }, [isOpen, titleID]);
 
-  const getStatusStyle = (status) => {
-    switch (status) {
+  const getStatusStyle = (bookStatus) => {
+    switch (bookStatus) {
       case "Available":
         return "bg-green text-white";
       case "Reserved":
         return "bg-yellow text-white";
+      case "Unavailable":
+        return "bg-orange text-white";
       case "Damaged":
         return "bg-red text-white";
       default:
-        return "bg-grey text-white";
+        return "bg-grey text-black";
     }
   };
 
@@ -75,7 +77,7 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
 
         <div className="flex flex-col">
           <div className="flex justify-between items-center text-base font-bold text-zinc-900">
-            <span className="flex-1 text-center">Title ID</span>
+            <span className="flex-1 text-center">Barcode</span>
             <span className="flex-1 text-center">Call No.</span>
             <span className="flex-1 text-center">Status</span>
             <span className="flex-1 text-center">Date Acq.</span>
@@ -93,14 +95,14 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
             bookCopies.map((book, index) => (
               <React.Fragment key={index}>
                 <div className="flex justify-between items-center text-base text-zinc-900 mt-3">
-                  <span className="flex-1 text-center">{book.titleID}</span>
+                  <span className="flex-1 text-center">{book.bookBarcode}</span>
                   <span className="flex-1 text-center">{book.bookARCID}</span>
                   <span
                     className={`px-5 py-1 rounded-3xl text-center ${getStatusStyle(
-                      book.status
+                      book.bookStatus
                     )}`}
                   >
-                    {book.status}
+                    {book.bookStatus}
                   </span>
                   <span className="flex-1 text-center">
                     {new Date(book.procurementDate).toLocaleDateString()}

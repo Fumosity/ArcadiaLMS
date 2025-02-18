@@ -11,17 +11,18 @@ const BksDueTdy = () => {
                 const { data, error } = await supabase
                     .from('book_transactions')
                     .select(`
-                        transaction_type, 
-                        checkin_date, 
-                        checkin_time, 
-                        checkout_date, 
-                        checkout_time, 
+                        transactionType, 
+                        checkinDate, 
+                        checkinTime, 
+                        checkoutDate, 
+                        checkoutTime, 
                         userID, 
                         bookID, 
                         book_indiv(
                             bookID,
                             bookARCID,
-                            status,
+                            bookBarcode,
+                            bookStatus,
                             book_titles (
                                 titleID,
                                 title,
@@ -65,7 +66,7 @@ const BksDueTdy = () => {
     }, []); // Empty dependency array ensures this runs once when the component mounts
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white p-4 rounded-lg border-grey border">
             <h3 className="text-xl font-semibold mb-4">Books Due Today</h3>
 
             {/* Table */}

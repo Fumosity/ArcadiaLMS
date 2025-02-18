@@ -57,8 +57,31 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
         }
     };
 
+    const formatAuthor = (authors) => {
+        if (!authors || authors.length === 0) return "N/A";
+
+        if (!Array.isArray(authors)) {
+            authors = [authors]; // Handle cases where author is not an array
+        }
+
+        const formattedAuthors = authors.map(author => {
+            author = author.trim();
+            const names = author.split(" ");
+            const initials = names.slice(0, -1).map(name => name[0] + ".");
+            const lastName = names.slice(-1)[0];
+            return `${initials.join("")} ${lastName}`;
+        });
+
+        if (formattedAuthors.length <= 2) {
+            return formattedAuthors.join(", ");
+        } else {
+            const etAlCount = authors.length - 2;
+            return `${formattedAuthors[0]}, ${formattedAuthors[1]}, et al (${etAlCount} more)`;
+        }
+    };
+
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md mr-5">
+        <div className="bg-white p-6 rounded-lg border-grey border mr-5">
             <h3 className="text-xl font-semibold mb-4">Current Research Inventory</h3>
 
             <div className="flex flex-wrap items-center mb-6 space-x-4">
@@ -156,9 +179,20 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                                             {item.title}
                                         </Link>
                                     </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900">
-                                        {item.author}
-                                    </td>
+                                    <td className="px-4 py-4 text-sm truncate max-w-xs relative group"> {/* Added group class here */}
+                                            <div className="flex items-center space-x-1">
+                                                <span className="inline-block">{formatAuthor(item.author)}</span>
+                                                {Array.isArray(item.author) && item.author.length > 2 && ( // Check if item.author is an array before checking length
+                                                    <div className="absolute top-0 left-full ml-2 bg-white border border-gray-300 rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                                                        {item.author.slice(2).map((author, i) => ( // Use item.author here!
+                                                            <div key={i} className="mt-1">
+                                                                {formatAuthor([author])}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
                                     <td className="px-4 py-4 text-center text-sm text-gray-500">
                                         {item.researchARCID}
                                     </td>

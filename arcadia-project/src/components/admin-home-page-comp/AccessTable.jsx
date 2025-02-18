@@ -10,7 +10,7 @@ const AccessTable = () => {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
+    <div className="bg-white p-2 rounded-lg border-grey border">
       <table className="min-w-full divide-y divide-gray-200">
         <tbody className="bg-white divide-y divide-gray-200">
           {actions.map((item, index) => (
@@ -19,7 +19,7 @@ const AccessTable = () => {
               className="cursor-pointer hover:bg-gray-100"
               onClick={() => navigate(item.path)}
             >
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                 {item.action}
               </td>
             </tr>

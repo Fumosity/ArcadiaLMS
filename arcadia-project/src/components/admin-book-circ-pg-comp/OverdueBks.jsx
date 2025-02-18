@@ -23,18 +23,19 @@ const OverdueBks = () => {
                 const { data, error } = await supabase
                     .from('book_transactions')
                     .select(`
-                        transaction_type, 
-                        checkin_date, 
-                        checkin_time, 
-                        checkout_date, 
-                        checkout_time,
+                        transactionType, 
+                        checkinDate, 
+                        checkinTime, 
+                        checkoutDate, 
+                        checkoutTime,
                         deadline, 
                         userID, 
                         bookID, 
                         book_indiv(
                             bookID,
                             bookARCID,
-                            status,
+                            bookBarcode,
+                            bookStatus,
                             book_titles (
                                 titleID,
                                 title,
@@ -55,8 +56,8 @@ const OverdueBks = () => {
                     console.log("Overdue data from Supabase:", data); // Debugging: raw data from Supabase
 
                     const formattedData = data.map(item => {
-                        const date = item.checkout_date;
-                        const time = item.checkout_time;
+                        const date = item.checkoutDate;
+                        const time = item.checkoutTime;
 
                         let formattedTime = null;
                         if (time) {
@@ -79,7 +80,7 @@ const OverdueBks = () => {
                             time: formattedTime,
                             borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                             bookTitle: bookDetails.title,
-                            bookId: item.bookID,
+                            bookBarcode: item.book_indiv.bookBarcode,
                             userId: item.userID,
                             titleID: bookDetails.titleID,
                             deadline: item.deadline
@@ -115,79 +116,8 @@ const OverdueBks = () => {
         };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
-            <h3 className="text-xl font-semibold mb-4">Overdue Books</h3>
-
-            {/* Controls Section */}
-            <div className="flex flex-wrap items-center mb-6 space-x-4">
-                {/* Type */}
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Type:</span>
-                    <span className="bg-gray-200 border border-gray-300 py-1 px-3 rounded-full text-xs" style={{ borderRadius: "40px" }}>
-                        {typeOrder}
-                    </span>
-                </div>
-
-                {/* Sort by */}
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Sort By:</span>
-                    <button
-                        onClick={() => setSortOrder(sortOrder === "Descending" ? "Ascending" : "Descending")}
-                        className="bg-gray-200 py-1 px-3 rounded-full text-xs hover:bg-gray-300"
-                        style={{ borderRadius: "40px" }}
-                    >
-                        {sortOrder}
-                    </button>
-                </div>
-
-                {/* Date Range */}
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Date Range:</span>
-                    <button
-                        onClick={() =>
-                            setDateRange(
-                                dateRange === "After 2020"
-                                    ? "After 2021"
-                                    : dateRange === "After 2021"
-                                        ? "After 2022"
-                                        : "After 2020"
-                            )
-                        }
-                        className="bg-gray-200 py-1 px-3 rounded-full text-xs hover:bg-gray-300"
-                        style={{ borderRadius: "40px" }}
-                    >
-                        {dateRange}
-                    </button>
-                </div>
-
-                {/* No. of Entries */}
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="entries" className="text-sm">No. of Entries:</label>
-                    <input
-                        type="number"
-                        id="entries"
-                        min="1"
-                        value={entries}
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm"
-                        style={{ borderRadius: "40px", width: "80px" }}
-                        onChange={(e) => setEntries(e.target.value)}
-                    />
-                </div>
-
-                {/* Search */}
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="search" className="text-sm">Search:</label>
-                    <input
-                        type="text"
-                        id="search"
-                        value={searchTerm}
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm"
-                        style={{ borderRadius: "40px" }}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Title, borrower, or ID"
-                    />
-                </div>
-            </div>
+        <div className="bg-white p-4 rounded-lg border-grey border">
+            <h3 className="text-xl font-semibold mb-2">Overdue Books</h3>
 
             {/* Table */}
             <table className="min-w-full divide-y divide-gray-200 text-center">
@@ -198,7 +128,7 @@ const OverdueBks = () => {
                         <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
                         <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
                         <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Book Title</th>
-                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Book ID</th>
+                        <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Barcode</th>
                         <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
                     </tr>
                 </thead>
@@ -226,13 +156,13 @@ const OverdueBks = () => {
                                         {truncateTitle(book.bookTitle)}
                                     </Link>
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{formatDate(book.deadline)}</td>
                             </tr>
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="6" className="px-4 py-2 text-center">
+                            <td colSpan="12" className="px-4 py-2 text-center">
                                 No data available.
                             </td>
                         </tr>
@@ -240,24 +170,20 @@ const OverdueBks = () => {
                 </tbody>
             </table>
 
-            {/* Pagination Controls */}
-            <div className="flex justify-center space-x-4 mt-4">
+           {/* Pagination */}
+           <div className="flex justify-center items-center mt-4 space-x-4">
                 <button
-                    onClick={() => setCurrentPage(currentPage - 1)}
+                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="py-2 px-4 rounded-full bg-gray-200 hover:bg-gray-300 text-sm disabled:opacity-50"
                 >
                     Previous
                 </button>
-
-                <span className="text-sm text-gray-600">
-                    Page {currentPage} of {totalPages}
-                </span>
-
+                <span className="text-sm">Page {currentPage} of {totalPages}</span>
                 <button
-                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="py-2 px-4 rounded-full bg-gray-200 hover:bg-gray-300 text-sm disabled:opacity-50"
                 >
                     Next
                 </button>

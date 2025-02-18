@@ -30,6 +30,7 @@ const BCHistory = () => {
                         book_indiv(
                             bookID,
                             bookARCID,
+                            bookBarcode,
                             bookStatus,
                             book_titles (
                                 titleID,
@@ -49,8 +50,8 @@ const BCHistory = () => {
                     console.log("History data from Supabase:", data); // Debugging: raw data from Supabase
 
                     const formattedData = data.map(item => {
-                        const date = item.checkin_date || item.checkout_date;
-                        const time = item.checkin_time || item.checkout_time;
+                        const date = item.checkinDate || item.checkoutDate;
+                        const time = item.checkinTime || item.checkoutTime;
 
                         let formattedTime = null;
                         if (time) {
@@ -68,12 +69,12 @@ const BCHistory = () => {
                         const bookDetails = item.book_indiv?.book_titles || {};
 
                         return {
-                            type: item.transaction_type,
+                            type: item.transactionType,
                             date,
                             time: formattedTime,
                             borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                             bookTitle: bookDetails.title,
-                            bookId: item.bookID,
+                            bookBarcode: item.book_indiv.bookBarcode,
                             userId: item.userID,
                             titleID: bookDetails.titleID,
                         };
@@ -118,9 +119,9 @@ const BCHistory = () => {
     };
     
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
+        <div className="bg-white p-4 rounded-lg border-grey border">
             {/* Title */}
-            <h3 className="text-xl font-semibold mb-4">Book Circulation History</h3>
+            <h3 className="text-xl font-semibold mb-2">Book Circulation History</h3>
 
             {/* Controls */}
             <div className="flex flex-wrap items-center mb-6 space-x-4">
@@ -195,7 +196,7 @@ const BCHistory = () => {
                             <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Time</th>
                             <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Borrower</th>
                             <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book Title</th>
-                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book ID</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Barcode</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-center">
@@ -224,12 +225,12 @@ const BCHistory = () => {
                                         {truncateTitle(book.bookTitle)}
                                     </Link>
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
                             </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="6" className="px-4 py-2 text-center">
+                                <td colSpan="12" className="px-4 py-2 text-center">
                                     No data available.
                                 </td>
                             </tr>
@@ -245,7 +246,7 @@ const BCHistory = () => {
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                 >
-                    Previous Page
+                    Previous
                 </button>
                 <span className="text-sm">Page {currentPage} of {totalPages}</span>
                 <button
@@ -253,7 +254,7 @@ const BCHistory = () => {
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                 >
-                    Next Page
+                    Next
                 </button>
             </div>
         </div>

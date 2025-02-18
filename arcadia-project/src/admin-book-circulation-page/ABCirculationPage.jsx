@@ -19,7 +19,7 @@ export default function ABCirculationPage() {
                     <OverdueBks />
                 </div>
 
-                <div className="w-full sm:w-auto space-y-8 mt-8">
+                <div className="w-full sm:w-auto space-y-8 mt-4">
                     <AccessTable />
                     <BksDueTdy />
                 </div>

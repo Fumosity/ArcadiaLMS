@@ -8,7 +8,7 @@ const SimilarTo = () => {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
+    <div className="bg-white p-6 rounded-lg border-grey border">
       <h3 className="text-xl font-semibold mb-4">Similar To</h3>
       <table className="w-full text-left">
         <thead>

@@ -18,13 +18,13 @@ const ResearchPreviewInv = ({ research }) => {
 
   // Show a message if no research is selected
   if (!research) {
-    return <div className="bg-white p-4 rounded-lg shadow-md">Select a research to see details.</div>;
+    return <div className="bg-white p-4 rounded-lg border-grey border">Select a research to see details.</div>;
   }
 
   // Show skeletons while loading
   if (loading) {
     return (
-      <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="bg-white p-4 rounded-lg border-grey border">
         <h3 className="text-xl font-semibold mb-3">
           <Skeleton width={150} />
         </h3>
@@ -76,7 +76,7 @@ const ResearchPreviewInv = ({ research }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md" style={{ maxWidth: "350px", margin: "0 auto" }}>
+    <div className="bg-white p-4 rounded-lg border-grey border" style={{ maxWidth: "350px", margin: "0 auto" }}>
       <h3 className="text-xl font-semibold mb-3">About</h3>
       <div className="relative bg-white p-2 mb-4 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
         <img
