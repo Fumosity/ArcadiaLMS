@@ -32,7 +32,7 @@ import UHomePage from './UserPages/user-home-page/UHomePage';
 import UCopyright from './components/UserComponents/user-main-comp/UCopyright';
 import UBkSearchCatalog from './UserPages/user-book-search-page/UBkSearchCatalog';
 import URsrchCatalog from './UserPages/user-rsrch-catalog-page/URsrchCatalog';
-import UNewsNUpd from './UserPages/user-news-and-updates-page/UNewsNUpd';
+
 import UDiscussionReserv from './UserPages/user-room-reserv-page/UDiscussionReserv';
 import UServices from './UserPages/user-services-page/UServices';
 import USupport from './UserPages/user-support-page/USupport';
@@ -60,6 +60,7 @@ import AReservView from './admin-reserv-page/AReservView';
 import AdminErrorPage from './AdminErrorPage.jsx';
 import URsrchView from './UserPages/user-rsrch-view-page/URsrchView.jsx';
 import AuthComplete from './UserPages/AuthComplete.jsx';
+import GenrePage from './components/UserComponents/user-genre-cat/GenrePage.jsx';
 
 function App() {
   return (
@@ -80,7 +81,6 @@ function App() {
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
               <Route path="/user/bookcatalog" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
-              <Route path="/user/newsupdates" element={<UNewsNUpd />} />
               <Route path="/user/reservations" element={<UDiscussionReserv />} />
               <Route path="/user/services" element={<UServices />} />
               <Route path="/user/support" element={<USupport />} />
@@ -94,6 +94,7 @@ function App() {
               <Route path="/user/researchview" element={<URsrchView/>} />
               <Route path="*" element={<ErrorPage />} /> 
               <Route path="/auth-complete" element={<AuthComplete />} />
+              <Route path="/genre/page" element={<GenrePage />} />
             </Routes>
             <UFooter />
             <UCopyright />
