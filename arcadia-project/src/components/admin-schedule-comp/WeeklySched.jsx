@@ -15,7 +15,7 @@ export default function WeeklySched() {
     const fetchSchedule = async () => {
         const { data, error } = await supabase
             .from('schedule')
-            .select('eventID, event_data');
+            .select('eventID, eventData');
 
         if (error) {
             console.error('Error fetching schedule:', error);
@@ -23,7 +23,7 @@ export default function WeeklySched() {
         }
 
         const formattedEvents = data.map((event) => {
-            const { event: eventName, start, end, isMultiDay } = event.event_data;
+            const { event: eventName, start, end, isMultiDay } = event.eventData;
             return {
                 title: eventName,
                 start: moment(start).toDate(),
@@ -77,7 +77,7 @@ export default function WeeklySched() {
             if (modifiedEvent.eventID) {
                 const { data, error } = await supabase
                     .from('schedule')
-                    .update({ event_data: eventToSave })
+                    .update({ eventData: eventToSave })
                     .eq('eventID', modifiedEvent.eventID)
                     .select();
                 if (error) throw error;
@@ -85,7 +85,7 @@ export default function WeeklySched() {
             } else {
                 const { data, error } = await supabase
                     .from('schedule')
-                    .insert({ event_data: eventToSave })
+                    .insert({ eventData: eventToSave })
                     .select();
                 if (error) throw error;
                 updatedEvent = data[0];
@@ -94,8 +94,8 @@ export default function WeeklySched() {
             const formattedEvent = {
                 ...modifiedEvent,
                 eventID: updatedEvent.eventID,
-                start: moment(updatedEvent.event_data.start).toDate(),
-                end: moment(updatedEvent.event_data.end).toDate(),
+                start: moment(updatedEvent.eventData.start).toDate(),
+                end: moment(updatedEvent.eventData.end).toDate(),
             };
 
             setEvents((prev) => {

@@ -15,7 +15,7 @@ const UpEvents = () => {
   const fetchEvents = async () => {
     const { data, error } = await supabase
       .from('schedule')
-      .select('eventID, event_data');
+      .select('eventID, eventData');
 
     if (error) {
       console.error('Error fetching events:', error);
@@ -23,7 +23,7 @@ const UpEvents = () => {
     }
 
     const formattedEvents = data.map((event) => {
-      const { event: title, start, end, isMultiDay, allDays } = event.event_data;
+      const { event: title, start, end, isMultiDay, allDays } = event.eventData;
       
       if (isMultiDay && allDays) {
         const firstDay = allDays[0];
