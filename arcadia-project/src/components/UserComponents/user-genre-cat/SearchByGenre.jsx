@@ -4,31 +4,31 @@ export default function SearchByGenre({ onGenreClick }) {
         category: "Fiction",
         genre: "Fantasy",
         img: "/image/Fantasy.png",
-        description: "Explore the lands of dungeons and dragons with these books.",
+        
       },
       {
         category: "Fiction",
         genre: "Sci-fi",
         img: "/image/Sci-fi.png",
-        description: "Discover futuristic worlds and advanced technologies.",
+
       },
       {
         category: "Fiction",
         genre: "Mystery",
         img: "/image/Myst.png",
-        description: "Unravel intriguing mysteries and solve complex cases.",
+
       },
       {
         category: "Non-fiction",
         genre: "Reference",
         img: "/image/Reference.png",
-        description: "Access comprehensive knowledge and reliable information.",
+
       },
       {
         category: "Non-fiction",
         genre: "Educational",
         img: "/image/Educ.png",
-        description: "Learn and grow with educational materials.",
+
       },
     ]
   
