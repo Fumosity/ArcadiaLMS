@@ -57,9 +57,13 @@ const Recommended = ({ titleID, onSeeMoreClick }) => {
         return <p>Error: User not found.</p>;
     }
 
-    return <BookCards title="Recommended for You" fetchBooks={() => fetchRecommendedBooks(user.userID, titleID)}
-    onSeeMoreClick={onSeeMoreClick}
-    />;
+    return(
+        <BookCards 
+            title="Recommended for You" 
+            fetchBooks={() => fetchRecommendedBooks(user.userID, titleID)} 
+            onSeeMoreClick={() => onSeeMoreClick("Recommended for You", () => fetchRecommendedBooks(user.userID, titleID))} 
+        />
+    )
 };
 
 export default Recommended;

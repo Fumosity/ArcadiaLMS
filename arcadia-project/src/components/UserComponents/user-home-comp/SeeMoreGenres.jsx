@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react"
-import BookCards from "./BookCards"
+import GenreGrid from "./GenreGrid"
 
-const SeeMore = ({ selectedComponent, onBackClick, fetchBooks }) => {
+const SeeMoreGenres = ({ onGenreClick, selectedComponent, onBackClick, fetchGenres }) => {
   return (
     <div className="min-h-screen bg-light-white">
       <button
@@ -14,10 +14,10 @@ const SeeMore = ({ selectedComponent, onBackClick, fetchBooks }) => {
         Back to Home
       </button>
 
-      <BookCards title={selectedComponent} fetchBooks={fetchBooks} />
+      <GenreGrid title={selectedComponent} fetchGenres={fetchGenres} onGenreClick={onGenreClick}/>
       </div>
   )
 }
 
-export default SeeMore
+export default SeeMoreGenres
 

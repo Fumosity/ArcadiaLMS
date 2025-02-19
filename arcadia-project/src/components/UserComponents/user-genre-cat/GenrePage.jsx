@@ -1,36 +1,119 @@
-import { ArrowLeft } from "lucide-react"
+import { useEffect, useState, useCallback } from "react";
+import { ArrowLeft } from "lucide-react";
+import BookGrid from "../user-home-comp/BookGrid";
+import { supabase } from "../../../supabaseClient";
 
 const GenrePage = ({ selectedGenre, onBackClick }) => {
-  // Metadata for genre descriptions
-  const genreMetadata = {
-    "Fantasy": "Explore the lands of dungeons and dragons with these books.",
-    "Sci-fi": "Discover futuristic worlds and advanced technologies.",
-    "Mystery": "Unravel intriguing mysteries and solve complex cases.",
-    "Reference": "Access comprehensive knowledge and reliable information.",
-    "Educational": "Learn and grow with educational materials.",
-  }
+  console.log("selectedGenre", selectedGenre);
 
-  // These are just placeholders for the actual books.
-  const books = [
-    { category: "Fiction", genre: "Fantasy", img: "/image/Fantasy.png" },
-    { category: "Fiction", genre: "Sci-fi", img: "/image/Sci-fi.png" },
-    { category: "Fiction", genre: "Mystery", img: "/image/Myst.png" },
-    { category: "Non-fiction", genre: "Reference", img: "/image/Reference.png" },
-    { category: "Non-fiction", genre: "Educational", img: "/image/Educ.png" },
-    { category: "Fiction", genre: "Fantasy", img: "/image/Fantasy.png" },
-    { category: "Fiction", genre: "Sci-fi", img: "/image/Sci-fi.png" },
-    { category: "Fiction", genre: "Mystery", img: "/image/Myst.png" },
-    { category: "Non-fiction", genre: "Reference", img: "/image/Reference.png" },
-    { category: "Non-fiction", genre: "Educational", img: "/image/Educ.png" },
-    { category: "Fiction", genre: "Fantasy", img: "/image/Fantasy.png" },
-    { category: "Fiction", genre: "Sci-fi", img: "/image/Sci-fi.png" },
-    { category: "Fiction", genre: "Mystery", img: "/image/Myst.png" },
-    { category: "Non-fiction", genre: "Reference", img: "/image/Reference.png" },
-    { category: "Non-fiction", genre: "Educational", img: "/image/Educ.png" },
-  ]
+  const fetchBooks = useCallback(async () => {
+    try {
+      console.log("Fetching books for genre:", selectedGenre.genreName);
+  
+      // 🟢 Fetch all book titles first
+      const { data: bookTitles, error: titleError } = await supabase
+        .from("book_titles")
+        .select("titleID, title, author, cover");
+  
+      if (titleError) throw titleError;
+  
+      const titleIDs = bookTitles.map(book => book.titleID);
+  
+      // 🟢 Fetch genre data
+      const { data: genreData, error: genreError } = await supabase
+        .from("book_genre_link")
+        .select("titleID, genres(genreID, genreName, category)")
+        .in("titleID", titleIDs);
+  
+      if (genreError) throw genreError;
+  
+      // 🟢 Organize genre data properly
+      const genreMap = {};
+      genreData.forEach(({ titleID, genres }) => {
+        if (!genreMap[titleID]) {
+          genreMap[titleID] = { genres: [], categories: new Set() };
+        }
+        genreMap[titleID].genres.push(genres.genreName);
+        genreMap[titleID].categories.add(genres.category);
+      });
+  
+      // Convert category Set back to an array
+      Object.keys(genreMap).forEach((titleID) => {
+        genreMap[titleID].categories = Array.from(genreMap[titleID].categories);
+      });
+  
+      // 🟢 Filter books correctly
+      const filteredBooks = bookTitles.filter(book => {
+        const titleID = book.titleID;
+        return genreMap[titleID] && genreMap[titleID].genres.includes(selectedGenre.genreName);
+      });
+  
+      // 🟢 Fetch borrow count data
+      const { data: transactions, error: transactionError } = await supabase
+        .from("book_transactions")
+        .select("bookID");
+  
+      if (transactionError) throw transactionError;
+  
+      const borrowCountMap = transactions.reduce((acc, transaction) => {
+        acc[transaction.bookID] = (acc[transaction.bookID] || 0) + 1;
+        return acc;
+      }, {});
+  
+      // 🟢 Fetch ratings data
+      const { data: ratings, error: ratingError } = await supabase
+        .from("ratings")
+        .select("ratingValue, titleID");
+  
+      if (ratingError) throw ratingError;
+  
+      const ratingMap = ratings.reduce((acc, { titleID, ratingValue }) => {
+        if (!acc[titleID]) {
+          acc[titleID] = { total: 0, count: 0 };
+        }
+        acc[titleID].total += ratingValue;
+        acc[titleID].count += 1;
+        return acc;
+      }, {});
+  
+      // 🟢 Format books correctly
+      const formattedBooks = filteredBooks.map(book => {
+        const titleID = book.titleID;
+        const borrowCount = borrowCountMap[book.titleID] || 0;
+        const avgRating = ratingMap[titleID]?.total / ratingMap[titleID]?.count || 0;
+        return {
+          title: book.title,
+          author: book.author,
+          cover: book.cover,
+          genre: selectedGenre.genreName,
+          category: genreMap[titleID]?.categories.join(", ") || "Unknown",
+          borrowCount,
+          weightedAvg: avgRating,
+        };
+      });
+  
+      // 🟢 Sort books properly
+      formattedBooks.sort((a, b) => {
+        if (b.borrowCount !== a.borrowCount) return b.borrowCount - a.borrowCount;
+        return b.weightedAvg - a.weightedAvg;
+      });
+  
+      let bookList = { books: formattedBooks };
+  
+      console.log("Fetched Books:", bookList);
+      return bookList;
+    } catch (err) {
+      console.error("Error fetching books:", err);
+      return { books: [] };
+    }
+  }, [selectedGenre]);
+  
 
-  // Get the description for the selected genre
-  const genreDescription = genreMetadata[selectedGenre.genre] || "Explore a world of books in this genre."
+  useEffect(() => {
+    if (selectedGenre.genreName) {
+      fetchBooks();
+    }
+  }, [fetchBooks]);
 
   return (
     <div className="min-h-screen bg-light-white">
@@ -41,8 +124,9 @@ const GenrePage = ({ selectedGenre, onBackClick }) => {
         >
           <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
           <div className="relative z-10 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold">{selectedGenre.genre}</h1>
-            <p className="text-sm md:text-lg">{genreDescription}</p>
+            <h4 className="text-xl md:text-2xl">{selectedGenre.category}</h4>
+            <h1 className="text-4xl md:text-5xl p-4 font-bold">{selectedGenre.genreName}</h1>
+            <p className="text-sm md:text-lg">{selectedGenre.description}</p>
           </div>
         </div>
       </div>
@@ -57,33 +141,9 @@ const GenrePage = ({ selectedGenre, onBackClick }) => {
         Back to Home
       </button>
 
-      <div className="uMain-cont w-full px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">{selectedGenre.genre} Books</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {books.map((book, index) => (
-            <div key={index} className="genCard-cont">
-              <div className="relative w-full h-[300px] rounded-xl overflow-hidden cursor-pointer group">
-                <img
-                  src={book.img || "/placeholder.svg"}
-                  alt={`${book.category} ${book.genre} Cover`}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-4 text-white">
-                  <p className="text-sm opacity-90">{book.category}</p>
-                  <h3 className="text-xl font-semibold mt-1 text-left">{book.genre}</h3>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <BookGrid title={`${selectedGenre.genreName} Books`} fetchBooks={fetchBooks} />
     </div>
-  )
-}
+  );
+};
 
-export default GenrePage
-
+export default GenrePage;

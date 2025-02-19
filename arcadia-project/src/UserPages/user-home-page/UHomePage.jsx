@@ -15,23 +15,44 @@ import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghe
 import SearchByGenre from "../../components/UserComponents/user-genre-cat/SearchByGenre"
 import GenrePage from "../../components/UserComponents/user-genre-cat/GenrePage"
 import SeeMore from "../../components/UserComponents/user-home-comp/SeeMore"
+import SeeMoreGenres from "../../components/UserComponents/user-home-comp/SeeMoreGenres"
 
 const UHomePage = () => {
   const [selectedGenre, setSelectedGenre] = useState(null)
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
+  const [seeMoreGenresComponent, setSeeMoreGenresComponent] = useState(null)
 
   const handleGenreClick = (genre) => {
     setSelectedGenre(genre)
+    console.log("selected genre", genre)
+    window.scrollTo({ top: 0, behavior: "smooth" }); 
   }
 
   const handleBackClick = () => {
     setSelectedGenre(null)
     setSeeMoreComponent(null)
+    setSeeMoreGenresComponent(null)
+    window.scrollTo({ top: 0, behavior: "smooth" }); 
   }
 
   const handleSeeMoreClick = (component, fetchFunction) => {
-    setSeeMoreComponent({ title: component, fetchBooks: fetchFunction })
-  }
+    if (typeof fetchFunction !== "function") {
+      console.error("fetchFunction is not a function", fetchFunction);
+      return;
+    }
+    setSeeMoreComponent({ 
+      title: component, 
+      fetchBooks: fetchFunction, 
+      onGenreClick: handleGenreClick 
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" }); 
+  };
+
+  const handleSeeMoreGenresClick = (component, fetchData) => {
+    setSeeMoreGenresComponent({ title: component, fetchGenres: fetchData });
+    window.scrollTo({ top: 0, behavior: "smooth" }); 
+  };
+  
 
   return (
     <div className="min-h-screen bg-light-white">
@@ -59,19 +80,21 @@ const UHomePage = () => {
                 onBackClick={handleBackClick}
                 fetchBooks={seeMoreComponent.fetchBooks}
               />
+            ) : seeMoreGenresComponent ? (
+              <SeeMoreGenres
+                selectedComponent={seeMoreGenresComponent.title}
+                onBackClick={handleBackClick}
+                fetchGenres={seeMoreGenresComponent.fetchGenres}
+              />
             ) : (
               <>
                 <UHero />
-                <SearchByGenre onGenreClick={handleGenreClick} />
-                <Recommended
-                  onSeeMoreClick={(fetchFunction) => handleSeeMoreClick("Recommended for You", fetchFunction)}
-                />
-                <InterestedGenre
-                  onSeeMoreClick={(fetchFunction) => handleSeeMoreClick("Because You Like", fetchFunction)}
-                />
-                <MostPopular onSeeMoreClick={(fetchFunction) => handleSeeMoreClick("Most Popular", fetchFunction)} />
-                <HighlyRated onSeeMoreClick={(fetchFunction) => handleSeeMoreClick("Highly Rated", fetchFunction)} />
-              </>
+                <SearchByGenre onGenreClick={handleGenreClick} onSeeMoreGenresClick={(title, fetchData) => handleSeeMoreGenresClick(title, fetchData)}/>
+                <Recommended onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}/>
+                <InterestedGenre onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}/>
+                <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}/>
+                <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}/>
+                </>
             )}
           </div>
         </div>

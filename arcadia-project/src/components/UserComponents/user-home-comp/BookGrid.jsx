@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "/src/supabaseClient.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faStarHalfAlt, faStar as faRegularStar } from '@fortawesome/free-solid-svg-icons'; // Import the icons you need
-import { faStar as faRegularStarOutline } from '@fortawesome/free-regular-svg-icons'; //Example of importing outline star
+import { faStar, faStarHalfAlt, faStar as faRegularStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar as faRegularStarOutline } from '@fortawesome/free-regular-svg-icons';
 
-const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
-    const [currentPage, setCurrentPage] = useState(1);
+const BookGrid = ({ title, fetchBooks }) => {
     const [books, setBooks] = useState([]);
     const [error, setError] = useState(null);
-    const entriesPerPage = 5;
-    const maxPages = 5;
-
     const [isLoading, setIsLoading] = useState(true); // Add loading state
+
+    const entriesPerRow = 5;
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
             try {
                 const fetchedBooks = await fetchBooks();
-                console.log(title, fetchedBooks)
-                setBooks(fetchedBooks.books || []);  // Ensure you're setting the 'books' array here
+                console.log("Fetched books in BookGrid:", fetchedBooks);
+
+                setBooks(fetchedBooks.books || []);
             } catch (error) {
                 setError(error.message);
                 console.error("Error fetching data:", error);
@@ -30,26 +29,16 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
         fetchData();
     }, [fetchBooks]);
 
-    const totalEntries = books.length;
-    const totalPages = Math.min(Math.ceil(totalEntries / entriesPerPage), maxPages);
-    const paginatedBooks = books.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
-
     const generatePlaceholders = () => {
-        const numPlaceholders = entriesPerPage - paginatedBooks.length;
-        return Array(numPlaceholders).fill(null); // Create an array of nulls for placeholders
+        const remainder = books.length % entriesPerRow;
+        return remainder === 0 ? [] : Array(entriesPerRow - remainder).fill(null);
     };
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
 
     const formatAuthor = (authors) => {
         if (!authors || !Array.isArray(authors) || authors.length === 0) {
             return "Unknown Author";
         }
-
         return authors.map((authorName) => {
-            // Trim whitespace before and after the name
             const trimmedName = authorName.trim();
             const names = trimmedName.split(" ");
             const lastName = names.pop();
@@ -59,12 +48,11 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
     };
 
     const renderStars = (rating) => {
-        const roundedRating = Math.round(rating * 10) / 10; // Round to one decimal place
+        const roundedRating = Math.round(rating * 10) / 10;
         const fullStars = Math.floor(roundedRating);
-        const halfStar = (roundedRating * 2) % 2 !== 0; // Better check for half star
-
+        const halfStar = (roundedRating * 2) % 2 !== 0;
         let emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-        emptyStars = Math.max(0, emptyStars); // Ensure non-negative
+        emptyStars = Math.max(0, emptyStars);
 
         return (
             <span className="flex gap-1 items-center">
@@ -74,31 +62,22 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
                     ))}
                     {halfStar && <FontAwesomeIcon icon={faStarHalfAlt} className="text-grey" />}
                     {[...Array(emptyStars)].map((_, i) => (
-                        <FontAwesomeIcon key={i} icon={faRegularStar} className="text-grey" /> // Use the outline star
+                        <FontAwesomeIcon key={i} icon={faRegularStar} className="text-grey" />
                     ))}
                 </span>
-                {formatRating(rating)}
+                {rating.toFixed(1)}
             </span>
         );
     };
-
-    const formatRating = (rating) => {
-        return rating.toFixed(1);
-    }
-
-    //console.log("book metadata", books)
 
     return (
         <div className="uMain-cont">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">{title}</h2>
-                <button className="uSee-more" onClick={onSeeMoreClick}>
-                    See more
-                </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
-                {isLoading ? ( // Conditionally render placeholders while loading
-                    Array(entriesPerPage).fill(null).map((_, index) => ( // Show placeholders while loading
+                {isLoading ? ( // Conditionally render placeholders
+                    Array(entriesPerRow).fill(null).map((_, index) => (
                         <div key={index} className="genCard-cont animate-pulse"> {/* Added animate-pulse */}
                             <div className="w-full h-40 rounded-lg mb-4 bg-light-gray"></div>
                             <div className="text-lg font-semibold mb-2 truncate bg-light-gray">&nbsp;</div>
@@ -109,16 +88,15 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
                     ))
                 ) : (
                     <>
-                        {paginatedBooks.map((book, index) => (
+                        {books.map((book, index) => (
                             <a key={index} href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`} className="block genCard-cont">
                                 <img src={book.cover} alt={book.title} className="w-full h-40 object-cover rounded-lg mb-4" />
                                 <h3 className="text-lg font-semibold mb-2 truncate">{book.title}</h3>
                                 <p className="text-sm text-gray-500 mb-2 truncate">{formatAuthor(book.author)}</p>
                                 <p className="text-sm text-gray-500 mb-2 truncate">
-                                    {book.weightedAvg && renderStars(book.weightedAvg)}{!book.weightedAvg && "Rating not available"}
+                                    {book.weightedAvg ? renderStars(book.weightedAvg) : "Rating not available"}
                                 </p>
                                 <p className="text-xs text-gray-400 mb-2 truncate">{book.category}</p>
-
                             </a>
                         ))}
                         {generatePlaceholders().map((_, index) => (
@@ -133,17 +111,8 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
                     </>
                 )}
             </div>
-            <div className="flex justify-center items-center mt-6 space-x-4">
-                <button className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-                    Previous Page
-                </button>
-                <span className="text-xs text-arcadia-red">Page {currentPage}</span>
-                <button className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
-                    Next Page
-                </button>
-            </div>
         </div>
     );
 };
 
-export default BookCards;
+export default BookGrid;
