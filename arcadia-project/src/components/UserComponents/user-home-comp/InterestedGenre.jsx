@@ -60,7 +60,7 @@ const fetchBooksByUserInterest = async (userID) => {
     }
 };
 
-const InterestedGenre = ({ userID }) => {
+const InterestedGenre = ({ userID, onSeeMoreClick }) => {
     const { user } = useUser(); // Global user state from context
     const [genreName, setGenreName] = useState("");
 
@@ -84,7 +84,9 @@ const InterestedGenre = ({ userID }) => {
         fetchData();
     }, [userID]);
 
-    return <BookCards title={`Because You Like ${genreName}`} fetchBooks={() => fetchBooksByUserInterest(userID)} />;
+    return <BookCards title={`Because You Like ${genreName}`} fetchBooks={() => fetchBooksByUserInterest(userID)} 
+    onSeeMoreClick={onSeeMoreClick}
+    />;
 };
 
 export default InterestedGenre;

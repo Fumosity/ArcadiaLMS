@@ -14,9 +14,11 @@ import MostPopBk from "../../components/UserComponents/user-main-comp/MostPopBk"
 import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghestRatedBk"
 import SearchByGenre from "../../components/UserComponents/user-genre-cat/SearchByGenre"
 import GenrePage from "../../components/UserComponents/user-genre-cat/GenrePage"
+import SeeMore from "../../components/UserComponents/user-home-comp/SeeMore"
 
 const UHomePage = () => {
   const [selectedGenre, setSelectedGenre] = useState(null)
+  const [seeMoreComponent, setSeeMoreComponent] = useState(null)
 
   const handleGenreClick = (genre) => {
     setSelectedGenre(genre)
@@ -24,6 +26,11 @@ const UHomePage = () => {
 
   const handleBackClick = () => {
     setSelectedGenre(null)
+    setSeeMoreComponent(null)
+  }
+
+  const handleSeeMoreClick = (component, fetchFunction) => {
+    setSeeMoreComponent({ title: component, fetchBooks: fetchFunction })
   }
 
   return (
@@ -46,14 +53,24 @@ const UHomePage = () => {
           <div className="userMain-content lg:w-3/4 w-full ml-5">
             {selectedGenre ? (
               <GenrePage selectedGenre={selectedGenre} onBackClick={handleBackClick} />
+            ) : seeMoreComponent ? (
+              <SeeMore
+                selectedComponent={seeMoreComponent.title}
+                onBackClick={handleBackClick}
+                fetchBooks={seeMoreComponent.fetchBooks}
+              />
             ) : (
               <>
                 <UHero />
                 <SearchByGenre onGenreClick={handleGenreClick} />
-                <Recommended />
-                <InterestedGenre />
-                <MostPopular />
-                <HighlyRated />
+                <Recommended
+                  onSeeMoreClick={(fetchFunction) => handleSeeMoreClick("Recommended for You", fetchFunction)}
+                />
+                <InterestedGenre
+                  onSeeMoreClick={(fetchFunction) => handleSeeMoreClick("Because You Like", fetchFunction)}
+                />
+                <MostPopular onSeeMoreClick={(fetchFunction) => handleSeeMoreClick("Most Popular", fetchFunction)} />
+                <HighlyRated onSeeMoreClick={(fetchFunction) => handleSeeMoreClick("Highly Rated", fetchFunction)} />
               </>
             )}
           </div>

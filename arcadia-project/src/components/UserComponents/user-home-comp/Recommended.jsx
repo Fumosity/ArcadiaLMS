@@ -45,7 +45,7 @@ const fetchRecommendedBooks = async (userID, titleID) => {
     }
 };
 
-const Recommended = ({ titleID }) => {
+const Recommended = ({ titleID, onSeeMoreClick }) => {
     const { user } = useUser(); // Global user state from context
 
     useEffect(() => {
@@ -57,7 +57,9 @@ const Recommended = ({ titleID }) => {
         return <p>Error: User not found.</p>;
     }
 
-    return <BookCards title="Recommended for You" fetchBooks={() => fetchRecommendedBooks(user.userID, titleID)} />;
+    return <BookCards title="Recommended for You" fetchBooks={() => fetchRecommendedBooks(user.userID, titleID)}
+    onSeeMoreClick={onSeeMoreClick}
+    />;
 };
 
 export default Recommended;

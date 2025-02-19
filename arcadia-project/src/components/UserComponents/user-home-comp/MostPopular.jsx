@@ -80,8 +80,10 @@ const fetchMostPopularBooks = async () => {
     }
 };
 
-const MostPopular = () => {
-    return <BookCards title="Most Popular" fetchBooks={fetchMostPopularBooks} />;
+const MostPopular = ({ onSeeMoreClick }) => {
+    return <BookCards title="Most Popular" fetchBooks={fetchMostPopularBooks} 
+    onSeeMoreClick={onSeeMoreClick}
+    />;
 };
 
 export default MostPopular;

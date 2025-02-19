@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalfAlt, faStar as faRegularStar } from '@fortawesome/free-solid-svg-icons'; // Import the icons you need
 import { faStar as faRegularStarOutline } from '@fortawesome/free-regular-svg-icons'; //Example of importing outline star
 
-const BookCards = ({ title, fetchBooks }) => {
+const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [books, setBooks] = useState([]);
     const [error, setError] = useState(null);
@@ -61,17 +61,17 @@ const BookCards = ({ title, fetchBooks }) => {
 
         let emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
         emptyStars = Math.max(0, emptyStars); // Ensure non-negative
-        
+
         return (
             <span className="flex gap-1 items-center">
                 <span className="flex">
-                {[...Array(fullStars)].map((_, i) => (
-                    <FontAwesomeIcon key={i} icon={faStar} className="text-arcadia-yellow" />
-                ))}
-                {halfStar && <FontAwesomeIcon icon={faStarHalfAlt} className="text-grey" />}
-                {[...Array(emptyStars)].map((_, i) => (
-                    <FontAwesomeIcon key={i} icon={faRegularStar} className="text-grey" /> // Use the outline star
-                ))}
+                    {[...Array(fullStars)].map((_, i) => (
+                        <FontAwesomeIcon key={i} icon={faStar} className="text-arcadia-yellow" />
+                    ))}
+                    {halfStar && <FontAwesomeIcon icon={faStarHalfAlt} className="text-grey" />}
+                    {[...Array(emptyStars)].map((_, i) => (
+                        <FontAwesomeIcon key={i} icon={faRegularStar} className="text-grey" /> // Use the outline star
+                    ))}
                 </span>
                 {formatRating(rating)}
             </span>
@@ -88,7 +88,9 @@ const BookCards = ({ title, fetchBooks }) => {
         <div className="uMain-cont">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">{title}</h2>
-                <button className="uSee-more">See more</button>
+                <button className="uSee-more" onClick={onSeeMoreClick}>
+                    See more
+                </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
                 {paginatedBooks.map((book, index) => (
@@ -100,20 +102,7 @@ const BookCards = ({ title, fetchBooks }) => {
                             {book.weightedAvg && renderStars(book.weightedAvg)}{!book.weightedAvg && "Rating not available"}
                         </p>
                         <p className="text-xs text-gray-400 mb-2 truncate">{book.category}</p>
-                        {/*
-                        <div className="flex items-center space-x-1">
-                            {book.genres.length > 0 && (
-                                <div className="flex items-center space-x-1">
-                                    <span className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-gray p-2">
-                                        {book.genres[0]}
-                                    </span>
-                                    {book.genres.length > 1 && (
-                                        <span className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-grey p-2">...</span>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                        */}
+
                     </a>
                 ))}
                 {generatePlaceholders().map((_, index) => (

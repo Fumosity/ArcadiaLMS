@@ -72,8 +72,10 @@ const fetchHighlyRatedBooks = async () => {
     }
 };
 
-const HighlyRated = () => {
-    return <BookCards title="Highly Rated" fetchBooks={fetchHighlyRatedBooks} />;
+const HighlyRated = ({ onSeeMoreClick }) => {
+    return <BookCards title="Highly Rated" fetchBooks={fetchHighlyRatedBooks} 
+    onSeeMoreClick={onSeeMoreClick}
+    />;
 };
 
 export default HighlyRated;
