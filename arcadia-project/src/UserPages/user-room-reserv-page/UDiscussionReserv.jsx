@@ -1,15 +1,11 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import Title from "../../components/main-comp/Title";
-
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
 import CurrentReservations from "../../components/UserComponents/user-room-reser-comp/CurrentReservations";
 import ReservHero from "../../components/UserComponents/user-room-reser-comp/ReservHero";
-import RoomBooking from "../../components/UserComponents/user-room-reser-comp/RoomBooking";
-import URoomReservations from "./URoomReservations";
 
 const UDiscussionReserv = () => {
     return (
@@ -28,9 +24,7 @@ const UDiscussionReserv = () => {
 
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
                         <ReservHero />
-                        <URoomReservations/>
                         <CurrentReservations />
-                        <RoomBooking />
                     </div>
                 </div>
             </main>

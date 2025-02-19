@@ -156,7 +156,7 @@ const BookingForm = () => {
 
             {/* Reserve a Room Button */}
             <div className="flex justify-center mt-6">
-                <button className="bg-blue-500 text-dark-gray border border-dark-gray px-4 py-2 rounded-full shadow-md hover:bg-blue-600 transition duration-200">
+                <button className=" text-dark-gray border border-dark-gray px-4 py-2 rounded-full shadow-md hover:bg-blue-600 transition duration-200">
                     Reserve a Room
                 </button>
             </div>

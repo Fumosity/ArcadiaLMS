@@ -14,7 +14,7 @@ export const UserProvider = ({ children }) => {
       setUser(storedUser);
       navigateBasedOnRole(storedUser.userAccountType);
     }
-    setLoading(false); // Mark loading as complete
+    setLoading(false); 
   }, []);
 
   const updateUser = (newUser) => {
