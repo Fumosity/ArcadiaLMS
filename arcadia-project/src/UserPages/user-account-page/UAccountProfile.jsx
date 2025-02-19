@@ -8,6 +8,7 @@ import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
 
 import { UserCredentials } from "../../components/UserComponents/user-account-comp/UserCredentials";
+import { UserInterests } from "../../components/UserComponents/user-account-comp/UserInterests";
 import { AccountSettings } from "../../components/UserComponents/user-account-comp/AccountSettings";
 import UserCirculationHistory from "../../components/UserComponents/user-account-comp/UserCirculationHistory";
 
@@ -32,6 +33,7 @@ const UAccountProfile = () => {
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
                         {/* Hero Section */}
                         <UserCredentials />
+                        <UserInterests />
                         <AccountSettings />
                         <UserCirculationHistory />
 
