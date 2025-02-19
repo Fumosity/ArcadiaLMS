@@ -9,7 +9,6 @@ export default function UNavbar() {
           <CustomLink to="/" className="userNav-link w-[150px] text-center">Home</CustomLink>
           <CustomLink to="/user/bookmanagement" className="userNav-link w-[150px] text-center">Book Catalog</CustomLink>
           <CustomLink to="/user/researchmanagement" className="userNav-link w-[150px] text-center">Research Catalog</CustomLink>
-          <CustomLink to="/user/newsupdates" className="userNav-link w-[150px] text-center">News and Updates</CustomLink>
           <CustomLink to="/user/reservations" className="userNav-link w-[150px] text-center">Reservations</CustomLink>
           <CustomLink to="/user/services" className="userNav-link w-[150px] text-center">Services</CustomLink>
           <CustomLink to="/user/support" className="userNav-link w-[150px] text-center">Support</CustomLink>

@@ -32,10 +32,7 @@ export default function UserInterests({ userData, onBack, onContinue }) {
   };
 
   const handleContinue = () => {
-    if (selectedGenres.length < 5) {
-      alert("Please select at least 5 genres");
-      return;
-    }
+    
     console.log("Selected genres:", selectedGenres);
 
     const selectedGenreNames = genres
@@ -111,18 +108,11 @@ export default function UserInterests({ userData, onBack, onContinue }) {
           <button onClick={onBack} className="registerBtn">Return</button>
           <button
             onClick={handleContinue}
-            disabled={selectedGenres.length < 5}
-            className={`genRedBtns ${selectedGenres.length < 5 ? "bg-gray-400 cursor-not-allowed" : "bg-arcadia-red hover:bg-arcadia-red/90"}`}
+            className={`genRedBtns`}
           >
             Continue
           </button>
         </div>
-
-        {selectedGenres.length < 5 && (
-          <p className="text-sm text-arcadia-red mt-2">
-            Please select {5 - selectedGenres.length} more genre(s) to continue.
-          </p>
-        )}
       </div>
 
       <div className="w-1/2 relative bg-grey rounded-2xl">
