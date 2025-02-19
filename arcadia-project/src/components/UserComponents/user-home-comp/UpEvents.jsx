@@ -46,7 +46,11 @@ const UpEvents = () => {
       };
     });
 
-    setEvents(formattedEvents);
+    // Filter out past events
+    const currentDate = new Date();
+    const upcomingEvents = formattedEvents.filter(event => moment(event.end).isAfter(currentDate));
+
+    setEvents(upcomingEvents);
   };
 
   const tileClassName = ({ date, view }) => {
@@ -93,4 +97,3 @@ const UpEvents = () => {
 };
 
 export default UpEvents;
-
