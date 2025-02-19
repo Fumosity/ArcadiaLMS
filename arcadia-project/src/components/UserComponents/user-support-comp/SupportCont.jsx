@@ -20,6 +20,7 @@ const SupportCont = () => {
             title: "FAQs",
             desc: "Do you have some questions or inquiries? Maybe it has been answered before! Check out our FAQs to see if your questions may be answered here.",
             more: "Read the FAQs",
+            link: "/user/faqs",
         },
     ];
 
