@@ -18,7 +18,7 @@ export default function ARoomBooking({ addReservation }) {
   });
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0]; 
+    const today = new Date().toISOString().split('T')[0];
     setFormData((prev) => ({
       ...prev,
       date: today,
@@ -26,60 +26,59 @@ export default function ARoomBooking({ addReservation }) {
   }, []);
 
   const handleInputChange = async (e) => {
-    const { name, value } = e.target;
-  
-    // Check if userId field is being updated
-    if (name === "userId" && value.trim() === "") {
-      // If userId is cleared, reset the dependent fields
+  const { name, value } = e.target;
+
+  // If the school ID field is updated and cleared, reset the dependent fields
+  if (name === "schoolId" && value.trim() === "") {
+    setFormData((prev) => ({
+      ...prev,
+      schoolId: value,
+      userId: "",
+      name: "",
+      college: "",
+      department: "",
+    }));
+    return;
+  }
+
+  setFormData((prev) => ({ ...prev, [name]: value }));
+
+  if (name === "schoolId" && value.trim() !== "") {
+    try {
+      const { data, error } = await supabase
+        .from("user_accounts")
+        .select("userID, userFName, userLName, userCollege, userDepartment")
+        .eq("userLPUID", value); // Query using school ID instead of user ID
+
+      if (error) {
+        console.error("Error fetching user details:", error.message);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        console.error("No user found with the provided School ID");
+        return;
+      }
+
+      if (data.length > 1) {
+        console.error("Multiple users found with the same School ID");
+        return;
+      }
+
+      const user = data[0];
       setFormData((prev) => ({
         ...prev,
-        userId: value,
-        schoolId: "",
-        name: "",
-        college: "",
-        department: "",
+        userId: user.userID,
+        name: `${user.userFName} ${user.userLName}`,
+        college: user.userCollege,
+        department: user.userDepartment,
       }));
-      return; // No need to fetch user details if userId is empty
+    } catch (error) {
+      console.error("Error fetching user details:", error.message);
     }
-  
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  
-    if (name === "userId" && value.trim() !== "") {
-      try {
-        const { data, error } = await supabase
-          .from("user_accounts")
-          .select("userLPUID, userFName, userLName, userCollege, userDepartment")
-          .eq("userID", value);
-  
-        if (error) {
-          console.error("Error fetching user details:", error.message);
-          return;
-        }
-  
-        if (!data || data.length === 0) {
-          console.error("No user found with the provided User ID");
-          return;
-        }
-  
-        if (data.length > 1) {
-          console.error("Multiple users found with the same User ID");
-          return;
-        }
-  
-        const user = data[0];
-        setFormData((prev) => ({
-          ...prev,
-          schoolId: user.userLPUID,
-          name: `${user.userFName} ${user.userLName}`,
-          college: user.userCollege,
-          department: user.userDepartment,
-        }));
-      } catch (error) {
-        console.error("Error fetching user details:", error.message);
-      }
-    }
-  };
-  
+  }
+};
+
   const checkExistingReservation = async () => {
     try {
       const { data, error } = await supabase
@@ -128,7 +127,6 @@ export default function ARoomBooking({ addReservation }) {
   };
 
   const handleFormSubmit = async () => {
-    // Check if all fields are filled
     if (
       !formData.userId ||
       !formData.schoolId ||
@@ -153,12 +151,12 @@ export default function ARoomBooking({ addReservation }) {
       });
       return;
     }
-  
+
     const isReserved = await checkExistingReservation();
     if (isReserved) {
       return; // Prevent form submission if the room is already booked
     }
-  
+
     const newEvent = {
       id: String(Date.now()),
       resourceId: formData.room,
@@ -166,9 +164,9 @@ export default function ARoomBooking({ addReservation }) {
       start: `${formData.date}T${formData.startTime}`,
       end: `${formData.date}T${formData.endTime}`,
     };
-  
+
     addReservation(newEvent);
-  
+
     const reserveData = {
       room: formData.room,
       date: formData.date,
@@ -176,7 +174,7 @@ export default function ARoomBooking({ addReservation }) {
       endTime: formData.endTime,
       title: formData.title,
     };
-  
+
     try {
       const { data, error } = await supabase
         .from("reservation")
@@ -184,7 +182,7 @@ export default function ARoomBooking({ addReservation }) {
           userID: formData.userId,
           reservationData: reserveData,
         });
-  
+
       if (error) {
         console.error("Error saving reservation:", error.message);
         toast.error("Error saving reservation", {
@@ -227,12 +225,11 @@ export default function ARoomBooking({ addReservation }) {
       });
     }
   };
-  
+
   return (
     <div className="bg-white overflow-hidden border border-grey mb-8 p-6 rounded-lg w-full">
       <h2 className="text-2xl font-semibold mb-2">Booking</h2>
       <div className="flex gap-8">
-        {/* Left Section */}
         <div className="space-y-4 flex-1">
           <div className="flex items-center justify-between gap-4">
             <span className="text-sm text-dark-gray">User ID:</span>
@@ -242,6 +239,7 @@ export default function ARoomBooking({ addReservation }) {
               value={formData.userId}
               onChange={handleInputChange}
               className="input-space"
+              readOnly
             />
           </div>
           <div className="flex items-center justify-between gap-4">
@@ -250,8 +248,8 @@ export default function ARoomBooking({ addReservation }) {
               type="text"
               name="schoolId"
               value={formData.schoolId}
+              onChange={handleInputChange} // Allow changes
               className="input-space"
-              readOnly
               required
             />
           </div>
