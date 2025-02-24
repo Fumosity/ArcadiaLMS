@@ -8,20 +8,20 @@ const SimilarTo = () => {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg border-grey border">
+    <div className="bg-white p-4 rounded-lg border-grey border mt-2">
       <h3 className="text-xl font-semibold mb-4">Similar To</h3>
-      <table className="w-full text-left">
+      <table className="w-full">
         <thead>
           <tr>
-            <th className="font-semibold pb-1 border-b border-grey">Book</th>
+            <th className="font-semibold pb-1 border-b border-grey">Title</th>
             <th className="font-semibold pb-1 border-b border-grey">Avg. Rating</th>
           </tr>
         </thead>
         <tbody>
           {similarBooks.map((book, index) => (
             <tr key={index} className="border-b border-grey">
-              <td className="py-2">{book.book}</td>
-              <td className="py-2">{book.rating}</td>
+              <td className="py-2 text-center">{book.book}</td>
+              <td className="py-2 text-center">{book.rating}</td>
             </tr>
           ))}
         </tbody>

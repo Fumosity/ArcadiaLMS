@@ -29,13 +29,7 @@ const AUsrAcc = () => (
                     {/* Preview section */}
                     <div className="lg:col-span-1 space-y-8">
                             <AccessTable />
-
-                            <Blacklist />
-
-                            <Whitelist />
-
                             <UserReports />
-
                             <SupportTix />
                     </div>
                 </div>

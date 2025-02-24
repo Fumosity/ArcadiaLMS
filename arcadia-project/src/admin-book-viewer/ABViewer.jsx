@@ -67,9 +67,6 @@ export default function ABViewer() {
             <div className="w-full">
               <SimilarTo />
             </div>
-            <div className="w-full">
-              <CompareTo />
-            </div>
           </div>
         </div>
       </main>

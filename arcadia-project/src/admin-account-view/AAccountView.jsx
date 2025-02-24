@@ -36,8 +36,7 @@ const AAccountView = () => {
 
                     {/* Right side content */}
                     <div className="lg:col-span-1 space-y-8">
-                        <Blacklist user={user} />
-                        <Whitelist user={user} />
+                        
                     </div>
                 </div>
             </main>

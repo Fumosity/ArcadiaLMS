@@ -132,9 +132,10 @@ const CurrentBookInventory = ({ onBookSelect }) => {
     };
 
     return (
-        <div className="bg-white p-4 rounded-xl border-grey border mr-5">
-            <h3 className="text-xl font-semibold mb-4">Current Inventory</h3>
-            <div className="flex flex-wrap items-center mb-6 space-x-4">
+        <div className="bg-white p-4 rounded-lg border-grey border h-fit">
+            <h3 className="text-2xl font-semibold mb-4">Current Inventory</h3>
+
+            <div className="flex flex-wrap items-center mb-4 space-x-4">
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Sort By:</span>
                     <button
@@ -170,16 +171,15 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                     <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Copies</button>
                 </div>
             </div>
-
-            <div className="overflow-x-auto">
+            <div className="">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            {["Category", "Genres", "Book Title", "Author", "Title ARC ID", "Original Pub. Date", "Copies"].map(
+                            {["Category", "Genres", "Book Title", "Author", "Call No.", "Org. Pub. Date", "Copies"].map(
                                 (header) => (
                                     <th
                                         key={header}
-                                        className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         {header}
                                     </th>
@@ -224,34 +224,33 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                         className="hover:bg-light-gray cursor-pointer"
                                         onClick={() => handleRowClick(item)}
                                     >
-                                        <td className="px-4 py-4 text-sm text-gray-900">
-                                            <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full p-2">
+                                        <td className="px-4 py-4 text-sm text-gray-900 flex justify-center max-w-36">
+                                            <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1">
                                                 {item.category}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-4 text-sm">
-                                            <div className="flex items-center space-x-1">
+                                        <td className="px-4 py-4 text-sm"
+                                            onMouseEnter={() => setHoveredGenreIndex(index)}
+                                            onMouseLeave={() => setHoveredGenreIndex(null)}
+                                        >
+                                            <div className="flex justify-start items-center space-x-1">
                                                 <span
-                                                    className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-gray p-2"
-                                                    onMouseEnter={() => setHoveredGenreIndex(index)}
-                                                    onMouseLeave={() => setHoveredGenreIndex(null)}
+                                                    className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-gray px-2 py-1 break-words"
                                                 >
                                                     {item.genres.length > 0 ? item.genres[0] : "No Genre"}
                                                 </span>
                                                 {item.genres.length > 1 && (
                                                     <span
-                                                        className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-grey p-2"
-                                                        onMouseEnter={() => setHoveredGenreIndex(index)}
-                                                        onMouseLeave={() => setHoveredGenreIndex(null)}
+                                                        className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-grey px-2 py-1 break-words"
                                                     >
                                                         ...
                                                     </span>
                                                 )}
                                             </div>
                                             {hoveredGenreIndex === index && item.genres.length > 1 && (
-                                                <div className="mt-1 transition-opacity duration-300 ease-in-out opacity-100">
+                                                <div className="flex-col justify-center mt-1 transition-opacity duration-300 ease-in-out opacity-100 w-full">
                                                     {item.genres.slice(1).map((genre, i) => (
-                                                        <div key={i} className="bg-grey rounded-full p-2 mt-1 text-sm">
+                                                        <div key={i} className="bookinv-genre rounded-full font-medium px-2 py-1 mt-1 text-sm w-fit break-words">
                                                             {genre}
                                                         </div>
                                                     ))}
@@ -259,7 +258,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                             )}
                                         </td>
 
-                                        <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate max-w-xs">
+                                        <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate max-w-64">
                                             <Link
                                                 to={`/admin/abviewer?titleID=${encodeURIComponent(item.titleID)}`}
                                                 className="text-blue-600 hover:underline"
@@ -267,9 +266,9 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                 {item.title}
                                             </Link>
                                         </td>
-                                        <td className="px-4 py-4 text-sm truncate max-w-xs relative group"> {/* Added group class here */}
+                                        <td className="px-4 py-4 text-sm max-w-48 relative group"> {/* Added group class here */}
                                             <div className="flex items-center space-x-1">
-                                                <span className="inline-block">{formatAuthor(item.author)}</span>
+                                                <span className="inline-block truncate break-words">{formatAuthor(item.author)}</span>
                                                 {Array.isArray(item.author) && item.author.length > 2 && ( // Check if item.author is an array before checking length
                                                     <div className="absolute top-0 left-full ml-2 bg-white border border-gray-300 rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
                                                         {item.author.slice(2).map((author, i) => ( // Use item.author here!
@@ -281,21 +280,21 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4 text-center text-sm text-gray-500 truncate max-w-xs">
+                                        <td className="px-4 py-4 text-center text-sm text-gray-500 truncate min-w-4">
                                             {item.arcID || 'N/A'}
                                         </td>
-                                        <td className="px-4 py-4 text-center text-sm text-gray-500 truncate max-w-xs">
+                                        <td className="px-4 py-4 text-center text-sm text-gray-500 truncate min-w-8">
                                             {item.originalPubDate}
                                         </td>
-                                        <td className="px-4 py-4 text-sm text-gray-500 truncate max-w-xs">
+                                        <td className="px-4 py-4 text-sm text-gray-500">
                                             <button
-                                                className="bg-blue-500 hover:bg-blue-700 text-black font-bold py-1 px-3 rounded"
+                                                className="bg-light-gray hover:bg-grey text-black py-1 px-3 rounded-full border-grey border"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleViewClick(item);
                                                 }}
                                             >
-                                                View Copies
+                                                Copies
                                             </button>
                                         </td>
                                     </tr>

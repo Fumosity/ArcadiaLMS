@@ -18,27 +18,28 @@ const ARInventory = () => {
     <div className="min-h-screen bg-gray-100">
       <MainHeader />
       <Title>Research Inventory</Title>
-      <div className="flex justify-center items-start space-x-2 pb-12 py-8">
-        <div className="flex-shrink-0">
-          <CurrentResearchInventory onResearchSelect={handleResearchSelect} />
-        </div>
-        <div className="hidden lg:flex flex-col items-start flex-shrink-0">
-          <button 
-            className="add-book mb-4 px-4 py-2 rounded-full border-grey hover:bg-blue-600 transition"
-            onClick={() => navigate('/admin/researchadding')} 
+
+      <div className="flex justify-center items-start space-x-2 pb-12 py-8 px-12">
+        <div className="flex-shrink-0 w-3/4">
+        <div className="flex justify-between w-full gap-2">
+        <button 
+              className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+              onClick={() => navigate('/admin/researchadding')} 
           >
             Add Research
           </button>
-          <div className="w-full mt-5">
+          <button 
+              className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+              onClick={() => navigate('/admin/researchadding')} 
+          >
+            Export Research Inventory
+          </button>
+        </div>
+          <CurrentResearchInventory onResearchSelect={handleResearchSelect} />
+        </div>
+        <div className="hidden lg:flex flex-col items-start flex-shrink-0 w-1/4">
+          <div className="w-full">
             <ResearchPreviewInv research={selectedResearch} /> 
-          </div>
-          
-          <div className="w-full mt-5">
-            <PopularAmong />
-          </div>
-
-          <div className="w-full mt-5">
-            <SimilarTo />
           </div>
         </div>
       </div>

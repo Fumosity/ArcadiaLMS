@@ -32,7 +32,6 @@
     @apply h-10 flex items-center justify-center mb-2;
     border: 1px solid;
     border-radius: 50px;
-    width: 21rem;
   }
 
   .input-field {
