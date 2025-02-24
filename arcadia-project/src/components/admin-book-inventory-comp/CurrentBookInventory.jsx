@@ -133,7 +133,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
 
     return (
         <div className="bg-white p-4 rounded-lg border-grey border h-fit">
-            <h3 className="text-2xl font-semibold mb-4">Current Inventory</h3>
+            <h3 className="text-2xl font-semibold mb-4">Current Book Inventory</h3>
 
             <div className="flex flex-wrap items-center mb-4 space-x-4">
                 <div className="flex items-center space-x-2">

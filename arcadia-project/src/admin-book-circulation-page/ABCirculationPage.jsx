@@ -11,15 +11,15 @@ export default function ABCirculationPage() {
     return (
         <div className="min-h-screen bg-gray-100">
             <Title>Book Circulation</Title>
-            <div className="flex flex-wrap justify-center gap-8 pb-12">
-                <div className="flex flex-col gap-4 mt-4 w-full sm:w-auto">
+            <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+                <div className="flex-shrink-0 w-3/4 space-y-2">
                     <BCHistory />
                     <BorrowedBks />
                     <ReturnedBks />
                     <OverdueBks />
                 </div>
 
-                <div className="w-full sm:w-auto space-y-8 mt-4">
+                <div className="flex flex-col items-start flex-shrink-0 w-1/4">
                     <AccessTable />
                     <BksDueTdy />
                 </div>

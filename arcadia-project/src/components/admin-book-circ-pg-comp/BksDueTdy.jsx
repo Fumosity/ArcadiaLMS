@@ -66,23 +66,23 @@ const BksDueTdy = () => {
     }, []); // Empty dependency array ensures this runs once when the component mounts
 
     return (
-        <div className="bg-white p-4 rounded-lg border-grey border">
-            <h3 className="text-xl font-semibold mb-4">Books Due Today</h3>
+        <div className="bg-white p-4 rounded-lg border-grey border w-full">
+            <h3 className="text-xl font-semibold mb-2">Books Due Today</h3>
 
             {/* Table */}
             <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                     <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
+                        <th className="px-4 w-1/2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Book</th>
+                        <th className="px-4 w-1/2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                     {booksDueToday.length > 0 ? (
                         booksDueToday.map((book, index) => (
                             <tr key={index} className="hover:bg-gray-100">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.bookTitle}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{book.borrower}</td>
+                                <td className="px-4 w-1/2 whitespace-nowrap text-sm text-gray-900">{book.bookTitle}</td>
+                                <td className="px-4 w-1/2 whitespace-nowrap text-sm text-gray-900">{book.borrower}</td>
                             </tr>
                         ))
                     ) : (

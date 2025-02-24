@@ -10,22 +10,18 @@ const AccessTable = () => {
   ];
 
   return (
-    <div className="bg-white p-2 rounded-lg border-grey border">
-      <table className="min-w-full divide-y divide-gray-200">
-        <tbody className="bg-white divide-y divide-gray-200">
-          {actions.map((item, index) => (
-            <tr 
-              key={index} 
-              className="cursor-pointer hover:bg-gray-100"
-              onClick={() => navigate(item.path)}
-            >
-              <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                {item.action}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="flex-col justify-center gap-2 w-full">
+      {actions.map((item, index) => (
+        <div
+          key={index}
+          onClick={() => navigate(item.path)}
+        >
+          <button className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey  hover:bg-arcadia-red hover:text-white"
+          >
+            {item.action}
+          </button>
+        </div>
+      ))}
     </div>
   );
 };

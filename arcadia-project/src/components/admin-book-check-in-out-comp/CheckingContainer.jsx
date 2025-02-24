@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
+import BarcodeScanner from './BarcodeScanner';
 
 const CheckingContainer = () => {
   const [checkMode, setCheckMode] = useState('Check Out');
   const [isSubmitting, setIsSubmitting] = useState(false); // State for loading indicator
   const [emptyFields, setEmptyFields] = useState({}); // Track empty fields
   const [isDamaged, setIsDamaged] = useState(false); // Track if the book is marked as damaged
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   // Function to get the PC's current local time
   const getLocalTime = () => {
@@ -27,16 +29,21 @@ const CheckingContainer = () => {
 
   const [formData, setFormData] = useState({
     userID: '',
-    bookID: '',
     schoolNo: '',
-    bookTitle: '',
     name: '',
-    date: '', // Store date in YYYY-MM-DD format
     college: '',
-    time: getLocalTime(), // Set the initial value to the PC's local time
     department: '',
+
+    bookBarcode: '',
+    bookTitle: '',
+    date: '', // Store date in YYYY-MM-DD format
+    time: getLocalTime(), // Set the initial value to the PC's local time
     deadline: '', // Initialize deadline as empty
   });
+
+  const handleBarcodeScan = (barcode) => {
+    setFormData((prev) => ({ ...prev, bookBarcode: barcode }));
+  };
 
   useEffect(() => {
     if (checkMode === 'Check In') {
@@ -95,14 +102,14 @@ const CheckingContainer = () => {
   const [bookCover, setBookCover] = useState(''); // State for the book cover image URL
 
   useEffect(() => {
-    if (formData.bookID) {
+    if (formData.bookBarcode) {
       const fetchBookData = async () => {
         try {
           // Fetch title and cover from the book_titles table using titleID from book_indiv
           const { data, error } = await supabase
             .from('book_indiv')
             .select('book_titles(title, cover)') // Include the cover field
-            .eq('bookID', formData.bookID)
+            .eq('bookBarcode', formData.bookBarcode)
             .single();
 
           if (error || !data) {
@@ -129,9 +136,9 @@ const CheckingContainer = () => {
         ...prev,
         bookTitle: '',
       }));
-      setBookCover(''); // Clear cover if no bookID is provided
+      setBookCover(''); // Clear cover if no bookBarcode is provided
     }
-  }, [formData.bookID]);
+  }, [formData.bookBarcode]);
 
   const handleCheckChange = (e) => {
     setCheckMode(e.target.value);
@@ -153,7 +160,7 @@ const CheckingContainer = () => {
   const handleSubmit = async () => {
     // Check if all required fields are filled
     const requiredFields = [
-      'userID', 'bookID', 'date', 'time', 'schoolNo', 'name', 'college', 'department', 'bookTitle'
+      'userID', 'bookBarcode', 'date', 'time', 'schoolNo', 'name', 'college', 'department', 'bookTitle'
     ];
 
     let emptyFields = {};
@@ -173,7 +180,7 @@ const CheckingContainer = () => {
     setEmptyFields({}); // Reset empty fields before submission
 
     try {
-      const { userID, bookID, schoolNo, name, college, department, bookTitle, date, time, deadline } = formData;
+      const { userID, bookBarcode, schoolNo, name, college, department, bookTitle, date, time, deadline } = formData;
       const currentTime = getLocalTime();
 
       const transactionType = checkMode === 'Check Out' ? 'Borrowed' : 'Returned';
@@ -183,7 +190,7 @@ const CheckingContainer = () => {
         const { data: existingTransaction, error: fetchError } = await supabase
           .from('book_transactions')
           .select('transactionType')
-          .eq('bookID', bookID)
+          .eq('bookBarcode', bookBarcode)
           .eq('transactionType', 'Borrowed') // Check if the book is already borrowed
           .order('checkoutDate', { ascending: false })
           .limit(1)
@@ -203,7 +210,7 @@ const CheckingContainer = () => {
         const { error: updateError } = await supabase
           .from('book_indiv')
           .update({ bookStatus: 'Unavailable' })
-          .eq('bookID', bookID);
+          .eq('bookBarcode', bookBarcode);
 
         if (updateError) {
           console.error('Error updating book status to Unavailable:', updateError);
@@ -213,7 +220,7 @@ const CheckingContainer = () => {
         // Insert a new transaction for Check Out
         const transactionData = {
           userID: userID,
-          bookID: bookID,
+          bookBarcode: bookBarcode,
           checkoutDate: date,
           checkoutTime: time,
           deadline: deadline,
@@ -236,7 +243,7 @@ const CheckingContainer = () => {
         const { data: existingTransaction, error: fetchError } = await supabase
           .from('book_transactions')
           .select('*')
-          .eq('bookID', bookID)
+          .eq('bookBarcode', bookBarcode)
           .eq('userID', userID)
           .eq('transactionType', 'Borrowed') // Only allow check-in if the book is borrowed
           .order('checkoutDate', { ascending: false })
@@ -275,7 +282,7 @@ const CheckingContainer = () => {
         const { error: checkinUpdateError } = await supabase
           .from('book_indiv')
           .update({ bookStatus: updatedStatus })
-          .eq('bookID', bookID);
+          .eq('bookBarcode', bookBarcode);
 
         if (checkinUpdateError) {
           console.error('Error updating book status:', checkinUpdateError);
@@ -293,97 +300,123 @@ const CheckingContainer = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4 bg-white shadow-lg rounded-lg">
-      <h2 className="text-lg font-bold mb-3">Checking</h2>
+    <div className="bg-white p-4 rounded-lg border-grey border">
+      <h3 className="text-2xl font-bold mb-4">Checking</h3>
 
-      <div className="flex items-center mb-3">
-        <label className="mr-2">
-          <input
-            type="radio"
-            name="check"
-            value="Check In"
-            className="mr-1"
-            checked={checkMode === 'Check In'}
-            onChange={handleCheckChange}
-          /> Check In
-        </label>
-        <label className="mr-2">
-          <input
-            type="radio"
-            name="check"
-            value="Check Out"
-            className="mr-1"
-            checked={checkMode === 'Check Out'}
-            onChange={handleCheckChange}
-          /> Check Out
-        </label>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-5">
-        {Object.entries(formData).map(([key, value]) => {
-          let label = key.replace(/([A-Z])/g, ' $1');
-          let inputType = 'text';
-
-          if (key === 'userID') label = 'User ID';
-          if (key === 'bookID') label = 'Book ID*';
-          if (key === 'bookTitle') label = 'Book Title*';
-
-          if (key === 'date') {
-            label = checkMode === 'Check In' ? 'Check In Date' : 'Check Out Date';
-            inputType = 'date';
-          } else if (key === 'time') {
-            label = checkMode === 'Check In' ? 'Check In Time' : 'Check Out Time';
-            inputType = 'time';
-          }
-
-          // Hide deadline field for "Check In"
-          if (key === 'deadline' && checkMode === 'Check In') {
-            return null;
-          }
-
-          return (
-            <div className="flex items-center" key={key}>
-              <label className="w-1/3 text-sm font-medium capitalize">
-                {label}:
-              </label>
+      <div className='flex'>
+        <div className='flex-col w-2/3'>
+          <div className="flex items-center mb-3">
+            <label className="mr-2">
               <input
-                type={inputType}
-                name={key}
-                value={value}
-                onChange={handleInputChange}
-                className={`w-full px-3 py-2 rounded-full border ${emptyFields[key] ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                required
+                type="radio"
+                name="check"
+                value="Check Out"
+                className="mr-1"
+                checked={checkMode === 'Check Out'}
+                onChange={handleCheckChange}
+              /> Checking Out
+            </label>
+            <label className="mr-2">
+              <input
+                type="radio"
+                name="check"
+                value="Check In"
+                className="mr-1"
+                checked={checkMode === 'Check In'}
+                onChange={handleCheckChange}
+              /> Checking In
+            </label>
+          </div>
+          <div className="grid grid-cols-1 gap-2 mb-4">
+            {Object.entries(formData).map(([key, value]) => {
+              let label = key.replace(/([A-Z])/g, ' $1');
+              let inputType = 'text';
+              let afterInput = null;
+
+              if (key === 'userID') label = 'User ID';
+              if (key === 'bookBarcode') {
+                label = 'Book Barcode';
+                afterInput = (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isScannerOpen) return;
+                      setIsScannerOpen(true);
+                    }}
+                    className="px-3 py-1 ml-2 rounded-full border border-grey w-[calc(2/5*100%)] hover:bg-light-gray transition" // Button width: 2/5 of 2/3
+                  >
+                    Scan Barcode
+                  </button>
+                );
+              }
+              if (key === 'bookTitle') label = 'Book Title';
+
+              if (key === 'date') {
+                label = checkMode === 'Check In' ? 'Check In Date' : 'Check Out Date';
+                inputType = 'date';
+              } else if (key === 'time') {
+                label = checkMode === 'Check In' ? 'Check In Time' : 'Check Out Time';
+                inputType = 'time';
+              }
+
+              // Hide deadline field for "Check In"
+              if (key === 'deadline' && checkMode === 'Check In') {
+                return null;
+              }
+
+              return (
+                <div className="flex items-center" key={key}>
+                  <label className="w-1/3 text-md capitalize">
+                    {label}:
+                  </label>
+                  <div className="w-2/3 flex items-center"> {/* Keep w-2/3 here */}
+                    <input
+                      type={inputType}
+                      name={key}
+                      value={value}
+                      onChange={handleInputChange}
+                      className={`px-3 py-1 rounded-full border ${emptyFields[key] ? 'border-arcadia-red' : 'border-grey'} ${key === 'bookBarcode' ? 'w-[calc(3/5*100%)]' : 'w-full'}`} // Input width: 3/5 of 2/3, otherwise w-full
+                      required
+                    />
+                    {afterInput}               
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {isScannerOpen && (
+                      <BarcodeScanner
+                        onScan={handleBarcodeScan}
+                        onClose={() => setIsScannerOpen(false)}
+                      />
+                    )}
+          <div className="w-full flex justify-end"> {/* Add flex and justify-end */}
+            {checkMode === 'Check In' && (
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={isDamaged}
+                  onChange={() => setIsDamaged(!isDamaged)}
+                  className="" // Remove right-full; not needed
+                />
+                <span className="ml-2">Mark as Damaged</span> {/* Add margin for spacing */}
+              </label>
+            )}
+          </div>
+        </div>
+        {/* Book Cover Image Section */}
+        <div className="flex flex-col items-center px-2 w-1/3">
+          <label className="text-md mb-2">Book Cover:</label>
+          {formData.bookBarcode && formData.bookTitle && (
+            <div className="border border-grey p-4 w-5/6 rounded-lg flex justify-center">
+              <img
+                src={bookCover}
+                alt="Book Cover"
+                className="h-[400px] object-cover rounded-lg"
               />
             </div>
-          );
-        })}
-      </div>
-      <div className="flex items-center mb-5">
-        {checkMode === 'Check In' && (
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={isDamaged}
-              onChange={() => setIsDamaged(!isDamaged)}
-              className="mr-2"
-            />
-            Mark as Damaged
-          </label>
-        )}
-      </div>
-      {/* Book Cover Image Section */}
-      <div className="flex flex-col items-center mb-5">
-        <label className="text-sm font-medium mb-2">Book Cover:</label>
-        {formData.bookID && formData.bookTitle && (
-          <div className="w-full flex justify-center">
-            <img
-              src={bookCover}
-              alt="Book Cover"
-              className="w-35 h-52 object-cover rounded-lg"
-            />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="flex justify-center mb-4">
