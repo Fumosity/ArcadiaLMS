@@ -1,112 +1,85 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import BookCards from "../user-home-comp/BookCards";
 import { supabase } from "/src/supabaseClient.js";
 
-const ReleasedThisYear = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [books, setBooks] = useState([]);
-    const [loading, setLoading] = useState(true);
+const fetchReleasedThisYearBooks = async () => {
+    try {
+        const currentYear = new Date().getFullYear();
 
-    const entriesPerPage = 5; // Books per page
-    const maxPages = 5; // Limit pagination to 5 pages
+        // Step 1: Fetch books released this year
+        const { data: bookMetadata, error: bookError } = await supabase
+            .from("book_titles")
+            .select("titleID, title, author, cover, currentPubDate")
+            .gte("currentPubDate", `${currentYear}-01-01`) // Fetch books from Jan 1 of the current year
+            .lte("currentPubDate", `${currentYear}-12-31`) // Up to Dec 31
+            .order("currentPubDate", { ascending: false });
 
-    // Fetch books from Supabase
-    useEffect(() => {
-        const fetchBooks = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from("book_titles")
-                    .select("*")
-                    .order("currentPubDate", { ascending: false }); // Sort by currentPubDate in descending order
+        if (bookError) throw bookError;
 
-                if (error) {
-                    console.error("Error fetching books:", error);
-                    setLoading(false);
-                } else {
-                    // Filter books by current year and randomize
-                    const currentYear = new Date().getFullYear();
-                    const filteredBooks = data.filter(book => {
-                        const publicationYear = new Date(book.currentPubDate).getFullYear();
-                        return publicationYear === currentYear;
-                    });
+        const titleIDs = bookMetadata.map(book => book.titleID);
 
-                    // Shuffle the filtered books
-                    const shuffledBooks = filteredBooks.sort(() => Math.random() - 0.5);
+        // Step 2: Fetch ratings
+        const { data: ratings, error: ratingError } = await supabase
+            .from("ratings")
+            .select("ratingValue, titleID")
+            .in("titleID", titleIDs);
 
-                    setBooks(shuffledBooks);
-                    setLoading(false);
-                }
-            } catch (error) {
-                console.error("Unexpected error:", error);
-                setLoading(false);
+        if (ratingError) throw ratingError;
+
+        // Step 3: Fetch genres and categories
+        const { data: genreData, error: genreError } = await supabase
+            .from("book_genre_link")
+            .select("titleID, genres(genreID, genreName, category)")
+            .in("titleID", titleIDs);
+
+        if (genreError) throw genreError;
+
+        // Step 4: Structure genres and categories
+        const genreMap = {};
+        genreData.forEach(({ titleID, genres }) => {
+            if (!genreMap[titleID]) {
+                genreMap[titleID] = { genres: [], category: genres.category };
             }
-        };
+            genreMap[titleID].genres.push(genres.genreName);
+        });
 
-        fetchBooks();
-    }, []);
+        // Step 5: Calculate average ratings
+        const ratingMap = ratings.reduce((acc, { titleID, ratingValue }) => {
+            if (!acc[titleID]) {
+                acc[titleID] = { total: 0, count: 0 };
+            }
+            acc[titleID].total += ratingValue;
+            acc[titleID].count += 1;
+            return acc;
+        }, {});
 
-    // Pagination logic
-    const totalEntries = books.length;
-    const totalPages = Math.min(Math.ceil(totalEntries / entriesPerPage), maxPages); // Limit total pages to 5
-    const paginatedBooks = books.slice(
-        (currentPage - 1) * entriesPerPage,
-        currentPage * entriesPerPage
-    );
+        // Step 6: Combine book data with genres, category, and rating
+        const booksWithDetails = bookMetadata.map(book => {
+            const titleID = book.titleID;
+            const avgRating = ratingMap[titleID] ? ratingMap[titleID].total / ratingMap[titleID].count : null;
+            return {
+                ...book,
+                weightedAvg: avgRating,
+                totalRatings: ratingMap[titleID]?.count || 0,
+                genres: genreMap[titleID]?.genres || [],
+                category: genreMap[titleID]?.category || "Unknown",
+            };
+        });
 
-    if (loading) {
-        return <div>Loading...</div>;
+        return { books: booksWithDetails };
+    } catch (error) {
+        console.error("Error fetching books released this year:", error);
+        return { books: [] };
     }
+};
 
+const ReleasedThisYear = ({ onSeeMoreClick }) => {
     return (
-        <div className="uMain-cont">
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold">Released This Year</h2>
-                <button className="uSee-more">
-                    See more
-                </button>
-            </div>
-
-            {/* Book Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
-                {paginatedBooks.map((book, index) => (
-                    <a key={index}
-                        href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`}
-                        className="block genCard-cont"
-                    >
-                        <img
-                            src={book.cover || "https://via.placeholder.com/150x200"} // Adjust for cover field
-                            alt={book.title}
-                            className="w-full h-40 object-cover rounded-lg mb-4"
-                        />
-                        <h3 className="text-lg font-semibold mb-2 truncate">{book.title}</h3>
-                        <p className="text-sm text-gray-500 mb-2 truncate">{book.author}</p>
-                        <p className="text-xs text-gray-400 mb-2 truncate">{book.category}</p>
-                        <div className="flex items-center space-x-1">
-                            <span className="text-bright-yellow text-sm">★</span>
-                            <p className=" text-sm">{book.average_rating?.toFixed(2)}</p>
-                        </div>
-                    </a>
-                ))}
-            </div>
-
-            {/* Pagination */}
-            <div className="flex justify-center items-center mt-6 space-x-4">
-                <button
-                    className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                >
-                    Previous Page
-                </button>
-                <span className="text-xs text-arcadia-red">Page {currentPage}</span>
-                <button
-                    className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                >
-                    Next Page
-                </button>
-            </div>
-        </div>
+        <BookCards 
+            title="Released This Year" 
+            fetchBooks={fetchReleasedThisYearBooks} 
+            onSeeMoreClick={() => onSeeMoreClick("Released This Year", fetchReleasedThisYearBooks)} 
+        />
     );
 };
 

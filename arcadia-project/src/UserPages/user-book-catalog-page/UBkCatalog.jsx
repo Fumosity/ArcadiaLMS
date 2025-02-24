@@ -21,6 +21,7 @@ const UBkCatalog = () => {
     const [bookDetails, setBookDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [seeMoreComponent, setSeeMoreComponent] = useState(null)
 
     console.log(user)
 
@@ -64,6 +65,26 @@ const UBkCatalog = () => {
         return <div>Loading...</div>; // Or show a user-friendly message
     }
 
+    const handleBackClick = () => {
+        setSelectedGenre(null)
+        setSeeMoreComponent(null)
+        setSeeMoreGenresComponent(null)
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const handleSeeMoreClick = (component, fetchFunction) => {
+        if (typeof fetchFunction !== "function") {
+            console.error("fetchFunction is not a function", fetchFunction);
+            return;
+        }
+        setSeeMoreComponent({
+            title: component,
+            fetchBooks: fetchFunction,
+            onGenreClick: handleGenreClick
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />
@@ -72,18 +93,16 @@ const UBkCatalog = () => {
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
-                    <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mr-5">
-                        <FilterSidebar />
-                    </div>
+                    <FilterSidebar />
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
                         {query.trim() && <UBkResults query={query} />}
                         <Recommended titleID={titleId} userID={user.userID} category={bookDetails?.category || "General"} />
-                        <MostPopular />
-                        <HighlyRated />
-                        <NewlyAdded />
-                        <ReleasedThisYear />
-                        <Fiction />
-                        <Nonfiction />
+                        <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                        <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                        <NewlyAdded onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                        <ReleasedThisYear onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                        <Fiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                        <Nonfiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
                     </div>
                 </div>
             </main>

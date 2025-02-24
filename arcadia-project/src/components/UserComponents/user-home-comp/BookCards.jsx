@@ -3,6 +3,7 @@ import { supabase } from "/src/supabaseClient.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalfAlt, faStar as faRegularStar } from '@fortawesome/free-solid-svg-icons'; // Import the icons you need
 import { faStar as faRegularStarOutline } from '@fortawesome/free-regular-svg-icons'; //Example of importing outline star
+import { Award } from "lucide-react";
 
 const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -96,44 +97,43 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
                     See more
                 </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2 my-4">
                 {isLoading ? ( // Conditionally render placeholders while loading
                     Array(entriesPerPage).fill(null).map((_, index) => ( // Show placeholders while loading
                         <div key={index} className="genCard-cont animate-pulse"> {/* Added animate-pulse */}
-                            <div className="w-full h-40 rounded-lg mb-4 bg-light-gray"></div>
-                            <div className="text-lg font-semibold mb-2 truncate bg-light-gray">&nbsp;</div>
-                            <div className="text-sm text-gray-500 mb-2 truncate bg-light-gray">&nbsp;</div>
-                            <div className="text-sm text-gray-500 mb-2 truncate bg-light-gray">&nbsp;</div>
-                            <div className="text-xs text-gray-400 mb-2 truncate bg-light-gray">&nbsp;</div>
+                            <div className="w-full h-60 rounded-lg mb-2 bg-light-gray"></div>
+                            <div className="text-lg font-semibold mb-1 truncate bg-light-gray">&nbsp;</div>
+                            <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
+                            <div className="text-sm text-gray-400 mb-1 truncate bg-light-gray">&nbsp;</div>
+                            <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
                         </div>
                     ))
                 ) : (
                     <>
                         {paginatedBooks.map((book, index) => (
-                            <a key={index} href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`} className="block genCard-cont">
-                                <img src={book.cover} alt={book.title} className="w-full h-40 object-cover rounded-lg mb-4" />
-                                <h3 className="text-lg font-semibold mb-2 truncate">{book.title}</h3>
-                                <p className="text-sm text-gray-500 mb-2 truncate">{formatAuthor(book.author)}</p>
-                                <p className="text-sm text-gray-500 mb-2 truncate">
+                            <a key={index} href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`} className="block genCard-cont" title={book.title}>
+                                <img src={book.cover || "/image/arcadia_gray.png"} alt={book.title} className="w-full h-60 object-cover rounded-lg mb-2 bg-light-gray" />
+                                <h3 className="text-lg h-[3rem] leading-tight font-semibold whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">{book.title}</h3>
+                                <p className="text-sm text-gray-500 mb-1 truncate">{formatAuthor(book.author)}</p>
+                                <p className="text-sm text-gray-400 mb-1 truncate">{book.category}</p>
+                                <p className="text-sm text-gray-500 mb-1 truncate">
                                     {book.weightedAvg && renderStars(book.weightedAvg)}{!book.weightedAvg && "Rating not available"}
                                 </p>
-                                <p className="text-xs text-gray-400 mb-2 truncate">{book.category}</p>
-
                             </a>
                         ))}
                         {generatePlaceholders().map((_, index) => (
-                            <div key={index} className="genCard-cont"> {/* Placeholder div */}
-                                <div className="w-full h-40 rounded-lg mb-4 bg-light-gray"></div> {/* Placeholder image with slightly darker gray */}
-                                <div className="text-lg font-semibold mb-2 truncate bg-light-gray">&nbsp;</div> {/* Placeholder title */}
-                                <div className="text-sm text-gray-500 mb-2 truncate bg-light-gray">&nbsp;</div> {/* Placeholder author */}
-                                <div className="text-sm text-gray-500 mb-2 truncate bg-light-gray">&nbsp;</div> {/* Placeholder rating */}
-                                <div className="text-xs text-gray-400 mb-2 truncate bg-light-gray">&nbsp;</div> {/* Placeholder category */}
+                            <div key={index} className="bg-white border border-grey rounded-xl p-4 "> {/* Placeholder div */}
+                                <div className="w-full h-60 rounded-lg mb-2 bg-light-gray"></div>
+                                <div className="text-lg h-[3rem] font-semibold mb-1 truncate bg-light-gray">&nbsp;</div>
+                                <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
+                                <div className="text-sm text-gray-400 mb-1 truncate bg-light-gray">&nbsp;</div>
+                                <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
                             </div>
                         ))}
                     </>
                 )}
             </div>
-            <div className="flex justify-center items-center mt-6 space-x-4">
+            <div className="flex justify-center items-center mt-2 space-x-4">
                 <button className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
                     Previous Page
                 </button>

@@ -25,14 +25,14 @@ const UHomePage = () => {
   const handleGenreClick = (genre) => {
     setSelectedGenre(genre)
     console.log("selected genre", genre)
-    window.scrollTo({ top: 0, behavior: "smooth" }); 
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   const handleBackClick = () => {
     setSelectedGenre(null)
     setSeeMoreComponent(null)
     setSeeMoreGenresComponent(null)
-    window.scrollTo({ top: 0, behavior: "smooth" }); 
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   const handleSeeMoreClick = (component, fetchFunction) => {
@@ -40,19 +40,22 @@ const UHomePage = () => {
       console.error("fetchFunction is not a function", fetchFunction);
       return;
     }
-    setSeeMoreComponent({ 
-      title: component, 
-      fetchBooks: fetchFunction, 
-      onGenreClick: handleGenreClick 
+    setSeeMoreComponent({
+      title: component,
+      fetchBooks: fetchFunction,
+      onGenreClick: handleGenreClick
     });
-    window.scrollTo({ top: 0, behavior: "smooth" }); 
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSeeMoreGenresClick = (component, fetchData) => {
-    setSeeMoreGenresComponent({ title: component, fetchGenres: fetchData });
-    window.scrollTo({ top: 0, behavior: "smooth" }); 
+    setSeeMoreGenresComponent({ 
+      title: component, 
+      fetchAllGenres: fetchData,
+      onGenreClick: handleGenreClick  // Pass onGenreClick
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  
 
   return (
     <div className="min-h-screen bg-light-white">
@@ -62,12 +65,12 @@ const UHomePage = () => {
         {/* Content Container */}
         <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
           {/* Sidebar */}
-          <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mr-5">
+          <div className="lg:w-1/4 md:w-1/3 w-full space-y-4">
             <ArcOpHr />
             <UpEvents />
             <Services />
-            <MostPopBk />
-            <HighestRatedBk />
+            <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+            <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
           </div>
 
           {/* Main Content */}
@@ -82,19 +85,23 @@ const UHomePage = () => {
               />
             ) : seeMoreGenresComponent ? (
               <SeeMoreGenres
+                onGenreClick={handleGenreClick}
                 selectedComponent={seeMoreGenresComponent.title}
                 onBackClick={handleBackClick}
-                fetchGenres={seeMoreGenresComponent.fetchGenres}
+                fetchAllGenres={seeMoreGenresComponent.fetchAllGenres}
               />
             ) : (
               <>
                 <UHero />
-                <SearchByGenre onGenreClick={handleGenreClick} onSeeMoreGenresClick={(title, fetchData) => handleSeeMoreGenresClick(title, fetchData)}/>
-                <Recommended onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}/>
-                <InterestedGenre onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}/>
-                <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}/>
-                <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}/>
-                </>
+                <SearchByGenre
+                  onGenreClick={handleGenreClick}
+                  onSeeMoreGenresClick={(title, fetchData) => handleSeeMoreGenresClick(title, fetchData)}
+                />
+                <Recommended onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                <InterestedGenre onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+              </>
             )}
           </div>
         </div>

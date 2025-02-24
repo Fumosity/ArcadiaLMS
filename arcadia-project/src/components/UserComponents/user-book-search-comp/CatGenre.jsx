@@ -27,7 +27,7 @@ export default function CatGenre() {
             <h2 className="text-xl font-semibold mb-2.5">Category and Genre</h2>
 
             {/* Category checkboxes with single-select behavior and custom styles */}
-            <div className="space-y-2 mb-2">
+            <div className="grid grid-cols-3 gap-2 pb-2">
                 {['All', 'Fiction', 'Nonfiction'].map((option) => (
                     <div key={option} className="flex items-center space-x-2">
                         {/* Custom checkbox styling */}
@@ -47,7 +47,7 @@ export default function CatGenre() {
 
             {/* Search Genre dropdown */}
             <div className="space-y-2 border-t border-grey">
-                <div className="flex items-center mt-2 justify-between">
+                <div className="flex items-center mt-1 justify-between">
                     <p className="text-sm font-medium">Search for Genre:</p>
                     <div className="flex items-center space-x-1 text-sm">
                         <button
@@ -92,7 +92,7 @@ export default function CatGenre() {
                 </div>
 
                 {/* Display selected genres for Search Genre */}
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-1">
                     {searchGenre.map((genre) => (
                         <div key={genre} className="flex items-center border-grey rounded-2xl bg-grey text-arcadia-black px-2 py-0.5">
                             <button
@@ -109,8 +109,8 @@ export default function CatGenre() {
 
 
             {/* Exclude Genre dropdown */}
-            <div className="space-y-2 mt-2 border-t border-grey">
-                <p className="text-sm font-medium mt-2">Exclude Genre:</p>
+            <div className="space-y-2">
+                <p className="text-sm font-medium mt-1">Exclude Genre:</p>
                 <div className="relative w-full">
                     <select
                         onChange={(e) => handleGenreSelect(e.target.value, setExcludeGenre, excludeGenre)}
@@ -135,7 +135,7 @@ export default function CatGenre() {
 
                 </div>
                 {/* Display selected genres for Exclude Genre */}
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-1">
                     {excludeGenre.map((genre) => (
                         <div key={genre} className="flex items-center border-grey rounded-2xl bg-grey text-arcadia-black px-2 py-0.5">
                             <button
@@ -149,7 +149,6 @@ export default function CatGenre() {
                         </div>
                     ))}
                 </div>
-
             </div>
         </div>
     );

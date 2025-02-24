@@ -5,18 +5,18 @@ import Language from "./Language"
 
 export default function FilterSidebar() {
     return (
-
-
-        <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 ">
-
+        <div className="lg:w-1/4 md:w-1/3 w-full space-y-4 sticky top-5">
+            <button className="uSidebar-filter text-arcadia-red px-3 py-0.5 text-sm font-semibold text-left border border-grey rounded-xl hover:underline">
+                Clear Filters
+            </button>
+            
             <div className="uSidebar-filter flex items-center space-x-2 px-3 py-0.5 border border-grey rounded-full">
-                <label htmlFor="sort" className="text-sm font-semibold">Sort:</label>
-
+                <label htmlFor="sort" className="text-sm font-semibold w-32">Sort:</label>
                 {/* Select Dropdown with Custom Arrow */}
-                <div className="relative">
+                <div className="relative w-64">
                     <select
                         id="sort"
-                        className="text-sm rounded-xl bg-white focus:outline-none focus:ring-0 appearance-none pr-4 px-3"
+                        className="text-sm rounded-xl border border-grey bg-white focus:outline-none focus:ring-0 appearance-none px-4 py-2 w-full"
                         defaultValue="best-match"
                     >
                         <option value="best-match">Best Match</option>
@@ -39,33 +39,9 @@ export default function FilterSidebar() {
                 </div>
             </div>
 
-
-
-
-            <button className="uSidebar-filter text-arcadia-red px-3 py-0.5 text-sm font-semibold text-left border border-grey rounded-xl hover:underline">
-                Clear Filters
-            </button>
-
-            
             <PublicationYear />
-
-
-
-
             <CatGenre />
-
-
-
-
             <Language />
-
         </div>
-
-
-
-
-
-
-
     )
 }

@@ -11,7 +11,7 @@ export default function Language() {
     return (
         <div className="uSidebar-filter">
             <h3 className="text-xl font-semibold mb-2.5">Language</h3>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2 py-2">
                 {languageOptions.map((option) => (
                     <div key={option} className="flex items-center space-x-2">
                         <input

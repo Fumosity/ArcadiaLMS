@@ -399,7 +399,7 @@
   padding: 16px;
   margin-bottom: 25px;
   border: 1px solid #d4d4d8;
-  border-radius: 20px;
+  border-radius: 12px;
   width: 100%;
   max-width: 334px;
 }
@@ -418,10 +418,10 @@
 .uMain-cont {
   @apply relative overflow-hidden;
   background-color: white;
-  padding: 24px;
+  padding: 16px;
   border: 1px solid #d4d4d8;
-  border-radius: 20px;
-  margin-bottom: 32px;
+  border-radius: 12px;
+  margin-bottom: 16px;
   width: 1000px;
 }
 
@@ -460,10 +460,10 @@
 .uHero-cont {
   width: 1000px;
   background-color: white;
-  padding: 24px;
+  padding: 12px;
   border: 1px solid #d4d4d8;
   border-radius: 20px;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 .uSidebar-Seemore {

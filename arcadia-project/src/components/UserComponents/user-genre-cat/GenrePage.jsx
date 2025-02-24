@@ -117,12 +117,22 @@ const GenrePage = ({ selectedGenre, onBackClick }) => {
 
   return (
     <div className="min-h-screen bg-light-white">
-      <div className="uHero-cont mb-6">
+      <button
+        onClick={onBackClick}
+        className="w-[200px] h-[44px] mb-4 border border-grey rounded-full px-5 inline-flex items-center gap-2 text-sm text-black hover:bg-light-gray transition-colors"
+      >
+        <span className="w-5 h-5 border border-black rounded-full bg-gray-100 flex items-center justify-center">
+          <ArrowLeft className="w-3 h-3" />
+        </span>
+        Back to Home
+      </button>
+
+      <div className="uHero-cont">
         <div
-          className="relative w-[950px] h-[280px] rounded-xl md:h-64 lg:h-72 xl:h-80 flex items-center justify-center bg-cover bg-center text-white"
+          className="relative w-full h-full rounded-xl md:h-64 lg:h-72 xl:h-80 flex items-center justify-center bg-cover bg-center text-white"
           style={{ backgroundImage: `url('${selectedGenre.img}')` }}
         >
-          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
+          <div className="absolute inset-0 bg-black bg-opacity-25 rounded-xl"></div>
           <div className="relative z-10 text-center">
             <h4 className="text-xl md:text-2xl">{selectedGenre.category}</h4>
             <h1 className="text-4xl md:text-5xl p-4 font-bold">{selectedGenre.genreName}</h1>
@@ -130,16 +140,6 @@ const GenrePage = ({ selectedGenre, onBackClick }) => {
           </div>
         </div>
       </div>
-
-      <button
-        onClick={onBackClick}
-        className="w-[200px] h-[44px] mb-8 border border-grey rounded-full px-5 inline-flex items-center gap-2 text-sm text-black hover:bg-light-gray transition-colors"
-      >
-        <span className="w-5 h-5 border border-black rounded-full bg-gray-100 flex items-center justify-center">
-          <ArrowLeft className="w-3 h-3" />
-        </span>
-        Back to Home
-      </button>
 
       <BookGrid title={`${selectedGenre.genreName} Books`} fetchBooks={fetchBooks} />
     </div>

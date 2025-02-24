@@ -96,10 +96,10 @@ const InterestedGenre = ({ userID, onSeeMoreClick }) => {
 
     return (
         <BookCards
-            title={`Because You Like ${genreData.genreName}`}
+            title={`Because you like ${genreData.genreName}`}
             fetchBooks={() => Promise.resolve(genreData.books)} // Use the stored books
             onSeeMoreClick={() =>
-                onSeeMoreClick(`Because You Like ${genreData.genreName}`, () => Promise.resolve(genreData.books))
+                onSeeMoreClick(`Because you like ${genreData.genreName}`, () => Promise.resolve(genreData.books))
             }
         />
     );

@@ -1,114 +1,99 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "/src/supabaseClient.js";
+import BookCards from "../user-home-comp/BookCards";
 
-const Fiction = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [books, setBooks] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const fetchFictionBooks = async () => {
+    try {
+        // Fetch user preferred genres
+        const { data: userGenresData, error: userGenresError } = await supabase
+            .from("user_genre_link")
+            .select("genreID");
 
-    const entriesPerPage = 5; // Books per page
-    const maxPages = 5; // Limit pagination to 5 pages
+        if (userGenresError) throw userGenresError;
 
-    // Fetch books from Supabase
-    useEffect(() => {
-        const fetchBooks = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from("book_titles")
-                    .select("*")
+        const userGenres = userGenresData.map(g => g.genreID);
 
-                if (error) {
-                    console.error("Error fetching books:", error);
-                    setError(error);
-                    setLoading(false);
-                } else {
-                    // Filter books by category "Fiction"
-                    const filteredBooks = data.filter(book => book.category.includes("Fiction"));
+        // Fetch books metadata
+        const { data: bookMetadata, error: bookError } = await supabase
+            .from("book_titles")
+            .select("titleID, title, author, cover")
+            .order("titleID", { ascending: false });
 
-                    // Shuffle the filtered books
-                    const shuffledBooks = filteredBooks.sort(() => Math.random() - 0.5);
+        if (bookError) throw bookError;
 
-                    setBooks(shuffledBooks);
-                    setLoading(false);
-                }
-            } catch (error) {
-                console.error("Unexpected error:", error);
-                setError(error);
-                setLoading(false);
+        const titleIDs = bookMetadata.map(book => book.titleID);
+
+        // Fetch genres and categories
+        const { data: genreData, error: genreError } = await supabase
+            .from("book_genre_link")
+            .select("titleID, genres(genreID, genreName, category)")
+            .in("titleID", titleIDs);
+
+        if (genreError) throw genreError;
+
+        // Fetch ratings
+        const { data: ratings, error: ratingError } = await supabase
+            .from("ratings")
+            .select("ratingValue, titleID")
+            .in("titleID", titleIDs);
+
+        if (ratingError) throw ratingError;
+
+        // Structure genres and filter Fiction books
+        const genreMap = {};
+        genreData.forEach(({ titleID, genres }) => {
+            if (!genreMap[titleID]) {
+                genreMap[titleID] = { genres: [], category: genres.category };
             }
-        };
+            genreMap[titleID].genres.push(genres.genreName);
+        });
 
-        fetchBooks();
-    }, []);
+        const fictionBooks = bookMetadata.filter(book => genreMap[book.titleID]?.category === "Fiction");
 
-    // Pagination logic
-    const totalEntries = books.length;
-    const totalPages = Math.min(Math.ceil(totalEntries / entriesPerPage), maxPages); // Limit total pages to 5
-    const paginatedBooks = books.slice(
-        (currentPage - 1) * entriesPerPage,
-        currentPage * entriesPerPage
-    );
+        // Calculate average ratings
+        const ratingMap = ratings.reduce((acc, { titleID, ratingValue }) => {
+            if (!acc[titleID]) {
+                acc[titleID] = { total: 0, count: 0 };
+            }
+            acc[titleID].total += ratingValue;
+            acc[titleID].count += 1;
+            return acc;
+        }, {});
 
-    if (loading) {
-        return <div>Loading...</div>;
+        // Combine book data with genres, category, and rating
+        const booksWithDetails = fictionBooks.map(book => {
+            const titleID = book.titleID;
+            const avgRating = ratingMap[titleID] ? ratingMap[titleID].total / ratingMap[titleID].count : null;
+            return {
+                ...book,
+                weightedAvg: avgRating,
+                totalRatings: ratingMap[titleID]?.count || 0,
+                genres: genreMap[titleID]?.genres || [],
+                category: genreMap[titleID]?.category || "Unknown",
+            };
+        });
+
+        // Prioritize books that match user genres
+        const prioritizedBooks = booksWithDetails.sort((a, b) => {
+            const aPriority = a.genres.some(g => userGenres.includes(g)) ? 1 : 0;
+            const bPriority = b.genres.some(g => userGenres.includes(g)) ? 1 : 0;
+            return bPriority - aPriority || Math.random() - 0.5;
+        });
+
+        return { books: prioritizedBooks };
+    } catch (error) {
+        console.error("Error fetching Fiction books:", error);
+        return { books: [] };
     }
+};
 
-    if (error) {
-        return <div>Error: {error.message}</div>;
-    }
-
+const Fiction = ({ onSeeMoreClick }) => {
     return (
-        <div className="uMain-cont">
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold">Fiction</h2>
-                <button className="uSee-more">
-                    See more
-                </button>
-            </div>
-
-            {/* Book Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
-                {paginatedBooks.map((book, index) => (
-                    <a key={index}
-                        href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`}
-                        className="block genCard-cont"
-                    >
-                        <img
-                            src={book.cover || "https://via.placeholder.com/150x200"} // Adjust for cover field
-                            alt={book.title}
-                            className="w-full h-40 object-cover rounded-lg mb-4"
-                        />
-                        <h3 className="text-lg font-semibold mb-2 truncate">{book.title}</h3>
-                        <p className="text-sm text-gray-500 mb-2 truncate">{book.author}</p>
-                        <p className="text-xs text-gray-400 mb-2 truncate">{book.category}</p>
-                        <div className="flex items-center space-x-1">
-                            <span className="text-bright-yellow text-sm">★</span>
-                            <p className=" text-sm">{book.average_rating?.toFixed(2)}</p>
-                        </div>
-                    </a>
-                ))}
-            </div>
-
-            {/* Pagination */}
-            <div className="flex justify-center items-center mt-6 space-x-4">
-                <button
-                    className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                >
-                    Previous Page
-                </button>
-                <span className="text-xs text-arcadia-red">Page {currentPage}</span>
-                <button
-                    className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                >
-                    Next Page
-                </button>
-            </div>
-        </div>
+        <BookCards 
+            title="Fiction" 
+            fetchBooks={fetchFictionBooks} 
+            onSeeMoreClick={() => onSeeMoreClick("Fiction", fetchFictionBooks)} 
+        />
     );
 };
 
