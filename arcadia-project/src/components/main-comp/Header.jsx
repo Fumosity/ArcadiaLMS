@@ -70,6 +70,8 @@ const Header = () => {
                         Manage Account
                       </Link>
                     </li>
+                    
+                    {/* Admin option to go to User Side */}
                     <li>
                       <Link
                         to="/"
@@ -78,6 +80,8 @@ const Header = () => {
                         Go to User side
                       </Link>
                     </li>
+                    {/* End */}
+
                     <li>
                       <button
                         onClick={handleLogout}

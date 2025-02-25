@@ -66,6 +66,7 @@ const UHeader = () => {
                         Manage Account
                       </Link>
                     </li>
+                    {/* Condition if user is admin then user is able to go to Admin side */}
                     <li>
                       {user.userAccountType === "Admin" && (
                         <Link
@@ -76,6 +77,7 @@ const UHeader = () => {
                         </Link>
                       )}
                     </li>
+                    {/* End */}
                     <li>
                       <button
                         onClick={handleLogout}
