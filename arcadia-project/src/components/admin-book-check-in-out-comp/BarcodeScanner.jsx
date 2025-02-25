@@ -1,16 +1,16 @@
 import { useEffect, useRef } from "react";
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from "@zxing/library";
 
-const BarcodeScanner = () => {
+const BarcodeScanner = ({ onScan }) => {
   const videoRef = useRef(null);
   const codeReader = useRef(null);
 
   useEffect(() => {
     codeReader.current = new BrowserMultiFormatReader();
 
-    // Set scanning format to CODE_39
+    // Set scanning format to CODE_128
     const hints = new Map();
-    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_39]);
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_128]);
     codeReader.current.hints = hints;
 
     const startScanner = async () => {
@@ -44,8 +44,8 @@ const BarcodeScanner = () => {
           videoRef.current,
           (result, err) => {
             if (result) {
-              console.log("CODE_39 barcode detected:", result.text);
-              alert(`Scanned CODE_39 barcode: ${result.text}`);
+              console.log("CODE_128 barcode detected:", result.text);
+              onScan(result.text); // Pass scanned data to parent component
             }
             if (err && err.name !== "NotFoundException") {
               console.warn("Scan error:", err);
@@ -64,16 +64,13 @@ const BarcodeScanner = () => {
         codeReader.current.reset();
       }
     };
-  }, []);
+  }, [onScan]);
 
   return (
     <div style={{ position: "relative", width: "100%", textAlign: "center" }}>
-      <h2>CODE_39 Barcode Scanner</h2>
+      <h2>CODE_128 Barcode Scanner</h2>
       <div style={{ position: "relative", display: "inline-block" }}>
-        {/* Video Feed */}
         <video ref={videoRef} autoPlay playsInline style={{ width: "100%", borderRadius: "10px" }}></video>
-
-        {/* Scanning Box Overlay */}
         <div
           style={{
             position: "absolute",

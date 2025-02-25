@@ -8,6 +8,7 @@ const CheckingContainer = () => {
   const [emptyFields, setEmptyFields] = useState({}); // Track empty fields
   const [isDamaged, setIsDamaged] = useState(false); // Track if the book is marked as damaged
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scannedCode, setScannedCode] = useState("");
 
   // Function to get the PC's current local time
   const getLocalTime = () => {
@@ -28,22 +29,37 @@ const CheckingContainer = () => {
   };
 
   const [formData, setFormData] = useState({
-    userID: '',
     schoolNo: '',
     name: '',
     college: '',
     department: '',
-
     bookBarcode: '',
     bookTitle: '',
-    date: '', // Store date in YYYY-MM-DD format
+    date: new Date().toISOString().split("T")[0], // Store date in YYYY-MM-DD format
     time: getLocalTime(), // Set the initial value to the PC's local time
     deadline: '', // Initialize deadline as empty
   });
 
-  const handleBarcodeScan = (barcode) => {
-    setFormData((prev) => ({ ...prev, bookBarcode: barcode }));
+  const formatSchoolNo = (value) => {
+    // Remove non-numeric characters
+    let numericValue = value.replace(/\D/g, "");
+    
+    // Apply the XXXX-X-XXXXX format
+    if (numericValue.length > 4) {
+      numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`;
+    }
+    if (numericValue.length > 6) {
+      numericValue = `${numericValue.slice(0, 6)}-${numericValue.slice(6, 11)}`;
+    }
+    return numericValue;
   };
+
+  const handleBarcodeScan = (barcode) => {
+    console.log(barcode);
+    setFormData((prev) => ({ ...prev, bookBarcode: barcode })); // Directly update bookBarcode
+    setIsScannerOpen(false); // Close scanner after a successful scan
+  };
+  
 
   useEffect(() => {
     if (checkMode === 'Check In') {
@@ -56,19 +72,18 @@ const CheckingContainer = () => {
   }, [checkMode]);
 
   useEffect(() => {
-    if (formData.userID) {
+    if (formData.schoolNo) {
       const fetchUserData = async () => {
         try {
           const { data, error } = await supabase
             .from('user_accounts')
-            .select('userLPUID, userFName, userLName, userCollege, userDepartment')
-            .eq('userID', formData.userID)
+            .select('userFName, userLName, userCollege, userDepartment')
+            .eq('userLPUID', formData.schoolNo)
             .single();
 
           if (error || !data) {
             setFormData((prev) => ({
               ...prev,
-              schoolNo: '',
               name: '',
               college: '',
               department: '',
@@ -76,7 +91,6 @@ const CheckingContainer = () => {
           } else {
             setFormData((prev) => ({
               ...prev,
-              schoolNo: data.userLPUID,
               name: `${data.userFName} ${data.userLName}`,
               college: data.userCollege,
               department: data.userDepartment,
@@ -91,13 +105,12 @@ const CheckingContainer = () => {
     } else {
       setFormData((prev) => ({
         ...prev,
-        schoolNo: '',
         name: '',
         college: '',
         department: '',
       }));
     }
-  }, [formData.userID]);
+  }, [formData.schoolNo]);
 
   const [bookCover, setBookCover] = useState(''); // State for the book cover image URL
 
@@ -373,8 +386,9 @@ const CheckingContainer = () => {
                     <input
                       type={inputType}
                       name={key}
-                      value={value}
+                      value={key === 'bookBarcode' ? formData.bookBarcode : value}
                       onChange={handleInputChange}
+                      placeholder= {key === 'schoolNo' ? "XXXX-X-XXXXX" : ""}
                       className={`px-3 py-1 rounded-full border ${emptyFields[key] ? 'border-arcadia-red' : 'border-grey'} ${key === 'bookBarcode' ? 'w-[calc(3/5*100%)]' : 'w-full'}`} // Input width: 3/5 of 2/3, otherwise w-full
                       required
                     />
