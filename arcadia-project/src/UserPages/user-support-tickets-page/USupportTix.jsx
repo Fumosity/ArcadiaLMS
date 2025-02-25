@@ -1,11 +1,22 @@
+import { useState } from "react"
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import Title from "../../components/main-comp/Title";
 import SupportTixStatus from "../../components/UserComponents/user-support-tix-comp/SupportTixStatus";
 import FileATix from "../../components/UserComponents/user-support-tix-comp/FileATix";
+import TicketDetails from "../../components/UserComponents/user-supportTix-view-comp/TicketDetails";
 
 const USupportTix = () => {
+    const [selectedSupportID, setSelectedSupportID] = useState(null)
+    
+    const handleSupportSelect = (supportID) => {
+      setSelectedSupportID(supportID)
+    }
+  
+    const handleBackToMakeSupport = () => {
+      setSelectedSupportID(null)
+    }
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />
@@ -18,10 +29,14 @@ const USupportTix = () => {
                     <div class="w-full max-w-full">
                         <div class="space-y-8">
                             <div class="flex justify-center">
-                                <SupportTixStatus />
+                            <SupportTixStatus onSupportSelect={handleSupportSelect}/>
                             </div>
                             <div class="flex justify-center">
-                                <FileATix />
+                            {selectedSupportID ? (
+                                    <TicketDetails supportID={selectedSupportID} onBack={handleBackToMakeSupport}/>
+                                ) : (
+                                    <FileATix />
+                                )}
                             </div>
                         </div>
                     </div>

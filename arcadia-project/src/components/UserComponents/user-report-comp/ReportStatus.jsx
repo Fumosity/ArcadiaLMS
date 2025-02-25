@@ -1,56 +1,60 @@
-import React, { useState, useEffect } from "react";
-import { supabase } from "/src/supabaseClient.js";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
-import { useUser } from "../../../backend/UserContext"; // Adjust this path as needed
+"use client"
 
-const ReportStatus = () => {
-  const [reportData, setReportData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { user } = useUser(); // Get logged-in user info
+import { useState, useEffect, useCallback } from "react"
+import { supabase } from "/src/supabaseClient.js"
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
+import { useUser } from "../../../backend/UserContext" // Adjust this path as needed
 
-  const fetchReports = async () => {
+const ReportStatus = ({ onReportSelect }) => {
+  const [reportData, setReportData] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const { user } = useUser() // Get logged-in user info
+
+  const fetchReports = useCallback(async () => {
     if (!user?.userID) {
-      alert("Please log in to view your reports.");
-      setIsLoading(false);
-      return;
+      alert("Please log in to view your reports.")
+      setIsLoading(false)
+      return
     }
 
     try {
-      setIsLoading(true);
+      setIsLoading(true)
       const { data, error } = await supabase
         .from("report_ticket")
         .select("reportID, type, status, subject, date, time")
-        .eq("userID", user.userID); // Filter by user ID
+        .eq("userID", user.userID) // Filter by user ID
 
-      if (error) throw error;
+      if (error) throw error
 
-      setReportData(data || []);
+      setReportData(data || [])
     } catch (error) {
-      console.error("Error fetching reports:", error.message);
+      console.error("Error fetching reports:", error.message)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }, [user?.userID])
 
   // Fetch reports on component mount
   useEffect(() => {
-    fetchReports();
-  }, [user]);
+    fetchReports()
+  }, [fetchReports])
+
+  const handleReportClick = (reportID) => {
+    onReportSelect(reportID)
+  }
 
   return (
     <div className="uHero-cont p-6 bg-white rounded-lg border border-grey">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">User Report Status</h2>
-        <button
-          className="modifyButton"
-          onClick={fetchReports}
-        >
+        <button className="modifyButton" onClick={fetchReports}>
           Refresh
         </button>
       </div>
       <p className="text-sm mb-4">
-        These are all the user reports that you have made. Click on the report ID to view the contents of the report and the ARC's reply.
+        These are all the user reports that you have made. Click on the report ID to view the contents of the report and
+        the ARC's reply.
       </p>
 
       <div className="overflow-x-auto">
@@ -69,24 +73,36 @@ const ReportStatus = () => {
             {isLoading ? (
               [...Array(5)].map((_, index) => (
                 <tr key={index}>
-                  <td><Skeleton height={20} /></td>
-                  <td><Skeleton height={20} /></td>
-                  <td><Skeleton height={20} /></td>
-                  <td><Skeleton height={20} /></td>
-                  <td><Skeleton height={20} /></td>
-                  <td><Skeleton height={20} /></td>
+                  <td>
+                    <Skeleton height={20} />
+                  </td>
+                  <td>
+                    <Skeleton height={20} />
+                  </td>
+                  <td>
+                    <Skeleton height={20} />
+                  </td>
+                  <td>
+                    <Skeleton height={20} />
+                  </td>
+                  <td>
+                    <Skeleton height={20} />
+                  </td>
+                  <td>
+                    <Skeleton height={20} />
+                  </td>
                 </tr>
               ))
             ) : reportData.length > 0 ? (
               reportData.map((report) => (
                 <tr key={report.reportID}>
                   <td className="px-4 py-2 text-sm">
-                    <div className="text-center border rounded-xl text-arcadia-red">
-                      {report.type || "N/A"}
-                    </div>
+                    <div className="text-center border rounded-xl text-arcadia-red">{report.type || "N/A"}</div>
                   </td>
                   <td className="px-4 py-2 text-sm">
-                    <span className={`px-4 py-1 rounded-full text-xs font-semibold ${report.status === "Ongoing" ? "bg-yellow" : report.status === "Resolved" ? "bg-green" : report.status === "Intended" ? "bg-red" : "bg-gray-200"}`}>
+                    <span
+                      className={`px-4 py-1 rounded-full text-xs font-semibold ${report.status === "Ongoing" ? "bg-yellow" : report.status === "Resolved" ? "bg-green" : report.status === "Intended" ? "bg-red" : "bg-gray-200"}`}
+                    >
                       {report.status || "N/A"}
                     </span>
                   </td>
@@ -94,7 +110,7 @@ const ReportStatus = () => {
                   <td className="px-4 py-2 text-sm">{report.date || "N/A"}</td>
                   <td className="px-4 py-2 text-sm">{report.time || "N/A"}</td>
                   <td className="px-4 py-2 text-sm text-red-600 font-medium hover:underline cursor-pointer">
-                    {report.reportID || "N/A"}
+                    <span onClick={() => handleReportClick(report.reportID)}>{report.reportID || "N/A"}</span>
                   </td>
                 </tr>
               ))
@@ -109,7 +125,8 @@ const ReportStatus = () => {
         </table>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ReportStatus;
+export default ReportStatus
+

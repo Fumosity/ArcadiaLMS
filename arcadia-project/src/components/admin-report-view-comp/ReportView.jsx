@@ -1,60 +1,147 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; // to receive state data
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-import { supabase } from "/src/supabaseClient.js";
+"use client"
+
+import { useState, useEffect } from "react"
+import { useLocation } from "react-router-dom"
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
+import { supabase } from "/src/supabaseClient.js"
 
 const ReportView = () => {
-  const { state } = useLocation();
-  const ticket = state?.ticket; // Receive the passed report data
+  const location = useLocation()
+  const ticket = location.state?.ticket
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [reply, setReply] = useState('');
+  const [isLoading, setIsLoading] = useState(true)
+  const [reply, setReply] = useState("")
+  const [selectedStatus, setSelectedStatus] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [userData, setUserData] = useState(null)
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-  }, []);
+    const fetchUserData = async () => {
+      try {
+        // First, get the complete report data including userID
+        if (ticket?.reportID) {
+          const { data: reportData, error: reportError } = await supabase
+            .from("report_ticket")
+            .select(`
+              *,
+              user_accounts:userID (
+                userID,
+                userLPUID,
+                userFName,
+                userLName,
+                userCollege,
+                userDepartment
+              )
+            `)
+            .eq("reportID", ticket.reportID)
+            .single()
 
-  const updateStatus = async (newStatus) => {
-    if (!ticket) return;
-  
-    // Capitalize only the first letter and make the rest lowercase
-    const formattedStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1).toLowerCase();
-  
-    const { data, error } = await supabase
-      .from('report_ticket')
-      .update({ status: formattedStatus })  // Use formattedStatus here
-      .eq('report_id', ticket.report_id);  // Match the ticket by its unique ID
-  
-    if (error) {
-      console.error("Error updating status:", error);
-    } else {
-      console.log("Status updated:", data);
-      alert(`Status updated to ${formattedStatus}`);
+          if (reportError) {
+            console.error("Error fetching report data:", reportError)
+            return
+          }
+
+          if (reportData && reportData.user_accounts) {
+            setUserData(reportData.user_accounts)
+            // Update ticket data with the fresh data
+            setSelectedStatus(reportData.status)
+          }
+        }
+      } catch (error) {
+        console.error("Error in fetchUserData:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  };
+
+    if (ticket) {
+      fetchUserData()
+    } else {
+      setIsLoading(false)
+    }
+  }, [ticket])
+
+  const handleStatusSelect = (status) => {
+    setSelectedStatus(status)
+  }
+
+  const submitReplyAndStatus = async () => {
+    if (!ticket) return
+
+    setIsSubmitting(true)
+
+    const updates = {}
+    if (reply.trim()) {
+      updates.reportReply = reply
+    }
+    if (selectedStatus) {
+      updates.status = selectedStatus
+    }
+
+    if (Object.keys(updates).length === 0) {
+      alert("No changes to submit.")
+      setIsSubmitting(false)
+      return
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("report_ticket")
+        .update(updates)
+        .eq("reportID", ticket.reportID)
+        .select(`
+          *,
+          user_accounts:userID (
+            userID,
+            userLPUID,
+            userFName,
+            userLName,
+            userCollege,
+            userDepartment
+          )
+        `)
+        .single()
+
+      if (error) throw error
+
+      // Update local state with fresh data
+      if (data.user_accounts) {
+        setUserData(data.user_accounts)
+      }
+      setReply("")
+      alert("Update submitted successfully!")
+    } catch (error) {
+      console.error("Error submitting update:", error)
+      alert("Failed to submit update. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const reportFields = [
-    { label: 'User ID*:', value: ticket?.user_id || 'Not Available' },
-    { label: 'School ID No.*:', value: ticket?.school_id || 'Not Available' },
-    { label: 'Name*:', value: ticket?.name || 'Not Available' },
-    { label: 'College*:', value: ticket?.college || 'Not Available' },
-    { label: 'Department*:', value: ticket?.department || 'Not Available' },
-    { label: 'Date and time of report:', value: ticket?.date || 'Not Available' },
-  ];
+    { label: "User ID*:", value: userData?.userID || "Not Available" },
+    { label: "School ID No.*:", value: userData?.userLPUID || "Not Available" },
+    { label: "Name*:", value: userData ? `${userData.userFName} ${userData.userLName}` : "Not Available" },
+    { label: "College*:", value: userData?.userCollege || "Not Available" },
+    { label: "Department*:", value: userData?.userDepartment || "Not Available" },
+    { label: "Date and time of report:", value: ticket?.date || "Not Available" },
+  ]
 
   const responseFields = [
-    { label: 'Type:', value: ticket?.type || 'Not Available' },
-    { label: 'Subject:', value: ticket?.subject || 'Not Available' },
-  ];
+    { label: "Type:", value: ticket?.type || "Not Available" },
+    { label: "Subject:", value: ticket?.subject || "Not Available" },
+  ]
 
   const buttons = [
-    { label: 'Mark as Resolved', status: 'Resolved' },
-    { label: 'Mark as Ongoing', status: 'Ongoing' },
-    { label: 'Mark as Intended', status: 'Intended' },
-  ];
+    { label: "Mark as Resolved", status: "Resolved" },
+    { label: "Mark as Ongoing", status: "Ongoing" },
+    { label: "Mark as Intended", status: "Intended" },
+  ]
+
+  if (!ticket) {
+    return <div className="text-center">No report selected. Please select a report from the list.</div>
+  }
 
   return (
     <section>
@@ -66,11 +153,7 @@ const ReportView = () => {
             <div key={index} className="flex justify-between w-full">
               <label className="text-sm">{field.label}</label>
               <div className="px-2 py-1 border border-grey rounded-md text-sm w-[60%] text-zinc-700">
-                {isLoading ? (
-                  <Skeleton width="100%" height={15} />
-                ) : (
-                  field.value
-                )}
+                {isLoading ? <Skeleton width="100%" height={15} /> : field.value}
               </div>
             </div>
           ))}
@@ -82,17 +165,13 @@ const ReportView = () => {
             <div key={index} className="flex justify-between w-full">
               <label className="text-sm">{field.label}</label>
               <div className="px-2 py-1 border border-grey rounded-md text-sm w-[60%] text-zinc-700">
-                {isLoading ? (
-                  <Skeleton width="100%" height={10} />
-                ) : (
-                  field.value
-                )}
+                {isLoading ? <Skeleton width="100%" height={10} /> : field.value}
               </div>
             </div>
           ))}
           <label className="mt-4 text-sm">Content:</label>
           <div className="p-2 border border-grey rounded-md text-sm text-dark-grey min-h-[100px] mt-2">
-            {isLoading ? <Skeleton count={3} height={20} /> : (ticket?.content || 'No content available')}
+            {isLoading ? <Skeleton count={3} height={20} /> : ticket?.content || "No content available"}
           </div>
         </div>
       </div>
@@ -104,8 +183,10 @@ const ReportView = () => {
           {buttons.map((button, index) => (
             <button
               key={index}
-              className="py-2 px-6 bg-sky-500 rounded-full border"
-              onClick={() => updateStatus(button.status)}
+              className={`py-2 px-6 rounded-full border ${
+                selectedStatus === button.status ? "bg-red text-white" : "bg-dark-gray text-grey"
+              }`}
+              onClick={() => handleStatusSelect(button.status)}
             >
               {button.label}
             </button>
@@ -119,10 +200,18 @@ const ReportView = () => {
             onChange={(e) => setReply(e.target.value)}
             placeholder="Enter your reply here..."
           />
+          <button
+            className="mt-2 py-2 px-6 text-white rounded-full border bg-arcadia-red"
+            onClick={submitReplyAndStatus}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Submitting..." : "Submit Update"}
+          </button>
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default ReportView;
+export default ReportView
+

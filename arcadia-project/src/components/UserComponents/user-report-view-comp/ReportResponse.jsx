@@ -3,31 +3,31 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../../../supabaseClient"
 
-const TicketResponse = ({ supportID }) => {
+const ReportResponse = ({ reportID }) => {
   const [reply, setReply] = useState("")
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const fetchSupportReply = async () => {
+    const fetchReportReply = async () => {
       setIsLoading(true)
       const { data, error } = await supabase
-        .from("support_ticket")
-        .select("supportReply")
-        .eq("supportID", supportID)
+        .from("report_ticket")
+        .select("reportReply")
+        .eq("reportID", reportID)
         .single()
 
       if (error) {
-        console.error("Error fetching support reply:", error)
+        console.error("Error fetching report reply:", error)
       } else {
-        setReply(data.supportReply || "")
+        setReply(data.reportReply || "")
       }
       setIsLoading(false)
     }
 
-    if (supportID) {
-      fetchSupportReply()
+    if (reportID) {
+      fetchReportReply()
     }
-  }, [supportID])
+  }, [reportID])
 
   if (isLoading) {
     return <div>Loading response...</div>
@@ -48,5 +48,5 @@ const TicketResponse = ({ supportID }) => {
   )
 }
 
-export default TicketResponse
+export default ReportResponse
 

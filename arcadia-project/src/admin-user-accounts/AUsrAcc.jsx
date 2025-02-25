@@ -1,14 +1,11 @@
 import React from "react";
-import MainHeader from "../components/main-comp/MainHeader";
 import RcntLibVisit from "../components/admin-user-acc-comp/RcntLibVisit";
 import AccessTable from "../components/admin-home-page-comp/AccessTable";
-import Blacklist from "../components/admin-user-acc-comp/Blacklist";
-import Whitelist from "../components/admin-user-acc-comp/Whitelist";
-import SupportTix from "../components/admin-user-acc-comp/SupportTix";
-import UserReports from "../components/admin-user-acc-comp/UserReports";
 import Title from "../components/main-comp/Title";
 import ListOfAdminAcc from "../components/admin-user-acc-comp/ListOfAdminAcc";
 import ListOfUserAcc from "../components/admin-user-acc-comp/ListOfUserAcc";
+import RecentReports from "../components/admin-user-support-report-view-comp/RecentReports";
+import RecentSupport from "../components/admin-user-support-report-view-comp/RecentSupport";
 
 const AUsrAcc = () => (
 
@@ -29,8 +26,8 @@ const AUsrAcc = () => (
                     {/* Preview section */}
                     <div className="lg:col-span-1 space-y-8">
                             <AccessTable />
-                            <UserReports />
-                            <SupportTix />
+                            <RecentReports />
+                            <RecentSupport />
                     </div>
                 </div>
             </main>
