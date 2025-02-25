@@ -7,11 +7,11 @@ const LibServ = () => {
     const totalPages = Math.ceil(totalEntries / entriesPerPage);
 
     const libserv = [
-        { title: "ARC E-Library", desc: "Connect to the internet to do your own research, create your presentations, or simply learn how to code through our e-library!", more: "Make a Request", img: "https://via.placeholder.com/475x535"},
-        { title: "Electronic Databases", desc: "Expand on your research on related literature through the electronic databases that the ARC is affiliated with!", more: "Try it out", img: "https://via.placeholder.com/475x535"},
-        { title: "Printing Services", desc: "Need a document printed? Our library offers convenient and affordable printing services. Simply bring in your digital file (USB, email, or cloud storage) and we'll print it out for you. We have a variety of paper options and printing sizes to suit your needs.", more: "Make a Request", img: "https://via.placeholder.com/315x535"},
-        { title: "Arcadia Chatbot", desc: "Ask questions, get answers. Our chatbot is here to help you 24/7. Need help finding a book? Want to know our hours? Have a question about your library account? Just ask!", more: "Try it out", img: "https://via.placeholder.com/315x535"},
-        { title: "ARC Café", desc: "Take a break and enjoy a delicious treat. Our cafe offers a variety of snacks and beverages to enjoy while you relax and recharge. From coffee and tea to pastries and sandwiches, there's something for everyone.", more: "Read More", img: "https://via.placeholder.com/315x535"},
+        { title: "ARC E-Library", desc: "Connect to the internet to do your own research, create your presentations, or simply learn how to code through our e-library!", more: "Make a Request", img: "/image/e-lib.png"},
+        { title: "Electronic Databases", desc: "Expand on your research on related literature through the electronic databases that the ARC is affiliated with!", more: "Try it out", img: "/image/e-db.png"},
+        { title: "Printing Services", desc: "Need a document printed? Our library offers convenient and affordable printing services. Simply bring in your digital file (USB, email, or cloud storage) and we'll print it out for you. We have a variety of paper options and printing sizes to suit your needs.", more: "Make a Request", img: "/image/print.png"},
+        { title: "Arcadia Chatbot", desc: "Ask questions, get answers. Our chatbot is here to help you 24/7. Need help finding a book? Want to know our hours? Have a question about your library account? Just ask!", more: "Try it out", img: "/image/chatbot.png"},
+        { title: "ARC Café", desc: "Take a break and enjoy a delicious treat. Our cafe offers a variety of snacks and beverages to enjoy while you relax and recharge. From coffee and tea to pastries and sandwiches, there's something for everyone.", more: "Read More", img: "/image/cafe.png"},
     ];
 
     return (

@@ -1,73 +1,87 @@
-import React from "react";
+import React from 'react';
+import { Link } from "react-router-dom";
 
 const UFooter = () => (
-    <div className="bg-arcadia-black w-full px-8 py-10">
-        <div className="grid grid-cols-2 md:grid-cols-7 gap-8">
-            <div>
-                <h4 className="text-sm font-semibold mb-4 text-white">Library Analytics</h4>
-                <ul className="text-sm text-white space-y-2">
-                    <li>Most Popular Books</li>
-                    <li>Highest Rated Books</li>
-                    <li>Most Popular Theses</li>
-                    <li>Highest Rated Theses</li>
-                </ul>
-            </div>
-            <div>
-                <h4 className="text-sm font-semibold mb-4 text-white">Circulation</h4>
-                <ul className="text-sm text-white space-y-2">
-                    <li>Book Checking</li>
-                    <li>History</li>
-                    <li>Borrowed Books</li>
-                    <li>Returned Books</li>
-                    <li>Overdue Books</li>
-                </ul>
-            </div>
-            <div>
-                <h4 className="text-sm font-semibold mb-4 text-white">Book Management</h4>
-                <ul className="text-sm text-white space-y-2">
-                    <li>Inventory</li>
-                    <li>Add Books</li>
-                    <li>Remove Books</li>
-                    <li>Modify Books</li>
-                    <li>Book Ratings and Reviews</li>
-                    <li>Categories</li>
-                </ul>
-            </div>
-            <div>
-                <h4 className="text-sm font-semibold mb-4 text-white">Research Management</h4>
-                <ul className="text-sm text-white space-y-2">
-                    <li>Inventory</li>
-                    <li>Add Theses</li>
-                    <li>Remove Theses</li>
-                    <li>Modify Theses</li>
-                    <li>Research Ratings</li>
-                </ul>
-            </div>
-            <div>
-                <h4 className="text-sm font-semibold mb-4 text-white">User Accounts</h4>
-                <ul className="text-sm text-white space-y-2">
-                    <li>Accounts List</li>
-                    <li>Library Cards</li>
-                    <li>Whitelist and Blacklist</li>
-                </ul>
-            </div>
-            <div>
-                <h4 className="text-sm font-semibold mb-4 text-white">Support</h4>
-                <ul className="text-sm text-white space-y-2">
-                    <li>User Reports</li>
-                    <li>Support Tickets</li>
-                    <li>Contacts</li>
-                </ul>
-            </div>
-            <div>
-                <h4 className="text-sm font-semibold mb-4 text-white">Reservations</h4>
-                <ul className="text-sm text-white space-y-2">
-                    <li>Reservation History</li>
-                    <li>Room Status</li>
-                </ul>
-            </div>
+  <footer className="bg-arcadia-black w-full px-4 py-10">
+    <div className="container mx-auto max-w-6xl">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-items-center text-center">
+        <div>
+          <h4 className="text-sm font-semibold mb-4 text-white">
+            <Link to="/user/bookmanagement" className="hover:underline">
+              Book Catalog
+            </Link>
+          </h4>
+          <ul className="text-sm text-grey space-y-2">
+            <li>Most Popular Books</li>
+            <li>Highest Rated Books</li>
+            <li>Most Popular Theses</li>
+            <li>Highest Rated Theses</li>
+          </ul>
         </div>
+        <div>
+          <h4 className="text-sm font-semibold mb-4 text-white">
+            <Link to="/user/researchmanagement" className="hover:underline">
+              Research Catalog
+            </Link>
+          </h4>
+          <ul className="text-sm text-grey space-y-2">
+            <li>Book Checking</li>
+            <li>History</li>
+            <li>Borrowed Books</li>
+            <li>Returned Books</li>
+            <li>Overdue Books</li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold mb-4 text-white">
+            <Link to="/user/reservations" className="hover:underline">
+              Reservations
+            </Link>
+          </h4>
+          <ul className="text-sm text-grey space-y-2">
+            <li>Reservation History</li>
+            <li>Room Status</li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold mb-4 text-white">
+            <Link to="/user/services" className="hover:underline">
+              Services
+            </Link>
+          </h4>
+          <ul className="text-sm text-grey space-y-2">
+            <li>Printing</li>
+            <li>Arcadia Chatbot</li>
+            <li>ARC Cafe</li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold mb-4 text-white">
+            <Link to="/user/support" className="hover:underline">
+              Support
+            </Link>
+          </h4>
+          <ul className="text-sm text-grey space-y-2">
+            <li>User Reports</li>
+            <li>Support Tickets</li>
+            <li>Contacts</li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold mb-4 text-white">
+            <Link to="/user/accountview" className="hover:underline">
+              User Account
+            </Link>
+          </h4>
+          <ul className="text-sm text-grey space-y-2">
+            <li>View Account</li>
+            <li>Circulation History</li>
+          </ul>
+        </div>
+      </div>
     </div>
-);
+  </footer>
+)
 
-export default UFooter;
+export default UFooter
+

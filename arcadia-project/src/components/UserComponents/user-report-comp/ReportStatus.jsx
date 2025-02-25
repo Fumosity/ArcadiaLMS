@@ -20,7 +20,7 @@ const ReportStatus = () => {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("report_ticket")
-        .select("report_id, type, status, subject, date, time")
+        .select("reportID, type, status, subject, date, time")
         .eq("userID", user.userID); // Filter by user ID
 
       if (error) throw error;
@@ -79,7 +79,7 @@ const ReportStatus = () => {
               ))
             ) : reportData.length > 0 ? (
               reportData.map((report) => (
-                <tr key={report.report_id}>
+                <tr key={report.reportID}>
                   <td className="px-4 py-2 text-sm">
                     <div className="text-center border rounded-xl text-arcadia-red">
                       {report.type || "N/A"}
@@ -94,7 +94,7 @@ const ReportStatus = () => {
                   <td className="px-4 py-2 text-sm">{report.date || "N/A"}</td>
                   <td className="px-4 py-2 text-sm">{report.time || "N/A"}</td>
                   <td className="px-4 py-2 text-sm text-red-600 font-medium hover:underline cursor-pointer">
-                    {report.report_id || "N/A"}
+                    {report.reportID || "N/A"}
                   </td>
                 </tr>
               ))
