@@ -16,8 +16,8 @@ const ARInventory = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <MainHeader />
       <Title>Research Inventory</Title>
+      <MainHeader />
 
       <div className="flex justify-center items-start space-x-2 pb-12 py-8 px-12">
         <div className="flex-shrink-0 w-3/4">
@@ -30,7 +30,7 @@ const ARInventory = () => {
             </button>
             <button
               className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-              onClick={() => navigate('/admin/researchadding')}
+              onClick={() => navigate('/admin/researchexport')}
             >
               Export Research Inventory
             </button>

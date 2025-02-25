@@ -23,6 +23,8 @@ import ABModify from './admin-book-modify/ABModify';
 import ARModify from './admin-research-modify/ARModify';
 import ASchedule from './admin-schedule-page/ASchedule'
 import ASystemReports from './admin-system-reports-page/ASystemReport.jsx'
+import AGenreMgmt from './admin-genre-mgmt/AGenreMgmt.jsx';
+import ABExport from './admin-book-export/ABExport.jsx';
 
 // User Components
 import UsrRegistration from './UserPages/user-registration-page/UsrRegistration';
@@ -61,6 +63,7 @@ import AdminErrorPage from './AdminErrorPage.jsx';
 import URsrchView from './UserPages/user-rsrch-view-page/URsrchView.jsx';
 import AuthComplete from './UserPages/AuthComplete.jsx';
 import GenrePage from './components/UserComponents/user-genre-cat/GenrePage.jsx';
+import ARExport from './admin-research-export/ARExport.jsx';
 
 function App() {
   return (
@@ -121,7 +124,10 @@ function App() {
               <Route path="abcirculationpage" element={<ABCirculationPage />} />
               <Route path="bookcheckinout" element={<ABChecking />} />
               <Route path="bookadding" element={<ABAdd />} />
+              <Route path="bookexport" element={<ABExport />} />
+              <Route path="genremanagement" element={<AGenreMgmt />} />
               <Route path="researchadding" element={<ARAdd />} />
+              <Route path="researchexport" element={<ARExport />} />
               <Route path="abviewer" element={<ABViewer />} />
               <Route path="arviewer" element={<ARViewer />} />
               <Route path="bookmodify" element={<ABModify />} />

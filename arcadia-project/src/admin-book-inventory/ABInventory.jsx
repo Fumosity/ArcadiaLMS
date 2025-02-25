@@ -15,8 +15,8 @@ const ABInventory = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <MainHeader />
       <Title>Book Inventory</Title>
+      <MainHeader />
 
       <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
         <div className="flex-shrink-0 w-3/4">
@@ -29,13 +29,13 @@ const ABInventory = () => {
             </button>
             <button
               className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-              onClick={() => navigate('/admin/bookadding')} // Navigate to ABAdd on click
+              onClick={() => navigate('/admin/genremanagement')} // Navigate to ABAdd on click
             >
               Genre Management
             </button>
             <button
               className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-              onClick={() => navigate('/admin/bookadding')} // Navigate to ABAdd on click
+              onClick={() => navigate('/admin/bookexport')} // Navigate to ABAdd on click
             >
               Export Book Inventory
             </button>
