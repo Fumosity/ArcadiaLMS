@@ -23,7 +23,7 @@ const UHeader = () => {
     dropdownTimeout = setTimeout(() => setIsDropdownVisible(false), 500);
   };
 
-  
+
 
   return (
     <header className="bg-arcadia-red shadow">
@@ -65,6 +65,16 @@ const UHeader = () => {
                       >
                         Manage Account
                       </Link>
+                    </li>
+                    <li>
+                      {user.userAccountType === "Admin" && (
+                        <Link
+                          to="/admin"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                          Back to Admin side
+                        </Link>
+                      )}
                     </li>
                     <li>
                       <button

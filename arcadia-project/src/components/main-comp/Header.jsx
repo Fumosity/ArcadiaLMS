@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FiUser } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
-import { useUser } from "../../backend/UserContext"; 
+import { useUser } from "../../backend/UserContext";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -68,6 +68,14 @@ const Header = () => {
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       >
                         Manage Account
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        Go to User side
                       </Link>
                     </li>
                     <li>
