@@ -9,9 +9,9 @@ export const checkAndAddBookTitle = async (bookData) => {
 
         const newTitleData = {
             title: bookData.title,
-            author: Array.isArray(bookData.author) ? bookData.author : bookData.author.split(';'),
+            author: Array.isArray(bookData.author) ? bookData.author : bookData.author.split(/[;,]/).map(item => item.trim()).filter(item => item !== ""),
             synopsis: bookData.synopsis,
-            keywords: Array.isArray(bookData.keyword) ? bookData.keyword : bookData.keyword.split(';'),
+            keywords: Array.isArray(bookData.keywords) ? bookData.keywords : bookData.keywords.split(/[;,]/).map(item => item.trim()).filter(item => item !== ""),
             publisher: bookData.publisher,
             currentPubDate: bookData.currentPubDate,
             originalPubDate: bookData.originalPubDate,
@@ -29,13 +29,13 @@ export const checkAndAddBookTitle = async (bookData) => {
         const newTitleID = newTitle.titleID;
         console.log("New titleID:", newTitleID);
 
-        console.log(bookData.genre)
+        console.log(bookData.genres)
 
         // Fetch genre IDs from Supabase based on selected genre names
         const { data: genreData, error: genreFetchError } = await supabase
             .from("genres")
             .select("genreID, genreName")
-            .in("genreName", bookData.genre); // bookData.genre contains ["Horror", "Mystery"]
+            .in("genreName", bookData.genres); // bookData.genre contains ["Horror", "Mystery"]
 
         if (genreFetchError) {
             console.error("Error fetching genre IDs:", genreFetchError);
@@ -45,9 +45,9 @@ export const checkAndAddBookTitle = async (bookData) => {
 
             if (genreData.length > 0) {
                 // Map fetched genre IDs for insertion
-                const genreLinks = genreData.map((genre) => ({
+                const genreLinks = genreData.map((genres) => ({
                     titleID: newTitleID,
-                    genreID: genre.genreID,
+                    genreID: genres.genreID,
                 }));
 
                 // Insert the genre-title links

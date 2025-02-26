@@ -10,7 +10,7 @@ const BarcodeScanner = ({ onScan }) => {
 
     // Set scanning format to CODE_128
     const hints = new Map();
-    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_128]);
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_128, BarcodeFormat.CODE_39, BarcodeFormat.CODE_93]);
     codeReader.current.hints = hints;
 
     const startScanner = async () => {

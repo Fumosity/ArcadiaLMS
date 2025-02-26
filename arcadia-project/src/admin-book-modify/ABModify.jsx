@@ -4,49 +4,63 @@ import MainHeader from "../components/main-comp/MainHeader";
 import Title from "../components/main-comp/Title";
 import BookModify from "../components/admin-book-modify/BookModify";
 import BookCopiesIndiv from "../components/admin-book-modify/BookCopiesIndiv";
+import ABAddPreview from "../components/admin-book-add-comp/ABAddPreview";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const ABModify = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
-  
+
   // Retrieve book details from query params
   const formData = {
     title: queryParams.get("title") || '',
     author: queryParams.get("author") || '',
-    genre: queryParams.get("genre") || '',
+    genres: queryParams.get("genres") || '',
     category: queryParams.get("category") || '',
     publisher: queryParams.get("publisher") || '',
     synopsis: queryParams.get("synopsis") || '',
-    keyword: queryParams.get("keywords") || '',
+    keywords: queryParams.get("keywords") || '',
     currentPubDate: queryParams.get("datePublished") || '',
     originalPubDate: queryParams.get("republished") || '',
     location: queryParams.get("location") || '',
     bookID: queryParams.get("databaseID") || '',
     arcID: queryParams.get("arcID") || '',
     isbn: queryParams.get("isbn") || '',
-    cover: '', // Adjust if cover needs to be passed
+    price: queryParams.get("price") || '',
+    cover: queryParams.get("cover") || '',
+    titleID: queryParams.get("titleID") || '',
   };
+
+  console.log("ABModify", formData)
 
   const [formDataState, setFormData] = useState(formData);
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Main header */}
-      <MainHeader />
-      <Title>Modify Book</Title>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-3 gap-8">
-        <div className="col-span-2 space-y-8">
-            {/* Pass formDataState and setFormData to BookModify */}
-            <BookModify formData={formDataState} setFormData={setFormData} />
-            
+      <Title>Book Modify</Title>
+      <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+        <div className="flex-shrink-0 w-3/4">
+          {/* Main content for adding research */}
+          <div className="flex justify-between w-full gap-2">
+            <button
+              className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+              onClick={() => navigate('/admin/bookmanagement')}
+            >
+              Return to Book Inventory
+            </button>
           </div>
-          <div className="col-span-2 space-y-8">
-            
-            
-          </div>
+          {/* Pass formDataState and setFormData to BookModify */}
+          <BookModify formData={formDataState} setFormData={setFormData} />
+
         </div>
-      </main>
+        <div className="col-span-2 space-y-8">
+
+          <ABAddPreview formData={formDataState} />
+        </div>
+      </div>
     </div>
   );
 };

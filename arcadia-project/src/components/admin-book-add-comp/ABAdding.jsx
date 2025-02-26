@@ -72,7 +72,7 @@ const ABAdding = ({ formData, setFormData }) => {
   const handleCategoryChange = (category) => {
     setCategoryFilter(category);
     setSelectedGenres([]); // Reset genres when category changes
-    setFormData((prev) => ({ ...prev, category, genre: [] }));
+    setFormData((prev) => ({ ...prev, category, genres: [] }));
   };
 
   const toggleGenre = (genreID) => {
@@ -83,10 +83,10 @@ const ABAdding = ({ formData, setFormData }) => {
 
       // Update formData with selected genre names
       const selectedGenreNames = genres
-        .filter((genre) => newSelection.includes(genre.genreID))
-        .map((genre) => genre.genreName);
+        .filter((genres) => newSelection.includes(genres.genreID))
+        .map((genres) => genres.genreName);
 
-      setFormData((prev) => ({ ...prev, genre: selectedGenreNames }));
+      setFormData((prev) => ({ ...prev, genres: selectedGenreNames }));
       return newSelection;
     });
   };
@@ -99,8 +99,8 @@ const ABAdding = ({ formData, setFormData }) => {
     console.log("Selected genres:", selectedGenres);
 
     const selectedGenreNames = genres
-      .filter((genre) => selectedGenres.includes(genre.genreID))
-      .map((genre) => genre.genreName);
+      .filter((genres) => selectedGenres.includes(genres.genreID))
+      .map((genres) => genres.genreName);
 
     console.log("Selected genre names:", selectedGenreNames);
     //onContinue(selectedGenres);
@@ -108,7 +108,7 @@ const ABAdding = ({ formData, setFormData }) => {
 
   // Filter genres based on the selected category
   const filteredGenres = categoryFilter
-    ? genres.filter((genre) => genre.category === categoryFilter)
+    ? genres.filter((genres) => genres.category === categoryFilter)
     : genres;
 
   const errorStyle = {
@@ -140,8 +140,7 @@ const ABAdding = ({ formData, setFormData }) => {
 
     if (Object.keys(newValidationErrors).length > 0) {
       setValidationErrors(newValidationErrors);  // This ensures re-render with red borders
-      console.log(newValidationErrors)
-      console.log("something is wrong here")
+      console.log("something is wrong here at", newValidationErrors)
       return;
     }
 
@@ -153,11 +152,11 @@ const ABAdding = ({ formData, setFormData }) => {
     setFormData({
       title: '',
       author: [],
-      genre: [],
+      genres: [],
       category: [],
       publisher: '',
       synopsis: '',
-      keyword: [],
+      keywords: [],
       currentPubDate: '',
       originalPubDate: '',
       procurementDate: '',
@@ -189,30 +188,23 @@ const ABAdding = ({ formData, setFormData }) => {
   //Form
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="flex justify-center items-start p-8">
-        <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-4xl flex">
+      <div className="bg-white border border-grey rounded-lg p-4 w-full h-fit">
+        <h2 className="text-2xl font-semibold mb-4">Book Adding</h2>
+        <div className='flex'>
           {/* Left Side: Form Section */}
-          <div className="w-3/4">
-            {/* Title */}
-            <h2 className="text-3xl font-bold mb-4">Book Adding</h2>
+          <div className="w-2/3">
             <p className="text-gray-600 mb-8">
-              Data points marked with an asterisk (*) are autofilled. Use a semicolon to add multiple authors.
+            Data points marked with an asterisk (*) are autofilled. Use a semicolon (;) or comma (,) to add multiple authors and keywords.
             </p>
 
-            {/* Upload Section */}
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <p>Upload book pages to autofill.</p>
-                <p className="text-gray-500">Accepted formats: (*.pdf, *.png, *.jpeg)</p>
-              </div>
-            </div>
+            <h3 className="text-xl font-semibold my-2">Book Title Information</h3>
 
             {/* Form Section */}
-            <form className="space-y-6">
+            <form className="space-y-2">
               <div className="flex justify-between items-center" key="title">
                 <label className="w-1/4">Title:</label>
                 <input type="text" name="title" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.title}
                   onChange={handleChange}
                   style={validationErrors.title ? errorStyle : {}}
@@ -221,7 +213,7 @@ const ABAdding = ({ formData, setFormData }) => {
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Authors:</label>
                 <input type="text" name="author" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.author}
                   onChange={handleChange}
                   style={validationErrors.author ? errorStyle : {}}
@@ -239,7 +231,7 @@ const ABAdding = ({ formData, setFormData }) => {
                         e.preventDefault();
                         handleCategoryChange(category);
                       }}
-                      className={`px-6 py-2 rounded-full w-full text-sm transition-colors ${categoryFilter === category ? "bg-arcadia-red border-arcadia-red border text-white"
+                      className={`px-4 py-1 rounded-full w-full text-sm transition-colors ${categoryFilter === category ? "bg-arcadia-red border-arcadia-red border text-white"
                         : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
                         }`}
                     >
@@ -250,42 +242,42 @@ const ABAdding = ({ formData, setFormData }) => {
               </div>
 
               <div className="flex justify-between items-center">
-                <label className="w-1/4">Genre:</label>
+                <label className="w-1/4">Genres:</label>
 
                 {loading ? (
                   <p>Loading genres...</p>
                 ) : (
                   <div className="flex flex-wrap gap-2 w-2/3">
                     {genres
-                      .filter((genre) => genre.category === categoryFilter)
-                      .map((genre) => (
+                      .filter((genres) => genres.category === categoryFilter)
+                      .map((genres) => (
                         <button
-                          key={genre.genreID}
+                          key={genres.genreID}
                           onClick={(e) => {
                             e.preventDefault();
-                            toggleGenre(genre.genreID);
+                            toggleGenre(genres.genreID);
                           }}
-                          className={`px-4 py-2 rounded-full text-sm transition-colors ${selectedGenres.includes(genre.genreID) ? "bg-arcadia-red border-arcadia-red border text-white"
+                          className={`px-4 py-1 rounded-full text-sm transition-colors ${selectedGenres.includes(genres.genreID) ? "bg-arcadia-red border-arcadia-red border text-white"
                             : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
                             }`}
                         >
-                          {genre.genreName}
+                          {genres.genreName}
                         </button>
                       ))}
                   </div>
                 )}
-                <input type="text" name="genre" required
+                <input type="text" name="genres" required
                   className="input-field w-2/3 p-2 border hidden"
-                  value={formData.genre}
+                  value={formData.genres}
                   onChange={handleChange}
-                  style={validationErrors.genre ? errorStyle : {}}
+                  style={validationErrors.genres ? errorStyle : {}}
                 />
               </div>
 
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Publisher:</label>
                 <input type="text" name="publisher" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.publisher}
                   onChange={handleChange}
                   style={validationErrors.publisher ? errorStyle : {}}
@@ -294,7 +286,7 @@ const ABAdding = ({ formData, setFormData }) => {
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Synopsis:</label>
                 <textarea name="synopsis" required
-                  className="input-field w-2/3 p-2 border min-h-24"
+                  className="w-2/3 px-3 py-1 rounded-2xl border border-grey min-h-24"
                   rows="3"
                   value={formData.synopsis}
                   onChange={handleChange}
@@ -303,26 +295,26 @@ const ABAdding = ({ formData, setFormData }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
-                <input type="text" name="keyword" required
-                  className="input-field w-2/3 p-2 border"
-                  value={formData.keyword}
+                <input type="text" name="keywords" required
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                  value={formData.keywords}
                   onChange={handleChange}
-                  style={validationErrors.keyword ? errorStyle : {}}
+                  style={validationErrors.keywords ? errorStyle : {}}
                 />
               </div>
               <div className="flex justify-between items-center">
-                <label className="w-1/4">Date Published (Current):</label>
+                <label className="w-1/4">Current Pub. Date:</label>
                 <input type="date" name="currentPubDate" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.currentPubDate}
                   onChange={handleChange}
                   style={validationErrors.currentPubDate ? errorStyle : {}}
                 />
               </div>
               <div className="flex justify-between items-center">
-                <label className="w-1/4">Date Published (Original):</label>
+                <label className="w-1/4">Original Pub. Date:</label>
                 <input type="date" name="originalPubDate" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.originalPubDate}
                   onChange={handleChange}
                   style={validationErrors.originalPubDate ? errorStyle : {}}
@@ -332,7 +324,7 @@ const ABAdding = ({ formData, setFormData }) => {
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
                 <input type="text" name="location" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.location}
                   onChange={handleChange}
                   style={validationErrors.location ? errorStyle : {}}
@@ -342,17 +334,17 @@ const ABAdding = ({ formData, setFormData }) => {
               <div className="justify-between items-center hidden">
                 <label className="w-1/4">Database ID*:</label>
                 <input type="text" name="bookID" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.bookID}
                   onChange={handleChange}
                   style={validationErrors.bookID ? errorStyle : {}}
                 />
               </div>
-              
+
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Title ARC ID:</label>
                 <input type="text" name="titleARCID" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.titleARCID}
                   onChange={handleChange}
                   style={validationErrors.titleARCID ? errorStyle : {}}
@@ -361,7 +353,7 @@ const ABAdding = ({ formData, setFormData }) => {
               <div className="flex justify-between items-center">
                 <label className="w-1/4">ISBN:</label>
                 <input type="text" name="isbn" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.isbn}
                   onChange={handleChange}
                   style={validationErrors.isbn ? errorStyle : {}}
@@ -370,26 +362,19 @@ const ABAdding = ({ formData, setFormData }) => {
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Price:</label>
                 <input type="number" name="price" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.price}
                   onChange={handleChange}
                   style={validationErrors.price ? errorStyle : {}}
                 />
               </div>
-              <div>Book information of first instance:</div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Date Procured:</label>
-                <input type="date" name="procurementDate" required
-                  className="input-field w-2/3 p-2 border"
-                  value={formData.procurementDate}
-                  onChange={handleChange}
-                  style={validationErrors.procurementDate ? errorStyle : {}}
-                />
-              </div>
+
+              <h3 className="text-xl font-semibold py-2">Book Information of First Copy</h3>
+              
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Call No.:</label>
                 <input type="text" name="bookARCID" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.bookARCID}
                   onChange={handleChange}
                   style={validationErrors.bookARCID ? errorStyle : {}}
@@ -398,36 +383,47 @@ const ABAdding = ({ formData, setFormData }) => {
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Barcode:</label>
                 <input type="text" name="bookBarcode" required
-                  className="input-field w-2/3 p-2 border"
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.bookBarcode}
                   onChange={handleChange}
                   style={validationErrors.bookBarcode ? errorStyle : {}}
                 />
               </div>
-
+              <div className="flex justify-between items-center">
+                <label className="w-1/4">Date Procured:</label>
+                <input type="date" name="procurementDate" required
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                  value={formData.procurementDate}
+                  onChange={handleChange}
+                  style={validationErrors.procurementDate ? errorStyle : {}}
+                />
+              </div>
             </form>
 
-            {/* Add Book Button */}
-            <div className="flex justify-center mt-8">
-              <button type="button" onClick={handleSubmit} className="add-research-btn py-2 px-8 border-gray-400 rounded-2xl">
-                {isSubmitting ? "Submitting..." : "Add Book"}
-              </button>
-            </div>
           </div>
 
           {/* Right Side: Book Cover Placeholder */}
-          <div className="w-60 ml-8 mt-72">
-            <p className="font-bold text-lg mb-2">Book Cover*</p>
-            <div className="relative bg-gray-100 p-4 h-50 border rounded-lg" onClick={handleDivClick}>
+          <div className="flex flex-col items-center px-2 w-1/3">
+            <label className="text-md mb-2">Book Cover:</label>
+            <div className="w-full h-fit flex justify-center">
+            <div className="border border-grey p-4 w-fit rounded-lg  hover:bg-light-gray transition" onClick={handleDivClick}>
               <img
                 src={formData.cover || '/image/book_research_placeholder.png'}
                 alt="Book cover placeholder"
-                className="h-full w-full object-contain mb-2"
+                className="h-[375px] w-[225px] object-cover rounded-lg border border-grey"
               />
-              <p className="text-xs text-gray-500 text-center">Click to change book cover</p>
             </div>
+            </div>
+            <p className="text-sm text-gray-500 text-center m-2">Click to change book cover</p>
+
             <input type="file" ref={fileInputRef} required className="hidden" onChange={uploadCover} accept="image/png, image/jpeg, image/jpg" />
           </div>
+        </div>
+        {/* Add Book Button */}
+        <div className="flex justify-center mt-8">
+          <button type="button" onClick={handleSubmit} className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition">
+            {isSubmitting ? "Submitting..." : "Add Book"}
+          </button>
         </div>
       </div>
     </div>

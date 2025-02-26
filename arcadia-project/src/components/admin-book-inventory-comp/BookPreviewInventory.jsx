@@ -59,21 +59,25 @@ const BookPreviewInventory = ({ book }) => {
 
   const bookDetails = {
     title: book.title,
-    author: book.author,
-    genre: book.genre,
+    author: Array.isArray(book.author) ? book.author.join(', ') : (book.author ?? '').split(';').join(',') || '',
+    genres: Array.isArray(book.genres) ? book.genres.join(', ') : (book.genres ?? '').split(';').join(',') || '',
     category: book.category,
     publisher: book.publisher,
     synopsis: book.synopsis,
-    keywords: book.keyword,
+    keywords: Array.isArray(book.keywords) ? book.keywords.join(', ') : (book.keywords ?? '').split(';').join(',') || '',
     datePublished: book.originalPubDate,
     republished: book.currentPubDate,
     quantity: book.quantity,
-    procurementDate: book.procDate,
+    cover: book.cover,
+    location: book.location,
+    isbn: book.isbn,
+    price: book.price,
+    titleID: book.titleID
   };
 
   // Create a function to handle navigation
   const handleModifyBook = () => {
-    console.log("Title ID in BookPreviewInventory:", bookDetails.titleID);
+    console.log("Title in BookPreviewInventory:", bookDetails.title);
     const queryParams = new URLSearchParams(bookDetails).toString();
     navigate(`/admin/bookmodify?${queryParams}`);
   };
@@ -96,21 +100,24 @@ const BookPreviewInventory = ({ book }) => {
       </div>
 
       <div className="bg-white p-4 rounded-lg border-grey border w-full">
-        <h3 className="text-2xl font-semibold mb-2">About</h3>
-        <div className="relative bg-white p-2 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
-          <img src={book.cover || "image/bkfrontpg.png"} alt="Book cover" className="h-[475px] w-full rounded-lg" />
+        <h3 className="text-2xl font-semibold mb-2">Book Preview</h3>
+        <div className="w-full h-fit flex justify-center">
+          <div className="relative bg-white p-4 w-fit rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md border border-grey">
+            <img src={book.cover || "image/bkfrontpg.png"} alt="Book cover" className="h-[475px] w-[300px] rounded-lg border border-grey object-cover" />
+          </div>
         </div>
-
         <table className="w-full border-collapse">
           <tbody>
-            {Object.entries(bookDetails).map(([key, value], index) => (
-              <tr key={index} className="border-b border-grey">
-                <td className="px-1 py-1 font-semibold capitalize">
-                  {key.replace(/([A-Z])/g, ' $1')}:
-                </td>
-                <td className="px-1 py-1 text-sm">{value}</td>
-              </tr>
-            ))}
+            {Object.entries(bookDetails)
+              .filter(([key]) => !["cover", "quantity", "titleID"].includes(key)) // Exclude multiple keys
+              .map(([key, value], index) => (
+                <tr key={index} className="border-b border-grey">
+                  <td className="px-1 py-1 font-semibold capitalize">
+                    {key.replace(/([A-Z])/g, " $1")}:
+                  </td>
+                  <td className="px-1 py-1 text-sm">{value}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

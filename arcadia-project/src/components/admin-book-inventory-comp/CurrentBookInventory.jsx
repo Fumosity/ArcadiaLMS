@@ -20,7 +20,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
             try {
                 const { data: bookTitles, error: titleError } = await supabase
                     .from("book_titles")
-                    .select("titleID, title, author, synopsis, keywords, publisher, currentPubDate, originalPubDate, procurementDate, cover, arcID");
+                    .select("*");
 
                 if (titleError) {
                     console.error("Error fetching book titles:", titleError.message);
@@ -127,7 +127,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
             return formattedAuthors.join(", ");
         } else {
             const etAlCount = authors.length - 2;
-            return `${formattedAuthors[0]}, ${formattedAuthors[1]}, et al (${etAlCount} more)`;
+            return `${formattedAuthors[0]}, ${formattedAuthors[1]}, ...`;
         }
     };
 
@@ -167,7 +167,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 <div className="flex items-center space-x-2">
                     <span className="font-medium">Filter By:</span>
                     <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Category</button>
-                    <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Genre</button>
+                    <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Genres</button>
                     <button className="bg-gray-200 py-1 px-3 rounded-full text-sm">Copies</button>
                 </div>
             </div>
@@ -216,7 +216,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                             ))
                         ) : (
                             uniqueBooks.map((item, index) => {
-                                const genres = Array.isArray(item.genre) ? item.genre : (typeof item.genre === "string" ? item.genre.split(";") : []);
+                                const genres = Array.isArray(item.genres) ? item.genres : (typeof item.genres === "string" ? item.genres.split(";") : []);
 
                                 return (
                                     <tr
@@ -249,9 +249,9 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                                             </div>
                                             {hoveredGenreIndex === index && item.genres.length > 1 && (
                                                 <div className="flex-col justify-center mt-1 transition-opacity duration-300 ease-in-out opacity-100 w-full">
-                                                    {item.genres.slice(1).map((genre, i) => (
+                                                    {item.genres.slice(1).map((genres, i) => (
                                                         <div key={i} className="bookinv-genre rounded-full font-medium px-2 py-1 mt-1 text-sm w-fit break-words">
-                                                            {genre}
+                                                            {genres}
                                                         </div>
                                                     ))}
                                                 </div>

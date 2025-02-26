@@ -43,7 +43,7 @@ const CheckingContainer = () => {
   const formatSchoolNo = (value) => {
     // Remove non-numeric characters
     let numericValue = value.replace(/\D/g, "");
-    
+
     // Apply the XXXX-X-XXXXX format
     if (numericValue.length > 4) {
       numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`;
@@ -59,7 +59,7 @@ const CheckingContainer = () => {
     setFormData((prev) => ({ ...prev, bookBarcode: barcode })); // Directly update bookBarcode
     setIsScannerOpen(false); // Close scanner after a successful scan
   };
-  
+
 
   useEffect(() => {
     if (checkMode === 'Check In') {
@@ -314,7 +314,7 @@ const CheckingContainer = () => {
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
-      <h3 className="text-2xl font-bold mb-4">Checking</h3>
+      <h3 className="text-2xl font-semibold mb-4">Book Checking</h3>
 
       <div className='flex'>
         <div className='flex-col w-2/3'>
@@ -388,22 +388,22 @@ const CheckingContainer = () => {
                       name={key}
                       value={key === 'bookBarcode' ? formData.bookBarcode : value}
                       onChange={handleInputChange}
-                      placeholder= {key === 'schoolNo' ? "XXXX-X-XXXXX" : ""}
+                      placeholder={key === 'schoolNo' ? "XXXX-X-XXXXX" : ""}
                       className={`px-3 py-1 rounded-full border ${emptyFields[key] ? 'border-arcadia-red' : 'border-grey'} ${key === 'bookBarcode' ? 'w-[calc(3/5*100%)]' : 'w-full'}`} // Input width: 3/5 of 2/3, otherwise w-full
                       required
                     />
-                    {afterInput}               
+                    {afterInput}
                   </div>
                 </div>
               );
             })}
           </div>
           {isScannerOpen && (
-                      <BarcodeScanner
-                        onScan={handleBarcodeScan}
-                        onClose={() => setIsScannerOpen(false)}
-                      />
-                    )}
+            <BarcodeScanner
+              onScan={handleBarcodeScan}
+              onClose={() => setIsScannerOpen(false)}
+            />
+          )}
           <div className="w-full flex justify-end"> {/* Add flex and justify-end */}
             {checkMode === 'Check In' && (
               <label className="flex items-center">
@@ -433,10 +433,10 @@ const CheckingContainer = () => {
         </div>
       </div>
 
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center m-4">
         <button
           onClick={handleSubmit}
-          className="border px-4 py-2 rounded-full"
+          className="add-book w-1/4 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Submitting...' : 'Submit'}
