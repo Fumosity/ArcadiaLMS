@@ -104,18 +104,18 @@ const LibBookCirc = () => {
   const formatTransactionData = (data) => {
     const today = new Date();
     return data.map((item) => {
-      const dueDate = new Date(item.checkout_date); // Assuming checkout_date is the due date
-      const returnDate = new Date(item.checkin_date || item.checkout_date);
+      const dueDate = new Date(item.checkoutDate); // Assuming checkoutDate is the due date
+      const returnDate = new Date(item.checkinDate || item.checkoutDate);
       const isOverdue = returnDate > dueDate;
   
       return {
-        type: item.transaction_type,
-        date: item.checkin_date || item.checkout_date,
-        time: item.checkin_time || item.checkout_time,
+        type: item.transactionType,
+        date: item.checkinDate || item.checkoutDate,
+        time: item.checkinTime || item.checkoutTime,
         borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
         bookTitle: item.book_indiv?.book_titles?.title || '',
         bookId: item.bookID,
-        overdue: isOverdue && item.transaction_type === "Borrowed",
+        overdue: isOverdue && item.transactionType === "Borrowed",
       };
     });
   };
@@ -125,18 +125,18 @@ const LibBookCirc = () => {
       try {
         const { data, error } = await supabase
           .from('book_transactions')
-          .select(`transaction_type, checkin_date, checkin_time, checkout_date, checkout_time, userID, bookID, book_indiv(book_titles(title, price)), user_accounts(userFName, userLName, userLPUID)`);
+          .select(`transactionType, checkinDate, checkinTime, checkoutDate, checkoutTime, userID, bookID, book_indiv(book_titles(title, price)), user_accounts(userFName, userLName, userLPUID)`);
 
         if (error) {
           console.error("Error fetching data: ", error.message);
         } else {
           const formattedData = data.map(item => {
-            const date = item.checkin_date || item.checkout_date;
-            const time = item.checkin_time || item.checkout_time;
+            const date = item.checkinDate || item.checkoutDate;
+            const time = item.checkinTime || item.checkoutTime;
             const formattedTime = time ? new Date(`1970-01-01T${time}`).toLocaleString('en-PH', { hour: 'numeric', minute: 'numeric', hour12: true }) : '';
 
             return {
-              type: item.transaction_type,
+              type: item.transactionType,
               date,
               time: formattedTime,
               borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
