@@ -34,6 +34,20 @@
     border-radius: 50px;
   }
 
+  /* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Slim scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #d4d4d4; /* Dark grey */
+  border-radius: 10px; /* Rounded shape */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Hide track */
+}
+
   .input-field {
     padding: 0.5rem;
     border: 1px solid #cbd5e0;

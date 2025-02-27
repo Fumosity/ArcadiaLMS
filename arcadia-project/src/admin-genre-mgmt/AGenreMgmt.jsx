@@ -14,11 +14,11 @@ export default function AGenreMgmt() {
       };
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="bg-gray-100">
             <Title>Genre Management</Title>
             <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
                 <div className="flex-shrink-0 w-2/4">
-                    <div className="flex justify-between w-full gap-2">
+                    <div className="flex justify-between w-full gap-2 h-fit">
                         <button
                             className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
                             onClick={() => navigate('/admin/bookmanagement')}
@@ -32,7 +32,7 @@ export default function AGenreMgmt() {
                             Add a Genre
                         </button>
                     </div>
-                    <div className="flex justify-between w-full gap-2">
+                    <div className="flex justify-between w-full gap-2 h-full">
                         <FictionList onGenreSelect={handleGenreSelect} />
                         <NonFictionList onGenreSelect={handleGenreSelect} />
                     </div>

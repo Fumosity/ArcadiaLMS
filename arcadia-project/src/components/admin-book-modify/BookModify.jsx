@@ -33,7 +33,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       price: params.get("price") || "",
       titleID: params.get("titleID") || null,
     };
-  
+
     setFormData(initialFormData);
     setCategoryFilter(initialFormData.category || null);
   }, [location.search, setFormData]);
@@ -75,12 +75,12 @@ const BookModify = ({ formData, setFormData, onSave }) => {
         console.error("Error fetching genres:", error);
       } else {
         setGenres(data);
-  
+
         // Map the genre names from formData to their corresponding genreIDs
         const selectedGenreIDs = data
           .filter((genre) => formData.genres.includes(genre.genreName))
           .map((genre) => genre.genreID);
-  
+
         setSelectedGenres(selectedGenreIDs);
       }
       setLoading(false);
@@ -142,72 +142,65 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       console.error("Invalid form data or missing titleID");
       return;
     }
-  
-    const { titleID, genres: selectedGenreNames, ...rest } = formData;
-  
-    // Convert `keywords` into an array for JSONB storage
-  const processKeywords = (keywords) => {
-    if (!keywords) return [];
-    return Array.isArray(keywords)
-      ? keywords.map((k) => k.trim()).filter((k) => k !== "")
-      : keywords.split(/[,;]+/).map((k) => k.trim()).filter((k) => k !== "");
-  };
 
-  const processAuthor = (author) => {
-    if (!author) return [];
-    return Array.isArray(author)
-      ? author.map((k) => k.trim()).filter((k) => k !== "")
-      : author.split(/[,;]+/).map((k) => k.trim()).filter((k) => k !== "");
-  };
-  
+    const { titleID, genres: selectedGenreNames, ...rest } = formData;
+
+    // Convert `keywords` into an array for JSONB storage
+    const processKeywords = (keywords) => {
+      if (!keywords) return [];
+      return Array.isArray(keywords)
+        ? keywords.map((k) => k.trim()).filter((k) => k !== "")
+        : keywords.split(/[,;]+/).map((k) => k.trim()).filter((k) => k !== "");
+    };
+
     // Convert array/string values properly (excluding category since it's derived from genres)
     const updateData = Object.fromEntries(
       Object.entries(rest)
-      .filter(([key]) => key !== 'category')
-      .map(([key, value]) => {
-        if (key === "keywords") {
-          return [key, processKeywords(value)]; // Store as JSONB array
-        }
-        if (key === "author") {
-          return [key, processKeywords(value)]; // Store as JSONB array
-        }
-        return [key, value];
-      })
+        .filter(([key]) => key !== 'category')
+        .map(([key, value]) => {
+          if (key === "keywords") {
+            return [key, processKeywords(value)]; // Store as JSONB array
+          }
+          if (key === "author") {
+            return [key, processKeywords(value)]; // Store as JSONB array
+          }
+          return [key, value];
+        })
     );
-  
+
     // 🔹 Step 1: Fetch genreIDs for selected genreNames
     if (!selectedGenreNames || selectedGenreNames.length === 0) {
       console.error("No genres selected.");
       return;
     }
-  
+
     const { data: genreData, error: genreError } = await supabase
       .from("genres")
       .select("genreID, genreName, category")
       .in("genreName", selectedGenreNames);
-  
+
     if (genreError) {
       console.error("Error fetching genre IDs:", genreError);
       return;
     }
-  
+
     // Extract genreIDs and determine new category
     const newGenreIDs = genreData.map((g) => g.genreID);
     const newCategory = genreData.length > 0 ? genreData[0].category : null;
-  
+
     // 🔹 Step 2: Fetch current genres linked to the book
     const { data: currentGenres, error: currentGenresError } = await supabase
       .from("book_genre_link")
       .select("genreID")
       .eq("titleID", titleID);
-  
+
     if (currentGenresError) {
       console.error("Error fetching current genres:", currentGenresError);
       return;
     }
-  
+
     const currentGenreIDs = currentGenres.map((g) => g.genreID);
-  
+
     // 🔹 Step 3: Check if category has changed
     let currentCategory = null;
     if (currentGenreIDs.length > 0) {
@@ -216,84 +209,84 @@ const BookModify = ({ formData, setFormData, onSave }) => {
         .select("category")
         .in("genreID", currentGenreIDs)
         .limit(1);
-  
+
       if (currentGenreError) {
         console.error("Error fetching current category:", currentGenreError);
         return;
       }
-  
+
       currentCategory = currentGenreData?.[0]?.category || null;
     }
-  
+
     // 🔹 Step 4: Remove old genres if switching categories
     if (currentCategory && newCategory && currentCategory !== newCategory) {
       const { error: deleteError } = await supabase
         .from("book_genre_link")
         .delete()
         .eq("titleID", titleID);
-  
+
       if (deleteError) {
         console.error("Error removing old genres:", deleteError);
         return;
       }
     }
-  
+
     // 🔹 Step 5: Insert new genres only if they have changed
     const genreChanges = new Set([...currentGenreIDs, ...newGenreIDs]);
-  
+
     if (genreChanges.size !== currentGenreIDs.length) {
       // Remove old genres before inserting new ones
       const { error: deleteOldGenresError } = await supabase
         .from("book_genre_link")
         .delete()
         .eq("titleID", titleID);
-  
+
       if (deleteOldGenresError) {
         console.error("Error removing old genres:", deleteOldGenresError);
         return;
       }
-  
+
       // Insert new genres
       if (newGenreIDs.length > 0) {
         const newGenreLinks = newGenreIDs.map((genreID) => ({
           titleID,
           genreID,
         }));
-  
+
         const { error: insertGenresError } = await supabase
           .from("book_genre_link")
           .insert(newGenreLinks);
-  
+
         if (insertGenresError) {
           console.error("Error inserting new genres:", insertGenresError);
           return;
         }
       }
     }
-  
 
-    console.log("updateData",updateData)
+
+    console.log("updateData", updateData)
 
     // 🔹 Step 6: Update book details (EXCLUDING `category`)
     const { data: updateBook, error: updateError } = await supabase
       .from("book_titles")
       .update(updateData)
       .eq("titleID", titleID);
-  
+
     if (updateError) {
       console.error("Error updating book:", updateError);
       return;
     }
-  
+
     console.log("Book updated successfully:", updateBook);
-  
+
     // 🔹 Step 7: Trigger onSave callback if provided
     if (onSave) {
       await onSave(formData);
     }
   };
-  
-  
+
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="bg-white border border-grey rounded-lg p-4 w-full h-fit">
@@ -481,7 +474,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
           </div>
         </div>
         <div className="flex justify-center mt-8 gap-2">
-        <button
+          <button
             type="button"
             onClick={handleReset}
             className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"

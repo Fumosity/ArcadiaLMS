@@ -25,7 +25,7 @@ import ASchedule from './admin-schedule-page/ASchedule'
 import ASystemReports from './admin-system-reports-page/ASystemReport.jsx'
 import AGenreMgmt from './admin-genre-mgmt/AGenreMgmt.jsx';
 import AGAdd from './admin-genre-add/AGAdd.jsx';
-import AGenreModify from './admin-genre-modify/AGenreModify.jsx';
+import AGModify from './admin-genre-modify/AGModify.jsx';
 import ABExport from './admin-book-export/ABExport.jsx';
 
 // User Components
@@ -129,7 +129,7 @@ function App() {
               <Route path="bookexport" element={<ABExport />} />
               <Route path="genremanagement" element={<AGenreMgmt />} />
               <Route path="genreadding" element={<AGAdd />} />
-              <Route path="genremodify" element={<AGenreModify />} />
+              <Route path="genremodify" element={<AGModify />} />
               <Route path="researchadding" element={<ARAdd />} />
               <Route path="researchexport" element={<ARExport />} />
               <Route path="abviewer" element={<ABViewer />} />

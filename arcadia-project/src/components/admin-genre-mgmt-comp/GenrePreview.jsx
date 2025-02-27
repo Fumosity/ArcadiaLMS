@@ -50,9 +50,11 @@ const GenrePreview = ({ genre }) => {
     }
 
     const genreDetails = {
+        genreID: genre.genreID,
         genre: genre.genreName,
         category: genre.category,
         description: genre.description,
+        img: genre.img,
     };
 
     // Create a function to handle navigation
@@ -80,7 +82,7 @@ const GenrePreview = ({ genre }) => {
             </div>
 
             <div className="bg-white p-4 rounded-lg border-grey border w-full">
-                <h3 className="text-2xl font-semibold mb-2">Genre Preview</h3>
+                <h3 className="text-2xl font-semibold mb-4">Genre Preview</h3>
                 <div className="w-full h-fit flex justify-center">
                     <div className="border border-grey p-4 w-full rounded-lg  hover:bg-light-gray transition">
                         <img src={genre.img || "image/book_research_placeholder.png"} alt="genre img" className="h-[250px] w-full object-cover rounded-lg border border-grey" />
@@ -88,7 +90,9 @@ const GenrePreview = ({ genre }) => {
                 </div>
                 <table className="w-full border-collapse">
                     <tbody>
-                        {Object.entries(genreDetails).map(([key, value], index) => (
+                        {Object.entries(genreDetails)
+                        .filter(([key]) => !["genreID", "img"].includes(key)) // Exclude multiple keys
+                        .map(([key, value], index) => (
                             <tr key={index} className="border-b border-grey">
                                 <td className="px-1 py-1 font-semibold capitalize">
                                     {key.replace(/([A-Z])/g, ' $1')}:

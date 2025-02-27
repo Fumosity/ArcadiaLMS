@@ -17,13 +17,17 @@ const SeeMoreGenres = ({ onGenreClick, selectedComponent, onBackClick, fetchAllG
       <div className="uHero-cont mb-6">
         <div
           className="relative w-full h-full rounded-xl md:h-64 lg:h-72 xl:h-80 flex items-center justify-center bg-cover bg-center text-white"
-          style={{ backgroundImage: `url(/public/image/fantasy.png)` }}
+          style={{ backgroundImage: `url(/image/allgenres.jpg)` }}
         >
-          <div className="absolute inset-0 bg-black bg-opacity-25 rounded-xl"></div>
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-black/25 to-black/50"></div>
           <div className="relative z-10 text-center">
             <h4 className="text-xl md:text-2xl"></h4>
-            <h1 className="text-4xl md:text-5xl p-4 font-bold">All Genres</h1>
-            <p className="text-sm md:text-lg">Browse the entire collection of genres in Arcadia!</p>
+            <h1 className="text-4xl md:text-5xl p-4 font-bold drop-shadow-lg">
+              All Genres
+            </h1>
+            <p className="text-sm md:text-lg drop-shadow-md">
+              Browse the entire collection of genres in Arcadia!
+            </p>
           </div>
         </div>
       </div>

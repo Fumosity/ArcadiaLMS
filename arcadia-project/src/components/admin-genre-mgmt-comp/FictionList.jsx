@@ -71,36 +71,43 @@ export default function FictionList({onGenreSelect}) {
     };
 
     return (
-        <div className="bg-white p-4 rounded-lg border-grey border h-fit w-full">
+        <div className="bg-white p-4 rounded-lg border-grey border w-full">
             <h3 className="text-2xl font-semibold mb-4">Fiction Genres</h3>
-            <div className="">
-            {isLoading ? (
-                <p>Loading...</p>
-            ) : (
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Genre</th>
-                            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Books Count</th>
-                            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Interested Users</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {genres.map((genre) => (
-                            <tr 
-                            key={genre.genreID}
-                            className="hover:bg-light-gray cursor-pointer border-b border-grey"
-                            onClick={() => handleRowClick(genre)}
-                            >
-                                <td className="px-4 py-2 text-sm">{genre.genreName}</td>
-                                <td className="px-4 py-2 text-sm text-center">{genre.bookCount}</td>
-                                <td className="px-4 py-2 text-sm text-center">{genre.userCount}</td>
+            <div className="max-h-96 overflow-y-auto border border-x-0 border-dark-gray custom-scrollbar">
+                {isLoading ? (
+                    <p>Loading...</p>
+                ) : (
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-white sticky top-0 z-10 ">
+                            <tr>
+                                <th className="w-1/2 px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Genre
+                                </th>
+                                <th className="w-1/4 px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Book Count
+                                </th>
+                                <th className="w-1/4 px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Interested Users
+                                </th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {genres.map((genre) => (
+                                <tr 
+                                    key={genre.genreID}
+                                    className="hover:bg-light-gray cursor-pointer border-b border-grey"
+                                    onClick={() => handleRowClick(genre)}
+                                >
+                                    <td className="w-1/2 px-4 py-2 text-sm">{genre.genreName}</td>
+                                    <td className="w-1/4 px-4 py-2 text-sm text-center">{genre.bookCount}</td>
+                                    <td className="w-1/4 px-4 py-2 text-sm text-center">{genre.userCount}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
     );
+    
 }
