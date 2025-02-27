@@ -5,7 +5,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 const AboutPage = ({ book }) => {
   if (!book)
     return (
-      <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="bg-white p-4 rounded-lg border-grey border w-full">
         <Skeleton height={20} width={150} className="mb-2" />
         <Skeleton height={200} className="mb-2" />
         <Skeleton count={8} className="mb-1" />
@@ -16,73 +16,80 @@ const AboutPage = ({ book }) => {
 
   const bookDetails = {
     title: book.title,
-    author: book.author,
-    genre: book.genre,
+    author: Array.isArray(book.author) ? book.author.join(', ') : (book.author ?? '').split(';').join(',') || '',
+    genres: Array.isArray(book.genres) ? book.genres.join(', ') : (book.genres ?? '').split(';').join(',') || '',
     category: book.category,
     publisher: book.publisher,
     synopsis: book.synopsis,
-    keywords: book.keyword,
-    datePublished: book.currentPubDate,
-    dateProcured: book.procDate,
+    keywords: Array.isArray(book.keywords) ? book.keywords.join(', ') : (book.keywords ?? '').split(';').join(',') || '',
+    currdatePublished: book.currentPubDate,
+    orgdatePublished: book.currentPubDate,
     location: book.location,
-    databaseID: book.bookID,
-    arcID: book.arcID,
     isbn: book.isbn,
-    quantity: book.quantity,
     cover: book.cover,
+    price: book.price,
+  };
+
+  const handleModifyBook = () => {
+    console.log("Title in BookPreviewInventory:", bookDetails.title);
+    const queryParams = new URLSearchParams(bookDetails).toString();
+    navigate(`/admin/bookmodify?${queryParams}`);
   };
 
   return (
-    <div
-      className="bg-white p-4 rounded-lg shadow-md"
-      style={{ maxWidth: "350px", margin: "0 auto" }}
-    >
-      <h3 className="text-xl font-semibold mb-3">About</h3>
-      <div className="relative bg-white p-2 mb-4 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
-        <img
-          src={bookDetails.cover}
-          alt="Book cover"
-          className="max-h-200 w-150 mx-auto mb-2 rounded"
-        />
-        <p className="text-xs text-gray-500 mb-2 text-center">
-          Book Cover
-        </p>
+    <div>
+      <div className="flex justify-center gap-2">
+        <button
+          className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey  hover:bg-arcadia-red hover:text-white"
+          onClick={handleModifyBook}
+        >
+          Modify Book Title
+        </button>
+        <button
+          className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey  hover:bg-arcadia-red hover:text-white"
+          onClick={handleModifyBook}
+        >
+          Modify Book Copies
+        </button>
       </div>
-      <table className="min-w-full border-collapse">
-        <tbody>
-          {Object.entries(bookDetails).map(([key, value], index) => (
-            <tr key={index} className="border-b border-grey">
-              <td
-                className="px-1 py-1 font-semibold capitalize"
-                style={{ width: "40%" }}
-              >
-                {key === "databaseID"
-                  ? "Database ID:"
-                  : key === "arcID"
-                  ? "Arc ID:"
-                  : key.replace(/([A-Z])/g, " $1") + ":"}
-              </td>
-              <td
-                className="px-1 py-1 text-sm"
-                style={{
-                  overflowWrap: "break-word", // Allows breaking of words to prevent overflow
-                  wordWrap: "break-word",      // For older browsers
-                  wordBreak: "break-all",       // Break words when they exceed container width
-                }}
-              >
-                {value}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-3 flex justify-center space-x-2">
-        <button className="px-2 py-1 bg-gray-200 text-gray-800 rounded text-xs">
-          Discard Changes
-        </button>
-        <button className="px-2 py-1 bg-blue-600 text-gray-800 rounded text-xs">
-          Save Changes
-        </button>
+      <div className="bg-white p-4 rounded-lg border-grey border w-full">
+        <h3 className="text-2xl font-semibold mb-2">About</h3>
+        <div className="w-full h-fit flex justify-center">
+          <div className="relative bg-white p-4 w-fit rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md border border-grey">
+            <img
+              src={bookDetails.cover}
+              alt="Book cover"
+              className="h-[475px] w-[300px] rounded-lg border border-grey object-cover" />
+          </div>
+        </div>
+        <table className="w-full border-collapse">
+          <tbody>
+            {Object.entries(bookDetails)
+              .filter(([key]) => !["cover"].includes(key)) // Exclude multiple keys
+              .map(([key, value], index) => (
+                <tr key={index} className="border-b border-grey">
+                  <td
+                    className="px-1 py-1 font-semibold capitalize w-1/3"
+                  >
+                    {key === "currdatePublished"
+                      ? "Current Pub. Date:"
+                      : key === "orgdatePublished"
+                        ? "Original Pub. Date:"
+                        : key === "isbn"
+                          ? "ISBN:"
+                          : key === "arcID"
+                            ? "ARC ID:"
+                            : key.replace(/([A-Z])/g, " $1") + ":"}
+                  </td>
+                  <td
+                    className="px-1 py-1 text-sm break-words w-2/3"
+                  >
+                    {value}
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

@@ -38,14 +38,14 @@ const ABAddPreview = ({ formData }) => {
                   <>
                     {key === 'currentPubDate' && (
                       <tr key="currentPubDate" className="border-b border-grey">
-                        <td className="px-1 py-1 font-semibold capitalize">Current Pub. Date:</td>
-                        <td className="px-1 py-1 text-sm break-words whitespace-normal">{value}</td>
+                        <td className="px-1 py-1 font-semibold capitalize w-1/3">Current Pub. Date:</td>
+                        <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
                       </tr>
                     )}
                     {key === 'originalPubDate' && (
                       <tr key="originalPubDate" className="border-b border-grey">
-                        <td className="px-1 py-1 font-semibold capitalize">Original Pub. Date:</td>
-                        <td className="px-1 py-1 text-sm break-words whitespace-normal">{value}</td>
+                        <td className="px-1 py-1 font-semibold capitalize w-1/3">Original Pub. Date:</td>
+                        <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
                       </tr>
                     )}
                   </>
@@ -53,10 +53,16 @@ const ABAddPreview = ({ formData }) => {
               } else {
                 return (
                   <tr key={index} className="border-b border-grey">
-                    <td className="px-1 py-1 font-semibold capitalize">
-                      {key === 'databaseID' ? 'Database ID' : key === 'arcID' ? 'ARC ID' : key.replace(/([A-Z])/g, ' $1')}:
+                    <td className="px-1 py-1 font-semibold capitalize w-1/3">
+                      {key === 'databaseID' 
+                      ? 'Database ID' 
+                      :key === "isbn"
+                      ? "ISBN"
+                      : key === 'arcID' 
+                      ? 'ARC ID' 
+                      : key.replace(/([A-Z])/g, ' $1')}:
                     </td>
-                    <td className="px-1 py-1 text-sm break-words whitespace-normal">
+                    <td className="px-1 py-1 text-sm break-words w-2/3">
                       {value}
                     </td>
                   </tr>

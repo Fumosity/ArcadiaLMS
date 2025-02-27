@@ -10,27 +10,23 @@ import LowRates from "../components/admin-lib-analytics-comp/LowRates";
 import Title from "../components/main-comp/Title";
 
 const ALibAnal = () => (
-        <div className="min-h-screen bg-gray-100">
-            <Title>Library Analytics</Title>
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-3 gap-8">
-                    <div className="col-span-2 space-y-8">
-                        {/* Main content for adding research */}
-                            <RcntLibVisit />
-                            <LibBookCirc />
-                            <RoomReserv />
-                    </div>
+    <div className="min-h-screen bg-gray-100">
+        <Title>Library Analytics</Title>
+        <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+            <div className="flex-shrink-0 w-3/4 space-y-2">
+                <RcntLibVisit />
+                <LibBookCirc />
+                <RoomReserv />
+            </div>
 
-                    {/* Preview section */}
-                    <div className="lg:col-span-1 space-y-8">
-                            <MostPop />
-                            <LeastPop />
-                            <HighRates />
-                            <LowRates />
-                    </div>
-                </div>
-            </main>
+            <div className="flex flex-col items-start flex-shrink-0 w-1/4 space-y-2">
+                <MostPop />
+                <LeastPop />
+                <HighRates />
+                <LowRates />
+            </div>
         </div>
+    </div>
 );
 
 export default ALibAnal;

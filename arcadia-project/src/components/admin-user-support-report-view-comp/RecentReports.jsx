@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { supabase } from "/src/supabaseClient.js"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
+import { Link } from "react-router-dom";
 
 const RecentReports = () => {
   const [recentReports, setRecentReports] = useState([])
@@ -75,47 +76,46 @@ const RecentReports = () => {
   }, [fetchRecentReports])
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
+    <div className="bg-white border border-grey p-4 rounded-lg">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Recent User Reports</h3>
-        <button onClick={fetchRecentReports} className="bg-grey rounded-xl p-1 text-sm text-gray-500 hover:text-white">
+        <h3 className="text-2xl font-semibold">Recent Reports</h3>
+        <button onClick={fetchRecentReports} className="rounded-full py-1 px-3 text-sm border border-grey hover:bg-light-gray">
           Refresh
         </button>
       </div>
-      <table className="w-full text-left">
+      <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr>
-            <th className="font-semibold pb-1 border-b border-grey">User</th>
-            <th className="font-semibold pb-1 border-b border-grey">User ID</th>
-            <th className="font-semibold pb-1 border-b border-grey">Report ID</th>
-            {/* <th className="font-semibold pb-1 border-b border-grey">Date & Time</th> */}
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Report ID</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="bg-white divide-y divide-gray-200">
           {isLoading ? (
             [...Array(5)].map((_, index) => (
-              <tr key={index} className="border-b border-grey">
-                <td className="py-2">
+              <tr key={index} className="hover:bg-light-gray cursor-pointer">
+                <td className="px-4 py-2 text-center text-sm truncate">
                   <Skeleton />
                 </td>
-                <td className="py-2">
-                  <Skeleton />
-                </td>
-                <td className="py-2">
-                  <Skeleton />
-                </td>
-                <td className="py-2">
+                <td className="px-4 py-2 text-center text-sm truncate">
                   <Skeleton />
                 </td>
               </tr>
             ))
           ) : recentReports.length > 0 ? (
             recentReports.map((report, index) => (
-              <tr key={index} className="border-b border-grey hover:bg-gray-50">
-                <td className="py-2">{report.user}</td>
-                <td className="py-2">{report.userID}</td>
-                <td className="py-2">{report.reportID}</td>
-                {/* <td className="py-2">{report.dateTime}</td> */}
+              <tr key={index} className="hover:bg-light-gray cursor-pointer">
+                <td className="px-4 py-2 text-center text-sm truncate">{report.user}</td>
+                <td className="px-4 py-2 text-center text-sm truncate">{report.reportID}</td>
+                <td className="px-4 py-2 text-arcadia-red font-semibold text-center text-sm truncate">
+                  <Link
+                    to={`/admin/support`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    View
+                  </Link>
+                </td>
               </tr>
             ))
           ) : (

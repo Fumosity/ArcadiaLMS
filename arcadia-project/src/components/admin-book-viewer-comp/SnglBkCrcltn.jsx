@@ -32,7 +32,7 @@ const SnglBkCrcltn = ({ titleID }) => {
           .select('bookID, titleID')
           .eq('titleID', titleID); // Fetch only books for the current titleID
 
-          console.log("current titleID:", titleID);
+        console.log("current titleID:", titleID);
 
         if (bookIndivError) {
           console.error("Error fetching book_indiv: ", bookIndivError.message);
@@ -43,8 +43,8 @@ const SnglBkCrcltn = ({ titleID }) => {
         const bookIDs = bookIndiv.map(book => book.bookID);
 
         const { data: transactions, error: transactionError } = await supabase
-        .from('book_transactions')
-        .select(`
+          .from('book_transactions')
+          .select(`
           transaction_type, 
           checkin_date, 
           checkin_time, 
@@ -57,7 +57,7 @@ const SnglBkCrcltn = ({ titleID }) => {
               userLName,
               userLPUID
           )`)
-        .in('bookID', bookIDs); // Use the .in() filter to include only the relevant bookIDs
+          .in('bookID', bookIDs); // Use the .in() filter to include only the relevant bookIDs
 
         if (transactionError) {
           console.error("Error fetching transactions: ", transactionError.message);
@@ -67,7 +67,7 @@ const SnglBkCrcltn = ({ titleID }) => {
             .from('book_titles')
             .select('titleID, title, price')
             .eq('titleID', titleID); // Fetch only the title details for the given titleID
-  
+
           if (bookTitlesError) {
             console.error("Error fetching book_titles: ", bookTitlesError.message);
           } else {
@@ -75,10 +75,10 @@ const SnglBkCrcltn = ({ titleID }) => {
             const formattedData = transactions.map(transaction => {
               const bookDetails = bookIndiv.find(book => book.bookID === transaction.bookID);
               const titleDetails = bookTitles[0]; // Since we know it's only one title for the current titleID
-  
+
               const date = transaction.checkin_date || transaction.checkout_date;
               const time = transaction.checkin_time || transaction.checkout_time;
-  
+
               let formattedTime = null;
               if (time) {
                 const timeString = time.includes(':') ? time : `${time.slice(0, 2)}:${time.slice(2)}`;
@@ -88,7 +88,7 @@ const SnglBkCrcltn = ({ titleID }) => {
                   hour12: true,
                 });
               }
-  
+
               return {
                 type: transaction.transaction_type,
                 date,
@@ -100,7 +100,7 @@ const SnglBkCrcltn = ({ titleID }) => {
                 titleID: titleDetails?.titleID,
               };
             });
-  
+
             setBkhistoryData(formattedData);
           }
         }
@@ -138,16 +138,16 @@ const SnglBkCrcltn = ({ titleID }) => {
     });
   };
 
-  
+
 
   const truncateTitle = (title, maxLength = 25) => {
     return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
+    <div className="bg-white p-4 rounded-lg border-grey border">
       {/* Title */}
-      <h3 className="text-xl font-semibold mb-4">Book Circulation History</h3>
+      <h3 className="text-2xl font-semibold mb-2">Book Circulation History</h3>
 
       {/* Controls */}
       <div className="flex flex-wrap items-center mb-6 space-x-4">
@@ -183,6 +183,20 @@ const SnglBkCrcltn = ({ titleID }) => {
           </button>
         </div>
 
+        {/* No. of Entries */}
+        <div className="flex items-center space-x-2">
+          <label htmlFor="entries" className="text-sm">No. of Entries:</label>
+          <input
+            type="number"
+            id="entries"
+            min="1"
+            value={entries}
+            className="border border-gray-300 rounded-md py-1 px-2 text-sm"
+            style={{ borderRadius: "40px", width: "80px" }}
+            onChange={(e) => setEntries(e.target.value)}
+          />
+        </div>
+
         {/* Search */}
         <div className="flex items-center space-x-2">
           <label htmlFor="search" className="text-sm">Search:</label>
@@ -208,7 +222,7 @@ const SnglBkCrcltn = ({ titleID }) => {
               <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Time</th>
               <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Borrower</th>
               <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book Title</th>
-              <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book ID</th>
+              <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Barcode</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 text-center">
@@ -216,7 +230,7 @@ const SnglBkCrcltn = ({ titleID }) => {
               paginatedData.map((book, index) => (
                 <tr key={index} className="hover:bg-gray-100">
                   <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
-                                  ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}>
+                                          ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}>
                     {book.type}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
@@ -237,12 +251,12 @@ const SnglBkCrcltn = ({ titleID }) => {
                       {truncateTitle(book.bookTitle)}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="px-4 py-2 text-center">
+                <td colSpan="12" className="px-4 py-2 text-center">
                   No data available.
                 </td>
               </tr>
@@ -252,20 +266,12 @@ const SnglBkCrcltn = ({ titleID }) => {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center items-center mt-4 space-x-4">
-        <button
-          className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
+      <div className="flex justify-center items-center mt-2 space-x-4">
+        <button className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
           Previous Page
         </button>
-        <span className="text-sm">Page {currentPage} of {totalPages}</span>
-        <button
-          className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
+        <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+        <button className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
           Next Page
         </button>
       </div>

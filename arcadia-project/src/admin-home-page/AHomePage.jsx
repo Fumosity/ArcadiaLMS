@@ -12,74 +12,46 @@ import BCHistory from '../components/admin-book-circ-pg-comp/BCHistory';
 import RcntLibVisit from '../components/admin-user-acc-comp/RcntLibVisit';
 import LibBookCirc from '../components/admin-lib-analytics-comp/LibBookCirc';
 import RoomReserv from '../components/admin-lib-analytics-comp/RoomReserv';
+import MostPop from '../components/admin-lib-analytics-comp/MostPop';
+import HighRates from '../components/admin-lib-analytics-comp/HighRates';
+import Title from '../components/main-comp/Title';
 
 const AHomePage = () => {
   const navigate = useNavigate(); // Initialize the useNavigate hook
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <main className="w-4/5 mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <BCHistory />
-            <LibBookCirc />
-            <RoomReserv />
-          </div>
+      <Title>Home</Title>
 
-          {/* Access Table and other sections on the right */}
-          <div className="lg:col-span-1 space-y-8">
-            <AccessTable />
-
-            {/* Reservations */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Reservations</h3>
-                <button
-                  className="text-arcadia-red text-sm flex items-center"
-                  onClick={() => navigate('/reservations')} // Navigate to Reservations page
-                >
-                  See more <FiChevronRight className="h-4 w-4 ml-1" />
-                </button>
-              </div>
-              <div className="w-full">
-                <ReservationsTable />
-              </div>
-            </div>
-
-            {/* Popular Books */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Popular Books</h3>
-                <button
-                  className="text-arcadia-red text-sm flex items-center"
-                  onClick={() => navigate('/popular-books-page')} // Navigate to Popular Books page
-                >
-                  See more <FiChevronRight className="h-4 w-4 ml-1" />
-                </button>
-              </div>
-              <div className="w-full">
-                <PopularBooksTable />
-              </div>
-            </div>
-
-            {/* Highest Rated Books */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Highest Rated Books</h3>
-                <button
-                  className="text-arcadia-red text-sm flex items-center"
-                  onClick={() => navigate('/highest-rated-books-page')} // Navigate to Highest Rated Books page
-                >
-                  See more <FiChevronRight className="h-4 w-4 ml-1" />
-                </button>
-              </div>
-              <div className="w-full">
-                <HighestRatedBooksTable />
-              </div>
-            </div>
-          </div>
+      <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+        <div className="flex-shrink-0 w-3/4 space-y-2">
+          <BCHistory />
+          <LibBookCirc />
+          <RoomReserv />
         </div>
-      </main>
+
+        <div className="flex flex-col items-start flex-shrink-0 w-1/4 space-y-2">
+          <AccessTable />
+
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">Reservations</h3>
+              <button
+                className="text-arcadia-red text-sm flex items-center"
+                onClick={() => navigate('/reservations')}
+              >
+                See more <FiChevronRight className="h-4 w-4 ml-1" />
+              </button>
+            </div>
+            <div className="w-full">
+              <ReservationsTable />
+            </div>
+          </div>
+
+          <MostPop />
+          <HighRates />
+        </div>
+      </div>
     </div>
   );
 }

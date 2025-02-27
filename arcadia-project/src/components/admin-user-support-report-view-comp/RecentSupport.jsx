@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react"
 import { supabase } from "/src/supabaseClient.js"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
+import { Link } from "react-router-dom";
 
 const RecentSupport = () => {
     const [recentSupports, setRecentSupports] = useState([])
@@ -74,57 +75,56 @@ const RecentSupport = () => {
       }, [fetchRecentSupports])
     
       return (
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white border border-grey p-4 rounded-lg">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold">Recent User Supports</h3>
-            <button onClick={fetchRecentSupports} className="bg-grey rounded-xl p-1 text-sm text-gray-500 hover:text-white">
+            <h3 className="text-2xl font-semibold">Recent Tickets</h3>
+            <button onClick={fetchRecentSupports} className="rounded-full py-1 px-3 text-sm border border-grey hover:bg-light-gray">
               Refresh
             </button>
           </div>
-          <table className="w-full text-left">
-            <thead>
+          <table className="min-w-full divide-y divide-gray-200">
+          <thead>
               <tr>
-                <th className="font-semibold pb-1 border-b border-grey">User</th>
-                <th className="font-semibold pb-1 border-b border-grey">User ID</th>
-                <th className="font-semibold pb-1 border-b border-grey">Support ID</th>
-                {/* <th className="font-semibold pb-1 border-b border-grey">Date & Time</th> */}
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket ID</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
               </tr>
             </thead>
-            <tbody>
-              {isLoading ? (
-                [...Array(5)].map((_, index) => (
-                  <tr key={index} className="border-b border-grey">
-                    <td className="py-2">
-                      <Skeleton />
-                    </td>
-                    <td className="py-2">
-                      <Skeleton />
-                    </td>
-                    <td className="py-2">
-                      <Skeleton />
-                    </td>
-                    <td className="py-2">
-                      <Skeleton />
-                    </td>
-                  </tr>
-                ))
-              ) : recentSupports.length > 0 ? (
-                recentSupports.map((support, index) => (
-                  <tr key={index} className="border-b border-grey hover:bg-gray-50">
-                    <td className="py-2">{support.user}</td>
-                    <td className="py-2">{support.userID}</td>
-                    <td className="py-2">{support.supportID}</td>
-                    {/* <td className="py-2">{support.dateTime}</td> */}
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="py-4 text-center text-gray-500">
-                    No recent supports found
-                  </td>
-                </tr>
-              )}
-            </tbody>
+           <tbody className="bg-white divide-y divide-gray-200">
+                     {isLoading ? (
+                       [...Array(5)].map((_, index) => (
+                         <tr key={index} className="hover:bg-light-gray cursor-pointer">
+                           <td className="px-4 py-2 text-center text-sm truncate">
+                             <Skeleton />
+                           </td>
+                           <td className="px-4 py-2 text-center text-sm truncate">
+                             <Skeleton />
+                           </td>
+                         </tr>
+                       ))
+                     ) : recentSupports.length > 0 ? (
+                      recentSupports.map((support, index) => (
+                         <tr key={index} className="hover:bg-light-gray cursor-pointer">
+                           <td className="px-4 py-2 text-center text-sm truncate">{support.user}</td>
+                           <td className="px-4 py-2 text-center text-sm truncate">{support.supportID}</td>
+                           <td className="px-4 py-2 text-arcadia-red font-semibold text-center text-sm truncate">
+                             <Link
+                               to={`/admin/support`}
+                               className="text-blue-600 hover:underline"
+                             >
+                               View
+                             </Link>
+                           </td>
+                         </tr>
+                       ))
+                     ) : (
+                       <tr>
+                         <td colSpan={4} className="py-4 text-center text-gray-500">
+                           No recent reports found
+                         </td>
+                       </tr>
+                     )}
+                   </tbody>
           </table>
         </div>
       )

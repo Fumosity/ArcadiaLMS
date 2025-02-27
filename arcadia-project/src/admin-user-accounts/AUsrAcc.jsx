@@ -9,29 +9,25 @@ import RecentSupport from "../components/admin-user-support-report-view-comp/Rec
 
 const AUsrAcc = () => (
 
-        <div className="min-h-screen bg-gray-100">
-            <Title>User Accounts</Title>
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-3 gap-8">
-                    <div className="col-span-2 space-y-8">
-                        {/* Main content for adding research */}
-                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                            <RcntLibVisit />
-                        </div>
-                        <ListOfUserAcc />
-                        <ListOfAdminAcc />
+    <div className="min-h-screen bg-gray-100">
+        <Title>User Accounts</Title>
 
-                    </div>
+        <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+            <div className="flex-shrink-0 w-3/4 space-y-2">
+                <RcntLibVisit />
+                <ListOfUserAcc />
+                <ListOfAdminAcc />
+            </div>
 
-                    {/* Preview section */}
-                    <div className="lg:col-span-1 space-y-8">
-                            <AccessTable />
-                            <RecentReports />
-                            <RecentSupport />
-                    </div>
+            <div className="flex flex-col items-start flex-shrink-0 w-1/4">
+                <AccessTable />
+                <div className="space-y-2 w-full">
+                <RecentReports />
+                <RecentSupport />
                 </div>
-            </main>
+            </div>
         </div>
+    </div>
 );
 
 export default AUsrAcc;

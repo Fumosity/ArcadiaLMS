@@ -105,9 +105,9 @@ const ReturnedBks = () => {
     const handleUserClick = (book) => {
         console.log("userid", book.userId, "user", book.borrower, book)
         navigate("/admin/useraccounts/viewusers", {
-          state: { userId: book.userId, user: book },
+            state: { userId: book.userId, user: book },
         });
-      };
+    };
 
     const truncateTitle = (title, maxLength = 25) => {
         return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
@@ -116,7 +116,7 @@ const ReturnedBks = () => {
     return (
         <div className="bg-white p-4 rounded-lg border-grey border">
             {/* Title */}
-            <h3 className="text-xl font-semibold mb-2">Returned Books</h3>
+            <h3 className="text-2xl font-semibold mb-2">Returned Books</h3>
 
             <table className="min-w-full divide-y divide-gray-200 text-center">
                 <thead className="bg-gray-50 rounded-t-lg" style={{ borderRadius: "40px" }}>
@@ -131,16 +131,16 @@ const ReturnedBks = () => {
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 text-center">
-                {returnedData.length > 0 ? (
-                    returnedData.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
-                        <tr key={index} className="hover:bg-gray-100">
-                            <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
+                    {returnedData.length > 0 ? (
+                        returnedData.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
+                            <tr key={index} className="hover:bg-gray-100">
+                                <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
                                     ${book.type === "Returned" ? "bg-green" : ""}`}
-                                                >
-                                {book.type}</td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
-                            <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
+                                >
+                                    {book.type}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
+                                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
                                     <button
                                         onClick={() => handleUserClick(book)}
                                         className="text-blue-500 hover:underline"
@@ -156,40 +156,28 @@ const ReturnedBks = () => {
                                         {truncateTitle(book.bookTitle)}
                                     </Link>
                                 </td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
-                            <td className="px-4 py-3 text-sm text-gray-900">{formatDate(book.deadline)}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{formatDate(book.deadline)}</td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="12" className="px-4 py-2 text-center">
+                                No data available.
+                            </td>
                         </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan="12" className="px-4 py-2 text-center">
-                            No data available.
-                        </td>
-                    </tr>
-                )}
+                    )}
                 </tbody>
             </table>
 
             {/* Pagination Controls */}
-            <div className="flex justify-center items-center mt-4 space-x-4">
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    style={{ borderRadius: "40px" }}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                >
-                    Previous
+            <div className="flex justify-center items-center mt-2 space-x-4">
+                <button className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+                    Previous Page
                 </button>
-                <span className="text-xs">
-                    Page {currentPage} of {totalPages}
-                </span>
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    style={{ borderRadius: "40px" }}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                >
-                    Next
+                <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+                <button className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+                    Next Page
                 </button>
             </div>
         </div>

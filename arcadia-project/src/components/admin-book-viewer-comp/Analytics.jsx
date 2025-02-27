@@ -12,8 +12,8 @@ const data = [
 const Analytics = ({ titleID }) => {
   console.log("Analytics received titleID:", titleID); // Debug log to confirm
   return(
-    <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full"> {/* Removed height constraints */}
-      <h3 className="text-xl font-semibold mb-4">Analytics</h3>
+    <div className="bg-white p-4 rounded-lg border-grey border">
+      <h3 className="text-2xl font-semibold mb-2">Analytics</h3>
 
       {/* Ensure chart container is responsive and grows based on content */}
       <div className="w-full mb-6">

@@ -53,17 +53,17 @@ export default function RcntLibVisit() {
     const now = new Date();
     const oneWeekAgo = new Date(now.setDate(now.getDate() - 7));
     const twoWeeksAgo = new Date(now.setDate(now.getDate() - 14));
-  
+
     const collegeMap = new Map();
     const departmentMap = new Map();
-  
+
     transactions.forEach((transaction) => {
       const { userCollege, userDepartment } = transaction.user_accounts || {};
       if (!userCollege) return;
-  
+
       const transactionDate = new Date(transaction.checkoutDate);
       const isReturned = transaction.checkinDate != null;
-  
+
       // College Aggregation
       if (!collegeMap.has(userCollege)) {
         collegeMap.set(userCollege, {
@@ -79,7 +79,7 @@ export default function RcntLibVisit() {
       const collegeData = collegeMap.get(userCollege);
       collegeData.borrows += 1;
       if (isReturned) collegeData.returns += 1;
-  
+
       // Time-based Aggregation
       if (transactionDate >= oneWeekAgo) {
         collegeData.thisWeekBorrows += 1;
@@ -88,7 +88,7 @@ export default function RcntLibVisit() {
         collegeData.lastWeekBorrows += 1;
         if (isReturned) collegeData.lastWeekReturns += 1;
       }
-  
+
       // Department Aggregation
       if (userDepartment) {
         if (!departmentMap.has(userDepartment)) {
@@ -106,7 +106,7 @@ export default function RcntLibVisit() {
         const departmentData = departmentMap.get(userDepartment);
         departmentData.borrows += 1;
         if (isReturned) departmentData.returns += 1;
-  
+
         if (transactionDate >= oneWeekAgo) {
           departmentData.thisWeekBorrows += 1;
           if (isReturned) departmentData.thisWeekReturns += 1;
@@ -116,19 +116,19 @@ export default function RcntLibVisit() {
         }
       }
     });
-  
+
     return {
       collegeData: Array.from(collegeMap.values()),
       departmentData: Array.from(departmentMap.values()),
     };
   }
-  
+
   return (
-    <div className=" overflow-hidden border border-grey p-6 rounded-lg w-full">
+    <div className="flex-col space-y-2">
 
       {/* Pie Charts */}
-      <div className="bg-white border border-grey p-6 rounded-lg mb-6">
-        <h2 className="text-xl font-semibold mb-4">Library Book Records</h2>
+      <div className="bg-white border border-grey p-4 rounded-lg">
+        <h2 className="text-2xl font-semibold mb-4 text-left">Library Book Circulation</h2>
         <div className="flex justify-around">
           {/* College Data Chart */}
           <div className="h-[300px] w-[300px]">
@@ -177,122 +177,66 @@ export default function RcntLibVisit() {
         </div>
       </div>
 
-      {/* By College Section */}
-      <div className="bg-white border border-grey p-6 rounded-lg mb-6">
-        <h2 className="text-xl font-semibold mb-4 text-left">By College</h2>
-        <div className="border border-grey rounded-lg px-5 py-5 flex gap-10 items-center justify-center">
+      <div className="flex space-x-2 w-full">
+        {/* By College Section */}
+        <div className="bg-white border border-grey p-4 rounded-lg w-full">
+          <h2 className="text-2xl font-semibold mb-4 text-left">Circulation By College</h2>
           <div>
-            <h2 className="text-xl mb-4 text-center">Records</h2>
-            <table className="w-full">
+            <table className="min-w-full divide-y divide-gray-200">
               <thead>
-                <tr>
-                  <th className="text-center">Group</th>
+                <tr className="bg-gray-200">
+                  <th className="px-2 py-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider border-t border-x-0 border" rowSpan="2">Group</th>
+                  <th className="px-2 py-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider border-y border-gray-200" colSpan="2">This Week</th>
+                  <th className="px-2 py-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider border-y border-gray-200" colSpan="2">Last Week</th>
+                </tr>
+                <tr className="bg-gray-100">
+                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Borrows</th>
+                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Returns</th>
+                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Borrows</th>
+                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Returns</th>
                 </tr>
               </thead>
               <tbody>
                 {collegeData.map((college) => (
-                  <tr key={college.name}>
-                    <td className="text-center">{college.name}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <h2 className="text-xl mb-4 text-center">This Week</h2>
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="text-right px-6">Borrows</th>
-                  <th className="text-right px-6">Returns</th>
-                </tr>
-              </thead>
-              <tbody>
-                {collegeData.map((college) => (
-                  <tr key={college.name}>
-                    <td className="text-center px-6">{college.thisWeekBorrows}</td>
-                    <td className="text-center px-6">{college.thisWeekReturns}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <h2 className="text-xl mb-4 text-center">Last Week</h2>
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="text-right px-6">Borrows</th>
-                  <th className="text-right px-6">Returns</th>
-                </tr>
-              </thead>
-              <tbody>
-                {collegeData.map((college) => (
-                  <tr key={college.name}>
-                    <td className="text-center px-6">{college.lastWeekBorrows}</td>
-                    <td className="text-center px-6">{college.lastWeekReturns}</td>
+                  <tr key={college.name} className="hover:bg-light-gray cursor-pointer border border-b border-x-0">
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{college.name}</td>
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{college.thisWeekBorrows}</td>
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{college.thisWeekReturns}</td>
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{college.lastWeekBorrows}</td>
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{college.lastWeekReturns}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
-      </div>
 
-      {/* By Department Section */}
-      <div className="bg-white border border-grey p-6 rounded-lg mb-6">
-        <h2 className="text-xl font-semibold mb-4 text-left">By Department</h2>
-        <div className="border border-grey rounded-lg px-5 py-5 flex gap-10 items-center justify-center">
+        {/* By Department Section */}
+        <div className="bg-white border border-grey p-4 rounded-lg w-full">
+          <h2 className="text-2xl font-semibold mb-4 text-left">Circulation By Department</h2>
           <div>
-            <h2 className="text-xl mb-4 text-center">Records</h2>
-            <table className="w-full">
+            <table className="min-w-full divide-y divide-gray-200">
               <thead>
-                <tr>
-                  <th className="text-center">Group</th>
+                <tr className="bg-gray-200">
+                  <th className="px-2 py-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider border-t border-x-0 border" rowSpan="2">Group</th>
+                  <th className="px-2 py-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider border-y border-gray-200" colSpan="2">This Week</th>
+                  <th className="px-2 py-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider border-y border-gray-200" colSpan="2">Last Week</th>
+                </tr>
+                <tr className="bg-gray-100">
+                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Borrows</th>
+                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Returns</th>
+                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Borrows</th>
+                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Returns</th>
                 </tr>
               </thead>
               <tbody>
                 {departmentData.map((dept) => (
-                  <tr key={dept.name}>
-                    <td className="text-center">{dept.name}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <h2 className="text-xl mb-4 text-center">This Week</h2>
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="text-right px-6">Borrows</th>
-                  <th className="text-right px-6">Returns</th>
-                </tr>
-              </thead>
-              <tbody>
-                {departmentData.map((dept) => (
-                  <tr key={dept.name}>
-                    <td className="text-center px-6">{dept.thisWeekBorrows}</td>
-                    <td className="text-center px-6">{dept.thisWeekReturns}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <h2 className="text-xl mb-4 text-center">Last Week</h2>
-            <table className="w-full">
-              <thead>
-                <tr>
-                  <th className="text-right px-6">Borrows</th>
-                  <th className="text-right px-6">Returns</th>
-                </tr>
-              </thead>
-              <tbody>
-                {departmentData.map((dept) => (
-                  <tr key={dept.name}>
-                    <td className="text-center px-6">{dept.lastWeekBorrows}</td>
-                    <td className="text-center px-6">{dept.lastWeekReturns}</td>
+                  <tr key={dept.name} className="hover:bg-light-gray cursor-pointer border border-b border-x-0">
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{dept.name}</td>
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{dept.thisWeekBorrows}</td>
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{dept.thisWeekReturns}</td>
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{dept.lastWeekBorrows}</td>
+                    <td className="px-4 py-2 text-center text-sm text-gray-500 truncate min-w-4">{dept.lastWeekReturns}</td>
                   </tr>
                 ))}
               </tbody>

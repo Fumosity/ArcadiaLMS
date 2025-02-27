@@ -47,8 +47,8 @@ const OverdueBks = () => {
                             userLName,
                             userLPUID
                         )`)
-                        .not('deadline', 'is.null')
-                        .lt('deadline', today.toISOString().split('T')[0]);
+                    .not('deadline', 'is.null')
+                    .lt('deadline', today.toISOString().split('T')[0]);
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
@@ -104,20 +104,20 @@ const OverdueBks = () => {
             day: 'numeric',
         });
 
-        const handleUserClick = (book) => {
-            console.log("userid", book.userId, "user", book.borrower, book)
-            navigate("/admin/useraccounts/viewusers", {
-              state: { userId: book.userId, user: book },
-            });
-          };
-    
-        const truncateTitle = (title, maxLength = 25) => {
-            return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
-        };
+    const handleUserClick = (book) => {
+        console.log("userid", book.userId, "user", book.borrower, book)
+        navigate("/admin/useraccounts/viewusers", {
+            state: { userId: book.userId, user: book },
+        });
+    };
+
+    const truncateTitle = (title, maxLength = 25) => {
+        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
+    };
 
     return (
         <div className="bg-white p-4 rounded-lg border-grey border">
-            <h3 className="text-xl font-semibold mb-2">Overdue Books</h3>
+            <h3 className="text-2xl font-semibold mb-2">Overdue Books</h3>
 
             {/* Table */}
             <table className="min-w-full divide-y divide-gray-200 text-center">
@@ -133,8 +133,8 @@ const OverdueBks = () => {
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 text-center">
-                {overdueData.length > 0 ? (
-                    overdueData.slice((currentPage - 1) * Number(entries), currentPage * Number(entries)).map((book, index) => (
+                    {overdueData.length > 0 ? (
+                        overdueData.slice((currentPage - 1) * Number(entries), currentPage * Number(entries)).map((book, index) => (
                             <tr key={index}>
                                 <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
                                     ${book.type === "Overdue" ? "bg-red" : ""}`}>{book.type}</td>
@@ -170,22 +170,14 @@ const OverdueBks = () => {
                 </tbody>
             </table>
 
-           {/* Pagination */}
-           <div className="flex justify-center items-center mt-4 space-x-4">
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                >
-                    Previous
+            {/* Pagination */}
+            <div className="flex justify-center items-center mt-2 space-x-4">
+                <button className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+                    Previous Page
                 </button>
-                <span className="text-sm">Page {currentPage} of {totalPages}</span>
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                >
-                    Next
+                <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+                <button className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+                    Next Page
                 </button>
             </div>
         </div>
