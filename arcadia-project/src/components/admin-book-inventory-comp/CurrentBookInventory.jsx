@@ -216,8 +216,6 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                             ))
                         ) : (
                             uniqueBooks.map((item, index) => {
-                                const genres = Array.isArray(item.genres) ? item.genres : (typeof item.genres === "string" ? item.genres.split(";") : []);
-
                                 return (
                                     <tr
                                         key={index}
