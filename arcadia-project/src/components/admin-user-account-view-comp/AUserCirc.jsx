@@ -22,17 +22,17 @@ const AUserCirc = ({ user }) => {
                 const { data, error } = await supabase
                     .from('book_transactions')
                     .select(`
-                        transaction_type, 
-                        checkin_date, 
-                        checkin_time, 
-                        checkout_date, 
-                        checkout_time, 
+                        transactionType, 
+                        checkinDate, 
+                        checkinTime, 
+                        checkoutDate, 
+                        checkoutTime, 
                         userID, 
                         bookID, 
                         book_indiv(
                             bookID,
                             bookARCID,
-                            status,
+                            bookStatus,
                             book_titles (
                                 titleID,
                                 title,
@@ -52,8 +52,8 @@ const AUserCirc = ({ user }) => {
                     console.log("History data from Supabase:", data); // Debugging: raw data from Supabase
 
                     const formattedData = data.map(item => {
-                        const date = item.checkin_date || item.checkout_date;
-                        const time = item.checkin_time || item.checkout_time;
+                        const date = item.checkinDate || item.checkoutDate;
+                        const time = item.checkinTime || item.checkoutTime;
 
                         let formattedTime = null;
                         if (time) {
@@ -71,7 +71,7 @@ const AUserCirc = ({ user }) => {
                         const bookDetails = item.book_indiv?.book_titles || {};
 
                         return {
-                            type: item.transaction_type,
+                            type: item.transactionType,
                             date,
                             time: formattedTime,
                             borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,

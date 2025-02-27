@@ -69,7 +69,7 @@ function OutstandingFines() {
                         book_indiv (
                             bookID,
                             bookARCID,
-                            status,
+                            bookStatus,
                             book_titles (
                                 titleID,
                                 title,
@@ -85,7 +85,7 @@ function OutstandingFines() {
                 if (damageError) {
                     console.error("Error fetching damage fines data: ", damageError.message);
                 } else {
-                    const filteredDamageData = damageData.filter(item => item.book_indiv?.status === 'Damaged');
+                    const filteredDamageData = damageData.filter(item => item.book_indiv?.bookStatus === 'Damaged');
                     setDamageFinesData(filteredDamageData.map(item => {
                         const bookDetails = item.book_indiv?.book_titles || {};
                         const fineAmount = bookDetails.price || 0;

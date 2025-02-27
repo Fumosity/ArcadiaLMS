@@ -23,15 +23,15 @@ export default function RcntLibVisit() {
         const { data, error } = await supabase
           .from("book_transactions")
           .select(`
-            transaction_type,
-            checkout_date,
-            checkin_date,
+            transactionType,
+            checkoutDate,
+            checkinDate,
             user_accounts!inner (
               userCollege,
               userDepartment
             )
           `)
-          .order("checkout_date", { ascending: false });
+          .order("checkoutDate", { ascending: false });
 
         if (error) {
           console.error("Error fetching data:", error);
@@ -61,8 +61,8 @@ export default function RcntLibVisit() {
       const { userCollege, userDepartment } = transaction.user_accounts || {};
       if (!userCollege) return;
   
-      const transactionDate = new Date(transaction.checkout_date);
-      const isReturned = transaction.checkin_date != null;
+      const transactionDate = new Date(transaction.checkoutDate);
+      const isReturned = transaction.checkinDate != null;
   
       // College Aggregation
       if (!collegeMap.has(userCollege)) {

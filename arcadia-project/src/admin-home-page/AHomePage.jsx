@@ -9,6 +9,9 @@ import ReservationsTable from '../components/admin-home-page-comp/ReservationsTa
 import HighestRatedBooksTable from '../components/admin-home-page-comp/HighestRatedBooksTable';
 import PopularBooksTable from '../components/admin-home-page-comp/PopularBooksTable';
 import BCHistory from '../components/admin-book-circ-pg-comp/BCHistory';
+import RcntLibVisit from '../components/admin-user-acc-comp/RcntLibVisit';
+import LibBookCirc from '../components/admin-lib-analytics-comp/LibBookCirc';
+import RoomReserv from '../components/admin-lib-analytics-comp/RoomReserv';
 
 const AHomePage = () => {
   const navigate = useNavigate(); // Initialize the useNavigate hook
@@ -17,16 +20,15 @@ const AHomePage = () => {
     <div className="min-h-screen bg-gray-100">
       <main className="w-4/5 mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-8">
             <BCHistory />
-            <div className="mt-4">
-              <LibraryAnalyticsChart />
-            </div>
+            <LibBookCirc />
+            <RoomReserv />
           </div>
 
           {/* Access Table and other sections on the right */}
           <div className="lg:col-span-1 space-y-8">
-              <AccessTable />
+            <AccessTable />
 
             {/* Reservations */}
             <div className="bg-white p-6 rounded-lg shadow">
