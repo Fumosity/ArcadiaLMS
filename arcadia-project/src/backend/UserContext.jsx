@@ -58,7 +58,7 @@ export const UserProvider = ({ children }) => {
         navigate("/");
         break;
       case "Guest":
-        navigate("/user/bookcatalog");
+        navigate("/");
         break;
       default:
         navigate("/user/login");

@@ -9,40 +9,44 @@ export default function SearchByGenre({ onGenreClick, onSeeMoreGenresClick }) {
   const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   const fetchGenres = async () => {
-    if (!user?.userID) return;
     try {
-      const { data: userGenres, error: userGenresError } = await supabase
-        .from("user_genre_link")
-        .select("genres(genreID, genreName, category, img, description)")
-        .eq("userID", user.userID);
-
-      if (userGenresError) throw userGenresError;
-
-      let userGenreList = userGenres.map(({ genres }) => genres).filter(Boolean);
       let selectedGenres = [];
       let uniqueGenres = new Set();
-
-      while (selectedGenres.length < 5 && userGenreList.length > 0) {
-        const randomIndex = Math.floor(Math.random() * userGenreList.length);
-        const randomGenre = userGenreList.splice(randomIndex, 1)[0];
-
-        if (!uniqueGenres.has(randomGenre.genreID)) {
-          uniqueGenres.add(randomGenre.genreID);
-          selectedGenres.push(randomGenre);
+  
+      if (user?.userID) {
+        // Fetch genres linked to the user
+        const { data: userGenres, error: userGenresError } = await supabase
+          .from("user_genre_link")
+          .select("genres(genreID, genreName, category, img, description)")
+          .eq("userID", user.userID);
+  
+        if (userGenresError) throw userGenresError;
+  
+        let userGenreList = userGenres.map(({ genres }) => genres).filter(Boolean);
+  
+        while (selectedGenres.length < 5 && userGenreList.length > 0) {
+          const randomIndex = Math.floor(Math.random() * userGenreList.length);
+          const randomGenre = userGenreList.splice(randomIndex, 1)[0];
+  
+          if (!uniqueGenres.has(randomGenre.genreID)) {
+            uniqueGenres.add(randomGenre.genreID);
+            selectedGenres.push(randomGenre);
+          }
         }
       }
-
+  
+      // If less than 5 genres are selected (or no userID is provided), fetch random genres
       if (selectedGenres.length < 5) {
         const { data: allGenres, error: allGenresError } = await supabase
           .from("genres")
           .select("genreID, genreName, category, img, description");
-
+  
         if (allGenresError) throw allGenresError;
-
-        const remainingGenres = allGenres.filter(
+  
+        let remainingGenres = allGenres.filter(
           (genre) => !uniqueGenres.has(genre.genreID)
         );
-
+  
         while (selectedGenres.length < 5 && remainingGenres.length > 0) {
           const randomIndex = Math.floor(Math.random() * remainingGenres.length);
           const randomGenre = remainingGenres.splice(randomIndex, 1)[0];
@@ -50,13 +54,14 @@ export default function SearchByGenre({ onGenreClick, onSeeMoreGenresClick }) {
           selectedGenres.push(randomGenre);
         }
       }
-
-      console.log("search by genre", selectedGenres);
+  
+      console.log("Fetched genres:", selectedGenres);
       setGenres(selectedGenres);
     } catch (error) {
       console.error("Error fetching genres:", error);
     }
   };
+  
 
   const fetchAllGenres = async () => {
     try {

@@ -41,23 +41,23 @@ const fetchBooksByUserInterest = async (userID) => {
         }, {});
 
         const books = bookGenreLinks
-    .filter(link => link.book_titles) // Ensure book_titles is not null
-    .map(link => {
-        const titleID = link.titleID;
-        const avgRating = ratingMap[titleID] ? ratingMap[titleID].total / ratingMap[titleID].count : null;
-        const totalRatings = ratingMap[titleID] ? ratingMap[titleID].count : 0;
-        return {
-            ...link.book_titles,
-            weightedAvg: avgRating,
-            totalRatings: totalRatings,
-            genres: link.genres?.genreName || "Unknown", 
-            category: link.genres?.category || "Unknown",
-        };
-    });
-    
+            .filter(link => link.book_titles) // Ensure book_titles is not null
+            .map(link => {
+                const titleID = link.titleID;
+                const avgRating = ratingMap[titleID] ? ratingMap[titleID].total / ratingMap[titleID].count : null;
+                const totalRatings = ratingMap[titleID] ? ratingMap[titleID].count : 0;
+                return {
+                    ...link.book_titles,
+                    weightedAvg: avgRating,
+                    totalRatings: totalRatings,
+                    genres: link.genres?.genreName || "Unknown",
+                    category: link.genres?.category || "Unknown",
+                };
+            });
 
 
-        return { genreName: randomGenre.genres.genreName, books: {books} };
+
+        return { genreName: randomGenre.genres.genreName, books: { books } };
     } catch (error) {
         console.error("Error fetching books by user interest:", error);
         return { genreName: "Unknown", books: [] };
@@ -65,7 +65,7 @@ const fetchBooksByUserInterest = async (userID) => {
 };
 
 const InterestedGenre = ({ userID, onSeeMoreClick }) => {
-    const { user } = useUser(); 
+    const { user } = useUser();
     const [genreData, setGenreData] = useState({ genreName: "", books: [] });
     const [loading, setLoading] = useState(true);
 
@@ -73,7 +73,7 @@ const InterestedGenre = ({ userID, onSeeMoreClick }) => {
 
     useEffect(() => {
         if (!userID) {
-            console.error("InterestedGenre: userID is undefined!");
+            console.log("InterestedGenre: Guest Mode");
             return;
         }
 
@@ -92,8 +92,10 @@ const InterestedGenre = ({ userID, onSeeMoreClick }) => {
         fetchData();
     }, [userID]);
 
-    if (loading) return <p>Loading...</p>;
 
+    if (!userID) {
+        return;
+    } else {
     return (
         <BookCards
             title={`Because you like ${genreData.genreName}`}
@@ -103,6 +105,7 @@ const InterestedGenre = ({ userID, onSeeMoreClick }) => {
             }
         />
     );
+    }
 };
 
 export default InterestedGenre;

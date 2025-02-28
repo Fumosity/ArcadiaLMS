@@ -53,8 +53,8 @@ const Recommended = ({ titleID, onSeeMoreClick }) => {
     }, [user, titleID]);
 
     if (!user || !user.userID) {
-        console.error("Recommended: userID is undefined or user is null!");
-        return <p>Error: User not found.</p>;
+        console.log("Recommended: Guest Mode");
+        return;
     }
 
     return(
