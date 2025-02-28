@@ -15,6 +15,8 @@ import RoomReserv from '../components/admin-lib-analytics-comp/RoomReserv';
 import MostPop from '../components/admin-lib-analytics-comp/MostPop';
 import HighRates from '../components/admin-lib-analytics-comp/HighRates';
 import Title from '../components/main-comp/Title';
+import RecentReports from '../components/admin-user-support-report-view-comp/RecentReports';
+import RecentSupport from '../components/admin-user-support-report-view-comp/RecentSupport';
 
 const AHomePage = () => {
   const navigate = useNavigate(); // Initialize the useNavigate hook
@@ -50,6 +52,10 @@ const AHomePage = () => {
 
           <MostPop />
           <HighRates />
+          <div className="space-y-2 w-full">
+            <RecentReports />
+            <RecentSupport />
+          </div>
         </div>
       </div>
     </div>

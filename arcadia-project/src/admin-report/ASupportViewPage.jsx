@@ -1,12 +1,12 @@
 import React from "react";
 import Title from "../components/main-comp/Title";
-import RecentReports from "../components/admin-user-support-report-view-comp/RecentReports";
+import RecentSupport from "../components/admin-user-support-report-view-comp/RecentSupport";
 import SupportView from "../components/admin-report-view-comp/SupportView"
 
 const ASupportViewPage = () => (
     <div className="">
         {/* Main header */}
-        <Title>User Report View</Title>
+        <Title>User Support Ticket View</Title>
 
         {/* Main content section */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -20,7 +20,7 @@ const ASupportViewPage = () => (
 
                 {/* Right side content */}
                 <div className="lg:col-span-1 space-y-8">
-                    <RecentReports />
+                    <RecentSupport />
                 </div>
             </div>
         </main>

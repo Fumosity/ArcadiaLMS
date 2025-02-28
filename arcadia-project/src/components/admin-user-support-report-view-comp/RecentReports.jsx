@@ -5,19 +5,19 @@ import { supabase } from "/src/supabaseClient.js"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const RecentReports = () => {
   const [recentReports, setRecentReports] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const navigate = useNavigate();
 
   const fetchRecentReports = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("report_ticket")
         .select(`
-                    reportID,
-                    date,
-                    time,
+                    *,
                     user_accounts:userID (
                         userID,
                         userFName,
@@ -32,15 +32,7 @@ const RecentReports = () => {
         throw error
       }
 
-      // Transform the data to match our needs
-      const formattedData = data.map((report) => ({
-        user: `${report.user_accounts.userFName} ${report.user_accounts.userLName}`,
-        userID: report.user_accounts.userID,
-        reportID: report.reportID,
-        dateTime: `${report.date} ${report.time}`,
-      }))
-
-      setRecentReports(formattedData)
+      setRecentReports(data)
     } catch (error) {
       console.error("Error fetching recent reports:", error)
     } finally {
@@ -75,6 +67,14 @@ const RecentReports = () => {
     }
   }, [fetchRecentReports])
 
+  const handleReportClick = (report) => {
+    console.log("report", report)
+    navigate("/admin/reportticket", {
+      state: { ticket: report },
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="bg-white border border-grey p-4 rounded-lg">
       <div className="flex justify-between items-center mb-4">
@@ -106,15 +106,13 @@ const RecentReports = () => {
           ) : recentReports.length > 0 ? (
             recentReports.map((report, index) => (
               <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                <td className="px-4 py-2 text-center text-sm truncate">{report.user}</td>
+                <td className="px-4 py-2 text-center text-sm truncate">{report.user_accounts.userFName} {report.user_accounts.userLName}</td>
                 <td className="px-4 py-2 text-center text-sm truncate">{report.reportID}</td>
-                <td className="px-4 py-2 text-arcadia-red font-semibold text-center text-sm truncate">
-                  <Link
-                    to={`/admin/support`}
-                    className="text-blue-600 hover:underline"
-                  >
+                <td 
+                className="px-4 py-2 text-arcadia-red font-semibold text-center text-sm truncate hover:underline" 
+                onClick={() => handleReportClick(report)}
+                >
                     View
-                  </Link>
                 </td>
               </tr>
             ))

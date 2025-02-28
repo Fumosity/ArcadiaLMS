@@ -5,101 +5,261 @@ import { supabase } from "/src/supabaseClient.js"
 import { Link } from "react-router-dom"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
+import { useNavigate } from "react-router-dom";
 
-const TableRow = ({ type, status, subject, date, time, supportID, supportDetails }) => {
-  const statusColor =
-    status === "Resolved"
-      ? "bg-green"
-      : status === "Ongoing"
-        ? "bg-yellow"
-        : status === "Intended"
-          ? "bg-red"
-          : "bg-grey"
-
-  return (
-    <Link
-      to="/admin/supportticket"
-      state={{ support: supportDetails }}
-      className="w-full grid grid-cols-6 gap-4 items-center text-center text-sm text-gray-900 mb-2 cursor-pointer hover:bg-gray-100"
-    >
-      <div className="border rounded-full py-1 px-3">{type || "Not Available"}</div>
-      <div className={`py-1 px-3 rounded-full ${statusColor}`}>{status || "Not Available"}</div>
-      <div className="truncate max-w-xs">{subject || "Not Available"}</div>
-      <div>{date || "Not Available"}</div>
-      <div>{time || "Not Available"}</div>
-      <div>{supportID || "Not Available"}</div>
-    </Link>
-  )
-}
-
-const SupportTicket = () => {
-  const [supports, setReports] = useState([])
+const UserSupports = () => {
+  const [supports, setSupports] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [entriesPerPage, setEntriesPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("Ascending");
+  const [typeFilter, setTypeFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const navigate = useNavigate();
+
+  function checkStatusColor(status) {
+    switch (status) {
+      case 'Resolved':
+        return "bg-green"
+      case 'Ongoing':
+        return "bg-yellow"
+      case 'Intended':
+        return "bg-red"
+      default:
+        return "bg-grey"
+    }
+  }
 
   useEffect(() => {
-    const fetchReports = async () => {
+    const fetchSupports = async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
         const { data, error } = await supabase
           .from("support_ticket")
-          .select("supportID, type, status, subject, date, time, content")
+          .select(`
+            supportID, type, status, subject, date, time, content, 
+            user_accounts:userID (userFName, userLName)
+          `);
 
-        if (error) throw error
+        if (error) throw error;
 
-        setReports(data)
-        setIsLoading(false)
+        setSupports(data || []);
       } catch (error) {
-        console.error("Error fetching supports:", error.message)
-        setIsLoading(false)
+        console.error("Error fetching supports:", error.message);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchReports()
-  }, [])
+    fetchSupports();
+  }, [supabase]); // Add `supabase` if needed, otherwise leave as `[]`
+
+  const totalPages = Math.ceil(supports.length / entriesPerPage);
+
+  // Handle sorting
+  const sortedData = [...supports].sort((a, b) => {
+    if (sortOrder === "Ascending") {
+      return String(a.supportID).localeCompare(String(b.supportID));
+    } else {
+      return String(b.supportID).localeCompare(String(a.supportID));
+    }
+  });  
+
+  // Handle filtering and searching
+  const filteredData = sortedData.filter((supports) => {
+    const matchesType =
+      typeFilter === "All" || supports.type === typeFilter;
+
+    const matchesStatus =
+      statusFilter === "All" || supports.status === statusFilter;
+
+    const matchesSearch =
+      supports.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supports.supportID.includes(searchTerm);
+
+    return matchesType && matchesStatus && matchesSearch;
+  });
+
+  // Pagination logic
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const displayedSupports = filteredData.slice(startIndex, startIndex + entriesPerPage);
+
+  // Log `supports` when it updates
+  useEffect(() => {
+    console.log("Updated supports:", supports);
+  }, [supports]);
+
+  const handleSupportClick = (support) => {
+    console.log("support", support)
+    navigate("/admin/supportticket", {
+      state: { support: support },
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
-    <>
-      <div className="w-full flex justify-between items-center mb-4">
-        <h2 className="text-zinc-900 text-xl font-semibold">Support Tickets</h2>
-      </div>
+    <div className="bg-white p-4 rounded-lg border-grey border h-fit">
+      <h3 className="text-2xl font-semibold mb-4">User Support Tickets</h3>
 
-      <div className="w-full grid grid-cols-6 gap-4 text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
-        <div>Type</div>
-        <div>Status</div>
-        <div>Subject</div>
-        <div>Date</div>
-        <div>Time</div>
-        <div>Ticket ID</div>
-      </div>
-      <div className="w-full border-t border-grey mb-2"></div>
+      {/* Controls for sort, filter, and search */}
+      <div className="mb-4 flex flex-wrap justify-between space-x-4">
+        <div className="flex gap-4">
+          {/* Sort By */}
+          <div className="flex items-center space-x-2">
+            <span className="font-medium text-sm">Sort:</span>
+            <button
+              onClick={() =>
+                setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")
+              }
+              className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+            >
+              {sortOrder}
+            </button>
+          </div>
 
-      {isLoading ? (
-        <div className="space-y-4">
-          {[...Array(5)].map((_, index) => (
-            <Skeleton key={index} height={20} />
-          ))}
+          {/* Filter By */}
+          <div className="flex items-center space-x-2">
+            <span className="font-medium text-sm">Type:</span>
+            <select
+              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+            >
+              <option value="All">All</option>
+              <option value="Account">Account</option>
+              <option value="Book">Book</option>
+              <option value="Research">Research</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <span className="font-medium text-sm">Status:</span>
+            <select
+              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="All">All</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Intended">Intended</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
         </div>
-      ) : supports.length > 0 ? (
-        supports.map((support) => (
-          <React.Fragment key={support.supportID}>
-            <TableRow
-              type={support.type}
-              status={support.status}
-              subject={support.subject}
-              date={support.date}
-              time={support.time}
-              supportID={support.supportID}
-              supportDetails={support}
-            />
-            <div className="w-full border-t border-grey mb-2"></div>
-          </React.Fragment>
-        ))
-      ) : (
-        <div className="text-center text-gray-500">No supports found</div>
-      )}
-    </>
+        {/* Search */}
+        <div className="flex items-center space-x-2">
+          <label htmlFor="search" className="font-medium text-sm">Search:</label>
+          <input
+            type="text"
+            id="search"
+            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-64"
+            placeholder="Subject or support ID"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Type</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Status</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-3/12">Subject</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-3/12">User</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">Date</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Time</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Ticket ID</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {isLoading ? (
+            <tr>
+              <td className="text-center py-4 w-1/12">
+                <Skeleton />
+              </td>
+              <td className="text-center py-4 w-1/12">
+                <Skeleton />
+              </td>
+              <td className="text-center py-4 w-3/12">
+                <Skeleton />
+              </td>
+              <td className="text-center py-4 w-3/12">
+                <Skeleton />
+              </td>
+              <td className="text-center py-4 w-2/12">
+                <Skeleton />
+              </td>
+              <td className="text-center py-4 w-1/12">
+                <Skeleton />
+              </td>
+              <td className="text-center py-4 w-1/12">
+                <Skeleton />
+              </td>
+            </tr>
+          ) : displayedSupports.length > 0 ? (
+            displayedSupports.map((support, index) => (
+              <tr key={index} className="hover:bg-light-gray cursor-pointer">
+                <td className="px-4 py-2 text-sm text-gray-900 text-center w-1/12">
+                  <div className={`py-1 px-3 rounded-full bg-grey font-semibold`}>
+                    {support.type || "N/A"}
+                  </div>
+                </td>
+                <td className="px-4 py-2 text-sm text-gray-900 text-center w-1/12">
+                  <div className={`py-1 px-3 rounded-full font-semibold ${checkStatusColor(support.status)}`}>
+                    {support.status || "N/A"}
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-left w-3/12">
+                  <button
+                    onClick={() => handleSupportClick(support)}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {support.subject}
+                  </button>
+                </td>
+                <td className="px-4 py-2 text-sm text-gray-900 text-center w-3/12">
+                  {support.user_accounts.userFName} {support.user_accounts.userLName}
+                </td>
+                <td className="px-4 py-2 text-sm text-gray-900 text-center w-2/12">
+                  {support.date}
+                </td>
+                <td className="px-4 py-2 text-sm text-gray-900 text-center w-1/12">
+                  {support.time}
+                </td>
+                <td className="px-4 py-2 text-sm  text-arcadia-red font-semibold text-center w-1/12">
+                  <button
+                    onClick={() => handleSupportClick(support)}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {support.supportID}
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td className="text-center text-zinc-600 py-4" colSpan="7">
+                No supports found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+        
+      </table>
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center mt-2 space-x-4">
+          <button className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+            Previous Page
+          </button>
+          <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+          <button className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+            Next Page
+          </button>
+        </div>
+    </div>
   )
 }
 
-export default SupportTicket
-
+export default UserSupports
