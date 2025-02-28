@@ -12,40 +12,65 @@ export const UserProvider = ({ children }) => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
-      navigateBasedOnRole(storedUser.userAccountType);
     }
-    setLoading(false); 
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      navigateBasedOnRole(user.userAccountType);
+    }
+  }, [user]);
 
   const updateUser = (newUser) => {
     if (newUser) {
       localStorage.setItem("user", JSON.stringify(newUser));
       setUser(newUser);
-      navigateBasedOnRole(newUser.userAccountType);
     } else {
       localStorage.removeItem("user");
       setUser(null);
-      navigate("/");
+      navigate("/user/login");
     }
   };
 
+  const loginAsGuest = () => {
+    const guestUser = {
+      userID: 0,
+      name: "Guest",
+      userAccountType: "Guest",
+    };
+    updateUser(guestUser);
+  };
+
   const navigateBasedOnRole = (userAccountType) => {
-    if (["Admin", "Superadmin", "Intern"].includes(userAccountType)) {
-      navigate("/admin");
-    } else if (["Student", "Teacher"].includes(userAccountType)) {
-      navigate("/");
-    } else {
-      alert("Unknown account type. Please contact support.");
-      navigate("/");
+    if (!userAccountType) {
+      navigate("/user/login");
+      return;
+    }
+    switch (userAccountType) {
+      case "Admin":
+      case "Superadmin":
+      case "Intern":
+        navigate("/admin");
+        break;
+      case "Student":
+      case "Teacher":
+        navigate("/");
+        break;
+      case "Guest":
+        navigate("/user/bookcatalog");
+        break;
+      default:
+        navigate("/user/login");
     }
   };
 
   if (loading) {
-    return <p>Loading...</p>; // Prevent rendering until user is loaded
+    return <p>Loading...</p>;
   }
 
   return (
-    <UserContext.Provider value={{ user, updateUser }}>
+    <UserContext.Provider value={{ user, updateUser, loginAsGuest }}>
       {children}
     </UserContext.Provider>
   );

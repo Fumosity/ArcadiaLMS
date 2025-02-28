@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../../supabaseClient.js";
 import { useUser } from "../../../backend/UserContext";
@@ -9,15 +9,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { updateUser } = useUser();
-
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      updateUser(storedUser);
-      navigateBasedOnRole(storedUser.userAccountType);
-    }
-  }, []);
+  const { updateUser, loginAsGuest } = useUser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,21 +33,14 @@ export default function LoginForm() {
         return;
       }
 
+      if (!loginData.userAccountType) {
+        alert("User role is missing. Please contact support.");
+        return;
+      }
+
       updateUser(loginData);
-      localStorage.setItem("user", JSON.stringify(loginData)); // Store user session
-      navigateBasedOnRole(loginData.userAccountType);
     } catch (err) {
       setError("Unable to connect to the server. Please check your network.");
-    }
-  };
-
-  const navigateBasedOnRole = (userAccountType) => {
-    if (["Admin", "Superadmin", "Intern"].includes(userAccountType)) {
-      navigate("/admin");
-    } else if (["Student", "Teacher"].includes(userAccountType)) {
-      navigate("/");
-    } else {
-      alert("Unknown account type. Please contact support.");
     }
   };
 
@@ -112,14 +97,16 @@ export default function LoginForm() {
 
           <label className="block text-sm text-center text-gray-700">Or you may also browse as a guest!</label>
           <div className="flex justify-center items-center">
-            <Link to="/user/register" className="guestBtn">
-              Browse as guest
-            </Link>
+            <button
+              onClick={loginAsGuest}
+              className="bg-red text-white p-2 rounded-md w-full"
+            >
+              Continue as Guest
+            </button>
           </div>
         </form>
       </div>
 
-      {/* Right Section */}
       <div className="w-1/2 relative bg-grey rounded-2xl">
         <div className="absolute inset-0 flex items-end p-12">
           <h2 className="text-white text-4xl text-right font-semibold">Knowledge that empowers.</h2>

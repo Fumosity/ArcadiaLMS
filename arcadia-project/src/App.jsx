@@ -4,6 +4,9 @@ import Header from './components/main-comp/Header';
 import Navbar from './components/main-comp/Navbar';
 import Footer from './components/main-comp/Footer';
 import Copyright from './components/main-comp/Copyright';
+import ProtectedRoute from './backend/ProtectedRoute.jsx';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Admin Components
 import AHomePage from './admin-home-page/AHomePage';
@@ -49,6 +52,7 @@ import UBookView from './UserPages/user-book-view-page/UBookView.jsx';
 
 // Testing modals
 import ModalTest from './z_modals/ModalTest';
+
 import ErrorPage from './UserPages/ErrorPage';
 import URegister from './UserPages/user-log-sign-page/URegister';
 import AUAccView from './admin-user-account-view/AUAccView';
@@ -69,9 +73,9 @@ import ARExport from './admin-research-export/ARExport.jsx';
 
 function App() {
   return (
-    
+    <>
+    <ToastContainer />
     <Routes>
-
       <Route path="/user/login" element={<ULogin />}/>
       <Route path="/user/register" element={<URegister />} />
       
@@ -86,12 +90,12 @@ function App() {
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
               <Route path="/user/bookcatalog" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
-              <Route path="/user/reservations" element={<UDiscussionReserv />} />
-              <Route path="/user/services" element={<UServices />} />
-              <Route path="/user/support" element={<USupport />} />
+              <Route path="/user/reservations" element={<ProtectedRoute><UDiscussionReserv /></ProtectedRoute>} />
+              <Route path="/user/services" element={<ProtectedRoute><UServices /></ProtectedRoute>} />
+              <Route path="/user/support" element={<ProtectedRoute><USupport /></ProtectedRoute>} />  
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
-              <Route path="/user/accountview" element={<UAccountProfile />} />
+              <Route path="/user/accountview" element={<ProtectedRoute><UAccountProfile /></ProtectedRoute>} />
               <Route path="/user/faqs" element={<UFAQs />} />
               <Route path="/user/mostpopularbooks" element={<UMostPop />} />
               <Route path="/user/highlyratedbooks" element={<UHighlyRated />} />
@@ -153,6 +157,7 @@ function App() {
         }
       />
     </Routes>
+    </>
   );
 }
 
