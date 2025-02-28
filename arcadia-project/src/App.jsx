@@ -92,7 +92,7 @@ function App() {
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
               <Route path="/user/reservations" element={<ProtectedRoute><UDiscussionReserv /></ProtectedRoute>} />
               <Route path="/user/services" element={<ProtectedRoute><UServices /></ProtectedRoute>} />
-              <Route path="/user/support" element={<ProtectedRoute><USupport /></ProtectedRoute>} />  
+              <Route path="/user/support" element={<USupport />} />  
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
               <Route path="/user/accountview" element={<ProtectedRoute><UAccountProfile /></ProtectedRoute>} />
