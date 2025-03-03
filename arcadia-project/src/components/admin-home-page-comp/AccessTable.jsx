@@ -10,13 +10,13 @@ const AccessTable = () => {
   ];
 
   return (
-    <div className="flex-col justify-center gap-2 w-full">
+    <div className="flex-col justify-center w-full space-y-2">
       {actions.map((item, index) => (
         <div
           key={index}
           onClick={() => navigate(item.path)}
         >
-          <button className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey  hover:bg-arcadia-red hover:text-white"
+          <button className="h-10 flex items-center justify-center border border-lg w-full px-2 rounded-lg border-grey  hover:bg-arcadia-red hover:text-white"
           >
             {item.action}
           </button>

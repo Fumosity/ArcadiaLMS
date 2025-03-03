@@ -26,58 +26,61 @@ export default function ARoomBooking({ addReservation }) {
   }, []);
 
   const handleInputChange = async (e) => {
-  const { name, value } = e.target;
+    const { name, value } = e.target;
 
-  // If the school ID field is updated and cleared, reset the dependent fields
-  if (name === "schoolId" && value.trim() === "") {
-    setFormData((prev) => ({
-      ...prev,
-      schoolId: value,
-      userId: "",
-      name: "",
-      college: "",
-      department: "",
-    }));
-    return;
-  }
-
-  setFormData((prev) => ({ ...prev, [name]: value }));
-
-  if (name === "schoolId" && value.trim() !== "") {
-    try {
-      const { data, error } = await supabase
-        .from("user_accounts")
-        .select("userID, userFName, userLName, userCollege, userDepartment")
-        .eq("userLPUID", value); // Query using school ID instead of user ID
-
-      if (error) {
-        console.error("Error fetching user details:", error.message);
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        console.error("No user found with the provided School ID");
-        return;
-      }
-
-      if (data.length > 1) {
-        console.error("Multiple users found with the same School ID");
-        return;
-      }
-
-      const user = data[0];
+    // If the school ID field is updated and cleared, reset the dependent fields
+    if (name === "schoolId" && value.trim() === "") {
       setFormData((prev) => ({
         ...prev,
-        userId: user.userID,
-        name: `${user.userFName} ${user.userLName}`,
-        college: user.userCollege,
-        department: user.userDepartment,
+        schoolId: value,
+        userId: "",
+        name: "",
+        college: "",
+        department: "",
       }));
-    } catch (error) {
-      console.error("Error fetching user details:", error.message);
+      return;
     }
-  }
-};
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "schoolId" && value.trim() !== "") {
+      try {
+        let new_value = value.replace(/\D/g, "");  
+        const { data, error } = await supabase
+          .from("user_accounts")
+          .select("userID, userFName, userLName, userCollege, userDepartment")
+          .eq("userLPUID", new_value); // Query using school ID instead of user ID
+
+        if (error) {
+          console.error("Error fetching user details:", error.message);
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          console.log("No user found with the provided School ID");
+          return;
+        }
+
+        if (data.length > 1) {
+          console.error("Multiple users found with the same School ID");
+          return;
+        }
+
+        console.log("User found with the provided School ID");
+
+        const user = data[0];
+        setFormData((prev) => ({
+          ...prev,
+          userId: user.userID,
+          name: `${user.userFName} ${user.userLName}`,
+          college: user.userCollege,
+          department: user.userDepartment,
+        }));
+      } catch (error) {
+        console.error("Error fetching user details:", error.message);
+      }
+    }
+  };
 
   const checkExistingReservation = async () => {
     try {
@@ -226,128 +229,167 @@ export default function ARoomBooking({ addReservation }) {
     }
   };
 
+  const formatSchoolNo = (value) => {
+    // Remove non-numeric characters
+    let numericValue = value.replace(/\D/g, "");
+
+    // Apply the XXXX-X-XXXXX format
+    if (numericValue.length > 4) {
+      numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`;
+    }
+    if (numericValue.length > 6) {
+      numericValue = `${numericValue.slice(0, 6)}-${numericValue.slice(6, 11)}`;
+    }
+    return numericValue;
+  };
+
   return (
-    <div className="bg-white overflow-hidden border border-grey mb-8 p-6 rounded-lg w-full">
-      <h2 className="text-2xl font-semibold mb-2">Booking</h2>
-      <div className="flex gap-8">
-        <div className="space-y-4 flex-1">
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">User ID:</span>
-            <input
-              type="text"
-              name="userId"
-              value={formData.userId}
-              onChange={handleInputChange}
-              className="input-space"
-              readOnly
-            />
+    <div className="bg-white p-4 rounded-lg border-grey border">
+      <h3 className="text-2xl font-semibold mb-4">Room Booking</h3>
+      <div className="flex space-x-4">
+        <div className="space-y-2 flex-1">
+          <div className="flex items-center">
+            <span className="w-1/3 text-md capitalize">School ID*:</span>
+            <div className="w-2/3 flex items-center">
+              <input
+                type="text"
+                name="schoolId"
+                value={formData.schoolId ? formatSchoolNo(formData.schoolId) : ""}
+                onChange={handleInputChange} // Allow changes
+                className="px-3 py-1 rounded-full border border-grey w-full"
+                required
+              />
+            </div>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">School ID No.*:</span>
-            <input
-              type="text"
-              name="schoolId"
-              value={formData.schoolId}
-              onChange={handleInputChange} // Allow changes
-              className="input-space"
-              required
-            />
+          <div className="flex items-center">
+            <span className="w-1/3 text-md capitalize">Name:</span>
+            <div className="w-2/3 flex items-center">
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                className="px-3 py-1 rounded-full border border-grey w-full"
+                readOnly
+                required
+              />
+            </div>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">Name*:</span>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              className="input-space"
-              readOnly
-              required
-            />
+          <div className="flex items-center">
+            <span className="w-1/3 text-md capitalize">College:</span>
+            <div className="w-2/3 flex items-center">
+              <input
+                type="text"
+                name="college"
+                value={formData.college}
+                className="px-3 py-1 rounded-full border border-grey w-full"
+                readOnly
+                required
+              />
+            </div>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">College*:</span>
-            <input
-              type="text"
-              name="college"
-              value={formData.college}
-              className="input-space"
-              readOnly
-              required
-            />
+          <div className="flex items-center">
+            <span className="w-1/3 text-md capitalize">Department:</span>
+            <div className="w-2/3 flex items-center">
+              <input
+                type="text"
+                name="department"
+                value={formData.department}
+                className="px-3 py-1 rounded-full border border-grey w-full"
+                readOnly
+                required
+              />
+            </div>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">Department*:</span>
-            <input
-              type="text"
-              name="department"
-              value={formData.department}
-              className="input-space"
-              readOnly
-              required
-            />
+          <div className="items-center hidden">
+            <span className="w-1/3 text-md capitalize">User ID:</span>
+            <div className="w-2/3 flex items-center">
+              <input
+                type="text"
+                name="userId"
+                value={formData.userId}
+                onChange={handleInputChange}
+                className="px-3 py-1 rounded-full border border-grey w-full"
+                readOnly
+              />
+            </div>
           </div>
         </div>
 
         {/* Right Section */}
-        <div className="space-y-4 flex-1">
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">Room:</span>
-            <select
-              name="room"
-              value={formData.room}
-              onChange={handleInputChange}
-              className="input-space"
-            >
-              <option value="A701-A">Discussion Room 1 (A701-A)</option>
-              <option value="A701-B">Discussion Room 2 (A701-B)</option>
-              <option value="A701-C">Discussion Room 3 (A701-C)</option>
-              <option value="A701-D">Discussion Room 4 (A701-D)</option>
-            </select>
+        <div className="space-y-2 flex-1">
+          <div className="flex items-center">
+            <span className="w-1/3 text-md capitalize">Department:</span>
+            <div className="w-2/3 flex items-center">
+              <select
+                name="room"
+                value={formData.room}
+                onChange={handleInputChange}
+                className="px-3 py-1 rounded-full border border-grey w-full"
+              >
+                <option value="A701-A">Discussion Room 1 (A701-A)</option>
+                <option value="A701-B">Discussion Room 2 (A701-B)</option>
+                <option value="A701-C">Discussion Room 3 (A701-C)</option>
+                <option value="A701-D">Discussion Room 4 (A701-D)</option>
+              </select>
+            </div>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">Date:</span>
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              className="input-space"
-            />
+
+          <div className="flex items-center">
+            <span className="w-1/3 text-md capitalize">Reservation Date:</span>
+            <div className="w-2/3 flex items-center">
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleInputChange}
+                className="px-3 py-1 rounded-full border border-grey w-full"
+              />
+            </div>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">Start Time:</span>
-            <input
-              type="time"
-              name="startTime"
-              value={formData.startTime}
-              onChange={handleInputChange}
-              className="input-space"
-            />
+
+          <div className="flex w-full items-center">
+            <span className="w-1/3 text-md capitalize">Start / End Time:</span>
+            <div className=" w-2/3 flex items-center space-x-2">
+              <div className="w-full flex items-center">
+                <input
+                  type="time"
+                  name="startTime"
+                  value={formData.startTime}
+                  onChange={handleInputChange}
+                  className="px-3 py-1 rounded-full border border-grey w-full"
+                />
+              </div>
+              <div className="w-full flex items-center">
+                <input
+                  type="time"
+                  name="endTime"
+                  value={formData.endTime}
+                  onChange={handleInputChange}
+                  className="px-3 py-1 rounded-full border border-grey w-full"
+                />
+              </div>
+            </div>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">End Time:</span>
-            <input
-              type="time"
-              name="endTime"
-              value={formData.endTime}
-              onChange={handleInputChange}
-              className="input-space"
-            />
+          <div className="flex items-center">
+            <span className="w-1/3 text-md capitalize">Title:</span>
+            <div className="w-2/3 flex items-center">
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                className="px-3 py-1 rounded-full border border-grey w-full"
+              />
+            </div>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-dark-gray">Purpose:</span>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              className="input-space"
-            />
-          </div>
+
         </div>
       </div>
       <div className="flex justify-center mt-8">
-        <button className="reservButton" onClick={handleFormSubmit}>
+        <button           
+        className="add-book w-1/4 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+        onClick={handleFormSubmit}
+        >
           Reserve a Room
         </button>
       </div>

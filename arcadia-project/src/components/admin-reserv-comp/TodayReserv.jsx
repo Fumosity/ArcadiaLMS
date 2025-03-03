@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
+import { useNavigate } from "react-router-dom";
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
 
 const TodayReserv = () => {
   const [roomRes, setRoomRes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true)
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -11,8 +16,8 @@ const TodayReserv = () => {
 
       const { data: reservations, error } = await supabase
         .from("reservation")
-        .select("reservationData, userID") 
-        .eq("reservationData->>date", today);   
+        .select("reservationData, userID")
+        .eq("reservationData->>date", today);
 
       if (error) {
         console.error("Error fetching reservations:", error);
@@ -55,35 +60,54 @@ const TodayReserv = () => {
     };
 
     fetchReservations();
+    setIsLoading(false)
   }, []);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="text-xl font-semibold mb-4">Today's Reservations</h3>
-      <table className="w-full text-left">
+    <div className="bg-white border border-grey p-4 rounded-lg w-full">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-2xl font-semibold">Today's Reservations</h3>
+      </div>
+
+      <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr>
-            <th className="font-semibold pb-1 border-b border-grey">Room</th>
-            <th className="font-semibold pb-1 border-b border-grey">Time</th>
-            <th className="font-semibold pb-1 border-b border-grey">Booker</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Booker</th>
           </tr>
         </thead>
-        <tbody>
-          {roomRes.length > 0 ? (
+        <tbody className="bg-white divide-y divide-gray-200">
+          {isLoading ? (
+            [...Array(5)].map((_, index) => (
+              <tr key={index} className="hover:bg-light-gray cursor-pointer">
+                <td className="px-4 py-2 text-center text-sm truncate">
+                  <Skeleton />
+                </td>
+                <td className="px-4 py-2 text-center text-sm truncate">
+                  <Skeleton />
+                </td>
+                <td className="px-4 py-2 text-center text-sm truncate">
+                  <Skeleton />
+                </td>
+              </tr>
+            ))
+          ) : roomRes.length > 0 ? (
             roomRes.map((room, index) => (
-              <tr key={index} className="border-b border-grey">
-                <td className="py-2">{room.room}</td>
-                <td className="py-2">{room.time}</td>
-                <td className="py-2">{room.booker}</td>
+              <tr key={index} className="hover:bg-light-gray cursor-pointer">
+                <td className="px-4 py-2 text-center text-sm truncate">{room.room}</td>
+                <td className="px-4 py-2 text-center text-sm truncate">{room.time}</td>
+                <td className="px-4 py-2 text-center text-sm truncate">{room.booker}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="3" className="py-2 text-center">No reservations found for today</td>
+              <td colSpan="3" className="px-4 py-2 text-center text-sm">No reservations found for today</td>
             </tr>
           )}
         </tbody>
       </table>
+
     </div>
   );
 };

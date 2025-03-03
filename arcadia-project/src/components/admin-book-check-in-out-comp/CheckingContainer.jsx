@@ -73,12 +73,14 @@ const CheckingContainer = () => {
 
   useEffect(() => {
     if (formData.schoolNo) {
+      let formattedSchoolNo = formData.schoolNo.replace(/\D/g, "");  
+
       const fetchUserData = async () => {
         try {
           const { data, error } = await supabase
             .from('user_accounts')
             .select('userFName, userLName, userCollege, userDepartment')
-            .eq('userLPUID', formData.schoolNo)
+            .eq('userLPUID', formattedSchoolNo)
             .single();
 
           if (error || !data) {
@@ -375,6 +377,9 @@ const CheckingContainer = () => {
               // Hide deadline field for "Check In"
               if (key === 'deadline' && checkMode === 'Check In') {
                 return null;
+              } 
+              if (key === 'deadline') {
+                inputType = 'date';
               }
 
               return (
@@ -386,7 +391,7 @@ const CheckingContainer = () => {
                     <input
                       type={inputType}
                       name={key}
-                      value={key === 'bookBarcode' ? formData.bookBarcode : value}
+                      value={key === 'bookBarcode' ? formData.bookBarcode : key === 'schoolNo' ? formatSchoolNo(formData.schoolNo) : value}
                       onChange={handleInputChange}
                       placeholder={key === 'schoolNo' ? "XXXX-X-XXXXX" : ""}
                       className={`px-3 py-1 rounded-full border ${emptyFields[key] ? 'border-arcadia-red' : 'border-grey'} ${key === 'bookBarcode' ? 'w-[calc(3/5*100%)]' : 'w-full'}`} // Input width: 3/5 of 2/3, otherwise w-full

@@ -19,7 +19,7 @@ const AUsrAcc = () => (
                 <ListOfAdminAcc />
             </div>
 
-            <div className="flex flex-col items-start flex-shrink-0 w-1/4">
+            <div className="flex flex-col items-start flex-shrink-0 w-1/4 space-y-2 ">
                 <AccessTable />
                 <div className="space-y-2 w-full">
                 <RecentReports />
