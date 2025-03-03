@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import DemoteToAdmin from "./attention-modals/DemoteToAdmin";
-import DeleteSupadminAcc from "./attention-modals/DeleteSupadminAcc";
 import PromoteToSuperadmin from "./attention-modals/PromoteToSuperadmin";
 import PromoteAdminModal from "./PromoteAdmin";
 import WrngDemote from "./warning-modals/WrngDemote";
+import bcrypt from "bcryptjs"
 
+//can delete this if cleared
 const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
   if (!isOpen) return null;
 

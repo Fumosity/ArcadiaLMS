@@ -4,7 +4,7 @@ import { supabase } from "../../supabaseClient.js"; // Adjust the import path as
 import AccountModifier from "../../z_modals/AccountModifier.jsx";
 import DeleteSupadminAcc from "../../z_modals/attention-modals/DeleteSupadminAcc";
 import DeleteAdminAcc from "../../z_modals/attention-modals/DeleteAdminAcc";
-
+//can delete this if cleared
 const AdminInformations = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -94,7 +94,7 @@ const AdminInformations = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-center mb-6">Admin Account Information</h2>
+      
       <div className="grid grid-cols-2 gap-4">
         {/* Left Column */}
         <div className="space-y-4">

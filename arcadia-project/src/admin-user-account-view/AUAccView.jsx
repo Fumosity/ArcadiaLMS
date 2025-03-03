@@ -1,12 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import MainHeader from "../components/main-comp/MainHeader";
-import Navbar from "../components/main-comp/Navbar";
-import Footer from "../components/main-comp/Footer";
-import Copyright from "../components/main-comp/Copyright";
 import Title from "../components/main-comp/Title";
-import Blacklist from "../components/admin-user-acc-comp/Blacklist";
-import Whitelist from "../components/admin-user-acc-comp/Whitelist";
 import AUserCirc from "../components/admin-user-account-view-comp/AUserCirc";
 import RecentReports from "../components/admin-user-support-report-view-comp/RecentReports";
 import RecentSupport from "../components/admin-user-support-report-view-comp/RecentSupport";
@@ -21,7 +15,12 @@ const AUAccView = () => {
 
     return (
         <div className="min-h-screen bg-white">
-            <Title>User Account Viewer</Title>
+            {user === "Student" || user === "Teacher" || user === "Intern" ? (
+                <Title>User Account Viewer</Title>
+            ) : user === "Admin" ? (
+                <Title>Admin Account Viewer</Title>
+            ) : null}
+
 
             <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
                 <div className="flex-shrink-0 w-3/4">
@@ -34,18 +33,18 @@ const AUAccView = () => {
                         </button>
                     </div>
                     <div className="space-y-2">
-                    <UserInformations user={user} />
-                    <AUserCirc user={user} />
+                        <UserInformations user={user} />
+                        <AUserCirc user={user} />
                     </div>
                 </div>
 
-            <div className="flex flex-col items-start flex-shrink-0 w-1/4 mt-12">
-                <div className="w-full space-y-2">
-                    <RecentReports user={user} />
-                    <RecentSupport user={user} />
+                <div className="flex flex-col items-start flex-shrink-0 w-1/4 mt-12">
+                    <div className="w-full space-y-2">
+                        <RecentReports user={user} />
+                        <RecentSupport user={user} />
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
 
     );

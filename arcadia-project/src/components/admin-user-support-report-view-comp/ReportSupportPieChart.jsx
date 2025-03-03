@@ -5,9 +5,9 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 import { supabase } from "/src/supabaseClient.js"
 
 const STATUS_COLORS = {
-  Ongoing: "#e8d08d",
-  Intended: "#de6262",
-  Resolved: "#8fd28f"
+  Ongoing: "#FFB200",
+  Intended: "#A31D1D",
+  Resolved: "#118B50"
 }
 
 const ReportSupportPieChart = () => {

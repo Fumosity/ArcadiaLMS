@@ -114,8 +114,8 @@ const ReportSupportBarPlot = () => {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="reports" fill="#902424" />
-          <Bar dataKey="supports" fill="#F5BF03" />
+          <Bar dataKey="reports" fill="#A31D1D" />
+          <Bar dataKey="supports" fill="#FFB200" />
         </BarChart>
       </ResponsiveContainer>
     </div>

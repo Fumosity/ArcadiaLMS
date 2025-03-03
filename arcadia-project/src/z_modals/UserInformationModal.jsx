@@ -4,6 +4,10 @@ import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 import WrngPromoteToIntern from "./warning-modals/WrngPromoteToIntern"
 import WrngDemoteFromIntern from "./warning-modals/WrngDemoteFromIntern"
+import DemoteToAdmin from "./attention-modals/DemoteToAdmin";
+import PromoteToSuperadmin from "./attention-modals/PromoteToSuperadmin";
+import PromoteAdminModal from "./PromoteAdmin";
+import WrngDemote from "./warning-modals/WrngDemote";
 import bcrypt from "bcryptjs"
 
 const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
@@ -11,6 +15,11 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isAttentionModalOpen, setIsAttentionModalOpen] = useState(false)
   const [isDemotionModalOpen, setIsDemotionModalOpen] = useState(false)
+  const [isDemoteModalOpen, setIsDemoteModalOpen] = useState(false);
+  const [isDemoteToInternModalOpen, setIsDemoteToInternModalOpen] = useState(false);
+  const [isPromoteToSuperadminModalOpen, setIsPromoteToSuperadminModalOpen] = useState(false);
+  const [isPromoteToAdminModalOpen, setIsPromoteToAdminModalOpen] = useState(false);
+  
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [newPassword, setNewPassword] = useState("")
 
@@ -47,6 +56,43 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
     }))
   }
 
+  const handleSubmit = async () => {
+    if (user.userAccountType === "Admin" || user.userAccountType === "Superadmin") {
+      if (modifiedUser.userAccountType === "Admin" && user.userAccountType === "Superadmin") {
+        setIsDemoteModalOpen(true);
+        return;
+      }
+  
+      if (modifiedUser.userAccountType === "Intern" && (user.userAccountType === "Superadmin" || user.userAccountType === "Admin")) {
+        setIsDemoteToInternModalOpen(true);
+        return;
+      }
+  
+      if (modifiedUser.userAccountType === "Superadmin" && user.userAccountType === "Admin") {
+        setIsPromoteToSuperadminModalOpen(true);
+        return;
+      }
+  
+      if (modifiedUser.userAccountType === "Admin" && user.userAccountType === "Intern") {
+        setIsPromoteToAdminModalOpen(true);
+        return;
+      }
+    } else {
+      if (modifiedUser.userAccountType === "Intern" && user.userAccountType !== "Intern") {
+        setIsAttentionModalOpen(true);
+        return;
+      }
+  
+      if (modifiedUser.userAccountType !== "Intern" && user.userAccountType === "Intern") {
+        setIsDemotionModalOpen(true);
+        return;
+      }
+    }
+  
+    await updateUserInDatabase();
+  };
+  
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setModifiedUser((prevUser) => ({
@@ -59,19 +105,7 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
     setNewPassword(e.target.value)
   }
 
-  const handleSubmit = async () => {
-    if (modifiedUser.userAccountType === "Intern" && user.userAccountType !== "Intern") {
-      setIsAttentionModalOpen(true)
-      return
-    }
-
-    if (modifiedUser.userAccountType !== "Intern" && user.userAccountType === "Intern") {
-      setIsDemotionModalOpen(true)
-      return
-    }
-
-    await updateUserInDatabase()
-  }
+  
 
   const handleAttentionConfirm = async () => {
     setIsAttentionModalOpen(false)
@@ -82,6 +116,28 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
     setIsDemotionModalOpen(false)
     await updateUserInDatabase()
   }
+
+  // Admin handle modals
+  const handleDemoteConfirm = async () => {
+    setIsDemoteModalOpen(false);
+    await updateUserInDatabase();
+  };
+
+  const handleDemoteToInternConfirm = async () => {
+    setIsDemoteToInternModalOpen(false);
+    await updateUserInDatabase();
+  };
+
+  const handlePromoteToSuperadminConfirm = async () => {
+    setIsPromoteToSuperadminModalOpen(false);
+    await updateUserInDatabase();
+  };
+
+  const handlePromoteToAdminConfirm = async () => {
+    setIsPromoteToAdminModalOpen(false);
+    await updateUserInDatabase();
+  };
+  // end
 
   const updateUserInDatabase = async () => {
     setIsLoading(true)
@@ -130,10 +186,20 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
     )
   }
 
+  const accountTitle =
+  user.userAccountType === "Student" ||
+    user.userAccountType === "Teacher" ||
+    user.userAccountType === "Intern"
+    ? "Modify User Account Information"
+    : user.userAccountType === "Admin" ||
+      user.userAccountType === "Superadmin"
+      ? "Modify Admin Account Information"
+      : "Account Information";
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-4xl p-8 sm:p-10">
-        <h2 className="text-2xl font-semibold mb-8 text-center">Modify User Account Information</h2>
+        <h3 className="text-2xl font-semibold mb-4 text-center">{accountTitle}</h3>
 
         <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
           <div className="flex-1 space-y-4 min-w-0">
@@ -145,12 +211,23 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
                 onChange={handleChangeType}
                 className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
               >
-                <option value="Intern">Intern</option>
-                <option value="Teacher">Teacher</option>
-                <option value="Student">Student</option>
-                <option value="User">User</option>
+                {user.userAccountType === "Admin" || user.userAccountType === "Superadmin" ? (
+                  <>
+                    <option value="Intern">Intern</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Superadmin">Superadmin</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="Intern">Intern</option>
+                    <option value="Teacher">Teacher</option>
+                    <option value="Student">Student</option>
+                    <option value="User">User</option>
+                  </>
+                )}
               </select>
             </div>
+
 
             <div className="flex items-center">
               <span className="w-32 text-sm font-medium">User ID:</span>
@@ -232,6 +309,7 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
 
             <div className="flex items-center">
               <span className="w-32 text-sm font-medium">New Password:</span>
+              <div className="flex-1 items-center relative">
               <div className="flex-1 flex items-center relative">
                 <input
                   type={isPasswordVisible ? "text" : "password"}
@@ -239,8 +317,9 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
                   value={newPassword}
                   onChange={handlePasswordChange}
                   className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
-                  placeholder="Enter new password (leave empty to keep current)"
+                  placeholder="Enter new password"
                 />
+                
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
@@ -249,6 +328,9 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
                   {isPasswordVisible ? "Hide" : "Show"}
                 </button>
               </div>
+              <p className="italic text-arcadia-red text-xs text-left ml-3">leave empty to keep current*</p>
+              </div>
+              
             </div>
           </div>
         </div>
@@ -263,21 +345,55 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
         </div>
       </div>
 
-      <WrngPromoteToIntern
-        isOpen={isAttentionModalOpen}
-        onClose={() => setIsAttentionModalOpen(false)}
-        userFName={modifiedUser.userFName}
-        userLName={modifiedUser.userLName}
-        onPromote={handleAttentionConfirm}
-      />
 
-      <WrngDemoteFromIntern
-        isOpen={isDemotionModalOpen}
-        onClose={() => setIsDemotionModalOpen(false)}
-        userFName={modifiedUser.userFName}
-        userLName={modifiedUser.userLName}
-        onDemote={handleDemotionConfirm}
-      />
+      {user.userAccountType === "Admin" || 
+        user.userAccountType === "Superadmin" ? (
+        <>
+          <DemoteToAdmin
+            isOpen={isDemoteModalOpen}
+            onClose={() => setIsDemoteModalOpen(false)}
+            onDemote={handleDemoteConfirm}
+          />
+
+          <WrngDemote
+            isOpen={isDemoteToInternModalOpen}
+            onClose={() => setIsDemoteToInternModalOpen(false)}
+            userFName={modifiedUser.userFName}
+            userLName={modifiedUser.userLName}
+            onDemote={handleDemoteToInternConfirm}
+          />
+
+          <PromoteToSuperadmin
+            isOpen={isPromoteToSuperadminModalOpen}
+            onClose={() => setIsPromoteToSuperadminModalOpen(false)}
+            onPromote={handlePromoteToSuperadminConfirm}
+          />
+
+          <PromoteAdminModal
+            isOpen={isPromoteToAdminModalOpen}
+            onClose={() => setIsPromoteToAdminModalOpen(false)}
+            onPromote={handlePromoteToAdminConfirm}
+          />
+        </>
+      ) : (
+        <>
+          <WrngPromoteToIntern
+            isOpen={isAttentionModalOpen}
+            onClose={() => setIsAttentionModalOpen(false)}
+            userFName={modifiedUser.userFName}
+            userLName={modifiedUser.userLName}
+            onPromote={handleAttentionConfirm}
+          />
+
+          <WrngDemoteFromIntern
+            isOpen={isDemotionModalOpen}
+            onClose={() => setIsDemotionModalOpen(false)}
+            userFName={modifiedUser.userFName}
+            userLName={modifiedUser.userLName}
+            onDemote={handleDemotionConfirm}
+          />
+        </>
+      )}
     </div>
   )
 }
