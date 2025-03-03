@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from "/src/supabaseClient.js";
 import { useNavigate, Link } from "react-router-dom";
 
-function OutstandingFines() {
-    const [bkhistoryData, setBkhistoryData] = useState([]);
+function OutstandingFines({ onDataExport }) {
+    const [bkHistoryData, setBkhistoryData] = useState([]);
     const [damageFinesData, setDamageFinesData] = useState([]);
     const navigate = useNavigate();
 
@@ -13,7 +13,7 @@ function OutstandingFines() {
                 const today = new Date();
                 const { data, error } = await supabase
                     .from('book_transactions')
-                    .select('transactionID, userID, bookID, deadline, user_accounts(userFName, userLName, userLPUID)')
+                    .select('transactionID, userID, bookID, checkoutDate, checkoutTime, deadline, user_accounts(userFName, userLName, userLPUID)')
                     .not('deadline', 'is.null')
                     .lt('deadline', today.toISOString().split('T')[0]);
 
@@ -22,8 +22,9 @@ function OutstandingFines() {
                 } else {
                     const groupedData = data.reduce((acc, item) => {
                         const userId = item.userID;
-                        const deadline = new Date(item.deadline);
-
+                        const deadline = item.deadline;
+                        const checkout_date = item.checkoutDate
+                        const checkout_time = item.checkoutTime                         
                         // Calculate overdue days excluding Sundays for each book
                         let overdueDays = 0;
                         for (let d = new Date(deadline); d < today; d.setDate(d.getDate() + 1)) {
@@ -43,6 +44,9 @@ function OutstandingFines() {
                                 books_borrowed: 0,
                                 total_fine: 0,
                                 incurred_per_day: 0,
+                                deadline,
+                                checkout_date,
+                                checkout_time
                             };
                         }
 
@@ -56,7 +60,7 @@ function OutstandingFines() {
                     const formattedData = Object.values(groupedData);
 
                     setBkhistoryData(formattedData);
-                    console.log(formattedData);
+                    console.log("bkHistoryData", formattedData);
                 }
 
                 // Fetch fines due to damages
@@ -101,22 +105,29 @@ function OutstandingFines() {
                         };
                     }));
 
-                    console.log(filteredDamageData);
+                    console.log("damageFinesData", filteredDamageData);
                 }
             } catch (error) {
                 console.error("Error: ", error);
             }
         };
 
-        fetchData();
+        fetchData();  
     }, []);
+
+    useEffect(() => {
+        if (bkHistoryData.length > 0 || damageFinesData.length > 0) {
+            console.log("onDataExport", bkHistoryData, damageFinesData);
+            onDataExport({ bkhistoryData: bkHistoryData, damageFinesData });
+        }
+    }, [bkHistoryData, damageFinesData]);
 
     const [outstandingSortOrder, setOutstandingSortOrder] = useState('Descending');
     const [outstandingSortBy, setOutstandingSortBy] = useState('total_fine');
     const [outstandingPage, setOutstandingPage] = useState(1);
 
     const outstandingEntriesPerPage = 10;
-    const outstandingSortedData = [...bkhistoryData].sort((a, b) => {
+    const outstandingSortedData = [...bkHistoryData].sort((a, b) => {
         if (outstandingSortOrder === 'Descending') {
             return b[outstandingSortBy] > a[outstandingSortBy] ? 1 : -1;
         } else {
@@ -153,20 +164,33 @@ function OutstandingFines() {
         return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
     };
 
+    const formatSchoolNo = (value) => {
+        // Remove non-numeric characters
+        let numericValue = value.replace(/\D/g, "");
+    
+        // Apply the XXXX-X-XXXXX format
+        if (numericValue.length > 4) {
+          numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`;
+        }
+        if (numericValue.length > 6) {
+          numericValue = `${numericValue.slice(0, 6)}-${numericValue.slice(6, 11)}`;
+        }
+        return numericValue;
+      };
+
     return (
-        <div className="aMain-cont">
-            <h2 className="text-xl font-semibold mb-4">Accounts With Outstanding Fines</h2>
+        <div className="bg-white p-4 rounded-lg border-grey border">
+            <h3 className="text-2xl font-semibold mb-4">Accounts with Outstanding Fines</h3>
             <p className="text-sm text-gray-600 mb-4">
                 Note: Additional fines are added per school day. Fines are not added when the ARC is closed.
             </p>
 
-            {/* overdue table */}
             <div className="flex justify-between align-middle items-center mb-4">
                 <h3 className="text-xl font-semibold">Overdue Books</h3>
                 <div className="flex items-center space-x-2">
                     <span className="font-medium text-sm">Sort By:</span>
                     <button
-                        className="px-3 py-1 bg-gray-200 border border-gray-300 rounded-md text-sm"
+                        className="px-3 py-1 bg-gray-200 border border-gray-300 rounded-md text-sm w-32"
                         onClick={() =>
                             setOutstandingSortOrder(outstandingSortOrder === 'Descending' ? 'Ascending' : 'Descending')
                         }
@@ -175,12 +199,13 @@ function OutstandingFines() {
                     </button>
                     <span className="font-medium text-sm">Filter:</span>
                     <select
-                        className="text-sm px-3 py-1 bg-gray-200 border border-gray-300 rounded-md "
+                        className="text-sm px-3 py-1 bg-gray-200 border border-gray-300 rounded-md w-44 "
                         value={outstandingSortBy}
                         onChange={(e) => setOutstandingSortBy(e.target.value)}
                     >
                         <option value="total_fine">Total Fine</option>
-                        <option value="user_id">User ID</option>
+                        <option value="books_borrowed">Books Borrowed</option>
+                        <option value="user_name">Name</option>
                     </select>
                 </div>
 
@@ -190,22 +215,15 @@ function OutstandingFines() {
                     <tr>
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Total Fine</th>
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Incurred per Day</th>
-
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Books Borrowed</th>
-
-
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Name</th>
-                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">User ID</th>
-
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">School ID</th>
-
-
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                     {outstandingDisplayedData.length > 0 ? (
                         outstandingDisplayedData.map((record, index) => (
-                            <tr key={index} className="whitespace-nowrap">
+                            <tr key={index} className="whitespace-nowrap hover:bg-light-gray cursor-pointer">
                                 <td className="px-4 py-2 text-center">₱{record.total_fine.toFixed(2)}</td>
                                 <td className="px-4 py-2 text-center">₱{record.incurred_per_day.toFixed(2)}/day</td>
                                 <td className="px-4 py-2 text-center">{record.books_borrowed}</td>
@@ -217,8 +235,7 @@ function OutstandingFines() {
                                         {record.user_name}
                                     </button>
                                 </td>
-                                <td className="px-4 py-2 text-center">{record.user_id}</td>
-                                <td className="px-4 py-2 text-center">{record.school_id}</td>
+                                <td className="px-4 py-2 text-center">{formatSchoolNo(record.school_id)}</td>
                             </tr>
                         ))
                     ) : (
@@ -240,12 +257,12 @@ function OutstandingFines() {
                     Previous Page
                 </button>
                 <span className="text-xs">
-                    Page {outstandingPage} of {Math.ceil(bkhistoryData.length / outstandingEntriesPerPage)}
+                    Page {outstandingPage} of {Math.ceil(bkHistoryData.length / outstandingEntriesPerPage)}
                 </span>
                 <button
-                    className={`uPage-btn ${outstandingPage === Math.ceil(bkhistoryData.length / outstandingEntriesPerPage) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    onClick={() => setOutstandingPage((prev) => Math.min(prev + 1, Math.ceil(bkhistoryData.length / outstandingEntriesPerPage)))}
-                    disabled={outstandingPage === Math.ceil(bkhistoryData.length / outstandingEntriesPerPage)}
+                    className={`uPage-btn ${outstandingPage === Math.ceil(bkHistoryData.length / outstandingEntriesPerPage) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={() => setOutstandingPage((prev) => Math.min(prev + 1, Math.ceil(bkHistoryData.length / outstandingEntriesPerPage)))}
+                    disabled={outstandingPage === Math.ceil(bkHistoryData.length / outstandingEntriesPerPage)}
                 >
                     Next Page
                 </button>
@@ -258,7 +275,7 @@ function OutstandingFines() {
                 <div className="flex items-center space-x-2">
                     <span className="font-medium text-sm">Sort By:</span>
                     <button
-                        className="px-3 py-1 bg-gray-200 border border-gray-300 rounded-md text-sm"
+                        className="px-3 py-1 bg-gray-200 border border-gray-300 rounded-md text-sm w-32"
                         onClick={() =>
                             setDamagedSortOrder(damagedSortOrder === 'Descending' ? 'Ascending' : 'Descending')
                         }
@@ -267,12 +284,12 @@ function OutstandingFines() {
                     </button>
                     <span className="font-medium text-sm">Filter:</span>
                     <select
-                        className="text-sm px-3 py-1 bg-gray-200 border border-gray-300 rounded-md "
+                        className="text-sm px-3 py-1 bg-gray-200 border border-gray-300 rounded-md w-44 "
                         value={damagedSortBy}
                         onChange={(e) => setDamagedSortBy(e.target.value)}
                     >
                         <option value="fine">Fine</option>
-                        <option value="user_id">User ID</option>
+                        <option value="user_name">Name</option>
                     </select>
                 </div>
 
@@ -281,17 +298,16 @@ function OutstandingFines() {
                 <thead>
                     <tr>
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Fine</th>
-                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Book ARC ID</th>
+                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Barcode</th>
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Book Title</th>
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Name</th>
-                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">User ID</th>
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">School ID</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                     {damagedDisplayedData.length > 0 ? (
                         damagedDisplayedData.map((record, index) => (
-                            <tr key={index} className="whitespace-nowrap">
+                            <tr key={index} className="whitespace-nowrap hover:bg-light-gray cursor-pointer">
                                 <td className="px-4 py-2 text-center">₱{record.fine.toFixed(2)}</td>
                                 <td className="px-4 py-2 text-center">{record.book_id}</td>
                                 <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
@@ -310,7 +326,6 @@ function OutstandingFines() {
                                         {record.user_name}
                                     </button>
                                 </td>
-                                <td className="px-4 py-2 text-center">{record.user_id}</td>
                                 <td className="px-4 py-2 text-center">{record.school_id}</td>
                             </tr>
                         ))

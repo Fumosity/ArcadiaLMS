@@ -26,9 +26,9 @@ const BCHistory = () => {
                         checkoutDate, 
                         checkoutTime, 
                         userID, 
-                        bookID, 
+                        bookBarcode, 
                         book_indiv(
-                            bookID,
+                            bookBarcode,
                             bookARCID,
                             bookBarcode,
                             bookStatus,

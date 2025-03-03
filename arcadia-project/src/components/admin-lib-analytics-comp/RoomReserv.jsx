@@ -35,10 +35,10 @@ export default function RoomReserv() {
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
-        <div className="bg-white overflow-hidden border border-grey p-6 rounded-lg w-full">
+        <div className="bg-white p-4 rounded-lg border-grey border">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold ">Room Reservations</h2>
-                <button className="px-2.5 py-0.5 border border-grey text-grey rounded-full hover:bg-blue-600 transition-colors">
+            <h3 className="text-2xl font-semibold mb-2">Room Reservations</h3>
+                <button className="px-2.5 py-0.5 border border-grey rounded-full hover:bg-blue-600 transition-colors">
                     Go to Reservations
                 </button>
             </div>

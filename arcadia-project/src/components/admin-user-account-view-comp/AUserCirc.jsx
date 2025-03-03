@@ -28,9 +28,9 @@ const AUserCirc = ({ user }) => {
                         checkoutDate, 
                         checkoutTime, 
                         userID, 
-                        bookID, 
+                        bookBarcode, 
                         book_indiv(
-                            bookID,
+                            bookBarcode,
                             bookARCID,
                             bookStatus,
                             book_titles (
@@ -76,7 +76,7 @@ const AUserCirc = ({ user }) => {
                             time: formattedTime,
                             borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                             bookTitle: bookDetails.title,
-                            bookId: item.bookID,
+                            bookBarcode: item.bookBarcode,
                             user_id: item.userID,
                             titleID: bookDetails.titleID,
                         };
@@ -183,7 +183,7 @@ const AUserCirc = ({ user }) => {
                             <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Time</th>
                             <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Borrower</th>
                             <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book Title</th>
-                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book ID</th>
+                            <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Barcode</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-center">
@@ -212,7 +212,7 @@ const AUserCirc = ({ user }) => {
                                         {truncateTitle(book.bookTitle)}
                                     </Link>
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
+                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
                             </tr>
                         ))
                     ) : (

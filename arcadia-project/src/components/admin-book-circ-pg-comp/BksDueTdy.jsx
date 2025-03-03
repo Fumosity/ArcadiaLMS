@@ -17,9 +17,9 @@ const BksDueTdy = () => {
                         checkoutDate, 
                         checkoutTime, 
                         userID, 
-                        bookID, 
+                        bookBarcode, 
                         book_indiv(
-                            bookID,
+                            bookBarcode,
                             bookARCID,
                             bookBarcode,
                             bookStatus,
@@ -50,7 +50,7 @@ const BksDueTdy = () => {
                         return {
                             bookTitle: bookDetails.title,
                             borrower: item.name,
-                            bookId: item.bookID,
+                            bookBarcode: item.bookBarcode,
                             due: deadline,
                         };
                     });

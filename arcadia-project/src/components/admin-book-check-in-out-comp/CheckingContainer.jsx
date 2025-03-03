@@ -38,6 +38,8 @@ const CheckingContainer = () => {
     date: new Date().toISOString().split("T")[0], // Store date in YYYY-MM-DD format
     time: getLocalTime(), // Set the initial value to the PC's local time
     deadline: '', // Initialize deadline as empty
+    userID: '',
+
   });
 
   const formatSchoolNo = (value) => {
@@ -73,13 +75,13 @@ const CheckingContainer = () => {
 
   useEffect(() => {
     if (formData.schoolNo) {
-      let formattedSchoolNo = formData.schoolNo.replace(/\D/g, "");  
+      let formattedSchoolNo = formData.schoolNo.replace(/\D/g, "");
 
       const fetchUserData = async () => {
         try {
           const { data, error } = await supabase
             .from('user_accounts')
-            .select('userFName, userLName, userCollege, userDepartment')
+            .select('userFName, userLName, userCollege, userDepartment, userID')
             .eq('userLPUID', formattedSchoolNo)
             .single();
 
@@ -89,6 +91,7 @@ const CheckingContainer = () => {
               name: '',
               college: '',
               department: '',
+              userID: '',
             }));
           } else {
             setFormData((prev) => ({
@@ -96,6 +99,7 @@ const CheckingContainer = () => {
               name: `${data.userFName} ${data.userLName}`,
               college: data.userCollege,
               department: data.userDepartment,
+              userID: data.userID
             }));
           }
         } catch (error) {
@@ -187,6 +191,7 @@ const CheckingContainer = () => {
 
     if (Object.keys(emptyFields).length > 0) {
       setEmptyFields(emptyFields); // Set empty fields state
+      console.log(emptyFields)
       alert('Please fill in all required fields.');
       return; // Prevent form submission if any required field is empty
     }
@@ -347,8 +352,12 @@ const CheckingContainer = () => {
               let label = key.replace(/([A-Z])/g, ' $1');
               let inputType = 'text';
               let afterInput = null;
+              let divClassName = "flex items-center"; // Default class for the div
 
-              if (key === 'userID') label = 'User ID';
+              if (key === 'userID') {
+                divClassName = "flex items-center hidden"; // Add 'hidden' class
+              }
+
               if (key === 'bookBarcode') {
                 label = 'Book Barcode';
                 afterInput = (
@@ -358,7 +367,7 @@ const CheckingContainer = () => {
                       if (isScannerOpen) return;
                       setIsScannerOpen(true);
                     }}
-                    className="px-3 py-1 ml-2 rounded-full border border-grey w-[calc(2/5*100%)] hover:bg-light-gray transition" // Button width: 2/5 of 2/3
+                    className="px-3 py-1 ml-2 rounded-full border border-grey w-[calc(2/5*100%)] hover:bg-light-gray transition"
                   >
                     Scan Barcode
                   </button>
@@ -374,27 +383,26 @@ const CheckingContainer = () => {
                 inputType = 'time';
               }
 
-              // Hide deadline field for "Check In"
               if (key === 'deadline' && checkMode === 'Check In') {
                 return null;
-              } 
+              }
               if (key === 'deadline') {
                 inputType = 'date';
               }
 
               return (
-                <div className="flex items-center" key={key}>
+                <div className={divClassName} key={key}> {/* Use the divClassName here */}
                   <label className="w-1/3 text-md capitalize">
                     {label}:
                   </label>
-                  <div className="w-2/3 flex items-center"> {/* Keep w-2/3 here */}
+                  <div className="w-2/3 flex items-center">
                     <input
                       type={inputType}
                       name={key}
                       value={key === 'bookBarcode' ? formData.bookBarcode : key === 'schoolNo' ? formatSchoolNo(formData.schoolNo) : value}
                       onChange={handleInputChange}
                       placeholder={key === 'schoolNo' ? "XXXX-X-XXXXX" : ""}
-                      className={`px-3 py-1 rounded-full border ${emptyFields[key] ? 'border-arcadia-red' : 'border-grey'} ${key === 'bookBarcode' ? 'w-[calc(3/5*100%)]' : 'w-full'}`} // Input width: 3/5 of 2/3, otherwise w-full
+                      className={`px-3 py-1 rounded-full border ${emptyFields[key] ? 'border-arcadia-red' : 'border-grey'} ${key === 'bookBarcode' ? 'w-[calc(3/5*100%)]' : 'w-full'}`}
                       required
                     />
                     {afterInput}

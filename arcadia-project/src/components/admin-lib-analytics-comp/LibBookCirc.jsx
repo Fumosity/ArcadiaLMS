@@ -114,7 +114,7 @@ const LibBookCirc = () => {
         time: item.checkinTime || item.checkoutTime,
         borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
         bookTitle: item.book_indiv?.book_titles?.title || '',
-        bookId: item.bookID,
+        bookBarcode: item.bookBarcode,
         overdue: isOverdue && item.transactionType === "Borrowed",
       };
     });
@@ -125,7 +125,7 @@ const LibBookCirc = () => {
       try {
         const { data, error } = await supabase
           .from('book_transactions')
-          .select(`transactionType, checkinDate, checkinTime, checkoutDate, checkoutTime, userID, bookID, book_indiv(book_titles(title, price)), user_accounts(userFName, userLName, userLPUID)`);
+          .select(`transactionType, checkinDate, checkinTime, checkoutDate, checkoutTime, userID, bookBarcode, book_indiv(book_titles(title, price)), user_accounts(userFName, userLName, userLPUID)`);
 
         if (error) {
           console.error("Error fetching data: ", error.message);
@@ -141,7 +141,7 @@ const LibBookCirc = () => {
               time: formattedTime,
               borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
               bookTitle: item.book_indiv?.book_titles?.title || '',
-              bookId: item.bookID,
+              bookBarcode: item.bookBarcode,
             };
           });
 
@@ -157,8 +157,8 @@ const LibBookCirc = () => {
   }, [timeFrame]);
 
   return (
-    <div className="bg-white overflow-hidden border border-grey p-6 rounded-lg w-full">
-      <h3 className="text-xl font-semibold mb-4">Book Circulation</h3>
+    <div className="bg-white p-4 rounded-lg border-grey border">
+            <h3 className="text-2xl font-semibold mb-2">Book Circulation</h3>
 
       {/* Time Frame Selector */}
       <div className="mb-4">
@@ -216,7 +216,7 @@ const LibBookCirc = () => {
                   <td className="px-4 py-3 text-sm text-gray-900">{book.date} {book.time}</td>
                   <td className="px-4 py-3 text-sm text-blue-600">{book.borrower}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">{book.bookTitle}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{book.bookId}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
                 </tr>
               ))}
             </tbody>

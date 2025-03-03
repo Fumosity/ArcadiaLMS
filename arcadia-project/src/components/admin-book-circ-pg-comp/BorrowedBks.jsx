@@ -28,9 +28,9 @@ const BorrowedBks = () => {
                     checkoutTime,
                     deadline, 
                     userID, 
-                    bookID, 
+                    bookBarcode, 
                     book_indiv(
-                        bookID,
+                        bookBarcode,
                         bookARCID,
                         bookBarcode,
                         bookStatus,
