@@ -13,7 +13,7 @@ function OutstandingFines({ onDataExport }) {
                 const today = new Date();
                 const { data, error } = await supabase
                     .from('book_transactions')
-                    .select('transactionID, userID, bookID, checkoutDate, checkoutTime, deadline, user_accounts(userFName, userLName, userLPUID)')
+                    .select('transactionID, userID, bookBarcode, checkoutDate, checkoutTime, deadline, user_accounts(userFName, userLName, userLPUID)')
                     .not('deadline', 'is.null')
                     .lt('deadline', today.toISOString().split('T')[0]);
 
@@ -69,9 +69,9 @@ function OutstandingFines({ onDataExport }) {
                     .select(`
                         transactionID,
                         userID,
-                        bookID,
+                        bookBarcode,
                         book_indiv (
-                            bookID,
+                            bookBarcode,
                             bookARCID,
                             bookStatus,
                             book_titles (
@@ -96,7 +96,7 @@ function OutstandingFines({ onDataExport }) {
                         return {
                             transaction_id: item.transactionID,
                             user_id: item.userID,
-                            book_id: item.book_indiv.bookARCID,
+                            book_barcode: item.book_indiv.bookBarcode,
                             book_title: bookDetails.title,
                             book_title_id: bookDetails.titleID,
                             fine: fineAmount,
@@ -309,7 +309,7 @@ function OutstandingFines({ onDataExport }) {
                         damagedDisplayedData.map((record, index) => (
                             <tr key={index} className="whitespace-nowrap hover:bg-light-gray cursor-pointer">
                                 <td className="px-4 py-2 text-center">₱{record.fine.toFixed(2)}</td>
-                                <td className="px-4 py-2 text-center">{record.book_id}</td>
+                                <td className="px-4 py-2 text-center">{record.book_barcode}</td>
                                 <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
                                     <Link
                                         to={`/admin/abviewer?titleID=${encodeURIComponent(record.book_title_id)}`}
@@ -326,7 +326,7 @@ function OutstandingFines({ onDataExport }) {
                                         {record.user_name}
                                     </button>
                                 </td>
-                                <td className="px-4 py-2 text-center">{record.school_id}</td>
+                                <td className="px-4 py-2 text-center">{formatSchoolNo(record.school_id)}</td>
                             </tr>
                         ))
                     ) : (

@@ -16,6 +16,8 @@ import HighRates from '../components/admin-lib-analytics-comp/HighRates';
 import Title from '../components/main-comp/Title';
 import RecentReports from '../components/admin-user-support-report-view-comp/RecentReports';
 import RecentSupport from '../components/admin-user-support-report-view-comp/RecentSupport';
+import SBFines from '../components/admin-system-reports-comp/SBFines';
+import SBOverdue from '../components/admin-system-reports-comp/SBOverdue';
 
 const AHomePage = () => {
   const navigate = useNavigate(); // Initialize the useNavigate hook
@@ -41,6 +43,8 @@ const AHomePage = () => {
             <RecentReports />
             <RecentSupport />
           </div>
+          <SBFines />
+          <SBOverdue />
         </div>
 
       </div>

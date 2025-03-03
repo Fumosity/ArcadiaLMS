@@ -144,8 +144,8 @@ const ReportView = () => {
   }
 
   return (
-    <section>
-      <h2 className="px-2.5 text-zinc-900 w-full">Report Details</h2>
+    <div className="bg-white border border-grey p-4 rounded-lg">
+        <h3 className="text-2xl font-semibold">Report Details</h3>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-2.5 w-full text-base text-black">
         <div className="space-y-2">
@@ -209,7 +209,7 @@ const ReportView = () => {
           </button>
         </div>
       </div>
-    </section>
+    </div>
   )
 }
 

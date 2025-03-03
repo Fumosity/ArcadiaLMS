@@ -67,7 +67,7 @@ const BksDueTdy = () => {
 
     return (
         <div className="bg-white p-4 rounded-lg border-grey border w-full">
-            <h3 className="text-xl font-semibold mb-2">Books Due Today</h3>
+            <h3 className="text-2xl font-semibold">Books Due Today</h3>
 
             {/* Table */}
             <table className="min-w-full divide-y divide-gray-200">

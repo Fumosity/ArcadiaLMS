@@ -6,6 +6,7 @@ import ReturnedBks from "../components/admin-book-circ-pg-comp/ReturnedBks";
 import OverdueBks from "../components/admin-book-circ-pg-comp/OverdueBks";
 import BksDueTdy from "../components/admin-book-circ-pg-comp/BksDueTdy";
 import Title from "../components/main-comp/Title";
+import SBOverdue from "../components/admin-system-reports-comp/SBOverdue";
 
 export default function ABCirculationPage() {
     return (
@@ -22,6 +23,7 @@ export default function ABCirculationPage() {
                 <div className="flex flex-col items-start flex-shrink-0 w-1/4 space-y-2">
                     <AccessTable />
                     <BksDueTdy />
+                    <SBOverdue />
                 </div>
             </div>
         </div>
