@@ -8,7 +8,7 @@ import UpEvents from "../components/UserComponents/user-home-comp/UpEvents";
 
 const AAccountSettings = () => {
     return (
-        <div className="min-h-screen bg-light-white">
+        <div className="min-h-screen bg-white">
             <Title>Schedule</Title>
 
                 <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">

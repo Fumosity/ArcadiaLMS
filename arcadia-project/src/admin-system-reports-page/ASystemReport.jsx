@@ -12,7 +12,7 @@ import SBFines from "../components/admin-system-reports-comp/SBFines";
 
 const ASystemReport = () => {
     return (
-        <div className="min-h-screen bg-light-white">
+        <div className="min-h-screen bg-white">
             <Title>System Reports</Title>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

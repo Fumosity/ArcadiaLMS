@@ -9,7 +9,7 @@ import RecentSupport from "../components/admin-user-support-report-view-comp/Rec
 
 const AUsrAcc = () => (
 
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
         <Title>User Accounts</Title>
 
         <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">

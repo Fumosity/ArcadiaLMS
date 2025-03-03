@@ -83,7 +83,7 @@ export default function ABViewer() {
   }, [location.search]); // Fetch book details when the component mounts
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Title>Book Viewer</Title>
       <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
         <div className="flex-shrink-0 w-3/4 space-y-2">

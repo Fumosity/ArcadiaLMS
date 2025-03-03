@@ -8,7 +8,7 @@ import ReportSupportBarPlot from "../components/admin-user-support-report-view-c
 import ReportSupportPieChart from "../components/admin-user-support-report-view-comp/ReportSupportPieChart";
 
 const ASupportPage = () => (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
         <Title>Support Tickets and Reports</Title>
 
         <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
