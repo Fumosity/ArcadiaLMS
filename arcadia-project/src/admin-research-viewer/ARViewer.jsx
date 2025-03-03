@@ -42,7 +42,7 @@ const ARViewer = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-white">
             <Title>User Account Viewer</Title>
 
             {/* Main content section */}

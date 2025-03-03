@@ -85,8 +85,8 @@ export default function RegisterForm({ onRegister }) {
   };
 
   return (
-    <div className="uMain-cont flex">
-      <div className="max-w-md mx-auto p-8 bg-white rounded-2xl">
+    <div className="uMain-cont flex bg-white">
+      <div className="max-w-md mx-auto p-8 rounded-2xl">
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-1">
             <h1 className="text-3xl font-semibold">Sign up</h1>
@@ -235,7 +235,7 @@ export default function RegisterForm({ onRegister }) {
               id="password"
               type="password"
               onChange={(e) => checkPasswordStrength(e.target.value)}
-              className="w-full px-2.5 py-1 border rounded"
+              className="w-full px-2.5 py-1 border rounded-full"
             />
             <div className="h-2 bg-gray-200 rounded">
               <div
@@ -258,7 +258,7 @@ export default function RegisterForm({ onRegister }) {
               type="password"
               value={new_data.confirmPassword}
               onChange={handleChange}
-              className="w-full px-2.5 py-1 border rounded"
+              className="w-full px-2.5 py-1 border rounded-full"
             />
           </div>
 
@@ -278,10 +278,21 @@ export default function RegisterForm({ onRegister }) {
           </div>
         </form>
       </div>
-      {/* Right Section */}
-      <div className=" w-1/2 relative bg-grey rounded-2xl">
-        <div className="absolute inset-0 flex items-end p-12">
-          <h2 className="text-white text-4xl text-right font-semibold">Knowledge that empowers.</h2>
+      <div
+        className="w-1/2 relative rounded-2xl bg-cover bg-center"
+      >
+          <img
+                        src="/image/hero2.jpeg"
+                        alt="Hero Background"
+                        className="w-full h-full object-cover rounded-lg" // Add rounded-lg here
+                    />
+
+        <div className="absolute inset-0 bg-black opacity-70 rounded-2xl" />
+
+        <div className="absolute inset-0 flex items-end p-12 z-10">
+          <h2 className="text-white text-4xl text-right font-semibold">
+            Knowledge that empowers.
+          </h2>
         </div>
       </div>
     </div>

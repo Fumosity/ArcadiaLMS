@@ -4,7 +4,7 @@ import RecentSupport from "../components/admin-user-support-report-view-comp/Rec
 import SupportView from "../components/admin-report-view-comp/SupportView"
 
 const ASupportViewPage = () => (
-    <div className="">
+    <div className="bg-white">
         {/* Main header */}
         <Title>User Support Ticket View</Title>
 

@@ -38,7 +38,7 @@ const ABModify = () => {
   const [formDataState, setFormData] = useState(formData);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Main header */}
       <Title>Book Modify</Title>
       <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">

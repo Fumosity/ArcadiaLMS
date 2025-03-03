@@ -25,7 +25,7 @@ const AGModify = () => {
   
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Title>Genre Modifying</Title>
       <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
         <div className="flex-shrink-0 w-1/2">

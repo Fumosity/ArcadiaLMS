@@ -21,10 +21,18 @@ export default function URegister() {
     };
 
     return (
-        <div className="min-h-screen  bg-red flex flex-col">
+        <div className="min-h-screen  flex flex-col relative">
+            <div className="absolute inset-0">
+                <img
+                    src="/image/login-bg.jpeg"
+                    alt="Background"
+                    className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-arcadia-red opacity-95" />
+            </div>
 
-            <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
+            <main className="relative flex-1 flex justify-center items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+                <div className="userContent-container flex justify-center items-center">
                     {step === "register" && <RegisterForm onRegister={handleRegister} />}
                     {step === "interests" && (
                         <UserInterests userData={userData} onBack={() => setStep("register")} onContinue={handleContinue} />
@@ -35,7 +43,9 @@ export default function URegister() {
                     )}
                 </div>
             </main>
+            <div className="relative z-10">
             <UCopyright />
+            </div>
         </div>
     )
 };

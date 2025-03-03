@@ -21,7 +21,7 @@ const AHomePage = () => {
   const navigate = useNavigate(); // Initialize the useNavigate hook
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Title>Home</Title>
 
       <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">

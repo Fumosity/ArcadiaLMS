@@ -47,7 +47,7 @@ const AReserv = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Title>Reservations</Title>
       <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
 

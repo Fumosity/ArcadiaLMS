@@ -1,114 +1,124 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
-import WrngPromoteToIntern from './warning-modals/WrngPromoteToIntern';
-import WrngDemoteFromIntern from './warning-modals/WrngDemoteFromIntern';
+"use client"
+
+import { useState, useEffect } from "react"
+import { supabase } from "../supabaseClient"
+import WrngPromoteToIntern from "./warning-modals/WrngPromoteToIntern"
+import WrngDemoteFromIntern from "./warning-modals/WrngDemoteFromIntern"
+import bcrypt from "bcryptjs"
 
 const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
-  if (!isOpen) return null;
-
-  const [modifiedUser, setModifiedUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAttentionModalOpen, setIsAttentionModalOpen] = useState(false);
-  const [isDemotionModalOpen, setIsDemotionModalOpen] = useState(false);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [modifiedUser, setModifiedUser] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isAttentionModalOpen, setIsAttentionModalOpen] = useState(false)
+  const [isDemotionModalOpen, setIsDemotionModalOpen] = useState(false)
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
+  const [newPassword, setNewPassword] = useState("")
 
   useEffect(() => {
     const fetchUserData = async () => {
-      setIsLoading(true);
+      if (!isOpen || !user.userID) return
+
+      setIsLoading(true)
       try {
-        const { data, error } = await supabase
-          .from('user_accounts')
-          .select('*')
-          .eq('userID', user.userID)
-          .single();
+        const { data, error } = await supabase.from("user_accounts").select("*").eq("userID", user.userID).single()
 
         if (error) {
-          console.error('Error fetching user data:', error);
-          alert('Failed to fetch user data. Please try again.');
+          console.error("Error fetching user data:", error)
+          alert("Failed to fetch user data. Please try again.")
         } else if (data) {
-          setModifiedUser(data);
+          setModifiedUser(data)
         }
       } catch (error) {
-        console.error('Unexpected error:', error);
-        alert('An unexpected error occurred while fetching user data.');
+        console.error("Unexpected error:", error)
+        alert("An unexpected error occurred while fetching user data.")
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
-
-    if (user.userID) {
-      fetchUserData();
     }
-  }, [user.userID]);
+
+    fetchUserData()
+  }, [isOpen, user.userID])
 
   const handleChangeType = (e) => {
-    const newType = e.target.value;
+    const newType = e.target.value
     setModifiedUser((prevUser) => ({
       ...prevUser,
       userAccountType: newType,
-    }));
-  };
+    }))
+  }
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setModifiedUser((prevUser) => ({
       ...prevUser,
       [name]: value,
-    }));
-  };
+    }))
+  }
+
+  const handlePasswordChange = (e) => {
+    setNewPassword(e.target.value)
+  }
 
   const handleSubmit = async () => {
-    if (modifiedUser.userAccountType === 'Intern' && user.userAccountType !== 'Intern') {
-      setIsAttentionModalOpen(true);
-      return;
+    if (modifiedUser.userAccountType === "Intern" && user.userAccountType !== "Intern") {
+      setIsAttentionModalOpen(true)
+      return
     }
 
-    if (modifiedUser.userAccountType !== 'Intern' && user.userAccountType === 'Intern') {
-      setIsDemotionModalOpen(true);
-      return;
+    if (modifiedUser.userAccountType !== "Intern" && user.userAccountType === "Intern") {
+      setIsDemotionModalOpen(true)
+      return
     }
 
-    await updateUserInDatabase();
-  };
+    await updateUserInDatabase()
+  }
 
   const handleAttentionConfirm = async () => {
-    setIsAttentionModalOpen(false);
-    await updateUserInDatabase();
-  };
-  
+    setIsAttentionModalOpen(false)
+    await updateUserInDatabase()
+  }
+
   const handleDemotionConfirm = async () => {
-    setIsDemotionModalOpen(false);
-    await updateUserInDatabase();
-  };
+    setIsDemotionModalOpen(false)
+    await updateUserInDatabase()
+  }
 
   const updateUserInDatabase = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('user_accounts')
-        .update(modifiedUser)
-        .eq('userID', user.userID);
+      const userToUpdate = { ...modifiedUser }
 
-      if (error) {
-        console.error('Error updating user:', error);
-        alert('An error occurred while updating the user.');
-        return;
+      if (newPassword) {
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+        userToUpdate.userPassword = hashedPassword
+      } else {
+        delete userToUpdate.userPassword
       }
 
-      console.log('User updated:', data);
-      onUpdate(modifiedUser);
-      onClose();
+      const { data, error } = await supabase.from("user_accounts").update(userToUpdate).eq("userID", user.userID)
+
+      if (error) {
+        console.error("Error updating user:", error)
+        alert("An error occurred while updating the user.")
+        return
+      }
+
+      console.log("User updated:", data)
+      onUpdate(modifiedUser)
+      onClose()
     } catch (error) {
-      console.error('Unexpected error:', error);
-      alert('An unexpected error occurred.');
+      console.error("Unexpected error:", error)
+      alert("An unexpected error occurred.")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
+    setIsPasswordVisible(!isPasswordVisible)
+  }
+
+  if (!isOpen) return null
 
   if (isLoading || !modifiedUser) {
     return (
@@ -117,7 +127,7 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
           <p className="text-lg font-semibold">Loading user data...</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -221,22 +231,22 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
             </div>
 
             <div className="flex items-center">
-              <span className="w-32 text-sm font-medium">Password:</span>
+              <span className="w-32 text-sm font-medium">New Password:</span>
               <div className="flex-1 flex items-center relative">
                 <input
                   type={isPasswordVisible ? "text" : "password"}
-                  name="userPassword"
-                  value={modifiedUser.userPassword}
-                  onChange={handleInputChange}
+                  name="newPassword"
+                  value={newPassword}
+                  onChange={handlePasswordChange}
                   className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
-                  placeholder="Enter new password"
+                  placeholder="Enter new password (leave empty to keep current)"
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
                   className="absolute right-3 text-sm text-blue-600 hover:text-blue-800"
                 >
-                  {isPasswordVisible ? 'Hide' : 'Show'}
+                  {isPasswordVisible ? "Hide" : "Show"}
                 </button>
               </div>
             </div>
@@ -244,17 +254,10 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
         </div>
 
         <div className="flex justify-center space-x-4 mt-10">
-          <button
-            className="modifyButton"
-            onClick={handleSubmit}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Saving...' : 'Modify'}
+          <button className="modifyButton" onClick={handleSubmit} disabled={isLoading}>
+            {isLoading ? "Saving..." : "Modify"}
           </button>
-          <button
-            className="cancelButton"
-            onClick={onClose}
-          >
+          <button className="cancelButton" onClick={onClose}>
             Cancel
           </button>
         </div>
@@ -276,8 +279,8 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
         onDemote={handleDemotionConfirm}
       />
     </div>
-  );
-};
+  )
+}
 
-export default UserInformationModal;
+export default UserInformationModal
 

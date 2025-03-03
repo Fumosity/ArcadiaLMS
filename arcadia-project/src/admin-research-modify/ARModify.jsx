@@ -26,7 +26,7 @@ const ARModify = () => {
   const [formDataState, setFormData] = useState(formData);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Main header */}
       <MainHeader />
       <Title>Modify Research</Title>

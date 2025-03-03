@@ -8,7 +8,7 @@ import ReservInformation from "../components/admin-room-reserv-comp/ReservInform
 
 
 const AReservView = () => (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
         {/* Main header */}
         <Title>Reservations View</Title>
 

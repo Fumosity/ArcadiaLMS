@@ -8,22 +8,24 @@ import UpEvents from "../components/UserComponents/user-home-comp/UpEvents";
 
 const AAccountSettings = () => {
     return (
-        <div className="min-h-screen bg-light-white">
+        <div className="min-h-screen bg-white">
             <Title>Schedule</Title>
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="md:col-span-2 space-y-8">
+
+                <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+                    <div className="flex-shrink-0 w-3/4 space-y-2">
                         <WeeklySched />
                         {/* <CalendarEvents /> */}
                     </div>
 
                     {/* Preview section */}
-                    <div className="md:col-span-1 space-y-8">
+                    <div className="flex flex-col items-start flex-shrink-0 w-1/4 space-y-2">
+                        <div className="space-y-2 w-full">
                         <ArcOpHr />
                         <UpEvents />
+                        </div>
                     </div>
                 </div>
-            </main>
+            
         </div>
     );
 };

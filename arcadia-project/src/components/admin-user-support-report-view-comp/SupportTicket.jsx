@@ -67,19 +67,20 @@ const UserSupports = () => {
   });  
 
   // Handle filtering and searching
-  const filteredData = sortedData.filter((supports) => {
+  const filteredData = sortedData.filter((support) => {
     const matchesType =
-      typeFilter === "All" || supports.type === typeFilter;
+      typeFilter === "All" || support.type === typeFilter;
 
     const matchesStatus =
-      statusFilter === "All" || supports.status === statusFilter;
+      statusFilter === "All" || support.status === statusFilter;
 
     const matchesSearch =
-      supports.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      supports.supportID.includes(searchTerm);
+      support.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      support.supportID.toString().includes(searchTerm);
 
     return matchesType && matchesStatus && matchesSearch;
   });
+
 
   // Pagination logic
   const startIndex = (currentPage - 1) * entriesPerPage;

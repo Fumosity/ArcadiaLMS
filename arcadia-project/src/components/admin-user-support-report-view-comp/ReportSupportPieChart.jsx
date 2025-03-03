@@ -1,0 +1,84 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
+import { supabase } from "/src/supabaseClient.js"
+
+const STATUS_COLORS = {
+  Ongoing: "#e8d08d",
+  Intended: "#de6262",
+  Resolved: "#8fd28f"
+}
+
+const ReportSupportPieChart = () => {
+  const [reportData, setReportData] = useState([])
+  const [supportData, setSupportData] = useState([])
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    const { data: reports, error: reportError } = await supabase.from("report_ticket").select("status")
+    const { data: supports, error: supportError } = await supabase.from("support_ticket").select("status")
+
+    if (reportError || supportError) {
+      console.error("Error fetching data:", reportError || supportError)
+      return
+    }
+
+    setReportData(groupDataByStatus(reports))
+    setSupportData(groupDataByStatus(supports))
+  }
+
+  const groupDataByStatus = (data) => {
+    const grouped = data.reduce((acc, item) => {
+      if (!acc[item.status]) acc[item.status] = 0
+      acc[item.status]++
+      return acc
+    }, {})
+
+    return Object.entries(grouped).map(([status, value]) => ({
+      name: status,
+      value,
+      color: STATUS_COLORS[status] || "#8884d8"
+    }))
+  }
+
+  const renderPieChart = (data, title) => (
+    <div className="flex flex-col w-1/2 items-center">
+      <h3 className="text-lg font-semibold text-center mb-4">{title}</h3>
+      <ResponsiveContainer width={400} height={350}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            outerRadius={90} // Increased radius to fit labels better
+            dataKey="value"
+            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend align="center" verticalAlign="bottom" />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  )
+
+  return (
+    <div className="bg-white p-4 rounded-lg border-grey border h-fit">
+      <h3 className="text-2xl font-semibold mb-6">Reports and Supports Status</h3>
+      <div className="flex justify-center items-start">
+        {renderPieChart(reportData, "Reports")}
+        {renderPieChart(supportData, "Supports")}
+      </div>
+    </div>
+  )
+}
+
+export default ReportSupportPieChart

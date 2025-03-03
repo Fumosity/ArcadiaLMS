@@ -18,7 +18,7 @@ const AUAccView = () => {
 
     console.log("user", user)
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-white">
             {/* Main header */}
             <Title>User Account Viewer</Title>
 

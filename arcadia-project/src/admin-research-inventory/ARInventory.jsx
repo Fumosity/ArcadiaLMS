@@ -15,7 +15,7 @@ const ARInventory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <Title>Research Inventory</Title>
       <MainHeader />
 
