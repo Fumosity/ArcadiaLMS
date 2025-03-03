@@ -128,7 +128,7 @@ export default function RcntLibVisit() {
 
       {/* Pie Charts */}
       <div className="bg-white border border-grey p-4 rounded-lg">
-        <h2 className="text-2xl font-semibold mb-4 text-left">Library Book Circulation</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-left">Book Circulation Demographics</h2>
         <div className="flex justify-around">
           {/* College Data Chart */}
           <div className="h-[300px] w-[300px]">

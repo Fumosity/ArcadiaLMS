@@ -10,26 +10,26 @@ const LeastPop = () => {
             // Fetch all borrow transactions
             const { data: transactions, error: transactionError } = await supabase
                 .from("book_transactions")
-                .select("bookID");
+                .select("bookBarcode");
 
             if (transactionError) throw transactionError;
 
-            // Count borrows per bookID
-            const borrowCountMap = transactions.reduce((acc, { bookID }) => {
-                acc[bookID] = (acc[bookID] || 0) + 1;
+            // Count borrows per bookBarcode
+            const borrowCountMap = transactions.reduce((acc, { bookBarcode }) => {
+                acc[bookBarcode] = (acc[bookBarcode] || 0) + 1;
                 return acc;
             }, {});
 
             // Fetch book metadata from book_indiv and book_titles
             const { data: bookMetadata, error: bookError } = await supabase
                 .from("book_indiv")
-                .select("bookID, titleID, book_titles(titleID, title)");
+                .select("bookBarcode, titleID, book_titles(titleID, title)");
 
             if (bookError) throw bookError;
 
             // Combine book data with borrow counts
             const booksWithDetails = bookMetadata.map(book => {
-                const borrowCount = borrowCountMap[book.bookID] || 0;
+                const borrowCount = borrowCountMap[book.bookBarcode] || 0;
                 return {
                     title: book.book_titles.title,
                     borrowCount,

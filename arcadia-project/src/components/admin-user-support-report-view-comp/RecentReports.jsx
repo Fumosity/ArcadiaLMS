@@ -75,6 +75,13 @@ const RecentReports = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleUserClick = (report) => {
+    navigate("/admin/useraccounts/viewusers", {
+      state: { userId: report.user_accounts.userID },
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="bg-white border border-grey p-4 rounded-lg">
       <div className="flex justify-between items-center mb-4">
@@ -106,13 +113,20 @@ const RecentReports = () => {
           ) : recentReports.length > 0 ? (
             recentReports.map((report, index) => (
               <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                <td className="px-4 py-2 text-center text-sm truncate">{report.user_accounts.userFName} {report.user_accounts.userLName}</td>
+                <td className="px-4 py-2 text-left text-sm  text-arcadia-red font-semibold">
+                  <button
+                    onClick={() => handleUserClick(report)}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {report.user_accounts.userFName} {report.user_accounts.userLName}
+                  </button>
+                </td>
                 <td className="px-4 py-2 text-center text-sm truncate">{report.reportID}</td>
-                <td 
-                className="px-4 py-2 text-arcadia-red font-semibold text-center text-sm truncate hover:underline" 
-                onClick={() => handleReportClick(report)}
+                <td
+                  className="px-4 py-2 text-arcadia-red font-semibold text-center text-sm truncate hover:underline"
+                  onClick={() => handleReportClick(report)}
                 >
-                    View
+                  View
                 </td>
               </tr>
             ))

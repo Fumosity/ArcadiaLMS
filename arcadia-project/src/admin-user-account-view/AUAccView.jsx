@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import MainHeader from "../components/main-comp/MainHeader";
 import Navbar from "../components/main-comp/Navbar";
 import Footer from "../components/main-comp/Footer";
@@ -15,35 +15,39 @@ import UserInformations from "../components/admin-user-account-view-comp/UserInf
 const AUAccView = () => {
     const location = useLocation();
     const user = location.state?.user || {};
+    const navigate = useNavigate(); // Initialize useNavigate
 
     console.log("user", user)
+
     return (
         <div className="min-h-screen bg-white">
-            {/* Main header */}
             <Title>User Account Viewer</Title>
 
-            {/* Main content section */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-3 gap-8">
-                    <div className="col-span-2 space-y-8">
-                        {/* Left side content */}
-                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                            <UserInformations user={user} />
-                        </div>
-                        <AUserCirc user={user} />
+            <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+                <div className="flex-shrink-0 w-3/4">
+                    <div className="flex justify-between w-full gap-2">
+                        <button
+                            className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+                            onClick={() => navigate('/admin/useraccounts')}
+                        >
+                            Return to User Accounts
+                        </button>
                     </div>
-
-                    {/* Right side content */}
-                    <div className="lg:col-span-1 space-y-8">
-                        <Blacklist />
-                        <Whitelist />
-                        <RecentReports user={user} />
-                        <RecentSupport user={user} />   
+                    <div className="space-y-2">
+                    <UserInformations user={user} />
+                    <AUserCirc user={user} />
                     </div>
                 </div>
-            </main>
 
+            <div className="flex flex-col items-start flex-shrink-0 w-1/4 mt-12">
+                <div className="w-full space-y-2">
+                    <RecentReports user={user} />
+                    <RecentSupport user={user} />
+                </div>
+            </div>
         </div>
+        </div>
+
     );
 };
 

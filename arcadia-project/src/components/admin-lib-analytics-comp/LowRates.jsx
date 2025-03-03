@@ -27,22 +27,22 @@ const LowRates = () => {
             // Fetch all borrow transactions
             const { data: transactions, error: transactionError } = await supabase
                 .from("book_transactions")
-                .select("bookID");
+                .select("bookBarcode");
 
             if (transactionError) throw transactionError;
 
-            // Count borrows per bookID
-            const borrowCountMap = transactions.reduce((acc, { bookID }) => {
-                acc[bookID] = (acc[bookID] || 0) + 1;
+            // Count borrows per bookBarcode
+            const borrowCountMap = transactions.reduce((acc, { bookBarcode }) => {
+                acc[bookBarcode] = (acc[bookBarcode] || 0) + 1;
                 return acc;
             }, {});
 
             // Fetch book metadata from book_indiv and book_titles
-            const bookIDs = Object.keys(borrowCountMap);
+            const bookBarcodes = Object.keys(borrowCountMap);
             const { data: bookMetadata, error: bookError } = await supabase
                 .from("book_indiv")
-                .select("bookID, titleID, book_titles(titleID, title)")
-                .in("bookID", bookIDs);
+                .select("bookBarcode, titleID, book_titles(titleID, title)")
+                .in("bookBarcode", bookBarcodes);
 
             if (bookError) throw bookError;
 
@@ -52,7 +52,7 @@ const LowRates = () => {
                 const avgRating = ratingMap[titleID]
                 ? (ratingMap[titleID].total / ratingMap[titleID].count).toFixed(2) // Format to X.XX
                 : "0.00";
-                const borrowCount = borrowCountMap[book.bookID] || 0;
+                const borrowCount = borrowCountMap[book.bookBarcode] || 0;
 
                 return {
                     title: book.book_titles.title,

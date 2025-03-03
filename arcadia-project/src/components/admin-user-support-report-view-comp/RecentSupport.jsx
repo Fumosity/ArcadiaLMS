@@ -74,6 +74,13 @@ const RecentSupport = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleUserClick = (support) => {
+    navigate("/admin/useraccounts/viewusers", {
+      state: { userId: support.user_accounts.userID },
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="bg-white border border-grey p-4 rounded-lg">
       <div className="flex justify-between items-center mb-4">
@@ -105,7 +112,14 @@ const RecentSupport = () => {
           ) : recentSupports.length > 0 ? (
             recentSupports.map((support, index) => (
               <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                <td className="px-4 py-2 text-center text-sm truncate">{support.user_accounts.userFName} {support.user_accounts.userLName}</td>
+                <td className="px-4 py-2 text-left text-sm  text-arcadia-red font-semibold">
+                  <button
+                    onClick={() => handleUserClick(support)}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {support.user_accounts.userFName} {support.user_accounts.userLName}
+                  </button>
+                </td>
                 <td className="px-4 py-2 text-center text-sm truncate">{support.supportID}</td>
                 <td
                   className="px-4 py-2 text-arcadia-red font-semibold text-center text-sm truncate hover:underline"

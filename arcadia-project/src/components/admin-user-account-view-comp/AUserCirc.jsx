@@ -44,7 +44,7 @@ const AUserCirc = ({ user }) => {
                             userLName,
                             userLPUID
                         )`)
-                        .eq('userID', user.userId);
+                    .eq('userID', user.userId);
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
@@ -118,11 +118,10 @@ const AUserCirc = ({ user }) => {
     const truncateTitle = (title, maxLength = 25) => {
         return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
     };
-    
+
     return (
-        <div className="bg-white p-6 rounded-lg shadow-md" style={{ borderRadius: "40px" }}>
-            {/* Title */}
-            <h3 className="text-xl font-semibold mb-4">Book Circulation History</h3>
+        <div className="bg-white p-4 rounded-lg border-grey border">
+            <h3 className="text-2xl font-semibold mb-2">User Book Circulation History</h3>
 
             {/* Controls */}
             <div className="flex flex-wrap items-center mb-6 space-x-4">
@@ -158,6 +157,20 @@ const AUserCirc = ({ user }) => {
                     </button>
                 </div>
 
+                {/* No. of Entries */}
+                <div className="flex items-center space-x-2">
+                    <label htmlFor="entries" className="text-sm">No. of Entries:</label>
+                    <input
+                        type="number"
+                        id="entries"
+                        min="1"
+                        value={entries}
+                        className="border border-gray-300 rounded-md py-1 px-2 text-sm"
+                        style={{ borderRadius: "40px", width: "80px" }}
+                        onChange={(e) => setEntries(e.target.value)}
+                    />
+                </div>
+
                 {/* Search */}
                 <div className="flex items-center space-x-2">
                     <label htmlFor="search" className="text-sm">Search:</label>
@@ -187,64 +200,57 @@ const AUserCirc = ({ user }) => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200 text-center">
-                    {paginatedData.length > 0 ? (
-                        paginatedData.map((book, index) => (
-                            <tr key={index} className="hover:bg-gray-100">
-                                <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
-                                    ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}>
-                                    {book.type}
+                        {paginatedData.length > 0 ? (
+                            paginatedData.map((book, index) => (
+                                <tr key={index} className="hover:bg-gray-100">
+                                    <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
+                                                ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}>
+                                        {book.type}
+                                    </td>
+                                    <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
+                                    <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
+                                    <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
+                                        <button
+                                            onClick={() => handleUserClick(book)}
+                                            className="text-blue-500 hover:underline"
+                                        >
+                                            {book.borrower}
+                                        </button>
+                                    </td>
+                                    <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
+                                        <Link
+                                            to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            {truncateTitle(book.bookTitle)}
+                                        </Link>
+                                    </td>
+                                    <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="12" className="px-4 py-2 text-center">
+                                    No data available.
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
-                                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
-                                    <button
-                                        onClick={() => handleUserClick(book)}
-                                        className="text-blue-500 hover:underline"
-                                    >
-                                        {book.borrower}
-                                    </button>
-                                </td>
-                                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
-                                    <Link
-                                        to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
-                                        className="text-blue-600 hover:underline"
-                                    >
-                                        {truncateTitle(book.bookTitle)}
-                                    </Link>
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
                             </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="6" className="px-4 py-2 text-center">
-                                No data available.
-                            </td>
-                        </tr>
-                    )}
+                        )}
                     </tbody>
                 </table>
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center items-center mt-4 space-x-4">
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                >
+            <div className="flex justify-center items-center mt-2 space-x-4">
+                <button className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
                     Previous Page
                 </button>
-                <span className="text-sm">Page {currentPage} of {totalPages}</span>
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                >
+                <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+                <button className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
                     Next Page
                 </button>
             </div>
         </div>
+
     );
 };
 

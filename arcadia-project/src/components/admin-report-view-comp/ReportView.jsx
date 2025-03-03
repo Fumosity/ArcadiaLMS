@@ -119,13 +119,28 @@ const ReportView = () => {
     }
   }
 
+  const formatSchoolNo = (value) => {
+    // Remove non-numeric characters
+    let numericValue = value.replace(/\D/g, "");
+
+    // Apply the XXXX-X-XXXXX format
+    if (numericValue.length > 4) {
+      numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`;
+    }
+    if (numericValue.length > 6) {
+      numericValue = `${numericValue.slice(0, 6)}-${numericValue.slice(6, 11)}`;
+    }
+    return numericValue;
+  };
+
   const reportFields = [
-    { label: "User ID*:", value: userData?.userID || "Not Available" },
-    { label: "School ID No.*:", value: userData?.userLPUID || "Not Available" },
-    { label: "Name*:", value: userData ? `${userData.userFName} ${userData.userLName}` : "Not Available" },
-    { label: "College*:", value: userData?.userCollege || "Not Available" },
-    { label: "Department*:", value: userData?.userDepartment || "Not Available" },
-    { label: "Date and time of report:", value: ticket?.date || "Not Available" },
+    { label: "School No.:", value: userData?.userLPUID || "Not Available" },
+    { label: "Name:", value: userData ? `${userData.userFName} ${userData.userLName}` : "Not Available" },
+    { label: "College:", value: userData?.userCollege || "Not Available" },
+    { label: "Department:", value: userData?.userDepartment || "Not Available" },
+    { label: "Date:", value: ticket?.date || "Not Available" },
+    { label: "Time:", value: ticket?.time || "Not Available" },
+
   ]
 
   const responseFields = [
@@ -144,69 +159,77 @@ const ReportView = () => {
   }
 
   return (
-    <div className="bg-white border border-grey p-4 rounded-lg">
-        <h3 className="text-2xl font-semibold">Report Details</h3>
+    <div className="space-y-2">
+      <div className="bg-white border border-grey p-4 rounded-lg">
+        <h3 className="text-2xl font-semibold mb-2">Report Details</h3>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-2.5 w-full text-base text-black">
-        <div className="space-y-2">
-          {reportFields.map((field, index) => (
-            <div key={index} className="flex justify-between w-full">
-              <label className="text-sm">{field.label}</label>
-              <div className="px-2 py-1 border border-grey rounded-md text-sm w-[60%] text-zinc-700">
-                {isLoading ? <Skeleton width="100%" height={15} /> : field.value}
+        <div className="grid grid-cols-2 gap-2 w-full">
+          <div className="space-y-2">
+            {reportFields.map((field, index) => (
+              <div key={index} className="flex justify-between items-center w-full">
+                <label className="text-md capitalize w-1/3">{field.label}</label>
+                <div className="px-3 py-1 rounded-full border border-grey w-2/3">
+                  {isLoading ? (
+                    <Skeleton width="100%" height={15} />
+                  ) : field.label === "School No.:" ? (
+                    formatSchoolNo(field.value)
+                  ) : (
+                    field.value
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="h-full flex flex-col justify-between">
+            <div className="space-y-2">
+              {responseFields.map((field, index) => (
+                <div key={index} className="flex justify-between items-center w-full">
+                  <label className="text-md capitalize w-1/3">{field.label}</label>
+                  <div className="px-3 py-1 rounded-full border border-grey w-2/3">
+                    {isLoading ? <Skeleton width="100%" height={10} /> : field.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div>
+              <label className="text-md capitalize w-1/3">Content:</label>
+              <div className="px-3 py-1 border border-grey rounded-xl text-md min-h-[125px] mt-2">
+                {isLoading ? <Skeleton count={3} height={20} /> : ticket?.content || "No content available"}
               </div>
             </div>
-          ))}
-          <p className="mt-2 text-xs text-gray-500">*Autofilled data</p>
-        </div>
-
-        <div className="space-y-2">
-          {responseFields.map((field, index) => (
-            <div key={index} className="flex justify-between w-full">
-              <label className="text-sm">{field.label}</label>
-              <div className="px-2 py-1 border border-grey rounded-md text-sm w-[60%] text-zinc-700">
-                {isLoading ? <Skeleton width="100%" height={10} /> : field.value}
-              </div>
-            </div>
-          ))}
-          <label className="mt-4 text-sm">Content:</label>
-          <div className="p-2 border border-grey rounded-md text-sm text-dark-grey min-h-[100px] mt-2">
-            {isLoading ? <Skeleton count={3} height={20} /> : ticket?.content || "No content available"}
           </div>
         </div>
       </div>
-
-      <h2 className="px-2.5 mt-4 w-full">Response</h2>
-
-      <div className="flex flex-wrap lg:flex-nowrap gap-4 p-1 w-full text-base">
-        <div className="flex flex-col items-center justify-center lg:w-1/2 space-y-4">
-          {buttons.map((button, index) => (
-            <button
-              key={index}
-              className={`py-2 px-6 rounded-full border ${
-                selectedStatus === button.status ? "bg-red text-white" : "bg-dark-gray text-grey"
-              }`}
-              onClick={() => handleStatusSelect(button.status)}
-            >
-              {button.label}
-            </button>
-          ))}
-        </div>
-        <div className="flex flex-col w-full lg:w-1/2">
-          <label className="text-black">Reply:</label>
+      <div className="bg-white border border-grey p-4 rounded-lg">
+        <h3 className="text-2xl font-semibold mb-2">Report Response</h3>
+        <div className="flex flex-col gap-2 w-full">
+          <label className="text-black text-md capitalize">Reply:</label>
           <textarea
-            className="p-2 mt-2 w-full rounded-md border border-zinc-300 text-sm min-h-[100px]"
+            className="bg-white px-3 py-1 border border-grey rounded-xl text-mdtext-sm min-h-[150px]"
             value={reply}
             onChange={(e) => setReply(e.target.value)}
             placeholder="Enter your reply here..."
           />
-          <button
-            className="mt-2 py-2 px-6 text-white rounded-full border bg-arcadia-red"
-            onClick={submitReplyAndStatus}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Submit Update"}
-          </button>
+          <div className="flex items-center justify-center space-x-2">
+            {buttons.map((button, index) => (
+              <button
+                key={index}
+                className={`add-book w-1/2 px-4 py-2 rounded-lg border transition ${selectedStatus === button.status ? "bg-arcadia-red text-white" : "bg-light-gray text-black border-grey"
+                  }`}
+                onClick={() => handleStatusSelect(button.status)}
+              >
+                {button.label}
+              </button>
+            ))}
+            <button
+              className="add-book w-1/2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+              onClick={submitReplyAndStatus}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit Update"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

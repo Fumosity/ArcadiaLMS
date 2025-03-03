@@ -66,10 +66,11 @@ const SBFines = () => {
         setIsLoading(false);
     }, []);
 
-    const handleUserClick = (record) => {
+    const handleUserClick = (user) => {
         navigate("/admin/useraccounts/viewusers", {
-            state: { userId: record.user_id },
+            state: { userId: user.user_id },
         });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     return (
@@ -97,16 +98,16 @@ const SBFines = () => {
                     ) : damageFinesData.length > 0 ? (
                         damageFinesData.map((user, index) => (
                             <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                                <td className="w-2/3 px-4 py-2 text-center text-arcadia-red font-semibold">
+                                <td className="w-2/3 px-4 py-2 text-sm text-left text-arcadia-red font-semibold">
                                     <button
-                                        onClick={() => handleUserClick(record)}
+                                        onClick={() => handleUserClick(user)}
                                         className="text-blue-500 hover:underline"
                                     >
                                         {user.user_name}
                                     </button>
                                 </td>
                                 <td className="w-1/3 px-4 py-2 text-center text-sm truncate">
-                                    {user.total_fine}
+                                ₱{user.fine}
                                 </td>
                             </tr>
                         ))
