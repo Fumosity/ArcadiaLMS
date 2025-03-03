@@ -41,9 +41,16 @@ const UHeader = () => {
               onMouseEnter={showDropdown}
               onMouseLeave={hideDropdown}
             >
-              <span className="mr-2 text-white cursor-pointer">
+              {user.userAccountType === "Guest" ? (
+                <span className="mr-2 text-white cursor-pointer">
+                Guest Mode
+              </span>  
+              ) : (
+                <span className="mr-2 text-white cursor-pointer">
                 {user.userFName} {user.userLName}
               </span>
+              )}
+              
               {user.userPicture ? (
                 <img
                   src={user.userPicture}
@@ -57,6 +64,26 @@ const UHeader = () => {
               {/* Dropdown Menu */}
               {isDropdownVisible && (
                 <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                {user.userAccountType === "Guest" ? (
+                  <ul className="py-1">
+                    <li>
+                      <Link
+                        to="/user/login"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        Login
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/user/register"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        Sign Up
+                      </Link>
+                    </li>
+                  </ul>
+                ) : (
                   <ul className="py-1">
                     <li>
                       <Link
@@ -66,18 +93,19 @@ const UHeader = () => {
                         Manage Account
                       </Link>
                     </li>
-                    {/* Condition if user is admin then user is able to go to Admin side */}
-                    <li>
-                      {user.userAccountType === "Admin" && (
+                    
+                    {/* Show "Back to Admin side" only if user is an Admin */}
+                    {user.userAccountType === "Admin" && (
+                      <li>
                         <Link
                           to="/admin"
                           className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                         >
                           Back to Admin side
                         </Link>
-                      )}
-                    </li>
-                    {/* End */}
+                      </li>
+                    )}
+              
                     <li>
                       <button
                         onClick={handleLogout}
@@ -87,7 +115,9 @@ const UHeader = () => {
                       </button>
                     </li>
                   </ul>
-                </div>
+                )}
+              </div>
+              
               )}
             </div>
           ) : (

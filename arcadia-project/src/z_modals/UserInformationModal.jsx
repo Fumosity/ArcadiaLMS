@@ -19,7 +19,7 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
   const [isDemoteToInternModalOpen, setIsDemoteToInternModalOpen] = useState(false);
   const [isPromoteToSuperadminModalOpen, setIsPromoteToSuperadminModalOpen] = useState(false);
   const [isPromoteToAdminModalOpen, setIsPromoteToAdminModalOpen] = useState(false);
-  
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [newPassword, setNewPassword] = useState("")
 
@@ -62,17 +62,17 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
         setIsDemoteModalOpen(true);
         return;
       }
-  
+
       if (modifiedUser.userAccountType === "Intern" && (user.userAccountType === "Superadmin" || user.userAccountType === "Admin")) {
         setIsDemoteToInternModalOpen(true);
         return;
       }
-  
+
       if (modifiedUser.userAccountType === "Superadmin" && user.userAccountType === "Admin") {
         setIsPromoteToSuperadminModalOpen(true);
         return;
       }
-  
+
       if (modifiedUser.userAccountType === "Admin" && user.userAccountType === "Intern") {
         setIsPromoteToAdminModalOpen(true);
         return;
@@ -82,17 +82,17 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
         setIsAttentionModalOpen(true);
         return;
       }
-  
+
       if (modifiedUser.userAccountType !== "Intern" && user.userAccountType === "Intern") {
         setIsDemotionModalOpen(true);
         return;
       }
     }
-  
+
     await updateUserInDatabase();
   };
-  
-  
+
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setModifiedUser((prevUser) => ({
@@ -105,7 +105,7 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
     setNewPassword(e.target.value)
   }
 
-  
+
 
   const handleAttentionConfirm = async () => {
     setIsAttentionModalOpen(false)
@@ -187,14 +187,14 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
   }
 
   const accountTitle =
-  user.userAccountType === "Student" ||
-    user.userAccountType === "Teacher" ||
-    user.userAccountType === "Intern"
-    ? "Modify User Account Information"
-    : user.userAccountType === "Admin" ||
-      user.userAccountType === "Superadmin"
-      ? "Modify Admin Account Information"
-      : "Account Information";
+    user.userAccountType === "Student" ||
+      user.userAccountType === "Teacher" ||
+      user.userAccountType === "Intern"
+      ? "Modify User Account Information"
+      : user.userAccountType === "Admin" ||
+        user.userAccountType === "Superadmin"
+        ? "Modify Admin Account Information"
+        : "Account Information";
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -310,27 +310,27 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
             <div className="flex items-center">
               <span className="w-32 text-sm font-medium">New Password:</span>
               <div className="flex-1 items-center relative">
-              <div className="flex-1 flex items-center relative">
-                <input
-                  type={isPasswordVisible ? "text" : "password"}
-                  name="newPassword"
-                  value={newPassword}
-                  onChange={handlePasswordChange}
-                  className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
-                  placeholder="Enter new password"
-                />
-                
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute right-3 text-sm text-blue-600 hover:text-blue-800"
-                >
-                  {isPasswordVisible ? "Hide" : "Show"}
-                </button>
+                <div className="flex-1 flex items-center relative">
+                  <input
+                    type={isPasswordVisible ? "text" : "password"}
+                    name="newPassword"
+                    value={newPassword}
+                    onChange={handlePasswordChange}
+                    className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
+                    placeholder="Enter new password"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-3 text-sm text-blue-600 hover:text-blue-800"
+                  >
+                    {isPasswordVisible ? "Hide" : "Show"}
+                  </button>
+                </div>
+                <p className="italic text-arcadia-red text-xs text-left ml-3">leave empty to keep current*</p>
               </div>
-              <p className="italic text-arcadia-red text-xs text-left ml-3">leave empty to keep current*</p>
-              </div>
-              
+
             </div>
           </div>
         </div>
@@ -346,7 +346,7 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
       </div>
 
 
-      {user.userAccountType === "Admin" || 
+      {user.userAccountType === "Admin" ||
         user.userAccountType === "Superadmin" ? (
         <>
           <DemoteToAdmin
