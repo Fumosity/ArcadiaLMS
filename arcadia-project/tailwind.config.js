@@ -3,7 +3,7 @@ export default {
   theme: {
     colors: {
         "arcadia-red": "#902424",
-        "white": "#FFFFFF",
+        "white": "#FAFAFA",
         "dark-gray": "#333333",
         "black": "#000000",
         "light-white": "FAFAFA",

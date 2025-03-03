@@ -138,8 +138,8 @@ export default function WeeklySched() {
     };
 
     return (
-        <div>
-            <h2>Weekly Schedule</h2>
+        <div className="bg-white p-4 rounded-lg border-grey border h-fit">
+            <h3 className="text-2xl font-semibold mb-4">Weekly Schedule</h3>
             <Calendar
                 localizer={localizer}
                 events={events}

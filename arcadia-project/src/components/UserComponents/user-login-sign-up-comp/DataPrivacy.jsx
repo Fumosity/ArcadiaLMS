@@ -17,10 +17,10 @@ export default function DataPrivacy({ onBack, onContinue }) {
   const isContinueEnabled = termsAccepted && privacyAccepted
 
   return (
-    <div className="uMain-cont flex h-[600px]">
-      <div className="max-w-md mx-auto p-8 bg-white flex flex-col items-center text-center">
+    <div className="uMain-cont flex h-[600px] bg-white">
+      <div className="max-w-md mx-auto p-8  flex flex-col items-center text-center">
         <div className="mb-6">
-          <h1 className="text-5xl font-semibold">Before we end...</h1>
+          <h3 className="text-5xl font-semibold">Before we end...</h3>
         </div>
 
         <p className="text-black mb-6">
@@ -68,9 +68,21 @@ export default function DataPrivacy({ onBack, onContinue }) {
         </div>
       </div>
 
-      <div className="w-1/2 relative bg-grey rounded-2xl">
-        <div className="absolute inset-0 flex items-end p-12">
-          <h2 className="text-white text-4xl text-right font-semibold">Knowledge that empowers.</h2>
+      <div
+        className="w-1/2 relative rounded-2xl bg-cover bg-center"
+      >
+          <img
+                        src="/image/hero2.jpeg"
+                        alt="Hero Background"
+                        className="w-full h-full object-cover rounded-lg" // Add rounded-lg here
+                    />
+
+        <div className="absolute inset-0 bg-black opacity-70 rounded-2xl" />
+
+        <div className="absolute inset-0 flex items-end p-12 z-10">
+          <h2 className="text-white text-4xl text-right font-semibold">
+            Knowledge that empowers.
+          </h2>
         </div>
       </div>
     </div>

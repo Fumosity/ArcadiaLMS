@@ -49,9 +49,9 @@ export default function UserInterests({ userData, onBack, onContinue }) {
     : genres;
 
   return (
-    <div className="uMain-cont flex">
+    <div className="uMain-cont flex h-[600px] bg-white">
       <div className="w-1/2 p-12 flex flex-col">
-        <h1 className="text-3xl font-semibold text-center mb-6">Hello {userData.firstName}!</h1>
+        <h3 className="text-5xl font-semibold text-center mb-6">Hello {userData.firstName}!</h3>
         <p className="text-gray-600 mb-4">Select a number of interests or genres that you want to see!</p>
 
         {/* Category selection buttons */}
@@ -115,9 +115,21 @@ export default function UserInterests({ userData, onBack, onContinue }) {
         </div>
       </div>
 
-      <div className="w-1/2 relative bg-grey rounded-2xl">
-        <div className="absolute inset-0 flex items-end p-12">
-          <h2 className="text-white text-4xl font-semibold">Knowledge that empowers.</h2>
+      <div
+        className="w-1/2 relative rounded-2xl bg-cover bg-center"
+      >
+          <img
+                        src="/image/hero2.jpeg"
+                        alt="Hero Background"
+                        className="w-full h-full object-cover rounded-lg" // Add rounded-lg here
+                    />
+
+        <div className="absolute inset-0 bg-black opacity-70 rounded-2xl" />
+
+        <div className="absolute inset-0 flex items-end p-12 z-10">
+          <h2 className="text-white text-4xl text-right font-semibold">
+            Knowledge that empowers.
+          </h2>
         </div>
       </div>
     </div>

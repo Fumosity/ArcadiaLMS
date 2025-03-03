@@ -45,8 +45,8 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="uMain-cont flex h-[600px]">
-      <div className="max-w-md mx-auto p-8 bg-white">
+    <div className="uMain-cont flex h-[600px] bg-white">
+      <div className="max-w-md mx-auto p-8 ">
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-1">
             <img src="/image/arcadia.png" alt="Arcadia logo" className="h-13 w-13" />
@@ -83,6 +83,7 @@ export default function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-3 py-1 border border-gray rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter password"
             />
           </div>
 
@@ -99,7 +100,7 @@ export default function LoginForm() {
           <div className="flex justify-center items-center">
             <button
               onClick={loginAsGuest}
-              className="bg-red text-white p-2 rounded-md w-full"
+              className="border py-1 border-arcadia-red text-arcadia-red p-2 rounded-full w-full hover:bg-red hover:border-red hover:text-white"
             >
               Continue as Guest
             </button>
@@ -107,11 +108,24 @@ export default function LoginForm() {
         </form>
       </div>
 
-      <div className="w-1/2 relative bg-grey rounded-2xl">
-        <div className="absolute inset-0 flex items-end p-12">
-          <h2 className="text-white text-4xl text-right font-semibold">Knowledge that empowers.</h2>
+      <div
+        className="w-1/2 relative rounded-2xl bg-cover bg-center"
+      >
+          <img
+                        src="/image/hero2.jpeg"
+                        alt="Hero Background"
+                        className="w-full h-full object-cover rounded-lg" // Add rounded-lg here
+                    />
+
+        <div className="absolute inset-0 bg-black opacity-70 rounded-2xl" />
+
+        <div className="absolute inset-0 flex items-end p-12 z-10">
+          <h2 className="text-white text-4xl text-right font-semibold">
+            Knowledge that empowers.
+          </h2>
         </div>
       </div>
+
     </div>
   );
 }
