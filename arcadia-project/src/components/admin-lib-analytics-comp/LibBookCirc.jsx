@@ -1,168 +1,34 @@
-import React, { useState, useEffect } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { supabase } from '../../supabaseClient';
+"use client"
+
+import { useState, useEffect } from "react"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { fetchBookCirculationData, processData } from "../../backend/LibBkCircBackend"
 
 const LibBookCirc = () => {
-  const [timeFrame, setTimeFrame] = useState("month");
-  const [circulationData, setCirculationData] = useState([]);
-  const [tableData, setTableData] = useState([]);
-
-  // Helper functions remain the same...
-  const groupDataByTimeFrame = (data, timeFrame) => {
-    const groupedData = {};
-
-    const fillMissingEntries = (keys, defaultValue = { borrowed: 0, returned: 0 }) => {
-      keys.forEach((key) => {
-        if (!groupedData[key]) {
-          groupedData[key] = { ...defaultValue };
-        }
-      });
-    };
-
-    if (timeFrame === "day") {
-      // Initialize 24-hour timeline
-      for (let hour = 0; hour < 24; hour++) {
-        const timeLabel = `${hour}:00`;
-        groupedData[timeLabel] = { borrowed: 0, returned: 0 };
-      }
-
-      data.forEach((entry) => {
-        const date = new Date(entry.date);
-        const timeLabel = `${date.getHours()}:00`;
-        if (groupedData[timeLabel]) {
-          if (entry.type === "Borrowed") groupedData[timeLabel].borrowed += 1;
-          else if (entry.type === "Returned") groupedData[timeLabel].returned += 1;
-        }
-      });
-
-    } else if (timeFrame === "week") {
-      const currentDate = new Date();
-      const startOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay())); // Sunday
-      const weekDays = Array.from({ length: 7 }, (_, i) => {
-        const date = new Date(startOfWeek);
-        date.setDate(startOfWeek.getDate() + i);
-        return date.toISOString().split('T')[0]; // Return as YYYY-MM-DD for consistency
-      });
-
-      data.forEach((entry) => {
-        const dateLabel = new Date(entry.date).toISOString().split('T')[0];
-        if (!groupedData[dateLabel]) groupedData[dateLabel] = { borrowed: 0, returned: 0 };
-        if (entry.type === "Borrowed") groupedData[dateLabel].borrowed += 1;
-        else if (entry.type === "Returned") groupedData[dateLabel].returned += 1;
-      });
-
-      fillMissingEntries(weekDays);
-    } else if (timeFrame === "month") {
-      // Initialize month timeline with all days of the month
-      const currentDate = new Date();
-      const currentYear = currentDate.getFullYear();
-      const currentMonth = currentDate.getMonth();
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-      const monthDays = Array.from({ length: daysInMonth }, (_, i) => {
-        const date = new Date(currentYear, currentMonth, i + 1);
-        return date.toLocaleDateString();
-      });
-
-      data.forEach((entry) => {
-        const dateLabel = new Date(entry.date).toLocaleDateString();
-        if (!groupedData[dateLabel]) groupedData[dateLabel] = { borrowed: 0, returned: 0 };
-        if (entry.type === "Borrowed") groupedData[dateLabel].borrowed += 1;
-        else if (entry.type === "Returned") groupedData[dateLabel].returned += 1;
-      });
-
-      fillMissingEntries(monthDays);
-    }
-
-    // Return grouped data in sorted order of keys
-    return Object.keys(groupedData)
-      .sort((a, b) => new Date(a) - new Date(b))  // Sorting dates correctly
-      .map((key) => ({
-        name: key,
-        ...groupedData[key],
-      }));
-  };
-
-  const processTableData = (data, timeFrame) => {
-    const currentDate = new Date();
-    return data.filter(entry => {
-      const date = new Date(entry.date);
-      if (timeFrame === "day") {
-        return date.setHours(0, 0, 0, 0) <= currentDate && date.setHours(23, 59, 59, 999) >= currentDate;
-      } else if (timeFrame === "week") {
-        const startOfWeek = new Date(date.setDate(date.getDate() - date.getDay()));
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
-        return date >= startOfWeek && date <= endOfWeek;
-      } else if (timeFrame === "month") {
-        return `${date.getMonth() + 1}-${date.getFullYear()}` === `${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
-      }
-      return true;
-    });
-  };
-
-  const formatTransactionData = (data) => {
-    const today = new Date();
-    return data.map((item) => {
-      const dueDate = new Date(item.checkoutDate); // Assuming checkoutDate is the due date
-      const returnDate = new Date(item.checkinDate || item.checkoutDate);
-      const isOverdue = returnDate > dueDate;
-  
-      return {
-        type: item.transactionType,
-        date: item.checkinDate || item.checkoutDate,
-        time: item.checkinTime || item.checkoutTime,
-        borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
-        bookTitle: item.book_indiv?.book_titles?.title || '',
-        bookBarcode: item.bookBarcode,
-        overdue: isOverdue && item.transactionType === "Borrowed",
-      };
-    });
-  };
+  const [timeFrame, setTimeFrame] = useState("month")
+  const [circulationData, setCirculationData] = useState([])
+  const [tableData, setTableData] = useState([])
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('book_transactions')
-          .select(`transactionType, checkinDate, checkinTime, checkoutDate, checkoutTime, userID, bookBarcode, book_indiv(book_titles(title, price)), user_accounts(userFName, userLName, userLPUID)`);
+    const loadData = async () => {
+      const rawData = await fetchBookCirculationData()
+      const { filteredTableData, chartData } = processData(rawData, timeFrame)
+      setTableData(filteredTableData)
+      setCirculationData(chartData)
+    }
 
-        if (error) {
-          console.error("Error fetching data: ", error.message);
-        } else {
-          const formattedData = data.map(item => {
-            const date = item.checkinDate || item.checkoutDate;
-            const time = item.checkinTime || item.checkoutTime;
-            const formattedTime = time ? new Date(`1970-01-01T${time}`).toLocaleString('en-PH', { hour: 'numeric', minute: 'numeric', hour12: true }) : '';
-
-            return {
-              type: item.transactionType,
-              date,
-              time: formattedTime,
-              borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
-              bookTitle: item.book_indiv?.book_titles?.title || '',
-              bookBarcode: item.bookBarcode,
-            };
-          });
-
-          setCirculationData(groupDataByTimeFrame(formattedData, timeFrame));
-          setTableData(processTableData(formattedData, timeFrame));
-        }
-      } catch (error) {
-        console.error("Error: ", error);
-      }
-    };
-
-    fetchData();
-  }, [timeFrame]);
+    loadData()
+  }, [timeFrame])
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
-            <h3 className="text-2xl font-semibold mb-2">Book Circulation</h3>
+      <h3 className="text-2xl font-semibold mb-2">Book Circulation</h3>
 
       {/* Time Frame Selector */}
       <div className="mb-4">
-        <label htmlFor="time-frame" className="mr-2">Select Time Frame:</label>
+        <label htmlFor="time-frame" className="mr-2">
+          Select Time Frame:
+        </label>
         <select
           id="time-frame"
           onChange={(e) => setTimeFrame(e.target.value)}
@@ -181,11 +47,11 @@ const LibBookCirc = () => {
           <BarChart data={circulationData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
-            <YAxis />
+            <YAxis allowDecimals={false} domain={[0, "auto"]} />
             <Tooltip />
             <Legend />
-            <Bar dataKey="borrowed" fill="#e8d08d" />
-            <Bar dataKey="returned" fill="#82ca9d" />
+            <Bar dataKey="borrowed" fill="#e8d08d" name="Borrowed" />
+            <Bar dataKey="returned" fill="#82ca9d" name="Returned" />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -208,12 +74,18 @@ const LibBookCirc = () => {
             <tbody className="bg-white divide-y divide-gray-200 text-center">
               {tableData.map((book, index) => (
                 <tr key={index} className="hover:bg-gray-100">
-                  <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
-                                        ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}>
+                  <td
+                    className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
+                            ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}
+                  >
                     {book.type}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{book.date} {book.time}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{book.date} {book.time}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {book.checkoutDate} {book.checkoutTime}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {book.type === "Returned" ? `${book.checkinDate} ${book.checkinTime}` : "-"}
+                  </td>
                   <td className="px-4 py-3 text-sm text-blue-600">{book.borrower}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">{book.bookTitle}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
@@ -224,7 +96,8 @@ const LibBookCirc = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LibBookCirc;
+export default LibBookCirc
+

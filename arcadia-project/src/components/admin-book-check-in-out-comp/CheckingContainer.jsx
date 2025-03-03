@@ -179,8 +179,13 @@ const CheckingContainer = () => {
   const handleSubmit = async () => {
     // Check if all required fields are filled
     const requiredFields = [
-      'userID', 'bookBarcode', 'date', 'time', 'schoolNo', 'name', 'college', 'department', 'bookTitle'
+      'userID', 'bookBarcode', 'date', 'time', 'schoolNo', 'name', 'college', 'bookTitle'
     ];
+
+    // Only require 'department' if the college is 'COECSA'
+  if (formData.college === 'COECSA') {
+    requiredFields.push('department');
+  }
 
     let emptyFields = {};
     for (let field of requiredFields) {
@@ -202,7 +207,6 @@ const CheckingContainer = () => {
     try {
       const { userID, bookBarcode, schoolNo, name, college, department, bookTitle, date, time, deadline } = formData;
       const currentTime = getLocalTime();
-
       const transactionType = checkMode === 'Check Out' ? 'Borrowed' : 'Returned';
 
       // If the mode is 'Check Out', perform the checkout logic
