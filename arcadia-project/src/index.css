@@ -3,6 +3,15 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --fc-button-text-color: #fff;
+  --fc-button-bg-color: #902424; 
+  --fc-button-border-color: #902424;
+  --fc-button-hover-bg-color: #790000;
+  --fc-button-hover-border-color: #790000;
+  --fc-button-active-bg-color: #790000;
+  --fc-button-active-border-color: #1c0000;
+}
 
 @layer components {
   .title {
