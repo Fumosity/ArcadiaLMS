@@ -95,7 +95,8 @@ function App() {
               <Route path="/user/support" element={<USupport />} />  
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
-              <Route path="/user/accountview" element={<ProtectedRoute><UAccountProfile /></ProtectedRoute>} />
+              {/* <Route path="/user/accountview" element={<ProtectedRoute><UAccountProfile /></ProtectedRoute>} /> */}
+              <Route path="/user/accountview" element={<UAccountProfile />} />
               <Route path="/user/faqs" element={<UFAQs />} />
               <Route path="/user/mostpopularbooks" element={<UMostPop />} />
               <Route path="/user/highlyratedbooks" element={<UHighlyRated />} />

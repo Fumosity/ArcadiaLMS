@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { ChevronRight } from 'lucide-react';
-import UpdateProfilePic from "../../z_modals/UpdateProfilePic"; // Adjust the import path as needed
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../../backend/UserContext"; // Adjust the path
+"use client"
+
+import { useState } from "react"
+import { ChevronRight } from "lucide-react"
+import UpdateProfilePic from "../../z_modals/UpdateProfilePic" // Adjust the import path as needed
+import { useNavigate } from "react-router-dom"
+import { useUser } from "../../backend/UserContext" // Adjust the path
 
 // Settings options with actions and links
 const settingsOptions = [
@@ -14,14 +16,14 @@ const settingsOptions = [
   {
     title: "Change Password",
     description: "Change your password through your registered email account.",
-    href: "/change-password", // Redirect to change password page
+    href: "/admin/useraccounts/viewusers"
   },
   {
     title: "Update User Data",
     description: "Edit your user data.",
-    href: "/admin/useraccounts/viewadmins", // Navigate to AdminInformations
+    href: "/admin/useraccounts/viewusers", // Navigate to UserInformations
   },
-];
+]
 
 // Individual settings option component
 const SettingsOption = ({ title, description, onClick }) => (
@@ -35,32 +37,36 @@ const SettingsOption = ({ title, description, onClick }) => (
     </div>
     <ChevronRight className="w-5 h-5 text-dark-gray group-hover:text-arcadia-black transition-colors" />
   </div>
-);
+)
 
 export const AdminSettings = ({ options = settingsOptions }) => {
-  const { user } = useUser(); // Access the current user
-  const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useUser() // Access the current user
+  const navigate = useNavigate()
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const handleOptionClick = (option) => {
     if (option.action === "openModal") {
-      setIsModalOpen(true); // Open modal for updating profile photo
+      setIsModalOpen(true) // Open modal for updating profile photo
     } else if (option.href) {
-      if (option.href === "/admin/useraccounts/viewadmins") {
-        // Navigate to AdminInformations and pass the complete user data
-        navigate(option.href, { state: { user } });
+      if (option.href === "/admin/useraccounts/viewusers") {
+        // Navigate to AUAccView and pass the full user object and source
+        navigate(option.href, {
+          state: {
+            user: user,
+            userId: user.userID,
+            source: "settings",
+          },
+        })
       } else {
         // Redirect to the provided link
-        navigate(option.href);
+        navigate(option.href)
       }
     }
-  };
+  }
 
   return (
     <div className="uMain-cont">
-      <h2 className="text-xl font-medium text-arcadia-black mb-6">
-        Account Settings
-      </h2>
+      <h2 className="text-xl font-medium text-arcadia-black mb-6">Account Settings</h2>
       <div className="space-y-4">
         {options.map((option) => (
           <SettingsOption
@@ -73,13 +79,8 @@ export const AdminSettings = ({ options = settingsOptions }) => {
       </div>
 
       {/* Render the modal */}
-      {isModalOpen && (
-        <UpdateProfilePic
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
+      {isModalOpen && <UpdateProfilePic isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />}
     </div>
-  );
-};
+  )
+}
 

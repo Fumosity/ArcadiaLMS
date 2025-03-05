@@ -1,30 +1,35 @@
-import React, { useState } from 'react';
-import { ChevronRight } from 'lucide-react';
-import UpdateProfilePic from '../../../z_modals/UpdateProfilePic';
-import UserChangePass from '../../../z_modals/UserChangePass';
+"use client"
+
+import { useState } from "react"
+import { ChevronRight } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import UpdateProfilePic from "../../../z_modals/UpdateProfilePic"
+import UserChangePass from "../../../z_modals/UserChangePass"
 
 const settingsOptions = [
   {
     title: "Update Profile Photo",
     description: "Change your profile photo.",
-    action: "openProfilePicModal"
+    action: "openProfilePicModal",
   },
   {
     title: "Change Password",
     description: "Change your password through your registered email account.",
-    action: "openChangePassModal"
+    action: "openChangePassModal",
   },
   {
     title: "Update User Data",
     description: "File a support ticket to update your data like email, college, or department.",
-    href: "/user/support/supportticket?type=Account&subject=Request%20to%20Update%20User%20Data"
+    path: "/user/support/supportticket",
+    params: { type: "Account", subject: "Request to Update User Data" },
   },
   {
     title: "Delete Account",
     description: "File a support ticket to request account deletion.",
-    href: "/user/support/supportticket?type=Account&subject=Request%20to%20Delete%20Account"
-  }
-];
+    path: "/user/support/supportticket",
+    params: { type: "Account", subject: "Request to Delete Account" },
+  },
+]
 
 // Individual settings option component
 const SettingsOption = ({ title, description, onClick }) => (
@@ -38,21 +43,24 @@ const SettingsOption = ({ title, description, onClick }) => (
     </div>
     <ChevronRight className="w-5 h-5 text-dark-gray group-hover:text-arcadia-black transition-colors" />
   </div>
-);
+)
 
 export const AccountSettings = ({ options = settingsOptions }) => {
-  const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false);
-  const [isChangePassModalOpen, setIsChangePassModalOpen] = useState(false);
+  const navigate = useNavigate()
+  const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false)
+  const [isChangePassModalOpen, setIsChangePassModalOpen] = useState(false)
 
   const handleOptionClick = (option) => {
     if (option.action === "openProfilePicModal") {
-      setIsProfilePicModalOpen(true);
+      setIsProfilePicModalOpen(true)
     } else if (option.action === "openChangePassModal") {
-      setIsChangePassModalOpen(true);
-    } else if (option.href) {
-      window.location.href = option.href;
+      setIsChangePassModalOpen(true)
+    } else if (option.path) {
+      // Use React Router's navigate instead of window.location.href
+      const queryParams = new URLSearchParams(option.params).toString()
+      navigate(`${option.path}?${queryParams}`)
     }
-  };
+  }
 
   return (
     <div className="uMain-cont">
@@ -70,19 +78,14 @@ export const AccountSettings = ({ options = settingsOptions }) => {
 
       {/* Profile Picture Modal */}
       {isProfilePicModalOpen && (
-        <UpdateProfilePic
-          isOpen={isProfilePicModalOpen}
-          onClose={() => setIsProfilePicModalOpen(false)}
-        />
+        <UpdateProfilePic isOpen={isProfilePicModalOpen} onClose={() => setIsProfilePicModalOpen(false)} />
       )}
 
       {/* Change Password Modal */}
       {isChangePassModalOpen && (
-        <UserChangePass
-          isOpen={isChangePassModalOpen}
-          onClose={() => setIsChangePassModalOpen(false)}
-        />
+        <UserChangePass isOpen={isChangePassModalOpen} onClose={() => setIsChangePassModalOpen(false)} />
       )}
     </div>
-  );
-};
+  )
+}
+
