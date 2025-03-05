@@ -95,13 +95,13 @@ const BCHistory = () => {
     const totalPages = Math.ceil(bkhistoryData.length / entriesPerPage)
 
     // Handle sorting by borrower name
-const sortedData = [...bkhistoryData].sort((a, b) => {
-    const nameA = a.borrower.toLowerCase();
-    const nameB = b.borrower.toLowerCase();
-  
-    return sortOrder === "Ascending" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-  });
-  
+    const sortedData = [...bkhistoryData].sort((a, b) => {
+        const nameA = a.borrower.toLowerCase();
+        const nameB = b.borrower.toLowerCase();
+
+        return sortOrder === "Ascending" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+    });
+
     // Handle filtering and searching
     const filteredData = sortedData.filter((book) => {
         const matchesType = typeFilter === "All" || book.type === typeFilter
@@ -134,9 +134,11 @@ const sortedData = [...bkhistoryData].sort((a, b) => {
         <div className="bg-white p-4 rounded-lg border-grey border">
             <h3 className="text-2xl font-semibold mb-4">Book Circulation History</h3>
 
+            <LibBookCirc />
+
             {/* Controls for sort, filter, and search */}
-            <div className="mb-4 flex flex-wrap justify-between space-x-4">
-                <div className="flex gap-4">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-4">
                     {/* Sort By */}
                     <div className="flex items-center space-x-2">
                         <span className="font-medium text-sm">Sort:</span>
@@ -177,21 +179,23 @@ const sortedData = [...bkhistoryData].sort((a, b) => {
                         </select>
                     </div>
                 </div>
+
                 {/* Search */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 min-w-[0]">
                     <label htmlFor="search" className="font-medium text-sm">
                         Search:
                     </label>
                     <input
                         type="text"
                         id="search"
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm w-64"
+                        className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
                         placeholder="Title, borrower, or barcode"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
             </div>
+
 
             {/* Table */}
             <div className="overflow-x-auto">
@@ -277,7 +281,7 @@ const sortedData = [...bkhistoryData].sort((a, b) => {
                     Next Page
                 </button>
             </div>
-            <LibBookCirc />
+            
         </div>
     )
 }

@@ -15,13 +15,16 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [entriesPerPage, setEntriesPerPage] = useState(10)
+  const [collegeType, setCollegeType] = useState("All")
+  const [departmentType, setDepartmentType] = useState("All")
+  const [availableDepartments, setAvailableDepartments] = useState([])
 
   useEffect(() => {
     const fetchResearch = async () => {
       setIsLoading(true)
       try {
         const { data, error } = await supabase
-          .from("research") // Fetch from 'research' table
+          .from("research")
           .select(
             "researchID, title, college, department, abstract, location, researchARCID, pubDate, cover, author, keywords, pages",
           )
@@ -42,6 +45,33 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
 
     fetchResearch()
   }, [])
+
+  useEffect(() => {
+    if (inventoryData.length > 0) {
+      const departments = []
+
+      if (collegeType === "All") {
+        inventoryData.forEach((research) => {
+          if (research.department) {
+            departments.push(research.department)
+          }
+        })
+      } else {
+        inventoryData
+          .filter((research) => research.college === collegeType)
+          .forEach((research) => {
+            if (research.department) {
+              departments.push(research.department)
+            }
+          })
+      }
+
+      const uniqueDepartments = [...new Set(departments)]
+      setAvailableDepartments(uniqueDepartments)
+
+      setDepartmentType("All")
+    }
+  }, [collegeType, inventoryData])
 
   // Handle sorting
   const sortedData = [...inventoryData].sort((a, b) => {
@@ -64,12 +94,19 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
       (research.title && research.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (research.college && research.college.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (research.department && research.department.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (research.keywords && research.keywords.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (research.author &&
         ((typeof research.author === "string" && research.author.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (Array.isArray(research.author) &&
             research.author.some((author) => author && author.toLowerCase().includes(searchTerm.toLowerCase())))))
 
-    return matchesPubDate && matchesSearch
+    // Filter by college type
+    const matchesCollege = collegeType === "All" || research.college === collegeType
+
+    // Filter by department type
+    const matchesDepartment = departmentType === "All" || research.department === departmentType
+
+    return matchesPubDate && matchesSearch && matchesCollege && matchesDepartment
   })
 
   // Pagination logic
@@ -80,7 +117,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
   const handleRowClick = (research) => {
     setSelectedResearch(research)
     if (onResearchSelect) {
-      onResearchSelect(research) // Pass the selected research to parent
+      onResearchSelect(research)
     }
   }
 
@@ -88,7 +125,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
     if (!authors || authors.length === 0) return "N/A"
 
     if (!Array.isArray(authors)) {
-      authors = [authors] // Handle cases where author is not an array
+      authors = [authors]
     }
 
     const formattedAuthors = authors.map((author) => {
@@ -112,17 +149,54 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
       <h3 className="text-2xl font-semibold mb-4">Current Research Inventory</h3>
 
       {/* Controls for sort, filter, and search */}
-      <div className="mb-4 flex flex-wrap justify-between space-x-4">
-        <div className="flex gap-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           {/* Sort By */}
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Sort:</span>
             <button
               onClick={() => setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")}
-              className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+              className="sort-by bg-gray-200 py-1 px-1 rounded-lg text-sm w-24"
             >
               {sortOrder}
             </button>
+          </div>
+
+          {/* College Type Filter */}
+          <div className="flex items-center space-x-2">
+            <span className="font-medium text-sm">College:</span>
+            <select
+              className="bg-gray-200 py-1 px-1 border rounded-lg text-sm w-[105px]"
+              value={collegeType}
+              onChange={(e) => setCollegeType(e.target.value)}
+            >
+              <option value="All">All Colleges</option>
+              <option value="COECSA">COECSA</option>
+              <option value="CITHM">CITHM</option>
+              <option value="CAMS">CAMS</option>
+              <option value="CBA">CBA</option>
+              <option value="COL">COL</option>
+              <option value="CFAD">CFAD</option>
+              <option value="CON">CON</option>
+            </select>
+          </div>
+
+          {/* Department Type Filter */}
+          <div className="flex items-center space-x-2">
+            <span className="font-medium text-sm">Department:</span>
+            <select
+              className="bg-gray-200 py-1 px-1 border rounded-lg text-sm w-[90px]"
+              value={departmentType}
+              onChange={(e) => setDepartmentType(e.target.value)}
+              disabled={availableDepartments.length === 0}
+            >
+              <option value="All">All Depts.</option>
+              {availableDepartments.map((department, index) => (
+                <option key={index} value={department}>
+                  {department}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Pub Date Filter */}
@@ -130,8 +204,8 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
             <span className="font-medium text-sm">Pub. Date:</span>
             <input
               type="text"
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
-              placeholder="YYYY or YYYY-MM"
+              className="bg-gray-200 py-1 px-2 border rounded-lg text-sm w-[90px]"
+              placeholder="YYYY-MM"
               value={pubDateFilter}
               onChange={(e) => setPubDateFilter(e.target.value)}
             />
@@ -141,7 +215,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Entries:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
+              className="bg-gray-200 py-1 px-1 border rounded-lg text-sm w-13"
               value={entriesPerPage}
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
             >
@@ -152,21 +226,24 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
             </select>
           </div>
         </div>
+
         {/* Search */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 min-w-[0]">
           <label htmlFor="search" className="font-medium text-sm">
             Search:
           </label>
           <input
             type="text"
             id="search"
-            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-64"
-            placeholder="Title, author, college, or department"
+            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+            placeholder="Title, author, or keywords"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
+
+
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -220,10 +297,9 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
               displayedResearch.map((item, index) => (
                 <tr
                   key={index}
-                  className={`hover:bg-light-gray cursor-pointer ${
-                    selectedResearch?.researchID === item.researchID ? "bg-gray-200" : ""
-                  }`}
-                  onClick={() => handleRowClick(item)} // Row click event
+                  className={`hover:bg-light-gray cursor-pointer ${selectedResearch?.researchID === item.researchID ? "bg-gray-200" : ""
+                    }`}
+                  onClick={() => handleRowClick(item)}
                 >
                   <td className="px-4 py-4 text-sm text-gray-900 max-w-36">
                     <div className="flex justify-center">
@@ -251,25 +327,17 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                   </td>
 
                   <td className="px-4 py-4 text-sm truncate max-w-48 relative group">
-                    {" "}
-                    {/* Added group class here */}
                     <div className="flex items-center space-x-1">
                       <span className="inline-block truncate break-words">{formatAuthor(item.author)}</span>
-                      {Array.isArray(item.author) &&
-                        item.author.length > 2 && ( // Check if item.author is an array before checking length
-                          <div className="absolute top-0 left-full ml-2 bg-white border border-gray-300 rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
-                            {item.author.slice(2).map(
-                              (
-                                author,
-                                i, // Use item.author here!
-                              ) => (
-                                <div key={i} className="mt-1">
-                                  {formatAuthor([author])}
-                                </div>
-                              ),
-                            )}
-                          </div>
-                        )}
+                      {Array.isArray(item.author) && item.author.length > 2 && (
+                        <div className="absolute top-0 left-full ml-2 bg-white border border-gray-300 rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                          {item.author.slice(2).map((author, i) => (
+                            <div key={i} className="mt-1">
+                              {formatAuthor([author])}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </td>
 

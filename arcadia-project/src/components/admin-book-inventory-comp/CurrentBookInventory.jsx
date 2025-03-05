@@ -26,7 +26,9 @@ const CurrentBookInventory = ({ onBookSelect }) => {
     const fetchBooks = async () => {
       setIsLoading(true)
       try {
-        const { data: bookTitles, error: titleError } = await supabase.from("book_titles").select("*")
+        const { data: bookTitles, error: titleError } = await supabase
+          .from("book_titles")
+          .select("*, book_genre_link(genres(genreID, genreName, category))")
 
         if (titleError) {
           console.error("Error fetching book titles:", titleError.message)
@@ -41,17 +43,6 @@ const CurrentBookInventory = ({ onBookSelect }) => {
 
         const bookIDs = bookTitles.map((book) => book.titleID)
 
-        // Fetch book-genre relationships and join with genres table
-        const { data: bookGenres, error: genreError } = await supabase
-          .from("book_genre_link")
-          .select("titleID, genres(genreID, genreName, category)") // Join with genres table
-          .in("titleID", bookIDs)
-
-        if (genreError) {
-          console.error("Error fetching book genres:", genreError.message)
-          return
-        }
-
         const { data: bookIndiv, error: bookError } = await supabase
           .from("book_indiv")
           .select("bookID, titleID")
@@ -63,24 +54,16 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         }
 
         // Process genre data
-        const bookGenreMap = bookGenres.reduce((acc, item) => {
-          if (!acc[item.titleID]) {
-            acc[item.titleID] = { category: item.genres.category, genres: [] }
-          }
-          acc[item.titleID].genres.push(item.genres.genreName)
-          return acc
-        }, {})
-
-        // Combine all data
         const combinedData = bookTitles.map((title) => {
           const books = bookIndiv.filter((b) => b.titleID === title.titleID)
-          const { category, genres } = bookGenreMap[title.titleID] || { category: "Uncategorized", genres: [] }
+          const genres = title.book_genre_link.map((link) => link.genres.genreName)
+          const category = title.book_genre_link[0]?.genres.category || "Uncategorized"
 
           return {
             ...title,
             copies: books,
             category,
-            genres, // Array of genre names
+            genres,
           }
         })
 
@@ -182,16 +165,26 @@ const CurrentBookInventory = ({ onBookSelect }) => {
       !pubDateFilter ||
       (book.originalPubDate && book.originalPubDate.toLowerCase().includes(pubDateFilter.toLowerCase()))
 
+    // Helper function to check if a value matches the search term
+    const matchesSearchTerm = (value) => {
+      if (typeof value === "string") {
+        return value.toLowerCase().includes(searchTerm.toLowerCase())
+      } else if (Array.isArray(value)) {
+        return value.some((item) => typeof item === "string" && item.toLowerCase().includes(searchTerm.toLowerCase()))
+      }
+      return false
+    }
+
     // Filter by search term
     const matchesSearch =
       !searchTerm ||
-      (book.title && book.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (book.category && book.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (book.arcID && book.arcID.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      matchesSearchTerm(book.title) ||
+      matchesSearchTerm(book.category) ||
+      matchesSearchTerm(book.arcID) ||
+      matchesSearchTerm(book.keywords) ||
       (book.author &&
-        ((typeof book.author === "string" && book.author.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (Array.isArray(book.author) &&
-            book.author.some((author) => author && author.toLowerCase().includes(searchTerm.toLowerCase())))))
+        ((typeof book.author === "string" && matchesSearchTerm(book.author)) ||
+          (Array.isArray(book.author) && book.author.some((author) => matchesSearchTerm(author)))))
 
     // Filter by category type
     const matchesCategory = categoryType === "All" || book.category === categoryType
@@ -211,8 +204,8 @@ const CurrentBookInventory = ({ onBookSelect }) => {
     <div className="bg-white p-4 rounded-lg border-grey border h-fit">
       <h3 className="text-2xl font-semibold mb-4">Current Book Inventory</h3>
 
-      <div className="mb-4 flex flex-wrap justify-between space-x-4">
-        <div className="flex gap-4 flex-wrap">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           {/* Sort By */}
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Sort:</span>
@@ -228,7 +221,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Category:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              className="bg-gray-200 py-1 px-1 border rounded-lg text-sm w-auto"
               value={categoryType}
               onChange={(e) => setCategoryType(e.target.value)}
             >
@@ -242,7 +235,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Genre:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              className="bbg-gray-200 py-1 px-1 border rounded-lg text-sm w-auto"
               value={genreType}
               onChange={(e) => setGenreType(e.target.value)}
               disabled={availableGenres.length === 0}
@@ -261,8 +254,8 @@ const CurrentBookInventory = ({ onBookSelect }) => {
             <span className="font-medium text-sm">Pub. Date:</span>
             <input
               type="text"
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
-              placeholder="YYYY or YYYY-MM"
+              className="bg-gray-200 py-1 px-2 border rounded-lg text-sm w-[90px]"
+              placeholder="YYYY-MM"
               value={pubDateFilter}
               onChange={(e) => setPubDateFilter(e.target.value)}
             />
@@ -272,7 +265,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Entries:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
+              className="bg-gray-200 py-1 px-1 border rounded-lg text-sm w-13"
               value={entriesPerPage}
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
             >
@@ -284,15 +277,15 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           </div>
         </div>
         {/* Search */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 min-w-[0]">
           <label htmlFor="search" className="font-medium text-sm">
             Search:
           </label>
           <input
             type="text"
             id="search"
-            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-64"
-            placeholder="Title, author, category, or call no."
+            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+            placeholder="Title, author, category, keywords, or call no."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -436,6 +429,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           </tbody>
         </table>
       </div>
+      
       {/* Pagination Controls */}
       <div className="flex justify-center items-center mt-2 space-x-4">
         <button
@@ -454,6 +448,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           Next Page
         </button>
       </div>
+
       {isModalOpen && selectedBook && (
         <BookCopies isOpen={isModalOpen} onClose={closeModal} titleID={selectedBook.titleID} />
       )}

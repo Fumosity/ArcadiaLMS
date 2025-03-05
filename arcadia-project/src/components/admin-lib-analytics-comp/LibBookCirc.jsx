@@ -21,8 +21,7 @@ const LibBookCirc = () => {
   }, [timeFrame])
 
   return (
-    <div className="bg-white p-4 rounded-lg border-grey border">
-      <h3 className="text-2xl font-semibold mb-2">Book Circulation</h3>
+    <div className="bg-white p-4">
 
       {/* Time Frame Selector */}
       <div className="mb-4">
