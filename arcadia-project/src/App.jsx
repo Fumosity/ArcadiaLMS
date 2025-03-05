@@ -21,6 +21,7 @@ import ABChecking from './admin-book-checking-in-out/ABChecking';
 import ABAdd from './admin-book-add/ABAdd';
 import ARAdd from './admin-research-add/ARAdd';
 import ABViewer from './admin-book-viewer/ABViewer';
+import ABCopies from './admin-book-copies/ABCopies.jsx';
 import ARViewer from './admin-research-viewer/ARViewer';
 import ABModify from './admin-book-modify/ABModify';
 import ARModify from './admin-research-modify/ARModify';
@@ -131,6 +132,7 @@ function App() {
               <Route path="bookcheckinout" element={<ABChecking />} />
               <Route path="bookadding" element={<ABAdd />} />
               <Route path="bookexport" element={<ABExport />} />
+              <Route path="copymanagement" element={<ABCopies />} />
               <Route path="genremanagement" element={<AGenreMgmt />} />
               <Route path="genreadding" element={<AGAdd />} />
               <Route path="genremodify" element={<AGModify />} />

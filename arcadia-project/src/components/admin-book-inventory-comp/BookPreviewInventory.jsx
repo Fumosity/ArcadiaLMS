@@ -63,7 +63,12 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
   const handleModifyBook = () => {
     console.log("Title in BookPreviewInventory:", bookDetails.title)
     const queryParams = new URLSearchParams(bookDetails).toString()
-    navigate(`/admin/bookmodify?${queryParams}`)
+    navigate(`/admin/bookmodify?` + encodeURIComponent(queryParams))
+  }
+
+  const handleManageCopies = () => {
+    console.log("Title in BookPreviewInventory:", bookDetails.title)
+    navigate(`/admin/copymanagement?titleID=${bookDetails.titleID}`)
   }
 
   const handleDeleteBook = () => {
@@ -103,9 +108,9 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
         </button>
         <button
           className="add-book text-sm w-full mb-2 px-2 py-2 rounded-lg border-grey hover:bg-arcadia-red hover:text-white"
-          onClick={handleModifyBook}
+          onClick={handleManageCopies}
         >
-          Modify Book Copies
+          Manage Copies
         </button>
         <button
           className="add-book text-sm w-full mb-2 px-2 py-2 rounded-lg border-grey hover:bg-arcadia-red hover:text-white"

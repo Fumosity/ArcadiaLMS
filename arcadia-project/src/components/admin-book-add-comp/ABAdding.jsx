@@ -91,30 +91,6 @@ const ABAdding = ({ formData, setFormData }) => {
     });
   };
 
-  const handleGenre = () => {
-    if (selectedGenres.length < 5) {
-      alert("Please select at least 5 genres");
-      return;
-    }
-    console.log("Selected genres:", selectedGenres);
-
-    const selectedGenreNames = genres
-      .filter((genres) => selectedGenres.includes(genres.genreID))
-      .map((genres) => genres.genreName);
-
-    console.log("Selected genre names:", selectedGenreNames);
-    //onContinue(selectedGenres);
-  };
-
-  // Filter genres based on the selected category
-  const filteredGenres = categoryFilter
-    ? genres.filter((genres) => genres.category === categoryFilter)
-    : genres;
-
-  const errorStyle = {
-    border: '1px solid red'
-  };
-
   //Handles the submission to the database
   const handleSubmit = async () => {
     console.log("formData before validation:", formData);
