@@ -168,7 +168,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
         })
     );
 
-    // 🔹 Step 1: Fetch genreIDs for selected genreNames
+    //  Step 1: Fetch genreIDs for selected genreNames
     if (!selectedGenreNames || selectedGenreNames.length === 0) {
       console.error("No genres selected.");
       return;
@@ -188,7 +188,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
     const newGenreIDs = genreData.map((g) => g.genreID);
     const newCategory = genreData.length > 0 ? genreData[0].category : null;
 
-    // 🔹 Step 2: Fetch current genres linked to the book
+    //  Step 2: Fetch current genres linked to the book
     const { data: currentGenres, error: currentGenresError } = await supabase
       .from("book_genre_link")
       .select("genreID")
@@ -201,7 +201,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
 
     const currentGenreIDs = currentGenres.map((g) => g.genreID);
 
-    // 🔹 Step 3: Check if category has changed
+    //  Step 3: Check if category has changed
     let currentCategory = null;
     if (currentGenreIDs.length > 0) {
       const { data: currentGenreData, error: currentGenreError } = await supabase
@@ -218,7 +218,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       currentCategory = currentGenreData?.[0]?.category || null;
     }
 
-    // 🔹 Step 4: Remove old genres if switching categories
+    //  Step 4: Remove old genres if switching categories
     if (currentCategory && newCategory && currentCategory !== newCategory) {
       const { error: deleteError } = await supabase
         .from("book_genre_link")
@@ -231,7 +231,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       }
     }
 
-    // 🔹 Step 5: Insert new genres only if they have changed
+    //  Step 5: Insert new genres only if they have changed
     const genreChanges = new Set([...currentGenreIDs, ...newGenreIDs]);
 
     if (genreChanges.size !== currentGenreIDs.length) {
@@ -267,7 +267,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
 
     console.log("updateData", updateData)
 
-    // 🔹 Step 6: Update book details (EXCLUDING `category`)
+    //  Step 6: Update book details (EXCLUDING `category`)
     const { data: updateBook, error: updateError } = await supabase
       .from("book_titles")
       .update(updateData)
@@ -280,7 +280,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
 
     console.log("Book updated successfully:", updateBook);
 
-    // 🔹 Step 7: Trigger onSave callback if provided
+    //  Step 7: Trigger onSave callback if provided
     if (onSave) {
       await onSave(formData);
     }
@@ -302,26 +302,27 @@ const BookModify = ({ formData, setFormData, onSave }) => {
 
             {/* Form Section */}
             <form className="space-y-2">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center" key="title">
                 <label className="w-1/4">Title:</label>
-                <input
-                  type="text"
-                  name="title"
+                <input type="text" name="title" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.title}
                   onChange={handleChange}
+                  style={validationErrors.title ? errorStyle : {}}
+                  placeholder="Full Book Title"
                 />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Authors:</label>
-                <input
-                  type="text"
-                  name="author"
+                <input type="text" name="author" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.author}
                   onChange={handleChange}
+                  style={validationErrors.author ? errorStyle : {}}
+                  placeholder="Author 1; Author 2; Author 3; ..."
                 />
               </div>
+
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Category:</label>
                 {/* Category selection buttons */}
@@ -375,56 +376,59 @@ const BookModify = ({ formData, setFormData, onSave }) => {
                   style={validationErrors.genres ? errorStyle : {}}
                 />
               </div>
+
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Publisher:</label>
-                <input
-                  type="text"
-                  name="publisher"
+                <input type="text" name="publisher" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.publisher}
                   onChange={handleChange}
+                  style={validationErrors.publisher ? errorStyle : {}}
+                  placeholder="Publishing Company Name"
                 />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Synopsis:</label>
-                <textarea
-                  name="synopsis"
+                <textarea name="synopsis" required
                   className="w-2/3 px-3 py-1 rounded-2xl border border-grey min-h-24"
                   rows="3"
                   value={formData.synopsis}
                   onChange={handleChange}
+                  style={validationErrors.synopsis ? errorStyle : {}}
+                  placeholder="Book Synopsis"
                 />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
-                <input
-                  type="text"
-                  name="keywords"
+                <input type="text" name="keywords" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.keywords}
                   onChange={handleChange}
+                  style={validationErrors.keywords ? errorStyle : {}}
+                  placeholder="Keyword 1; Keyword 2; Keyword 3; ..."
                 />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Current Pub. Date:</label>
-                <input
-                  type="date"
-                  name="currentPubDate"
+                <input type="date" name="currentPubDate" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.currentPubDate}
                   onChange={handleChange}
+                  style={validationErrors.currentPubDate ? errorStyle : {}}
+                  placeholder="Publishing Date of Current Edition"
                 />
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Original Pub. Date:</label>
-                <input
-                  type="date"
-                  name="originalPubDate"
+                <input type="date" name="originalPubDate" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.originalPubDate}
                   onChange={handleChange}
+                  style={validationErrors.originalPubDate ? errorStyle : {}}
+                  placeholder="Publishing Date of Original Edition"
                 />
               </div>
+
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
                 <input type="text" name="location" required
@@ -432,6 +436,29 @@ const BookModify = ({ formData, setFormData, onSave }) => {
                   value={formData.location}
                   onChange={handleChange}
                   style={validationErrors.location ? errorStyle : {}}
+                  placeholder="Book Location"
+                />
+              </div>
+
+              <div className="justify-between items-center hidden">
+                <label className="w-1/4">Database ID*:</label>
+                <input type="text" name="bookID" required
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                  value={formData.bookID}
+                  onChange={handleChange}
+                  style={validationErrors.bookID ? errorStyle : {}}
+                  placeholder="Database ID"
+                />
+              </div>
+
+              <div className="flex justify-between items-center">
+                <label className="w-1/4">Call No.:</label>
+                <input type="text" name="titleARCID" required
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                  value={formData.titleARCID}
+                  onChange={handleChange}
+                  style={validationErrors.titleARCID ? errorStyle : {}}
+                  placeholder="Book Title Call Number"
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -441,6 +468,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
                   value={formData.isbn}
                   onChange={handleChange}
                   style={validationErrors.isbn ? errorStyle : {}}
+                  placeholder="ISBN Number"
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -450,6 +478,30 @@ const BookModify = ({ formData, setFormData, onSave }) => {
                   value={formData.price}
                   onChange={handleChange}
                   style={validationErrors.price ? errorStyle : {}}
+                  placeholder="Market Price"
+                />
+              </div>
+
+              <h3 className="text-xl font-semibold py-2">Book Information of First Copy</h3>
+              
+              <div className="flex justify-between items-center">
+                <label className="w-1/4">Barcode:</label>
+                <input type="text" name="bookBarcode" required
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                  value={formData.bookBarcode}
+                  onChange={handleChange}
+                  style={validationErrors.bookBarcode ? errorStyle : {}}
+                  placeholder="Unique Barcode"
+                />
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="w-1/4">Date Procured:</label>
+                <input type="date" name="procurementDate" required
+                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                  value={formData.procurementDate}
+                  onChange={handleChange}
+                  style={validationErrors.procurementDate ? errorStyle : {}}
+                  placeholder="Procurement Date of First Copy"
                 />
               </div>
             </form>

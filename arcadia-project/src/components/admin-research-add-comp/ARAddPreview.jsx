@@ -31,30 +31,36 @@ const ARAddPreview = ({ formData }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md" style={{ maxWidth: "350px", margin: "0 auto" }}>
-      {/* Book Front Page */}
-      <h3 className="text-xl font-semibold mb-3">About</h3>
-      <div className="relative bg-white p-2 mb-4 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
-        <img src={cover || "/image/book_research_placeholder.png"} alt="Thesis cover" className="h-200 w-150 mx-auto mb-2 rounded border border-grey" />
-        <p className="text-xs text-gray-500 mb-2 text-center">Research Cover Preview</p>
+    <div className="w-full">
+      <div className="bg-white p-4 rounded-lg border-grey border w-full mt-12">
+        <h3 className="text-2xl font-semibold mb-2">Research Preview</h3>
+        <div className="w-full h-fit flex justify-center ">
+          <div className="relative bg-white p-4 w-fit rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md border border-grey">
+            <img src={thesisDetails.cover || "/image/book_research_placeholder.png"} alt="Book cover" className="h-[475px] w-[300px] rounded-lg border border-grey object-cover" />
+          </div>
+        </div>
+        <table className="min-w-full border-collapse">
+          <tbody>
+            {Object.entries(thesisDetails)
+            .filter(([key]) => !["cover", "databaseID"].includes(key))
+            .map(([key, value], index) => (
+              <tr key={index} className="border-b border-grey">
+                <td className="px-1 py-1 font-semibold capitalize w-1/3" >
+                  {key == "researchARCID" ? "ARC ID"
+                  :
+                  key == "datePublished" ? "Pub. Date"
+                  :
+                  key.replace(/([A-Z])/g, ' $1')}:
+                </td>
+                <td className="px-1 py-1 text-sm break-words w-2/3">
+                  {value}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
       </div>
-
-      <table className="min-w-full border-collapse">
-        <tbody>
-          {Object.entries(thesisDetails).map(([key, value], index) => (
-            <tr key={index} className="border-b border-grey">
-              <td className="px-1 py-1 font-semibold capitalize" style={{ width: "40%" }}>
-                {key.replace(/([A-Z])/g, ' $1')}:
-              </td>
-              <td className="px-1 py-1 text-sm overflow-hidden text-ellipsis max-w-[200px] whitespace-nowrap">
-                {value}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Buttons */}
     </div>
   );
 };

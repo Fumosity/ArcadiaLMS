@@ -24,7 +24,6 @@ const ABAdd = () => {
     procurementDate: '',
     location: '',
     bookID: '',
-    bookARCID: '',
     bookBarcode: '',
     isbn: '',
     cover: '',
