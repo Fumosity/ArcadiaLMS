@@ -15,7 +15,7 @@ const ARAdd = () => {
     college: '',
     department: '',
     abstract: '',
-    keyword: [],
+    keywords: [],
     location: '',
     researchARCID: '',
     pubDate: '',

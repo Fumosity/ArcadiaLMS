@@ -52,17 +52,15 @@ const ARFullText = ({ researchData }) => {
     }, [pdf]);
 
     return (
-        <>
-            <div className="space-y-4">
-                <div className="px-2.5 justify-start items-center gap-6 inline-flex">
-                    <div className="text-zinc-900 text-2xl font-medium font-['Zen Kaku Gothic Antique']">Full Text Preview</div>
-                </div>
-                <p className="px-2.5 text-gray-600 mb-8">
+        <div className="bg-white p-4 rounded-lg border-grey border">
+            <div className="space-y-4 flex-col justify-center items-center">
+                <h3 className="text-2xl font-semibold mb-4">Full Text Preview</h3>
+                <p className="text-gray-600 mb-8">
                     Preview the first ten pages of this research paper.
                 </p>
                 <div className="h-100 p-2.5 flex justify-center items-center">
                     {pdf ? (
-                        <div className="p-2.5 pdf-viewer w-full max-w-4xl flex justify-center border border-grey rounded-lg" style={{ height: '725px' }}>
+                        <div className="p-2.5 pdf-viewer flex justify-center border border-grey rounded-lg" style={{ height: '725px' }}>
                             {/* Loading Spinner */}
                             {isLoading && (
                                 <div className="absolute flex justify-center items-center w-full h-full bg-gray-100 opacity-75">
@@ -109,7 +107,7 @@ const ARFullText = ({ researchData }) => {
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 };
 

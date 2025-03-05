@@ -1,8 +1,11 @@
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const AboutPage = ({ book }) => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
   if (!book)
     return (
       <div className="bg-white p-4 rounded-lg border-grey border w-full">
@@ -57,7 +60,9 @@ const AboutPage = ({ book }) => {
         <div className="w-full h-fit flex justify-center">
           <div className="relative bg-white p-4 w-fit rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md border border-grey">
             <img
-              src={bookDetails.cover}
+              src={bookDetails.cover && bookDetails.cover !== ""
+                ? bookDetails.cover
+                : "../image/book_research_placeholder.png"}
               alt="Book cover"
               className="h-[475px] w-[300px] rounded-lg border border-grey object-cover" />
           </div>

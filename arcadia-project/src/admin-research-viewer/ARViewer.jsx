@@ -7,9 +7,11 @@ import PopularAmong from "../components/admin-book-viewer-comp/PopularAmong";
 import SimilarTo from "../components/admin-book-viewer-comp/SimilarTo";
 import ARPastReview from "../components/admin-research-viewer/ARPastReview";
 import { supabase } from "/src/supabaseClient.js";
-import { useLocation } from "react-router-dom"; 
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const ARViewer = () => {
+    const navigate = useNavigate(); // Initialize useNavigate
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const researchID = queryParams.get('researchID'); // Get researchID from query params
@@ -44,32 +46,29 @@ const ARViewer = () => {
     return (
         <div className="min-h-screen bg-white">
             <Title>User Account Viewer</Title>
-
-            {/* Main content section */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-3 gap-8">
-                    <div className="col-span-2 space-y-8">
-                        {/* Left side content */}
-                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                            <ARTitle researchData={researchData} /> {/* Pass research data to ARTitle */}
-                        </div>
-                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                            <ARFullText researchData={researchData}/>
-                        </div>
-                        <div className="bg-white overflow-hidden p-6 rounded-lg shadow w-full">
-                            <ARPastReview />
-                        </div>
+            <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+                <div className="flex-shrink-0 w-3/4 space-y-2">
+                    <div className="flex justify-between w-full gap-2">
+                        <button
+                            className="add-book mb-0 w-1/2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+                            onClick={() => navigate('/admin/researchmanagement')}
+                        >
+                            Return to Research Inventory
+                        </button>
                     </div>
-
-                    {/* Right side content */}
-                    <div className="lg:col-span-1 space-y-8">
-                        <ARAbout researchData={researchData} /> {/* Pass research data to ARAbout */}
-                        <PopularAmong />
-                        <SimilarTo />
+                    <ARTitle researchData={researchData} /> {/* Pass research data to ARTitle */}
+                    <div className="flex w-full space-x-2">
+                    <PopularAmong />
+                    <SimilarTo />
                     </div>
+                    <ARFullText researchData={researchData} />
                 </div>
-            </main>
-        </div>
+
+                <div className="flex flex-col items-start flex-shrink-0 w-1/4">
+                    <ARAbout researchData={researchData} /> {/* Pass research data to ARAbout */}            
+                </div>
+            </div>
+        </div >
     );
 };
 

@@ -23,7 +23,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
         const { data, error } = await supabase
           .from("research") // Fetch from 'research' table
           .select(
-            "researchID, title, college, department, abstract, location, researchARCID, pubDate, cover, author, keyword, pages",
+            "researchID, title, college, department, abstract, location, researchARCID, pubDate, cover, author, keywords, pages",
           )
 
         if (error) {

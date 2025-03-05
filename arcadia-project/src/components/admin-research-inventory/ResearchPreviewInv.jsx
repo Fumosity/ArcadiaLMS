@@ -111,12 +111,12 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
     college: research.college,
     department: research.department,
     abstract: abstractContent, // Use the state variable instead of research.abstract
+    researchARCID: research.researchARCID,
     pages: research.pages,
-    keyword: research.keyword,
+    keywords: research.keywords,
     pubDate: research.pubDate,
     location: research.location,
-    researchARCID: research.researchARCID,
-  }
+  };
 
   // Navigate to modify research page with query parameters
   const handleModifyResearch = () => {
@@ -134,45 +134,44 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
           Modify Research
         </button>
       </div>
-
+      
       <div className="bg-white p-4 rounded-lg border-grey border w-full">
-        <h3 className="text-2xl font-semibold mb-2">About</h3>
-        <div className="relative bg-white p-2 rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
-          <img
-            src={research.cover || "image/bkfrontpg.png"}
-            alt="Research cover"
-            className="h-[475px] w-full rounded-lg border border-dark-grey"
-          />
+        <h3 className="text-2xl font-semibold mb-2">Research Preview</h3>
+        <div className="w-full h-fit flex justify-center">
+          <div className="relative bg-white p-4 w-fit rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md border border-grey">
+            <img
+              src={research.cover && research.cover !== ""
+                ? research.cover
+                : "../image/book_research_placeholder.png"}
+              alt="Research cover"
+              className="h-[475px] w-[300px] rounded-lg border border-grey object-cover" />
+          </div>
         </div>
-
         <table className="min-w-full border-collapse">
           <tbody>
             {Object.entries(researchDetails).map(([key, value], index) => (
               <tr key={index} className="border-b border-grey">
-                <td className="px-1 py-1 font-semibold capitalize">
-                  {key
-                    .replace(/([a-z])([A-Z])/g, "$1 $2")
-                    .replace(/\b([a-z]+)([A-Z]{2,})\b/g, (match, p1, p2) => p1 + " " + p2)
-                    .replace(/\b([A-Z]{2,})\b/g, (match) => match.toUpperCase())}
+                <td className="px-1 py-1 font-semibold capitalize w-1/3">
+                  {key === "pubDate"
+                    ? "Original Pub. Date:"
+                    : key === "researchARCID"
+                      ? "ARC ID:"
+                      : key.replace(/([A-Z])/g, " $1") + ":"}
                 </td>
-                <td className="px-1 py-1 text-sm flex justify-between items-center">
-                  {key === "abstract" && (
-                    <div className="flex gap-2">
+                <td className="px-1 py-1 text-sm break-words w-2/3">
+                  {key === "abstract" ? (
+                    <div className="flex gap-2 items-center">
+                      <span>{value ? value.substring(0, 100) + (value.length > 100 ? "..." : "") : "N/A"}</span> {/* Display a preview */}
                       <button
                         className="border border-grey px-2 py-0.5 rounded-xl hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md"
                         onClick={() => setViewOpen(true)}
                       >
                         View
                       </button>
-                      <button
-                        className="border border-grey px-2 py-0.5 rounded-xl hover:bg-arcadia-red hover:text-white transition-all duration-300 ease-in-out hover:shadow-md"
-                        onClick={() => setModifyOpen(true)}
-                      >
-                        Modify
-                      </button>
                     </div>
+                  ) : (
+                    <span>{value || "N/A"}</span>
                   )}
-                  <span>{key === "abstract" ? "" : value || "N/A"}</span>
                 </td>
               </tr>
             ))}
@@ -187,10 +186,6 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
         )}
       </div>
 
-      <div className="w-full">
-        <SimilarTo />
-      </div>
-
       {/* Abstract Modals */}
       <ViewAbstract isOpen={isViewOpen} onClose={() => setViewOpen(false)} abstractContent={abstractContent} />
 
@@ -201,7 +196,7 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
         initialAbstract={abstractContent}
         isUpdating={updateStatus.loading}
       />
-    </div>
+    </div >
   )
 }
 

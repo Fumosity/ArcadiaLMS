@@ -65,6 +65,7 @@ const BookPreviewInventory = ({ book }) => {
     category: book.category,
     publisher: book.publisher,
     synopsis: book.synopsis,
+    arcID: book.arcID,
     keywords: Array.isArray(book.keywords) ? book.keywords.join(', ') : (book.keywords ?? '').split(';').join(',') || '',
     datePublished: book.originalPubDate,
     republished: book.currentPubDate,
@@ -73,7 +74,7 @@ const BookPreviewInventory = ({ book }) => {
     location: book.location,
     isbn: book.isbn,
     price: book.price,
-    titleID: book.titleID
+    titleID: book.titleID,
   };
 
   const handleModifyBook = () => {
@@ -141,7 +142,9 @@ const BookPreviewInventory = ({ book }) => {
         <div className="w-full h-fit flex justify-center">
           <div className="relative bg-white p-4 w-fit rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md border border-grey">
             <img
-              src={book.cover || "image/bkfrontpg.png"}
+              src={book.cover && book.cover !== ""
+                ? book.cover
+                : "../image/book_research_placeholder.png"}
               alt="Book cover"
               className="h-[475px] w-[300px] rounded-lg border border-grey object-cover"
             />
@@ -157,12 +160,12 @@ const BookPreviewInventory = ({ book }) => {
                     {key === "datePublished"
                       ? "Current Pub. Date:"
                       : key === "republished"
-                      ? "Original Pub. Date:"
-                      : key === "isbn"
-                      ? "ISBN:"
-                      : key === "arcID"
-                      ? "ARC ID:"
-                      : key.replace(/([A-Z])/g, " $1") + ":"}
+                        ? "Original Pub. Date:"
+                        : key === "isbn"
+                          ? "ISBN:"
+                          : key === "arcID"
+                            ? "Call No.:"
+                            : key.replace(/([A-Z])/g, " $1") + ":"}
                   </td>
                   <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
                 </tr>
@@ -170,9 +173,6 @@ const BookPreviewInventory = ({ book }) => {
           </tbody>
         </table>
       </div>
-      <PopularAmong />
-      <SimilarTo />
-
       <WrngDeleteTitle
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}

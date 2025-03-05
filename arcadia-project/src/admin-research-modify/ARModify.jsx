@@ -15,7 +15,7 @@ const ARModify = () => {
     college: queryParams.get("college") || '',
     department: queryParams.get("department") || '',
     abstract: queryParams.get("abstract") || '',
-    keyword: queryParams.get("keyword") || '',
+    keywords: queryParams.get("keywords") || '',
     pubDate: queryParams.get("pubDate") || '',
     location: queryParams.get("location") || '',
     thesisID: queryParams.get("thesisID") || '',
