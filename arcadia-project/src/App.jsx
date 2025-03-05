@@ -78,7 +78,6 @@ function App() {
     <Routes>
       <Route path="/user/login" element={<ULogin />}/>
       <Route path="/user/register" element={<URegister />} />
-      
       <Route
         path="/*"
         element={

@@ -14,7 +14,7 @@ export default function BookInformation({ book }) {
     useEffect(() => {
         // Fetch the user's existing rating for the book
         const fetchExistingRating = async () => {
-            if (!user || !user.userID || !book) return;
+            if (!user || !user.userID || !book || user.userAccountType === "Guest") return;
 
             try {
                 const { data, error } = await supabase
@@ -122,33 +122,37 @@ export default function BookInformation({ book }) {
                         <p className="mt-2"><span className="font-semibold"></span> {book.synopsis || "No synopsis available."}</p>
                     </div>
 
-                    <div className="flex items-center justify-start gap-1 mt-2">
-                        {[...Array(5)].map((_, i) => (
-                            <Star
-                                key={i}
-                                className={`w-4 h-4 cursor-pointer ${
-                                    i < selectedRating ? "fill-bright-yellow" : "fill-grey"
-                                }`}
-                                onClick={() => handleStarClick(i + 1)} // Update rating on star click
-                            />
-                        ))}
-                        <span className="text-sm text-gray-600 ml-1">{selectedRating || "No rating selected"}</span>
-                    </div>
+                    {user && user.userAccountType !== "Guest" && (
+                        <>
+                            <div className="flex items-center justify-start gap-1 mt-2">
+                                {[...Array(5)].map((_, i) => (
+                                    <Star
+                                        key={i}
+                                        className={`w-4 h-4 cursor-pointer ${
+                                            i < selectedRating ? "fill-bright-yellow" : "fill-grey"
+                                        }`}
+                                        onClick={() => handleStarClick(i + 1)}
+                                    />
+                                ))}
+                                <span className="text-sm text-gray-600 ml-1">{selectedRating || "No rating selected"}</span>
+                            </div>
 
-                    <button
-                        className="viewBk-btn ml-3"
-                        onClick={() => {
-                            if (!user) {
-                                navigate("/user/login"); // Redirect to login if not logged in
-                            } else {
-                                handleSubmitRating(); // Submit or update rating
-                            }
-                        }}
-                    >
-                        {!user ? "Log In to Rate" : existingRatingID ? "Update Rating" : "Rate"}
-                    </button>
+                            <button
+                                className="viewBk-btn ml-3"
+                                onClick={() => {
+                                    if (!user) {
+                                        navigate("/user/login");
+                                    } else {
+                                        handleSubmitRating();
+                                    }
+                                }}
+                            >
+                                {!user ? "Log In to Rate" : existingRatingID ? "Update Rating" : "Rate"}
+                            </button>
 
-                    {message && <p className="text-sm text-center mt-2 text-gray-500">{message}</p>}
+                            {message && <p className="text-sm text-center mt-2 text-gray-500">{message}</p>}
+                        </>
+                    )}
                 </div>
             </div>
 

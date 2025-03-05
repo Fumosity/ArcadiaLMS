@@ -4,26 +4,27 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import PopularAmong from "../admin-book-viewer-comp/PopularAmong";
 import SimilarTo from "../admin-book-viewer-comp/SimilarTo";
+import { supabase } from "../../supabaseClient";
+import WrngDeleteTitle from "../../z_modals/warning-modals/WrmgDeleteTitle";
+import { toast } from "react-toastify";
+import "react-toastify/ReactToastify.css"
 
 const BookPreviewInventory = ({ book }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  // Simulate loading effect when a book is selected
   useEffect(() => {
     if (book) {
-      // Simulate a delay to show the skeleton effect
       const timer = setTimeout(() => setLoading(false), 1000);
       return () => clearTimeout(timer);
     }
   }, [book]);
 
-  // Show a message if no book is selected
   if (!book) {
     return <div className="bg-white p-4 rounded-lg border-grey border text-center mt-12">Select a book title to view its details.</div>;
   }
 
-  // Show skeletons while loading
   if (loading) {
     return (
       <div className="bg-white p-4 rounded-lg border-grey border mt-12">
@@ -75,27 +76,63 @@ const BookPreviewInventory = ({ book }) => {
     titleID: book.titleID
   };
 
-  // Create a function to handle navigation
   const handleModifyBook = () => {
     console.log("Title in BookPreviewInventory:", bookDetails.title);
     const queryParams = new URLSearchParams(bookDetails).toString();
     navigate(`/admin/bookmodify?${queryParams}`);
   };
 
+  const handleDeleteBook = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteBook = async () => {
+    try {
+      const { error } = await supabase
+        .from("book_titles")
+        .delete()
+        .eq("titleID", bookDetails.titleID);
+  
+      if (error) {
+        console.error("Error deleting book:", error.message);
+        toast.error("Failed to delete book.");
+        return;
+      }
+  
+      toast.success("Book deleted successfully!");
+      setIsDeleteModalOpen(false);
+  
+      // Reload the page after a short delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500); 
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      toast.error("An error occurred while deleting the book.");
+    }
+  };
+  
+
   return (
     <div className="">
       <div className="flex justify-center gap-2">
         <button
-          className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey  hover:bg-arcadia-red hover:text-white"
+          className="add-book text-sm w-full mb-2 px-2 py-2 rounded-lg border-grey hover:bg-arcadia-red hover:text-white"
           onClick={handleModifyBook}
         >
           Modify Book Title
         </button>
         <button
-          className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey  hover:bg-arcadia-red hover:text-white"
+          className="add-book text-sm w-full mb-2 px-2 py-2 rounded-lg border-grey hover:bg-arcadia-red hover:text-white"
           onClick={handleModifyBook}
         >
           Modify Book Copies
+        </button>
+        <button
+          className="add-book text-sm w-full mb-2 px-2 py-2 rounded-lg border-grey hover:bg-arcadia-red hover:text-white"
+          onClick={handleDeleteBook}
+        >
+          Delete Book
         </button>
       </div>
 
@@ -106,7 +143,8 @@ const BookPreviewInventory = ({ book }) => {
             <img
               src={book.cover || "image/bkfrontpg.png"}
               alt="Book cover"
-              className="h-[475px] w-[300px] rounded-lg border border-grey object-cover" />
+              className="h-[475px] w-[300px] rounded-lg border border-grey object-cover"
+            />
           </div>
         </div>
         <table className="w-full border-collapse">
@@ -119,12 +157,12 @@ const BookPreviewInventory = ({ book }) => {
                     {key === "datePublished"
                       ? "Current Pub. Date:"
                       : key === "republished"
-                        ? "Original Pub. Date:"
-                        : key === "isbn"
-                          ? "ISBN:"
-                          : key === "arcID"
-                            ? "ARC ID:"
-                            : key.replace(/([A-Z])/g, " $1") + ":"}
+                      ? "Original Pub. Date:"
+                      : key === "isbn"
+                      ? "ISBN:"
+                      : key === "arcID"
+                      ? "ARC ID:"
+                      : key.replace(/([A-Z])/g, " $1") + ":"}
                   </td>
                   <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
                 </tr>
@@ -134,6 +172,13 @@ const BookPreviewInventory = ({ book }) => {
       </div>
       <PopularAmong />
       <SimilarTo />
+
+      <WrngDeleteTitle
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDeleteBook}
+        itemName={bookDetails.title}
+      />
     </div>
   );
 };
