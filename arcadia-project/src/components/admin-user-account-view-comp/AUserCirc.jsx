@@ -94,8 +94,7 @@ const AUserCirc = ({ user }) => {
 
     // Filter and Sort logic
     const filteredData = bkhistoryData.filter(book =>
-        book.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.borrower.toLowerCase().includes(searchTerm.toLowerCase())
+        book.bookTitle.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Sorting by both date and time (latest first for descending order)
@@ -124,28 +123,37 @@ const AUserCirc = ({ user }) => {
             <h3 className="text-2xl font-semibold mb-2">User Book Circulation History</h3>
 
             {/* Controls */}
-            <div className="flex flex-wrap items-center mb-6 space-x-4">
-                {/* Type */}
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Type:</span>
-                    <span className="bg-gray-200 border border-gray-300 py-1 px-3 rounded-full text-xs" style={{ borderRadius: "40px" }}>
-                        {typeOrder}
-                    </span>
-                </div>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
 
                 {/* Sort By */}
                 <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Sort By:</span>
+                <span className="font-medium text-sm">Sort By:</span>
                     <button
                         onClick={() => setSortOrder(sortOrder === "Descending" ? "Ascending" : "Descending")}
-                        className="sort-by bg-gray-200 py-1 px-3 rounded-full text-xs"
-                        style={{ borderRadius: "40px" }}
+                        className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
                     >
                         {sortOrder}
                     </button>
                 </div>
 
-                {/* Date Range */}
+                {/* Type */}
+                    <div className="flex items-center space-x-2">
+                    <span className="font-medium text-sm">Type:</span>
+                    <select
+                            className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+                            value={typeOrder}
+                            onChange={(e) => setTypeFilter(e.target.value)}
+                        >
+                            <option value="All">All</option>
+                            <option value="Borrowed">Borrowed</option>
+                            <option value="Returned">Returned</option>
+                        </select>
+                </div>
+
+                
+
+                {/* Date Range
                 <div className="flex items-center space-x-2">
                     <span className="font-medium text-sm">Date Range:</span>
                     <button
@@ -155,33 +163,31 @@ const AUserCirc = ({ user }) => {
                     >
                         {dateRange}
                     </button>
-                </div>
+                </div> */}
 
                 {/* No. of Entries */}
                 <div className="flex items-center space-x-2">
-                    <label htmlFor="entries" className="text-sm">No. of Entries:</label>
+                <label htmlFor="entries" className="text-sm">No. of Entries:</label>
                     <input
                         type="number"
                         id="entries"
                         min="1"
                         value={entries}
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm"
-                        style={{ borderRadius: "40px", width: "80px" }}
+                        className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
                         onChange={(e) => setEntries(e.target.value)}
                     />
                 </div>
-
+                </div>
                 {/* Search */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 min-w-[0]">
                     <label htmlFor="search" className="text-sm">Search:</label>
                     <input
                         type="text"
                         id="search"
                         value={searchTerm}
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm"
-                        style={{ borderRadius: "40px" }}
+                        className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Title or borrower"
+                        placeholder="Title or hello"
                     />
                 </div>
             </div>
