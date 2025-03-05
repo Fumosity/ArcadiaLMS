@@ -208,6 +208,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.title}
                   onChange={handleChange}
                   style={validationErrors.title ? errorStyle : {}}
+                  placeholder="Full Book Title"
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -217,6 +218,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.author}
                   onChange={handleChange}
                   style={validationErrors.author ? errorStyle : {}}
+                  placeholder="Author 1; Author 2; Author 3; ..."
                 />
               </div>
 
@@ -281,6 +283,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.publisher}
                   onChange={handleChange}
                   style={validationErrors.publisher ? errorStyle : {}}
+                  placeholder="Publishing Company Name"
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -291,6 +294,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.synopsis}
                   onChange={handleChange}
                   style={validationErrors.synopsis ? errorStyle : {}}
+                  placeholder="Book Synopsis"
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -300,6 +304,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.keywords}
                   onChange={handleChange}
                   style={validationErrors.keywords ? errorStyle : {}}
+                  placeholder="Keyword 1; Keyword 2; Keyword 3; ..."
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -309,6 +314,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.currentPubDate}
                   onChange={handleChange}
                   style={validationErrors.currentPubDate ? errorStyle : {}}
+                  placeholder="Publishing Date of Current Edition"
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -318,6 +324,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.originalPubDate}
                   onChange={handleChange}
                   style={validationErrors.originalPubDate ? errorStyle : {}}
+                  placeholder="Publishing Date of Original Edition"
                 />
               </div>
 
@@ -328,6 +335,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.location}
                   onChange={handleChange}
                   style={validationErrors.location ? errorStyle : {}}
+                  placeholder="Book Location"
                 />
               </div>
 
@@ -338,16 +346,18 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.bookID}
                   onChange={handleChange}
                   style={validationErrors.bookID ? errorStyle : {}}
+                  placeholder="Database ID"
                 />
               </div>
 
               <div className="flex justify-between items-center">
-                <label className="w-1/4">Title ARC ID:</label>
+                <label className="w-1/4">Call No.:</label>
                 <input type="text" name="titleARCID" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.titleARCID}
                   onChange={handleChange}
                   style={validationErrors.titleARCID ? errorStyle : {}}
+                  placeholder="Book Title Call Number"
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -357,6 +367,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.isbn}
                   onChange={handleChange}
                   style={validationErrors.isbn ? errorStyle : {}}
+                  placeholder="ISBN Number"
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -366,20 +377,12 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.price}
                   onChange={handleChange}
                   style={validationErrors.price ? errorStyle : {}}
+                  placeholder="Market Price"
                 />
               </div>
 
               <h3 className="text-xl font-semibold py-2">Book Information of First Copy</h3>
               
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Call No.:</label>
-                <input type="text" name="bookARCID" required
-                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.bookARCID}
-                  onChange={handleChange}
-                  style={validationErrors.bookARCID ? errorStyle : {}}
-                />
-              </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Barcode:</label>
                 <input type="text" name="bookBarcode" required
@@ -387,6 +390,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.bookBarcode}
                   onChange={handleChange}
                   style={validationErrors.bookBarcode ? errorStyle : {}}
+                  placeholder="Unique Barcode"
                 />
               </div>
               <div className="flex justify-between items-center">
@@ -396,6 +400,7 @@ const ABAdding = ({ formData, setFormData }) => {
                   value={formData.procurementDate}
                   onChange={handleChange}
                   style={validationErrors.procurementDate ? errorStyle : {}}
+                  placeholder="Procurement Date of First Copy"
                 />
               </div>
             </form>

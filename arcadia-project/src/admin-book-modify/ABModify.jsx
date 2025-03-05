@@ -54,10 +54,9 @@ const ABModify = () => {
           </div>
           {/* Pass formDataState and setFormData to BookModify */}
           <BookModify formData={formDataState} setFormData={setFormData} />
-
         </div>
-        <div className="col-span-2 space-y-8">
-
+        
+        <div className="flex flex-col items-start flex-shrink-0 w-1/4">
           <ABAddPreview formData={formDataState} />
         </div>
       </div>
