@@ -24,6 +24,9 @@ export default {
         "light-blue" : '#48CAE4',
         "dark-green" : '#234F1E',
         "pastel-yellow" : '#FDFD96',
+        "ongoing" : '#FFB200',
+        "resolved" : '#118B50',
+        "intended" : '#A31D1D',
     },
     extend: {
       fontFamily: {

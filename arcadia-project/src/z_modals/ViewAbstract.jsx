@@ -5,10 +5,11 @@ const ViewAbstract = ({ isOpen, onClose, abstractContent }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" role="dialog" aria-modal="true">
-      <div className="bg-white rounded-lg w-full max-w-md p-6 shadow-xl">
+      <div className="bg-white rounded-lg w-full max-w-2xl p-8 shadow-xl h-auto">
+
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">View Abstract</h2>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 focus:outline-none"
             aria-label="Close"
@@ -22,10 +23,11 @@ const ViewAbstract = ({ isOpen, onClose, abstractContent }) => {
           </label>
           <textarea
             id="abstract"
-            value={abstractContent} // Display current abstract
-            readOnly // Make it read-only
-            className="w-full h-32 p-2 border border-gray-300 rounded-md bg-gray-100 resize-none"
+            value={abstractContent}
+            readOnly
+            className="w-full h-64 p-2 border border-gray-300 rounded-md bg-gray-100 resize-none"
           ></textarea>
+
         </div>
         <div className="flex justify-end">
           <button

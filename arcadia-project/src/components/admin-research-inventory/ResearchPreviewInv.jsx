@@ -1,25 +1,41 @@
-// File: ResearchPreviewInventory.jsx
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
-import SimilarTo from "../admin-book-viewer-comp/SimilarTo";
+"use client"
 
-const ResearchPreviewInv = ({ research }) => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
+import SimilarTo from "../admin-book-viewer-comp/SimilarTo"
+import ViewAbstract from "../../z_modals/ViewAbstract"
+import ModifyAbstract from "../../z_modals/ModifyAbstract"
+import { supabase } from "../../supabaseClient"
+
+const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+  const [isViewOpen, setViewOpen] = useState(false)
+  const [isModifyOpen, setModifyOpen] = useState(false)
+  const [abstractContent, setAbstractContent] = useState("")
+  const [updateStatus, setUpdateStatus] = useState({ loading: false, error: null })
 
   // Simulate loading effect when a research is selected
   useEffect(() => {
     if (research) {
-      const timer = setTimeout(() => setLoading(false), 1000);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        setLoading(false)
+        // Initialize abstract content when research is loaded
+        setAbstractContent(research.abstract || "")
+      }, 1000)
+      return () => clearTimeout(timer)
     }
-  }, [research]);
+  }, [research])
 
   // Show a message if no research is selected
   if (!research) {
-    return <div className="bg-white p-4 rounded-lg border-grey border text-center mt-12">Select a research paper to view its details.</div>;
+    return (
+      <div className="bg-white p-4 rounded-lg border-grey border text-center mt-12">
+        Select a research paper to view its details.
+      </div>
+    )
   }
 
   // Show skeletons while loading
@@ -53,7 +69,40 @@ const ResearchPreviewInv = ({ research }) => {
           <Skeleton width={100} height={35} borderRadius={20} />
         </div>
       </div>
-    );
+    )
+  }
+
+  // Handle abstract modification with Supabase update
+  const handleModifyAbstract = async (newAbstract) => {
+    setUpdateStatus({ loading: true, error: null })
+
+    try {
+      // Update the abstract in Supabase
+      const { data, error } = await supabase
+        .from("research")
+        .update({ abstract: newAbstract })
+        .eq("researchID", research.researchID)
+
+      if (error) throw error
+
+      // Update local state
+      setAbstractContent(newAbstract)
+
+      // Notify parent component about the update if needed
+      if (onResearchUpdate) {
+        onResearchUpdate({
+          ...research,
+          abstract: newAbstract,
+        })
+      }
+
+      setUpdateStatus({ loading: false, error: null })
+      setModifyOpen(false)
+    } catch (error) {
+      console.error("Error updating abstract:", error)
+      setUpdateStatus({ loading: false, error: error.message })
+      // You might want to show an error message to the user here
+    }
   }
 
   const researchDetails = {
@@ -61,25 +110,25 @@ const ResearchPreviewInv = ({ research }) => {
     author: research.author,
     college: research.college,
     department: research.department,
-    abstract: research.abstract,
+    abstract: abstractContent, // Use the state variable instead of research.abstract
     pages: research.pages,
     keyword: research.keyword,
     pubDate: research.pubDate,
     location: research.location,
     researchARCID: research.researchARCID,
-  };
+  }
 
   // Navigate to modify research page with query parameters
   const handleModifyResearch = () => {
-    const queryParams = new URLSearchParams(researchDetails).toString();
-    navigate(`/admin/researchmodify?${queryParams}`);
-  };
+    const queryParams = new URLSearchParams(researchDetails).toString()
+    navigate(`/admin/researchmodify?${queryParams}`)
+  }
 
   return (
     <div className="">
       <div className="flex justify-center gap-2">
         <button
-          className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey  hover:bg-arcadia-red hover:text-white"
+          className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey hover:bg-arcadia-red hover:text-white"
           onClick={handleModifyResearch}
         >
           Modify Research
@@ -101,13 +150,27 @@ const ResearchPreviewInv = ({ research }) => {
             {Object.entries(researchDetails).map(([key, value], index) => (
               <tr key={index} className="border-b border-grey">
                 <td className="px-1 py-1 font-semibold capitalize">
-                  {key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b([a-z]+)([A-Z]{2,})\b/g, (match, p1, p2) => p1 + ' ' + p2).replace(/\b([A-Z]{2,})\b/g, (match) => match.toUpperCase())}
+                  {key
+                    .replace(/([a-z])([A-Z])/g, "$1 $2")
+                    .replace(/\b([a-z]+)([A-Z]{2,})\b/g, (match, p1, p2) => p1 + " " + p2)
+                    .replace(/\b([A-Z]{2,})\b/g, (match) => match.toUpperCase())}
                 </td>
                 <td className="px-1 py-1 text-sm flex justify-between items-center">
-                  {(key === "abstract") && value && (
-                    <button className="border border-grey px-2 py-0.5 rounded-xl hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md">
-                      View
-                    </button>
+                  {key === "abstract" && (
+                    <div className="flex gap-2">
+                      <button
+                        className="border border-grey px-2 py-0.5 rounded-xl hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md"
+                        onClick={() => setViewOpen(true)}
+                      >
+                        View
+                      </button>
+                      <button
+                        className="border border-grey px-2 py-0.5 rounded-xl hover:bg-arcadia-red hover:text-white transition-all duration-300 ease-in-out hover:shadow-md"
+                        onClick={() => setModifyOpen(true)}
+                      >
+                        Modify
+                      </button>
+                    </div>
                   )}
                   <span>{key === "abstract" ? "" : value || "N/A"}</span>
                 </td>
@@ -115,13 +178,32 @@ const ResearchPreviewInv = ({ research }) => {
             ))}
           </tbody>
         </table>
+
+        {/* Status message for database updates */}
+        {updateStatus.error && (
+          <div className="mt-2 p-2 bg-red-100 text-red-700 rounded-md">
+            Error updating abstract: {updateStatus.error}
+          </div>
+        )}
       </div>
 
       <div className="w-full">
         <SimilarTo />
       </div>
-    </div>
-  );
-};
 
-export default ResearchPreviewInv;
+      {/* Abstract Modals */}
+      <ViewAbstract isOpen={isViewOpen} onClose={() => setViewOpen(false)} abstractContent={abstractContent} />
+
+      <ModifyAbstract
+        isOpen={isModifyOpen}
+        onClose={() => setModifyOpen(false)}
+        onModify={handleModifyAbstract}
+        initialAbstract={abstractContent}
+        isUpdating={updateStatus.loading}
+      />
+    </div>
+  )
+}
+
+export default ResearchPreviewInv
+

@@ -49,9 +49,16 @@ export const processData = (data, selectedTimeFrame) => {
 
 const filterDataByTimeFrame = (data, selectedTimeFrame) => {
   const currentDate = new Date()
+  currentDate.setHours(0, 0, 0, 0) // Set to start of day
 
   return data.filter((entry) => {
-    const entryDate = new Date(entry.type === "Borrowed" ? entry.checkoutDate : entry.checkinDate)
+    let entryDate
+    if (entry.type === "Borrowed") {
+      entryDate = new Date(entry.checkoutDate)
+    } else {
+      entryDate = new Date(entry.checkinDate)
+    }
+    entryDate.setHours(0, 0, 0, 0) // Set to start of day for comparison
 
     if (selectedTimeFrame === "day") {
       return isSameDay(entryDate, currentDate)
@@ -73,23 +80,34 @@ const generateChartData = (data, selectedTimeFrame) => {
 
   // First pass: Process all transactions
   data.forEach((entry) => {
-    if (entry.checkoutDate) {
-      const borrowDate = new Date(entry.checkoutDate)
-      const borrowTimeLabel = formatTimeLabel(borrowDate, selectedTimeFrame)
+    let date
+    let timeLabel
 
-      if (chartData[borrowTimeLabel]) {
-        chartData[borrowTimeLabel].borrowed += 1
+    if (entry.checkoutDate) {
+      date = new Date(entry.checkoutDate)
+      if (selectedTimeFrame === "day") {
+        timeLabel = `${date.getHours()}:00`
+      } else {
+        timeLabel = formatTimeLabel(date, selectedTimeFrame)
+      }
+
+      if (chartData[timeLabel]) {
+        chartData[timeLabel].borrowed += 1
         // Track this book as borrowed with its original borrow date
-        borrowedBooks.set(entry.bookBarcode, { date: borrowDate, timeLabel: borrowTimeLabel })
+        borrowedBooks.set(entry.bookBarcode, { date, timeLabel })
       }
     }
 
     if (entry.type === "Returned" && entry.checkinDate) {
-      const returnDate = new Date(entry.checkinDate)
-      const returnTimeLabel = formatTimeLabel(returnDate, selectedTimeFrame)
+      date = new Date(entry.checkinDate)
+      if (selectedTimeFrame === "day") {
+        timeLabel = `${date.getHours()}:00`
+      } else {
+        timeLabel = formatTimeLabel(date, selectedTimeFrame)
+      }
 
-      if (chartData[returnTimeLabel]) {
-        chartData[returnTimeLabel].returned += 1
+      if (chartData[timeLabel]) {
+        chartData[timeLabel].returned += 1
       }
     }
   })
@@ -122,9 +140,9 @@ const generateChartData = (data, selectedTimeFrame) => {
 
 const isSameDay = (date1, date2) => {
   return (
-    date1.getDate() === date2.getDate() &&
+    date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth() &&
-    date1.getFullYear() === date2.getFullYear()
+    date1.getDate() === date2.getDate()
   )
 }
 
@@ -150,7 +168,7 @@ const getTimeLabels = (selectedTimeFrame) => {
 
   if (selectedTimeFrame === "day") {
     for (let hour = 0; hour < 24; hour++) {
-      labels.push(`${hour}:00`)
+      labels.push(`${hour.toString().padStart(2, "0")}:00`)
     }
   } else if (selectedTimeFrame === "week") {
     const startOfWeek = new Date(currentDate)

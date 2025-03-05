@@ -21,11 +21,11 @@ const UserReports = () => {
   function checkStatusColor(status) {
     switch (status) {
       case 'Resolved':
-        return "bg-green"
+        return "bg-resolved"
       case 'Ongoing':
-        return "bg-yellow"
+        return "bg-ongoing"
       case 'Intended':
-        return "bg-red"
+        return "bg-intended"
       default:
         return "bg-grey"
     }

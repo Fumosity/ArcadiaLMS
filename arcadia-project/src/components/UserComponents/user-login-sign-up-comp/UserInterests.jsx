@@ -124,7 +124,7 @@ export default function UserInterests({ userData, onBack, onContinue }) {
                         className="w-full h-full object-cover rounded-lg" // Add rounded-lg here
                     />
 
-        <div className="absolute inset-0 bg-black opacity-70 rounded-2xl" />
+        <div className="absolute inset-0 bg-black opacity-70 rounded-lg" />
 
         <div className="absolute inset-0 flex items-end p-12 z-10">
           <h2 className="text-white text-4xl text-right font-semibold">

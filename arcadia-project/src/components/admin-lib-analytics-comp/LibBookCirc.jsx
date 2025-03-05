@@ -43,7 +43,7 @@ const LibBookCirc = () => {
 
       {/* Bar Chart for Book Circulation */}
       <div className="w-full mb-6">
-        <ResponsiveContainer width="100%" aspect={2}>
+        <ResponsiveContainer width="100%" aspect={3}>
           <BarChart data={circulationData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
@@ -54,46 +54,6 @@ const LibBookCirc = () => {
             <Bar dataKey="returned" fill="#82ca9d" name="Returned" />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-
-      {/* Book Circulation History Table */}
-      <div>
-        <h3 className="text-xl font-semibold mb-4">Book Circulation History</h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 text-center">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Start Date & Time</th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">End Date & Time</th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Borrower</th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book Title</th>
-                <th className="px-4 py-3 text-xs font-medium text-gray-500 uppercase">Book ID</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200 text-center">
-              {tableData.map((book, index) => (
-                <tr key={index} className="hover:bg-gray-100">
-                  <td
-                    className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
-                            ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}
-                  >
-                    {book.type}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {book.checkoutDate} {book.checkoutTime}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {book.type === "Returned" ? `${book.checkinDate} ${book.checkinTime}` : "-"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-blue-600">{book.borrower}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{book.bookTitle}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{book.bookBarcode}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   )

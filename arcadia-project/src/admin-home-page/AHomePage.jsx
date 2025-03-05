@@ -1,15 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import SearchBar from '../components/main-comp/SearchBar';
-import BookCirculationTable from '../components/admin-home-page-comp/BookCirculationTable';
-import LibraryAnalyticsChart from '../components/admin-home-page-comp/LibraryAnalyticsChart';
 import AccessTable from '../components/admin-home-page-comp/AccessTable';
 import TodayReserv from '../components/admin-reserv-comp/TodayReserv';
-import HighestRatedBooksTable from '../components/admin-home-page-comp/HighestRatedBooksTable';
-import PopularBooksTable from '../components/admin-home-page-comp/PopularBooksTable';
 import BCHistory from '../components/admin-book-circ-pg-comp/BCHistory';
-import RcntLibVisit from '../components/admin-user-acc-comp/RcntLibVisit';
-import LibBookCirc from '../components/admin-lib-analytics-comp/LibBookCirc';
 import RoomReserv from '../components/admin-lib-analytics-comp/RoomReserv';
 import MostPop from '../components/admin-lib-analytics-comp/MostPop';
 import HighRates from '../components/admin-lib-analytics-comp/HighRates';
@@ -30,7 +23,6 @@ const AHomePage = () => {
 
         <div className="flex-shrink-0 w-3/4 space-y-2">
           <BCHistory />
-          <LibBookCirc />
           <RoomReserv />
         </div>
 

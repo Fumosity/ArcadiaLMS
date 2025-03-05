@@ -17,7 +17,7 @@ const ARInventory = () => {
   return (
     <div className="min-h-screen bg-white">
       <Title>Research Inventory</Title>
-      <MainHeader />
+      {/* <MainHeader /> */}
 
       <div className="flex justify-center items-start space-x-2 pb-12 py-8 px-12">
         <div className="flex-shrink-0 w-3/4">
