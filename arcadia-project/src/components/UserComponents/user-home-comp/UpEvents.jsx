@@ -76,26 +76,30 @@ const UpEvents = () => {
       </div>
       
       {/* Events List */}
-      {events.length > 0 ? (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-gray-600">
-              <th className="text-left py-2">Event</th>
-              <th className="text-right py-2">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {events.map((event, index) => (
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-gray-600">
+            <th className="text-left py-2">Event</th>
+            <th className="text-right py-2">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {events.length > 0 ? (
+            events.map((event, index) => (
               <tr key={index} className="border-t border-grey">
                 <td className="py-2">{event.title}</td>
                 <td className="py-2 text-right">{event.dateRange}</td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p className="text-center text-gray-500 py-4">No upcoming events</p>
-      )}
+            ))
+          ) : (
+            <tr>
+              <td colSpan="2" className="py-4 text-center text-gray-500">
+                No upcoming events
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
