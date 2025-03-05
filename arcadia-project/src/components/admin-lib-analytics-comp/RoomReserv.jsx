@@ -37,7 +37,7 @@ export default function RoomReserv() {
     return (
         <div className="bg-white p-4 rounded-lg border-grey border">
             <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-semibold mb-2">Room Reservations</h3>
+                <h3 className="text-2xl font-semibold mb-2">Room Reservations</h3>
                 <button className="px-2.5 py-0.5 border border-grey rounded-full hover:bg-blue-600 transition-colors">
                     Go to Reservations
                 </button>
@@ -58,7 +58,7 @@ export default function RoomReserv() {
                         Annual
                     </button>
                 </div>
-                
+
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" />

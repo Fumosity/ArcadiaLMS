@@ -229,7 +229,7 @@ const BCHistory = () => {
                                     <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
                                         <span
                                             className={`inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
-                                            ${book.type === "Returned" ? "bg-[#8fd28f]" : book.type === "Borrowed" ? "bg-[#e8d08d]" : "bg-grey"}`}
+                                            ${book.type === "Returned" ? "bg-resolved" : book.type === "Borrowed" ? "bg-ongoing" : "bg-grey"}`}
                                         >
                                             {book.type}
                                         </span>

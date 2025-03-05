@@ -1,13 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import { supabase } from "/src/supabaseClient.js"
 
 const STATUS_COLORS = {
   Ongoing: "#FFB200",
   Intended: "#A31D1D",
-  Resolved: "#118B50"
+  Resolved: "#118B50",
 }
 
 const ReportSupportPieChart = () => {
@@ -41,21 +41,21 @@ const ReportSupportPieChart = () => {
     return Object.entries(grouped).map(([status, value]) => ({
       name: status,
       value,
-      color: STATUS_COLORS[status] || "#8884d8"
+      color: STATUS_COLORS[status] || "#8884d8",
     }))
   }
 
   const renderPieChart = (data, title) => (
     <div className="flex flex-col w-1/2 items-center">
       <h3 className="text-lg font-semibold text-center mb-4">{title}</h3>
-      <ResponsiveContainer width={400} height={350}>
+      <ResponsiveContainer width={400} height={300}>
         <PieChart>
           <Pie
             data={data}
             cx="50%"
             cy="50%"
             labelLine={false}
-            outerRadius={90} // Increased radius to fit labels better
+            outerRadius={90}
             dataKey="value"
             label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
           >
@@ -64,9 +64,20 @@ const ReportSupportPieChart = () => {
             ))}
           </Pie>
           <Tooltip />
-          <Legend align="center" verticalAlign="bottom" />
         </PieChart>
       </ResponsiveContainer>
+    </div>
+  )
+
+  // Custom legend component
+  const CustomLegend = () => (
+    <div className="flex justify-center items-center gap-8 mt-4">
+      {Object.entries(STATUS_COLORS).map(([status, color]) => (
+        <div key={status} className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: color }}></div>
+          <span className="text-sm font-medium">{status}</span>
+        </div>
+      ))}
     </div>
   )
 
@@ -77,8 +88,10 @@ const ReportSupportPieChart = () => {
         {renderPieChart(reportData, "Reports")}
         {renderPieChart(supportData, "Supports")}
       </div>
+      <CustomLegend />
     </div>
   )
 }
 
 export default ReportSupportPieChart
+

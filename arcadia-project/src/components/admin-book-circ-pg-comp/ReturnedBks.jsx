@@ -135,7 +135,7 @@ const ReturnedBks = () => {
                         returnedData.slice((currentPage - 1) * entries, currentPage * entries).map((book, index) => (
                             <tr key={index} className="hover:bg-gray-100">
                                 <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
-                                    ${book.type === "Returned" ? "bg-green" : ""}`}
+                                    ${book.type === "Returned" ? "bg-resolved" : ""}`}
                                 >
                                     {book.type}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>

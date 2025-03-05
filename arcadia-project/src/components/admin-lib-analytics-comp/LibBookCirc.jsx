@@ -49,8 +49,8 @@ const LibBookCirc = () => {
             <YAxis allowDecimals={false} domain={[0, "auto"]} />
             <Tooltip />
             <Legend />
-            <Bar dataKey="borrowed" fill="#e8d08d" name="Borrowed" />
-            <Bar dataKey="returned" fill="#82ca9d" name="Returned" />
+            <Bar dataKey="borrowed" fill="#FFB200" name="Borrowed" />
+            <Bar dataKey="returned" fill="#118B50" name="Returned" />
           </BarChart>
         </ResponsiveContainer>
       </div>

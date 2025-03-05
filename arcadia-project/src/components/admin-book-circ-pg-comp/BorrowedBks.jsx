@@ -142,7 +142,7 @@ const BorrowedBks = () => {
                                 <tr key={index} className="hover:bg-gray-100">
                                     <td
                                         className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
-                                    ${book.type === "Borrowed" ? "bg-[#e8d08d]" : ""}`}>
+                                    ${book.type === "Borrowed" ? "bg-ongoing" : ""}`}>
                                         {book.type}
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{book.date}</td>

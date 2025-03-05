@@ -137,7 +137,7 @@ const OverdueBks = () => {
                         overdueData.slice((currentPage - 1) * Number(entries), currentPage * Number(entries)).map((book, index) => (
                             <tr key={index}>
                                 <td className={`py-1 px-3 my-2 text-sm text-gray-900 rounded-full inline-flex justify-center self-center
-                                    ${book.type === "Overdue" ? "bg-red" : ""}`}>{book.type}</td>
+                                    ${book.type === "Overdue" ? "bg-intended" : ""}`}>{book.type}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.date}</td>
                                 <td className="px-4 py-3 text-sm text-gray-900">{book.time}</td>
                                 <td className="px-4 py-3 text-sm text-arcadia-red font-semibold">
