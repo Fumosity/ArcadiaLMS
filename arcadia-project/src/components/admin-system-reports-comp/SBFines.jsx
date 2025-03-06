@@ -22,7 +22,6 @@ const SBFines = () => {
                         bookBarcode,
                         book_indiv (
                             bookBarcode,
-                            bookARCID,
                             bookStatus,
                             book_titles (
                                 titleID,

@@ -3,9 +3,8 @@
 import { supabase } from "../../supabaseClient"
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import LibBookCirc from "../admin-lib-analytics-comp/LibBookCirc"
 
-const BCHistory = () => {
+const ABCopiesHistory = ({ titleID }) => {
     const [currentPage, setCurrentPage] = useState(1)
     const [entriesPerPage, setEntriesPerPage] = useState(10)
     const [searchTerm, setSearchTerm] = useState("")
@@ -16,10 +15,18 @@ const BCHistory = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
+        if (!titleID) {
+            console.log("titleID is not set.");
+            return;
+        }
+
         const fetchData = async () => {
             try {
-                setLoading(true)
-                const { data, error } = await supabase.from("book_transactions").select(`
+                setLoading(true);
+                console.log("Matching based on titleID: ", titleID);
+                const { data, error } = await supabase
+                    .from("book_transactions")
+                    .select(`
                         transactionType, 
                         checkinDate, 
                         checkinTime, 
@@ -40,14 +47,19 @@ const BCHistory = () => {
                             userFName,
                             userLName,
                             userLPUID
-                        )`)
+                        )
+                    `)
+                    .eq("book_indiv.book_titles.titleID", titleID);
 
                 if (error) {
-                    console.error("Error fetching data: ", error.message)
+                    console.error("Error fetching data: ", error.message);
                 } else {
-                    console.log("History data from Supabase:", data) // Debugging: raw data from Supabase
+                    console.log("Raw Supabase Data:", data); // Inspect the raw data
 
-                    const formattedData = data.map((item) => {
+                    const filteredData = data.filter(item => item.book_indiv?.book_titles?.titleID == titleID);
+                    console.log("Filtered Data:", filteredData); // Inspect the filtered data
+
+                    const formattedData = filteredData.map((item) => {
                         const date = item.checkinDate || item.checkoutDate
                         const time = item.checkinTime || item.checkoutTime
 
@@ -64,75 +76,69 @@ const BCHistory = () => {
                             })
                         }
 
-                        const bookDetails = item.book_indiv?.book_titles || {}
+                        const bookDetails = item.book_indiv?.book_titles || {};
 
                         return {
                             type: item.transactionType,
                             date,
                             time: formattedTime,
-                            borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
+                            borrower: `${item.user_accounts?.userFName} ${item.user_accounts?.userLName}`,
                             bookTitle: bookDetails.title,
-                            bookBarcode: item.book_indiv.bookBarcode,
+                            bookBarcode: item.book_indiv?.bookBarcode,
                             userId: item.userID,
                             titleID: bookDetails.titleID,
-                        }
-                    })
+                        };
 
-                    setBkhistoryData(formattedData)
+                    });
+
+                    console.log("Formatted Data:", formattedData); // Inspect the final data
+                    setBkhistoryData(formattedData);
                 }
-                setLoading(false)
+                setLoading(false);
             } catch (error) {
-                console.error("Error: ", error)
-                setLoading(false)
+                console.error("Error: ", error);
+                setLoading(false);
             }
-        }
+        };
 
-        fetchData()
-    }, [])
+        fetchData();
+    }, [titleID]);
 
-    const totalPages = Math.ceil(bkhistoryData.length / entriesPerPage)
+    const totalPages = Math.ceil(bkhistoryData.length / entriesPerPage);
 
-    // Handle sorting by borrower name
     const sortedData = [...bkhistoryData].sort((a, b) => {
-        const nameA = a.borrower.toLowerCase();
-        const nameB = b.borrower.toLowerCase();
-
+        const nameA = a.borrower?.toLowerCase() || '';
+        const nameB = b.borrower?.toLowerCase() || '';
         return sortOrder === "Ascending" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
 
-    // Handle filtering and searching
     const filteredData = sortedData.filter((book) => {
-        const matchesType = typeFilter === "All" || book.type === typeFilter
-
+        const matchesType = typeFilter === "All" || book.type === typeFilter;
         const matchesSearch =
-            book.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            book.borrower.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            book.bookBarcode.includes(searchTerm)
+            book.bookTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            book.borrower?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            book.bookBarcode?.includes(searchTerm);
+        return matchesType && matchesSearch;
+    });
 
-        return matchesType && matchesSearch
-    })
-
-    // Pagination logic
-    const startIndex = (currentPage - 1) * entriesPerPage
-    const displayedBooks = filteredData.slice(startIndex, startIndex + entriesPerPage)
+    const startIndex = (currentPage - 1) * entriesPerPage;
+    const displayedBooks = filteredData.slice(startIndex, startIndex + entriesPerPage);
 
     const handleUserClick = (book) => {
-        console.log("userid", book.userId, "user", book.borrower, book)
+        console.log("userid", book.userId, "user", book.borrower, book);
         navigate("/admin/useraccounts/viewusers", {
             state: { userId: book.userId, user: book },
-        })
-        window.scrollTo({ top: 0, behavior: "smooth" })
-    }
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
     const truncateTitle = (title, maxLength = 25) => {
-        return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title
-    }
+        return title?.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
+    };
 
     return (
         <div className="bg-white p-4 rounded-lg border-grey border">
-            <h3 className="text-2xl font-semibold mb-4">Book Circulation History</h3>
-
-            <LibBookCirc />
+            <h3 className="text-2xl font-semibold mb-4">Copy Circulation History</h3>
 
             {/* Controls for sort, filter, and search */}
             <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -279,10 +285,10 @@ const BCHistory = () => {
                     Next Page
                 </button>
             </div>
-            
+
         </div>
     )
 }
 
-export default BCHistory
+export default ABCopiesHistory
 

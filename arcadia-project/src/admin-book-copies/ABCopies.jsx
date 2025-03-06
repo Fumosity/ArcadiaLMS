@@ -5,6 +5,9 @@ import ABCopiesPreview from '../components/admin-book-copies-comp/ABCopiesPrevie
 import { supabase } from '/src/supabaseClient.js'; // Import Supabase client
 import ABCopiesList from '../components/admin-book-copies-comp/ABCopiesList';
 import ABCopiesMgmt from '../components/admin-book-copies-comp/ABCopiesMgmt';
+import Skeleton from "react-loading-skeleton"
+import "react-loading-skeleton/dist/skeleton.css"
+import ABCopiesHistory from '../components/admin-book-copies-comp/ABCopiesHistory';
 
 const ABCopies = () => {
     const navigate = useNavigate(); // Initialize useNavigate
@@ -13,6 +16,7 @@ const ABCopies = () => {
     const [titleID, setTitleID] = useState(null); // State to store the titleID
     const [loading, setLoading] = useState(true); // Add loading state
     const [isLoadingTitleID, setIsLoadingTitleID] = useState(true);
+    const [refreshList, setRefreshList] = useState(false);
 
     const [formData, setFormData] = useState({
         bookStatus: '',
@@ -20,7 +24,82 @@ const ABCopies = () => {
         bookCallNo: '',
         bookLocation: '',
         bookAcqDate: '',
-      })
+        bookID: null,
+    })
+
+    const [originalFormData, setOriginalFormData] = useState(null);
+    const [isAddMode, setIsAddMode] = useState(false); // Add isAddMode state
+
+    const handleCopySelect = (selectedCopy) => {
+        const newFormData = {
+            bookStatus: selectedCopy.bookStatus || '',
+            bookBarcode: selectedCopy.bookBarcode || '',
+            bookCallNo: selectedCopy.book_titles.arcID || '',
+            bookLocation: selectedCopy.book_titles.location || '',
+            bookAcqDate: selectedCopy.bookAcqDate || '',
+            bookID: selectedCopy.bookID
+        };
+
+        setFormData(newFormData);
+        setOriginalFormData(newFormData);
+        setIsAddMode(false); // Set to edit mode
+
+    };
+
+    const handleAddCopy = async () => {
+        setIsAddMode(true); // Set to add mode
+        setOriginalFormData(null);
+
+        // Fetch bookCallNo and bookLocation using titleID
+        if (titleID) {
+            const { data, error } = await supabase
+                .from('book_titles')
+                .select('arcID, location')
+                .eq('titleID', titleID)
+                .single();
+
+            if (error) {
+                console.error("Error fetching book details:", error);
+                return;
+            }
+
+            if (data) {
+                setFormData({
+                    bookStatus: '',
+                    bookBarcode: '',
+                    bookCallNo: data.arcID || '',
+                    bookLocation: data.location || '',
+                    bookAcqDate: '',
+                    bookID: null,
+                });
+            } else {
+                //Handle case where book title is not found.
+                setFormData({
+                    bookStatus: '',
+                    bookBarcode: '',
+                    bookCallNo: '',
+                    bookLocation: '',
+                    bookAcqDate: '',
+                    bookID: null,
+                });
+                console.error("Book title not found");
+            }
+        } else {
+            setFormData({
+                bookStatus: '',
+                bookBarcode: '',
+                bookCallNo: '',
+                bookLocation: '',
+                bookAcqDate: '',
+                bookID: null,
+            });
+            console.error("titleID is not set");
+        }
+    };
+
+    const handleRefresh = () => {
+        setRefreshList(!refreshList); // Toggle refresh state
+    };
 
     useEffect(() => {
         const fetchBookDetails = async () => {
@@ -66,9 +145,9 @@ const ABCopies = () => {
         <div className="min-h-screen bg-white">
             <Title>Copy Management</Title>
             <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
-                <div className="flex-shrink-0 w-3/4">
+                <div className="flex-shrink-0 w-3/4 space-y-2">
                     {/* Main content for adding research */}
-                    <div className="flex justify-between w-full gap-2">
+                    <div className="flex justify-between w-full gap-2 -mb-2">
                         <button
                             className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
                             onClick={() => navigate('/admin/bookmanagement')}
@@ -77,27 +156,120 @@ const ABCopies = () => {
                         </button>
                         <button
                             className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-                            onClick={() => navigate('/admin/bookmanagement')}
+                            onClick={() => navigate(`/admin/abviewer?titleID=${encodeURIComponent(titleID)}`)}
+                        >
+                            Return to Book Viewer
+                        </button>
+                        <button
+                            className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+                            onClick={handleAddCopy}
                         >
                             Add a Copy
                         </button>
                     </div>
                     <div className="flex justify-between w-full gap-2">
                         {isLoadingTitleID ? (
-                            <div>Loading Book Details...</div> // Or a spinner
-                        ) : titleID ? (
-                            <ABCopiesList titleID={titleID} />
+                            <div className="bg-white p-4 rounded-lg border-grey border h-fit w-1/2">
+                                <h3 className="text-2xl font-semibold mb-4">
+                                    <Skeleton width={150} />
+                                </h3>
+
+                                <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+                                    <div className="flex flex-wrap items-center gap-4">
+                                        {/* Sort By */}
+                                        <div className="flex items-center space-x-2">
+                                            <span className="font-medium text-sm">
+                                                <Skeleton width={40} />
+                                            </span>
+                                            <Skeleton width={80} height={30} />
+                                        </div>
+
+                                        {/* Status Type Filter */}
+                                        <div className="flex items-center space-x-2">
+                                            <span className="font-medium text-sm">
+                                                <Skeleton width={40} />
+                                            </span>
+                                            <Skeleton width={80} height={30} />
+                                        </div>
+
+                                        {/* Acq Date Filter */}
+                                        <div className="flex items-center space-x-2">
+                                            <span className="font-medium text-sm">
+                                                <Skeleton width={70} />
+                                            </span>
+                                            <Skeleton width={80} height={30} />
+                                        </div>
+
+                                        {/* Entries Per Page */}
+                                        <div className="flex items-center space-x-2">
+                                            <span className="font-medium text-sm">
+                                                <Skeleton width={50} />
+                                            </span>
+                                            <Skeleton width={40} height={30} />
+                                        </div>
+                                    </div>
+                                    {/* Search */}
+                                    <div className="flex items-center space-x-2 min-w-[0]">
+                                        <label htmlFor="search" className="font-medium text-sm">
+                                            <Skeleton width={50} />
+                                        </label>
+                                        <Skeleton width={200} height={30} />
+                                    </div>
+                                </div>
+
+                                <div className="">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                {["Status", "Barcode", "Date Acquired"].map((header) => (
+                                                    <th
+                                                        key={header}
+                                                        className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3"
+                                                    >
+                                                        <Skeleton width={60} />
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {Array.from({ length: 5 }).map((_, index) => (
+                                                <tr key={index}>
+                                                    <td className="px-4 py-2 text-sm text-gray-500 truncate max-w-xs">
+                                                        <Skeleton width="80%" />
+                                                    </td>
+                                                    <td className="px-4 py-2 text-sm text-gray-500 truncate max-w-xs">
+                                                        <Skeleton width="80%" />
+                                                    </td>
+                                                    <td className="px-4 py-2 text-sm text-gray-500 truncate max-w-xs">
+                                                        <Skeleton width="80%" />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         ) : (
-                            <div>No Book Selected</div>
+                            <ABCopiesList titleID={titleID} onRowSelect={handleCopySelect} refreshList={refreshList} />
                         )}
-                        <ABCopiesMgmt formData={formData} setFormData={setFormData}/>
+                        <ABCopiesMgmt
+                            formData={formData}
+                            setFormData={setFormData}
+                            originalFormData={originalFormData}
+                            setOriginalFormData={setOriginalFormData}
+                            onRefresh={handleRefresh}
+                            titleID={titleID}
+                            isAddMode={isAddMode}
+                        />
                     </div>
+                    <ABCopiesHistory titleID={titleID} />
                 </div>
                 {/* Preview section */}
                 <div className="flex flex-col items-start flex-shrink-0 w-1/4">
                     <ABCopiesPreview book={book} loading={loading} /> {/* Pass loading prop */}
                 </div>
             </div>
+
         </div>
     );
 };

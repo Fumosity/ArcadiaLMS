@@ -29,7 +29,7 @@ const SnglBkCrcltn = ({ titleID }) => {
         // Step 1: Fetch books associated with the current titleID from book_indiv
         const { data: bookIndiv, error: bookIndivError } = await supabase
           .from('book_indiv')
-          .select('bookID, titleID')
+          .select('*')
           .eq('titleID', titleID); // Fetch only books for the current titleID
 
         console.log("current titleID:", titleID);
@@ -39,25 +39,34 @@ const SnglBkCrcltn = ({ titleID }) => {
           return;
         }
 
-        // Get a list of bookIDs for the current titleID
-        const bookIDs = bookIndiv.map(book => book.bookID);
+        // Get a list of bookBarcodes for the current titleID
+        const bookBarcodes = bookIndiv.map(book => book.bookBarcode);
 
         const { data: transactions, error: transactionError } = await supabase
           .from('book_transactions')
           .select(`
-          transaction_type, 
-          checkin_date, 
-          checkin_time, 
-          checkout_date, 
-          checkout_time, 
-          userID, 
-          bookID,
+          transactionType, 
+          checkinDate, 
+          checkinTime, 
+          checkoutDate, 
+          checkoutTime, 
+          userID,
+          bookBarcode, 
+          book_indiv(
+              bookBarcode,
+              bookStatus,
+              book_titles (
+                  titleID,
+                  title,
+                  price
+              )
+          ),
           user_accounts (
               userFName,
               userLName,
               userLPUID
           )`)
-          .in('bookID', bookIDs); // Use the .in() filter to include only the relevant bookIDs
+          .in('bookBarcode', bookBarcodes); // Use the .in() filter to include only the relevant bookBarcodes
 
         if (transactionError) {
           console.error("Error fetching transactions: ", transactionError.message);
@@ -73,11 +82,10 @@ const SnglBkCrcltn = ({ titleID }) => {
           } else {
             // Step 4: Now join the data manually in JavaScript
             const formattedData = transactions.map(transaction => {
-              const bookDetails = bookIndiv.find(book => book.bookID === transaction.bookID);
               const titleDetails = bookTitles[0]; // Since we know it's only one title for the current titleID
 
-              const date = transaction.checkin_date || transaction.checkout_date;
-              const time = transaction.checkin_time || transaction.checkout_time;
+              const date = transaction.checkinDate || transaction.checkoutDate;
+              const time = transaction.checkinTime || transaction.checkoutTime;
 
               let formattedTime = null;
               if (time) {
@@ -90,12 +98,12 @@ const SnglBkCrcltn = ({ titleID }) => {
               }
 
               return {
-                type: transaction.transaction_type,
+                type: transaction.transactionType,
                 date,
                 time: formattedTime,
                 borrower: `${transaction.user_accounts.userFName} ${transaction.user_accounts.userLName}`,
                 bookTitle: titleDetails?.title || 'N/A',
-                bookId: transaction.bookID,
+                bookBarcode: transaction.bookBarcode,
                 userId: transaction.userID,
                 titleID: titleDetails?.titleID,
               };

@@ -72,7 +72,6 @@ function OutstandingFines({ onDataExport }) {
                         bookBarcode,
                         book_indiv (
                             bookBarcode,
-                            bookARCID,
                             bookStatus,
                             book_titles (
                                 titleID,

@@ -3,7 +3,7 @@ import { supabase } from "/src/supabaseClient.js"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 
-export default function ABCopiesList({ titleID }) {
+export default function ABCopiesList({ titleID, onRowSelect, refreshList }) {
     const [copyData, setCopyData] = useState([])
     const [sortOrder, setSortOrder] = useState("Descending")
     const [acqDateFilter, setAcqDateFilter] = useState("")
@@ -13,6 +13,7 @@ export default function ABCopiesList({ titleID }) {
     const [currentPage, setCurrentPage] = useState(1)
     const [entriesPerPage, setEntriesPerPage] = useState(5)
     const [statusType, setStatusType] = useState("All")
+    const [statusColor, setStatusColor] = useState('');
 
 
     useEffect(() => {
@@ -26,18 +27,30 @@ export default function ABCopiesList({ titleID }) {
 
             try {
 
-                const { data: bookIndiv, error: bookError } = await supabase
+                const { data: combinedData, error: combinedError } = await supabase
                     .from("book_indiv")
-                    .select("*")
-                    .in("titleID", [titleID])
+                    .select(`
+                            *,
+                            book_titles (
+                            titleID,
+                            arcID,
+                            location
+                            )
+                        `)
+                    .in("titleID", [titleID]);
 
-                if (bookError) {
-                    console.error("Error fetching book_indiv:", bookError.message)
-                    return
+                if (combinedError) {
+                    console.error("Error fetching combined data:", combinedError.message);
+                    return;
                 }
 
-                console.log("Copies of selected book:", bookIndiv)
-                setCopyData(bookIndiv)
+                if (combinedData) {
+                    console.log("Combined data:", combinedData);
+                    // Process the combined data
+                }
+
+                console.log("Copies of selected book:", combinedData)
+                setCopyData(combinedData)
             } catch (error) {
                 console.error("An unexpected error occurred:", error)
             } finally {
@@ -46,14 +59,20 @@ export default function ABCopiesList({ titleID }) {
         }
 
         fetchCopies()
-    }, [titleID])
+    }, [titleID, refreshList])
+
+    const statusColorMap = {
+        'Available': '#118B50',
+        'Unavailable': '#FFB200',
+        'Damaged': '#A31D1D',
+    };
 
     // Handle sorting
     const sortedData = [...copyData].sort((a, b) => {
         if (sortOrder === "Ascending") {
-            return a.title.localeCompare(b.title)
+            return a.bookBarcode.localeCompare(b.bookBarcode)
         } else {
-            return b.title.localeCompare(a.title)
+            return b.bookBarcode.localeCompare(a.bookBarcode)
         }
     })
 
@@ -89,8 +108,15 @@ export default function ABCopiesList({ titleID }) {
     const startIndex = (currentPage - 1) * entriesPerPage
     const displayedBooks = filteredData.slice(startIndex, startIndex + entriesPerPage)
 
+    const handleRowClick = (item) => {
+        setSelectedBook(item);
+        if (onRowSelect) {
+            onRowSelect(item); // Call the callback with the selected item
+        }
+    };
+
     return (
-        <div className="bg-white p-4 rounded-lg border-grey border h-fit w-1/2">
+        <div className="bg-white p-4 rounded-lg border-grey border h-full w-1/2">
             <h3 className="text-2xl font-semibold mb-4">List of Copies</h3>
 
             <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -196,6 +222,7 @@ export default function ABCopiesList({ titleID }) {
                             ))
                         ) : displayedBooks.length > 0 ? (
                             displayedBooks.map((item, index) => {
+                                const statusColor = statusColorMap[item.bookStatus] || ""; // Get color for this item
                                 return (
                                     <tr
                                         key={index}
@@ -203,11 +230,17 @@ export default function ABCopiesList({ titleID }) {
                                         onClick={() => handleRowClick(item)}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-900 text-center w-1/3">
-                                            <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1">
+                                            <span
+                                                className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 w-2/3"
+                                                style={{
+                                                    backgroundColor: statusColor,
+                                                    color: item.bookStatus === 'Available' || item.bookStatus === 'Damaged' ? 'white' : 'black',
+                                                }}
+                                            >
                                                 {item.bookStatus}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-2 text-sm text-gray-900 text-center w-1/3">
+                                        <td className="px-4 py-2 text-sm text-arcadia-red text-center font-semibold truncate w-1/3 hover:underline">
                                             {item.bookBarcode}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-900 text-center w-1/3">
@@ -219,7 +252,7 @@ export default function ABCopiesList({ titleID }) {
                         ) : (
                             <tr>
                                 <td colSpan="3" className="px-4 py-2 text-center text-zinc-600">
-                                    No books found.
+                                    No copies found.
                                 </td>
                             </tr>
                         )}

@@ -33,7 +33,6 @@ const OverdueBks = () => {
                         bookBarcode, 
                         book_indiv(
                             bookBarcode,
-                            bookARCID,
                             bookBarcode,
                             bookStatus,
                             book_titles (

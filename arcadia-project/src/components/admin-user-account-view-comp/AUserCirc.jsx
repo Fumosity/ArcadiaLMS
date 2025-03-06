@@ -31,7 +31,6 @@ const AUserCirc = ({ user }) => {
                         bookBarcode, 
                         book_indiv(
                             bookBarcode,
-                            bookARCID,
                             bookStatus,
                             book_titles (
                                 titleID,

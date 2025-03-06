@@ -39,6 +39,11 @@ const AboutPage = ({ book }) => {
     navigate(`/admin/bookmodify?${queryParams}`);
   };
 
+  const handleManageCopies = () => {
+    console.log("Title in BookPreviewInventory:", book.title)
+    navigate(`/admin/copymanagement?titleID=${book.titleID}`)
+  }
+
   return (
     <div>
       <div className="flex justify-center gap-2">
@@ -50,7 +55,7 @@ const AboutPage = ({ book }) => {
         </button>
         <button
           className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey  hover:bg-arcadia-red hover:text-white"
-          onClick={handleModifyBook}
+          onClick={handleManageCopies}
         >
           Modify Book Copies
         </button>
