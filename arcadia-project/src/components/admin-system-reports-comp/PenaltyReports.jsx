@@ -8,7 +8,7 @@ function PenaltyReports({ exportData }) {
 
     useEffect(() => {
         if (exportData) {
-            const overdueTotal = exportData.bkhistoryData.reduce((sum, entry) => sum + entry.total_fine, 0);
+            const overdueTotal = exportData.bkhistoryData.reduce((sum, entry) => sum + entry.fine_amount, 0);
             const damageTotal = exportData.damageFinesData.reduce((sum, entry) => sum + entry.fine, 0);
             const totalFines = overdueTotal + damageTotal;
 

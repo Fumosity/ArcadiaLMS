@@ -14,10 +14,32 @@ const SBOverdue = () => {
             try {
                 const today = new Date();
                 const { data, error } = await supabase
-                    .from('book_transactions')
-                    .select('transactionID, userID, bookBarcode, checkoutDate, checkoutTime, deadline, user_accounts(userFName, userLName, userLPUID)')
-                    .not('deadline', 'is.null')
-                    .lt('deadline', today.toISOString().split('T')[0]);
+                .from('book_transactions')
+                .select(`
+                    transactionID, 
+                    transactionType,
+                    userID, 
+                    bookBarcode, 
+                    book_indiv (
+                        bookBarcode,
+                        bookStatus,
+                        book_titles (
+                            titleID,
+                            title,
+                            price
+                        )
+                    ),
+                    checkoutDate, 
+                    checkoutTime, 
+                    deadline, 
+                    user_accounts(
+                        userFName, 
+                        userLName, 
+                        userLPUID)
+                    `)
+                .not('deadline', 'is.null')
+                .lt('deadline', today.toISOString().split('T')[0])
+                .neq('transactionType', 'Returned');
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
@@ -87,7 +109,7 @@ const SBOverdue = () => {
                 <thead>
                     <tr>
                         <th className="w-2/3 px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
-                        <th className="w-1/3 px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total Fine</th>
+                        <th className="w-1/3 px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Fine</th>
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">

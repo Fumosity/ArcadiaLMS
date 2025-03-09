@@ -20,7 +20,7 @@ const SBFines = () => {
                         transactionID,
                         userID,
                         bookBarcode,
-                        book_indiv (
+                        book_indiv!inner (
                             bookBarcode,
                             bookStatus,
                             book_titles (
@@ -34,27 +34,39 @@ const SBFines = () => {
                             userLName,
                             userLPUID
                         )
-                    `)
+                        `)
+                    .eq('book_indiv.bookStatus', 'Damaged') // Get only damaged book transactions
+                    .order('transactionID', { ascending: false }); // Get latest transactions first
+
                 if (damageError) {
-                    console.error("Error fetching damage fines data: ", damageError.message);
+                    console.error("Error fetching latest damaged book transactions:", damageError.message);
                 } else {
-                    const filteredDamageData = damageData.filter(item => item.book_indiv?.bookStatus === 'Damaged');
-                    setDamageFinesData(filteredDamageData.map(item => {
+                    // Use JavaScript to filter only the most recent damaged transaction per bookBarcode
+                    const latestDamageData = Object.values(
+                        damageData.reduce((acc, item) => {
+                            if (!acc[item.bookBarcode]) {
+                                acc[item.bookBarcode] = item; // Store only the latest transaction per bookBarcode
+                            }
+                            return acc;
+                        }, {})
+                    );
+
+                    const formattedDamageData = latestDamageData.map(item => {
                         const bookDetails = item.book_indiv?.book_titles || {};
-                        const fineAmount = bookDetails.price || 0;
                         return {
                             transaction_id: item.transactionID,
                             user_id: item.userID,
                             book_barcode: item.book_indiv.bookBarcode,
                             book_title: bookDetails.title,
                             book_title_id: bookDetails.titleID,
-                            fine: fineAmount,
+                            fine: bookDetails.price || 0,
                             user_name: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                             school_id: item.user_accounts.userLPUID,
                         };
-                    }));
+                    })
 
-                    console.log("damageFinesData", filteredDamageData);
+                    setDamageFinesData(formattedDamageData);
+
                 }
             } catch (error) {
                 console.error("Error: ", error);
@@ -106,7 +118,7 @@ const SBFines = () => {
                                     </button>
                                 </td>
                                 <td className="w-1/3 px-4 py-2 text-center text-sm truncate">
-                                ₱{user.fine}
+                                    ₱{user.fine}
                                 </td>
                             </tr>
                         ))

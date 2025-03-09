@@ -20,25 +20,32 @@ const LeastPop = () => {
                 return acc;
             }, {});
 
-            // Fetch book metadata from book_indiv and book_titles
+            // Fetch book metadata and join with book_titles
             const { data: bookMetadata, error: bookError } = await supabase
                 .from("book_indiv")
                 .select("bookBarcode, titleID, book_titles(titleID, title)");
 
             if (bookError) throw bookError;
 
-            // Combine book data with borrow counts
-            const booksWithDetails = bookMetadata.map(book => {
-                const borrowCount = borrowCountMap[book.bookBarcode] || 0;
-                return {
-                    title: book.book_titles.title,
-                    borrowCount,
-                    titleID: book.book_titles.titleID
-                };
+            // Aggregate borrow counts by titleID
+            const titleBorrowMap = {};
+
+            bookMetadata.forEach(({ bookBarcode, titleID, book_titles }) => {
+                if (!titleBorrowMap[titleID]) {
+                    titleBorrowMap[titleID] = {
+                        title: book_titles.title,
+                        borrowCount: 0,
+                        titleID: book_titles.titleID,
+                    };
+                }
+                titleBorrowMap[titleID].borrowCount += borrowCountMap[bookBarcode] || 0;
             });
 
-            // Sort by least borrowed
-            let books = booksWithDetails.sort((a, b) => a.borrowCount - b.borrowCount).slice(0, 10);
+            // Convert object to array, sort by least borrowed, and get bottom 10
+            const books = Object.values(titleBorrowMap)
+                .sort((a, b) => a.borrowCount - b.borrowCount)
+                .slice(0, 10);
+
             return books;
         } catch (error) {
             console.error("Error fetching least popular books:", error);

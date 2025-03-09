@@ -13,9 +13,31 @@ function OutstandingFines({ onDataExport }) {
                 const today = new Date();
                 const { data, error } = await supabase
                     .from('book_transactions')
-                    .select('transactionID, userID, bookBarcode, checkoutDate, checkoutTime, deadline, user_accounts(userFName, userLName, userLPUID)')
+                    .select(`
+                        transactionID, 
+                        transactionType,
+                        userID, 
+                        bookBarcode, 
+                        book_indiv (
+                            bookBarcode,
+                            bookStatus,
+                            book_titles (
+                                titleID,
+                                title,
+                                price
+                            )
+                        ),
+                        checkoutDate, 
+                        checkoutTime, 
+                        deadline, 
+                        user_accounts(
+                            userFName, 
+                            userLName, 
+                            userLPUID)
+                        `)
                     .not('deadline', 'is.null')
-                    .lt('deadline', today.toISOString().split('T')[0]);
+                    .lt('deadline', today.toISOString().split('T')[0])
+                    .neq('transactionType', 'Returned');
 
                 if (error) {
                     console.error("Error fetching data: ", error.message);
@@ -24,35 +46,36 @@ function OutstandingFines({ onDataExport }) {
                         const userId = item.userID;
                         const deadline = item.deadline;
                         const checkout_date = item.checkoutDate
-                        const checkout_time = item.checkoutTime                         
+                        const checkout_time = item.checkoutTime
                         // Calculate overdue days excluding Sundays for each book
-                        let overdueDays = 0;
+                        let overdue_days = 0;
+
                         for (let d = new Date(deadline); d < today; d.setDate(d.getDate() + 1)) {
                             if (d.getDay() !== 0) {
-                                overdueDays++;
+                                overdue_days++;
                             }
                         }
 
-                        const penaltyPerDay = 10;
-                        const totalFineForBook = overdueDays * penaltyPerDay;
+                        const fine_amount = overdue_days * 10;
+
+                        let bookDetails = item.book_indiv
 
                         if (!acc[userId]) {
                             acc[userId] = {
                                 user_id: userId,
                                 user_name: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                                 school_id: item.user_accounts.userLPUID,
-                                books_borrowed: 0,
-                                total_fine: 0,
-                                incurred_per_day: 0,
+                                book_title: bookDetails.book_titles.title,
+                                book_title_id: bookDetails.book_titles.titleID,
+                                book_barcode: item.bookBarcode,
+                                days_overdue: 0,
                                 deadline,
                                 checkout_date,
-                                checkout_time
+                                checkout_time,
+                                fine_amount,
+                                overdue_days
                             };
                         }
-
-                        acc[userId].books_borrowed += 1;
-                        acc[userId].total_fine += totalFineForBook;
-                        acc[userId].incurred_per_day += penaltyPerDay;
 
                         return acc;
                     }, {});
@@ -67,51 +90,64 @@ function OutstandingFines({ onDataExport }) {
                 const { data: damageData, error: damageError } = await supabase
                     .from('book_transactions')
                     .select(`
-                        transactionID,
-                        userID,
-                        bookBarcode,
-                        book_indiv (
-                            bookBarcode,
-                            bookStatus,
-                            book_titles (
-                                titleID,
-                                title,
-                                price
-                            )
-                        ),
-                        user_accounts (
-                            userFName,
-                            userLName,
-                            userLPUID
-                        )
-                    `)
+    transactionID,
+    userID,
+    bookBarcode,
+    book_indiv!inner (
+        bookBarcode,
+        bookStatus,
+        book_titles (
+            titleID,
+            title,
+            price
+        )
+    ),
+    user_accounts (
+        userFName,
+        userLName,
+        userLPUID
+    )
+`)
+                    .eq('book_indiv.bookStatus', 'Damaged') // Get only damaged book transactions
+                    .order('transactionID', { ascending: false }); // Get latest transactions first
+
                 if (damageError) {
-                    console.error("Error fetching damage fines data: ", damageError.message);
+                    console.error("Error fetching latest damaged book transactions:", damageError.message);
                 } else {
-                    const filteredDamageData = damageData.filter(item => item.book_indiv?.bookStatus === 'Damaged');
-                    setDamageFinesData(filteredDamageData.map(item => {
+                    // Use JavaScript to filter only the most recent damaged transaction per bookBarcode
+                    const latestDamageData = Object.values(
+                        damageData.reduce((acc, item) => {
+                            if (!acc[item.bookBarcode]) {
+                                acc[item.bookBarcode] = item; // Store only the latest transaction per bookBarcode
+                            }
+                            return acc;
+                        }, {})
+                    );
+
+                    const formattedDamageData = latestDamageData.map(item => {
                         const bookDetails = item.book_indiv?.book_titles || {};
-                        const fineAmount = bookDetails.price || 0;
                         return {
                             transaction_id: item.transactionID,
                             user_id: item.userID,
                             book_barcode: item.book_indiv.bookBarcode,
                             book_title: bookDetails.title,
                             book_title_id: bookDetails.titleID,
-                            fine: fineAmount,
+                            fine: bookDetails.price || 0,
                             user_name: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
                             school_id: item.user_accounts.userLPUID,
                         };
-                    }));
+                    });
 
-                    console.log("damageFinesData", filteredDamageData);
+                    setDamageFinesData(formattedDamageData);
+                    console.log("Latest damage transactions per book:", formattedDamageData);
                 }
+
             } catch (error) {
                 console.error("Error: ", error);
             }
         };
 
-        fetchData();  
+        fetchData();
     }, []);
 
     useEffect(() => {
@@ -166,16 +202,16 @@ function OutstandingFines({ onDataExport }) {
     const formatSchoolNo = (value) => {
         // Remove non-numeric characters
         let numericValue = value.replace(/\D/g, "");
-    
+
         // Apply the XXXX-X-XXXXX format
         if (numericValue.length > 4) {
-          numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`;
+            numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`;
         }
         if (numericValue.length > 6) {
-          numericValue = `${numericValue.slice(0, 6)}-${numericValue.slice(6, 11)}`;
+            numericValue = `${numericValue.slice(0, 6)}-${numericValue.slice(6, 11)}`;
         }
         return numericValue;
-      };
+    };
 
     return (
         <div className="bg-white p-4 rounded-lg border-grey border">
@@ -202,8 +238,8 @@ function OutstandingFines({ onDataExport }) {
                         value={outstandingSortBy}
                         onChange={(e) => setOutstandingSortBy(e.target.value)}
                     >
-                        <option value="total_fine">Total Fine</option>
-                        <option value="books_borrowed">Books Borrowed</option>
+                        <option value="fine_amount">Total Fine</option>
+                        <option value="overdue_days">Days Overdue</option>
                         <option value="user_name">Name</option>
                     </select>
                 </div>
@@ -212,9 +248,10 @@ function OutstandingFines({ onDataExport }) {
             <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead>
                     <tr>
-                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Total Fine</th>
-                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Incurred per Day</th>
-                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Books Borrowed</th>
+                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Fine</th>
+                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">No. of Days Overdue</th>
+                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Book Title</th>
+                        <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Book Barcode</th>
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Name</th>
                         <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">School ID</th>
                     </tr>
@@ -223,9 +260,17 @@ function OutstandingFines({ onDataExport }) {
                     {outstandingDisplayedData.length > 0 ? (
                         outstandingDisplayedData.map((record, index) => (
                             <tr key={index} className="whitespace-nowrap hover:bg-light-gray cursor-pointer">
-                                <td className="px-4 py-2 text-center">₱{record.total_fine.toFixed(2)}</td>
-                                <td className="px-4 py-2 text-center">₱{record.incurred_per_day.toFixed(2)}/day</td>
-                                <td className="px-4 py-2 text-center">{record.books_borrowed}</td>
+                                <td className="px-4 py-2 text-center">₱{record.fine_amount}</td>
+                                <td className="px-4 py-2 text-center">{record.overdue_days} days</td>
+                                <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
+                                    <Link
+                                        to={`/admin/abviewer?titleID=${encodeURIComponent(record.book_title_id)}`}
+                                        className="text-blue-600 hover:underline"
+                                    >
+                                        {truncateTitle(record.book_title)}
+                                    </Link>
+                                </td>
+                                <td className="px-4 py-2 text-center">{record.book_barcode}</td>
                                 <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
                                     <button
                                         onClick={() => handleUserClick(record)}
@@ -308,7 +353,6 @@ function OutstandingFines({ onDataExport }) {
                         damagedDisplayedData.map((record, index) => (
                             <tr key={index} className="whitespace-nowrap hover:bg-light-gray cursor-pointer">
                                 <td className="px-4 py-2 text-center">₱{record.fine.toFixed(2)}</td>
-                                <td className="px-4 py-2 text-center">{record.book_barcode}</td>
                                 <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
                                     <Link
                                         to={`/admin/abviewer?titleID=${encodeURIComponent(record.book_title_id)}`}
@@ -317,6 +361,7 @@ function OutstandingFines({ onDataExport }) {
                                         {truncateTitle(record.book_title)}
                                     </Link>
                                 </td>
+                                <td className="px-4 py-2 text-center">{record.book_barcode}</td>
                                 <td className="px-4 py-2 text-center text-arcadia-red font-semibold">
                                     <button
                                         onClick={() => handleUserClick(record)}
