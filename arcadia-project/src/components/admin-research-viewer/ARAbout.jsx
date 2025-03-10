@@ -30,6 +30,7 @@ const ARAbout = ({ researchData }) => {
         location: researchData.location,
         researchARCID: researchData.researchARCID,
         cover: researchData.cover,
+        researchID: researchData.researchID
     }
 
     console.log(researchData)

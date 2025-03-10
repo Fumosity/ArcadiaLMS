@@ -125,7 +125,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
     if (!authors || authors.length === 0) return "N/A"
 
     if (!Array.isArray(authors)) {
-      authors = [authors]
+      authors = [authors] // Handle cases where author is not an array
     }
 
     const formattedAuthors = authors.map((author) => {
@@ -140,7 +140,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
       return formattedAuthors.join(", ")
     } else {
       const etAlCount = authors.length - 2
-      return `${formattedAuthors[0]}, ${formattedAuthors[1]}, et al (${etAlCount} more)`
+      return `${formattedAuthors[0]}, ${formattedAuthors[1]}, ...`
     }
   }
 
@@ -261,10 +261,10 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Authors
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8">
                 Thesis ID
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8">
                 Pub. Date
               </th>
             </tr>
@@ -326,24 +326,24 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                     </Link>
                   </td>
 
-                  <td className="px-4 py-4 text-sm truncate max-w-48 relative group">
-                    <div className="flex items-center space-x-1">
-                      <span className="inline-block truncate break-words">{formatAuthor(item.author)}</span>
-                      {Array.isArray(item.author) && item.author.length > 2 && (
-                        <div className="absolute top-0 left-full ml-2 bg-white border border-gray-300 rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
-                          {item.author.slice(2).map((author, i) => (
-                            <div key={i} className="mt-1">
-                              {formatAuthor([author])}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </td>
+                  <td className="px-4 py-4 text-sm max-w-48 relative group">
+                      <div className="flex items-center space-x-1 w-fit">
+                        <span className="inline-block truncate break-words">{formatAuthor(item.author)}</span>
+                        {Array.isArray(item.author) && item.author.length > 2 && (
+                          <div className="absolute top-0 left-1/2 bg-white border border-grey rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                            {item.author.slice(2).map((author, i) => (
+                              <div key={i} className="mt-1">
+                                {formatAuthor([author])}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </td>
 
-                  <td className="px-4 py-4 text-center text-sm text-gray-500 w-10">{item.researchARCID}</td>
+                  <td className="px-4 py-4 text-center text-sm text-gray-500 w-1/8">{item.researchARCID}</td>
 
-                  <td className="px-4 py-4 text-center text-sm text-gray-500 min-w-8">{item.pubDate}</td>
+                  <td className="px-4 py-4 text-center text-sm text-gray-500 w-1/8">{item.pubDate}</td>
                 </tr>
               ))
             ) : (

@@ -24,7 +24,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
     const queryParams = new URLSearchParams(location.search);
     const initialFormData = {
       title: queryParams.get("title") || '',
-      author: queryParams.get("author") || '',
+      author: queryParams.get("author") || [],
       college: queryParams.get("college") || '',
       department: queryParams.get("department") || '',
       abstract: queryParams.get("abstract") || '',
@@ -32,7 +32,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
       pubDate: queryParams.get("pubDate") || '',
       location: queryParams.get("location") || '',
       researchID: queryParams.get("researchID") || '',
-      arcID: queryParams.get("arcID") || '',
+      researchARCID: queryParams.get("researchARCID") || '',
       cover: queryParams.get("cover") || '',
     };
 
@@ -53,7 +53,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
     const queryParams = new URLSearchParams(location.search);
     const initialFormData = {
       title: queryParams.get("title") || '',
-      author: queryParams.get("author") || '',
+      author: queryParams.get("author") || [],
       college: queryParams.get("college") || '',
       department: queryParams.get("department") || '',
       abstract: queryParams.get("abstract") || '',
@@ -61,7 +61,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
       pubDate: queryParams.get("pubDate") || '',
       location: queryParams.get("location") || '',
       researchID: queryParams.get("researchID") || '',
-      arcID: queryParams.get("arcID") || '',
+      researchARCID: queryParams.get("researchARCID") || '',
       cover: queryParams.get("cover") || '',
     };
 
@@ -76,7 +76,31 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
       return;
     }
 
-    const { researchID, ...updateData } = formData;
+    const { researchID, ...rest } = formData;
+
+    // Convert `keywords` into an array for JSONB storage
+    const processKeywords = (keywords) => {
+      if (!keywords) return [];
+      return Array.isArray(keywords)
+        ? keywords.map((k) => k.trim()).filter((k) => k !== "")
+        : keywords.split(/[,;]+/).map((k) => k.trim()).filter((k) => k !== "");
+    };
+
+    // Convert array/string values properly (excluding category since it's derived from genres)
+    const updateData = Object.fromEntries(
+      Object.entries(rest)
+        .filter(([key]) => key !== 'category')
+        .map(([key, value]) => {
+          if (key === "keywords") {
+            return [key, processKeywords(value)]; // Store as JSONB array
+          }
+          if (key === "author") {
+            return [key, processKeywords(value)]; // Store as JSONB array
+          }
+          return [key, value];
+        })
+    );
+
 
     try {
       const { data, error } = await supabase

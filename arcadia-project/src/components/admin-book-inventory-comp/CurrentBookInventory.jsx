@@ -386,10 +386,10 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                       </Link>
                     </td>
                     <td className="px-4 py-4 text-sm max-w-48 relative group">
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-1 w-fit">
                         <span className="inline-block truncate break-words">{formatAuthor(item.author)}</span>
                         {Array.isArray(item.author) && item.author.length > 2 && (
-                          <div className="absolute top-0 left-full ml-2 bg-white border border-gray-300 rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                          <div className="absolute top-0 left-1/2 bg-white border border-grey rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
                             {item.author.slice(2).map((author, i) => (
                               <div key={i} className="mt-1">
                                 {formatAuthor([author])}

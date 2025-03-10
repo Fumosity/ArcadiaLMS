@@ -116,6 +116,7 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
     keywords: research.keywords,
     pubDate: research.pubDate,
     location: research.location,
+    researchID: research.researchID
   };
 
   // Navigate to modify research page with query parameters
