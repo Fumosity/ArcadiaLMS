@@ -41,30 +41,26 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
 
   const bookDetails = {
     title: book.title,
-    author: Array.isArray(book.author) ? book.author.join(", ") : (book.author ?? "").split(";").join(",") || "",
-    genres: Array.isArray(book.genres) ? book.genres.join(", ") : (book.genres ?? "").split(";").join(",") || "",
+    author: Array.isArray(book.author) ? book.author.join(', ') : (book.author ?? '').split(';').join(',') || '',
+    genres: Array.isArray(book.genres) ? book.genres.join(', ') : (book.genres ?? '').split(';').join(',') || '',
     category: book.category,
     publisher: book.publisher,
-    synopsis: synopsisContent,
-    arcID: book.arcID,
-    keywords: Array.isArray(book.keywords)
-      ? book.keywords.join(", ")
-      : (book.keywords ?? "").split(";").join(",") || "",
-    datePublished: book.originalPubDate,
-    republished: book.currentPubDate,
-    quantity: book.quantity,
-    cover: book.cover,
+    synopsis: book.synopsis,
+    keywords: Array.isArray(book.keywords) ? book.keywords.join(', ') : (book.keywords ?? '').split(';').join(',') || '',
+    currdatePublished: book.currentPubDate,
+    orgdatePublished: book.currentPubDate,
     location: book.location,
     isbn: book.isbn,
+    cover: book.cover,
     price: book.price,
-    titleID: book.titleID,
-  }
+    arcID: book.arcID,
+  };
 
   const handleModifyBook = () => {
-    console.log("Title in BookPreviewInventory:", bookDetails.title)
-    const queryParams = new URLSearchParams(bookDetails).toString()
-    navigate(`/admin/bookmodify?` + encodeURIComponent(queryParams))
-  }
+    console.log("Title in BookPreviewInventory:", bookDetails.title);
+    const queryParams = new URLSearchParams(bookDetails).toString();
+    navigate(`/admin/bookmodify?${queryParams}`);
+  };
 
   const handleManageCopies = () => {
     console.log("Title in BookPreviewInventory:", bookDetails.title)
@@ -138,9 +134,9 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
               .map(([key, value], index) => (
                 <tr key={index} className="border-b border-grey">
                   <td className="px-1 py-1 font-semibold capitalize w-1/3">
-                    {key === "datePublished"
+                    {key === "currdatePublished"
                       ? "Current Pub. Date:"
-                      : key === "republished"
+                      : key === "orgdatePublished"
                         ? "Original Pub. Date:"
                         : key === "isbn"
                           ? "ISBN:"

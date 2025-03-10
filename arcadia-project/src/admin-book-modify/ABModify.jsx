@@ -22,8 +22,8 @@ const ABModify = () => {
     publisher: queryParams.get("publisher") || '',
     synopsis: queryParams.get("synopsis") || '',
     keywords: queryParams.get("keywords") || '',
-    currentPubDate: queryParams.get("datePublished") || '',
-    originalPubDate: queryParams.get("republished") || '',
+    currentPubDate: queryParams.get("currdatePublished") || '',
+    originalPubDate: queryParams.get("orgdatePublished") || '',
     location: queryParams.get("location") || '',
     bookID: queryParams.get("databaseID") || '',
     arcID: queryParams.get("arcID") || '',
@@ -32,8 +32,6 @@ const ABModify = () => {
     cover: queryParams.get("cover") || '',
     titleID: queryParams.get("titleID") || '',
   };
-
-  console.log("ABModify", formData)
 
   const [formDataState, setFormData] = useState(formData);
 

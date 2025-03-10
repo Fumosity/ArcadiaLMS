@@ -31,6 +31,7 @@ const AboutPage = ({ book }) => {
     isbn: book.isbn,
     cover: book.cover,
     price: book.price,
+    arcID: book.arcID,
   };
 
   const handleModifyBook = () => {

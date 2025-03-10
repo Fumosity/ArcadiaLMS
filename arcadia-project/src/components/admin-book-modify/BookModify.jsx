@@ -25,13 +25,14 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       publisher: params.get("publisher") || "",
       synopsis: params.get("synopsis") || "",
       keywords: params.get("keywords") || [],
-      currentPubDate: params.get("republished") || "",
-      originalPubDate: params.get("datePublished") || "",
+      currentPubDate: params.get("currdatePublished") || "",
+      originalPubDate: params.get("orgdatePublished") || "",
       cover: params.get("cover") || "",
       location: params.get("location") || "",
       isbn: params.get("isbn") || "",
       price: params.get("price") || "",
       titleID: params.get("titleID") || null,
+      arcID: params.get("arcID") || null,
     };
 
     setFormData(initialFormData);
@@ -128,6 +129,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       isbn: params.get("isbn") || "",
       price: params.get("price") || "",
       titleID: params.get("titleID") || null,
+      arcID: params.get("arcID") || null,
     };
 
     console.log(initialFormData)
@@ -453,11 +455,11 @@ const BookModify = ({ formData, setFormData, onSave }) => {
 
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Call No.:</label>
-                <input type="text" name="titleARCID" required
+                <input type="text" name="arcID" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.titleARCID}
+                  value={formData.arcID}
                   onChange={handleChange}
-                  style={validationErrors.titleARCID ? errorStyle : {}}
+                  style={validationErrors.arcID ? errorStyle : {}}
                   placeholder="Book Title Call Number"
                 />
               </div>
@@ -479,29 +481,6 @@ const BookModify = ({ formData, setFormData, onSave }) => {
                   onChange={handleChange}
                   style={validationErrors.price ? errorStyle : {}}
                   placeholder="Market Price"
-                />
-              </div>
-
-              <h3 className="text-xl font-semibold py-2">Book Information of First Copy</h3>
-              
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Barcode:</label>
-                <input type="text" name="bookBarcode" required
-                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.bookBarcode}
-                  onChange={handleChange}
-                  style={validationErrors.bookBarcode ? errorStyle : {}}
-                  placeholder="Unique Barcode"
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Date Procured:</label>
-                <input type="date" name="procurementDate" required
-                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.procurementDate}
-                  onChange={handleChange}
-                  style={validationErrors.procurementDate ? errorStyle : {}}
-                  placeholder="Procurement Date of First Copy"
                 />
               </div>
             </form>
