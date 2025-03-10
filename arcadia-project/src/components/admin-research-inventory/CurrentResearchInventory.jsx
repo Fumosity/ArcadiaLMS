@@ -91,14 +91,13 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
     // Filter by search term
     const matchesSearch =
       !searchTerm ||
-      (research.title && research.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (research.college && research.college.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (research.department && research.department.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (research.keywords && research.keywords.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (research.author &&
-        ((typeof research.author === "string" && research.author.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (Array.isArray(research.author) &&
-            research.author.some((author) => author && author.toLowerCase().includes(searchTerm.toLowerCase())))))
+      (typeof research.title === "string" && research.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (typeof research.college === "string" && research.college.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (typeof research.department === "string" && research.department.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (typeof research.keywords === "string" && research.keywords.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (typeof research.author === "string" && research.author.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (Array.isArray(research.author) &&
+        research.author.some((author) => typeof author === "string" && author.toLowerCase().includes(searchTerm.toLowerCase())));
 
     // Filter by college type
     const matchesCollege = collegeType === "All" || research.college === collegeType
@@ -327,19 +326,19 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                   </td>
 
                   <td className="px-4 py-4 text-sm max-w-48 relative group">
-                      <div className="flex items-center space-x-1 w-fit">
-                        <span className="inline-block truncate break-words">{formatAuthor(item.author)}</span>
-                        {Array.isArray(item.author) && item.author.length > 2 && (
-                          <div className="absolute top-0 left-1/2 bg-white border border-grey rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
-                            {item.author.slice(2).map((author, i) => (
-                              <div key={i} className="mt-1">
-                                {formatAuthor([author])}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </td>
+                    <div className="flex items-center space-x-1 w-fit">
+                      <span className="inline-block truncate break-words">{formatAuthor(item.author)}</span>
+                      {Array.isArray(item.author) && item.author.length > 2 && (
+                        <div className="absolute top-0 left-1/2 bg-white border border-grey rounded p-2 z-10 transition-opacity duration-300 ease-in-out opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                          {item.author.slice(2).map((author, i) => (
+                            <div key={i} className="mt-1">
+                              {formatAuthor([author])}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </td>
 
                   <td className="px-4 py-4 text-center text-sm text-gray-500 w-1/8">{item.researchARCID}</td>
 
