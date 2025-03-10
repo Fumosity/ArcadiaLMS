@@ -68,9 +68,8 @@ const Footer = () => (
                         </Link>
                     </h4>
                     <ul className="text-sm text-grey text-left space-y-2">
-                        <li>Accounts List</li>
-                        <li>Library Cards</li>
-                        <li>Whitelist and Blacklist</li>
+                        <li>List of User Accounts</li>
+                        <li>List of Admin Accounts</li>
                     </ul>
                 </div>
                 <div>

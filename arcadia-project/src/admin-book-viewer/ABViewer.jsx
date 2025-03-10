@@ -101,7 +101,7 @@ export default function ABViewer() {
             <SimilarTo />
           </div>
           <Analytics titleID={book?.titleID || titleID} />
-          <PastReviews />
+          <PastReviews titleID={book?.titleID || titleID} />
         </div>
         <div className="flex flex-col items-start flex-shrink-0 w-1/4">
           <AboutPage book={book} loading={loading} /> {/* Pass loading prop */}
