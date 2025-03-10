@@ -47,7 +47,7 @@ const AUAccView = () => {
           </div>
           <div className="space-y-2">
             <UserInformations user={user} source={source} />
-            <AUserCirc user={user} />
+            <AUserCirc user={user} source={source} />
           </div>
         </div>
 
