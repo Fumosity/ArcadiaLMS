@@ -140,6 +140,8 @@ const BookModify = ({ formData, setFormData, onSave }) => {
   }
 
   const handleSave = async () => {
+    console.log(formData)
+    
     if (!formData || !formData.titleID) {
       console.error("Invalid form data or missing titleID");
       return;
@@ -442,16 +444,17 @@ const BookModify = ({ formData, setFormData, onSave }) => {
                 />
               </div>
 
-              <div className="justify-between items-center hidden">
-                <label className="w-1/4">Database ID*:</label>
-                <input type="text" name="bookID" required
+              <div className="justify-between items-center">
+                <label className="w-1/4">Title ID*:</label>
+                <input type="text" name="titleID" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.bookID}
+                  value={formData.titleID}
                   onChange={handleChange}
-                  style={validationErrors.bookID ? errorStyle : {}}
+                  style={validationErrors.titleID ? errorStyle : {}}
                   placeholder="Database ID"
                 />
               </div>
+
 
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Call No.:</label>

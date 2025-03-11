@@ -9,6 +9,7 @@ import ReturnToSearch from "../../components/UserComponents/user-book-view-comp/
 import BookInformation from "../../components/UserComponents/user-book-view-comp/BookInformation";
 import SimBooks from "../../components/UserComponents/user-book-search-comp/SimBooks";
 import { useUser } from "../../backend/UserContext";
+import Pathfinder from "../../components/UserComponents/pathfinder-comp/Pathfinder";
 
 const UBookView = () => {
   const location = useLocation();
@@ -89,6 +90,7 @@ const UBookView = () => {
               book={bookDetails}
               publishedYear={bookDetails?.publishedYear || "Unknown"}
             />
+            <Pathfinder book={bookDetails}/>
             <SimBooks titleID={titleId} userID={user.userID} category={bookDetails?.category} />
           </div>
         </div>

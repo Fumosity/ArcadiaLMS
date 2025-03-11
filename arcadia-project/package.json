@@ -38,6 +38,7 @@
     "dotenv": "^16.4.5",
     "excellentexport": "3.9.9",
     "express": "^4.21.1",
+    "fast-astar": "1.0.6",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.451.0",
     "moment": "^2.30.1",

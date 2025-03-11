@@ -157,8 +157,8 @@ export default function BookInformation({ book }) {
             </div>
 
             {/* Additional Information Section */}
-            <div className="mt-4 border-t border-grey">
-                <h4 className="text-lg font-semibold mt-4 mb-2">Additional Information</h4>
+            <div className="mt-4 border-t border-grey p-2">
+                <h3 className="text-2xl font-semibold mt-4 mb-2">Additional Information</h3>
                 <div>
                     <p><span className="font-semibold">Category:</span> {book.category || "No category available"}</p>
                     <br />

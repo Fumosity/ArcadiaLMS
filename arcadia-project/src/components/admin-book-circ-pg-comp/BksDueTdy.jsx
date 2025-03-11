@@ -43,7 +43,7 @@ const BksDueTdy = () => {
 
                     const formattedData = data.map(item => {
                         const bookDetails = item.book_indiv?.book_titles || {};
-                        const bookBorrower = item.user_accounts.userFName + item.user_accounts.userLName
+                        const bookBorrower = `${item.user_accounts.userFName} ${item.user_accounts.userLName}`
                         const deadline = new Date(item.deadline).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
                         console.log("deadline today", item.deadline)
                         console.log("bookDetails", bookDetails)
@@ -101,7 +101,7 @@ const BksDueTdy = () => {
                                         {book.borrower}
                                     </button>
                                 </td>
-                                <td className="w-1/3 px-4 py-2 text-center text-sm text-arcadia-red font-semibold">
+                                <td className="w-1/3 px-4 py-2 text-center text-sm text-arcadia-red font-semibold truncate">
                                     <Link
                                         to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
                                         className="text-blue-600 hover:underline"
