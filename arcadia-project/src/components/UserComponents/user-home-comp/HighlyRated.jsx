@@ -1,85 +1,125 @@
-import React from "react";
-import BookCards from "./BookCards";
-import { supabase } from "/src/supabaseClient.js";
+import BookCards from "./BookCards"
+import { supabase } from "/src/supabaseClient.js"
 
 const fetchHighlyRatedBooks = async () => {
-    try {
-        // Step 1: Fetch all ratings with titleID
-        const { data: ratings, error: ratingError } = await supabase
-            .from("ratings")
-            .select("ratingValue, titleID");
+  try {
+    // Step 1: Fetch all ratings with titleID
+    const { data: ratings, error: ratingError } = await supabase.from("ratings").select("ratingValue, titleID")
 
-        if (ratingError) throw ratingError;
+    if (ratingError) throw ratingError
 
-        // Step 2: Group ratings by titleID and calculate weighted average
-        const ratingMap = ratings.reduce((acc, { titleID, ratingValue }) => {
-            if (!acc[titleID]) {
-                acc[titleID] = { total: 0, count: 0 };
-            }
-            acc[titleID].total += ratingValue;
-            acc[titleID].count += 1;
-            return acc;
-        }, {});
+    // Step 2: Group ratings by titleID and calculate average rating
+    const ratingMap = {}
+    ratings.forEach(({ titleID, ratingValue }) => {
+      if (!ratingMap[titleID]) {
+        ratingMap[titleID] = { total: 0, count: 0 }
+      }
+      ratingMap[titleID].total += ratingValue
+      ratingMap[titleID].count += 1
+    })
 
-        const bookIDs = Object.keys(ratingMap);
+    // Get unique titleIDs that have ratings
+    const bookIDs = Object.keys(ratingMap)
 
-        // Step 3: Fetch book metadata from book_indiv and book_titles
-        const { data: bookMetadata, error: bookError } = await supabase
-            .from("book_indiv")
-            .select("titleID, book_titles(titleID, title, author, cover)")
-            .in("titleID", bookIDs);
-
-        if (bookError) throw bookError;
-
-        // Step 4: Fetch genres and categories using book_genre_link and genre tables
-        const titleIDs = bookMetadata.map(book => book.book_titles.titleID);
-        const { data: genreData, error: genreError } = await supabase
-            .from("book_genre_link")
-            .select("titleID, genreID, genres(genreID, genreName, category)")
-            .in("titleID", titleIDs);
-
-        if (genreError) throw genreError;
-
-        // Step 5: Structure genres and categories
-        const genreMap = {};
-        genreData.forEach(({ titleID, genres }) => {
-            if (!genreMap[titleID]) {
-                genreMap[titleID] = { genres: [], category: genres.category };
-            }
-            genreMap[titleID].genres.push(genres.genreName);
-        });
-
-        // Step 6: Combine book data with genres, category, and rating
-        const booksWithDetails = bookMetadata.map(book => {
-            const titleID = book.book_titles.titleID;
-            const avgRating = ratingMap[titleID].total / ratingMap[titleID].count;
-            return {
-                ...book.book_titles,
-                weightedAvg: avgRating,
-                totalRatings: ratingMap[titleID].count,
-                genres: genreMap[titleID]?.genres || [],
-                category: genreMap[titleID]?.category || "Unknown",
-            };
-        });
-
-        let books = booksWithDetails.sort((a, b) => b.weightedAvg - a.weightedAvg)
-
-        // Step 7: Sort by highest weighted average rating
-        return { books };
-    } catch (error) {
-        console.error("Error fetching highly rated books:", error);
-        return [];
+    if (bookIDs.length === 0) {
+      console.log("No books with ratings found")
+      return { books: [] }
     }
-};
+
+    // Step 3: Fetch book details for unique books that have ratings
+    const { data: books, error: bookError } = await supabase
+      .from("book_titles")
+      .select("titleID, title, author, cover")
+      .in("titleID", bookIDs)
+
+    if (bookError) {
+      console.error("Error fetching book details:", bookError)
+      throw bookError
+    }
+
+    if (!books || books.length === 0) {
+      console.log("No book details found for the rated books")
+      return { books: [] }
+    }
+
+    // Step 4: Fetch genres and categories
+    const { data: genreData, error: genreError } = await supabase
+      .from("book_genre_link")
+      .select("titleID, genreID, genres(genreID, genreName, category)")
+      .in("titleID", bookIDs)
+
+    if (genreError) throw genreError
+
+    // Create a map of genres and categories
+    const genreMap = {}
+    if (genreData) {
+      genreData.forEach(({ titleID, genres }) => {
+        if (genres && titleID) {
+          if (!genreMap[titleID]) {
+            genreMap[titleID] = { genres: [], category: genres.category }
+          }
+          genreMap[titleID].genres.push(genres.genreName)
+        }
+      })
+    }
+
+    // Calculate weighted ranking score for each book
+    // This formula balances average rating with number of ratings
+    const calculateWeightedRankingScore = (avgRating, totalRatings) => {
+      // Constants for the ranking algorithm
+      const MIN_RATINGS_THRESHOLD = 5 // Minimum number of ratings to get full weight
+      const RATING_WEIGHT = 0.7 // Weight given to the average rating (0-1)
+      const COUNT_WEIGHT = 0.3 // Weight given to the number of ratings (0-1)
+
+      // Normalize the rating count (0-1 scale)
+      const normalizedCount = Math.min(totalRatings / MIN_RATINGS_THRESHOLD, 1)
+
+      // Calculate weighted score
+      // This combines both the average rating and how many people rated it
+      return avgRating * RATING_WEIGHT + avgRating * normalizedCount * COUNT_WEIGHT
+    }
+
+    // Combine all data into final book objects
+    const booksWithDetails = books.map((book) => {
+      const titleID = book.titleID
+      const avgRating = ratingMap[titleID].total / ratingMap[titleID].count
+      const totalRatings = ratingMap[titleID].count
+
+      // Calculate ranking score
+      const rankingScore = calculateWeightedRankingScore(avgRating, totalRatings)
+
+      return {
+        ...book,
+        weightedAvg: avgRating,
+        totalRatings: totalRatings,
+        rankingScore: rankingScore,
+        genres: genreMap[titleID]?.genres || [],
+        category: genreMap[titleID]?.category || "Unknown",
+      }
+    })
+
+    // Sort by the weighted ranking score instead of just the average rating
+    const sortedBooks = booksWithDetails.sort((a, b) => b.rankingScore - a.rankingScore)
+
+    console.log("Highly rated books:", sortedBooks)
+    return { books: sortedBooks }
+  } catch (error) {
+    console.error("Error fetching highly rated books:", error)
+    return { books: [] }
+  }
+}
 
 const HighlyRated = ({ onSeeMoreClick }) => {
-    return (
-        <BookCards 
-            title="Highly Rated" 
-            fetchBooks={fetchHighlyRatedBooks} 
-            onSeeMoreClick={() => onSeeMoreClick("Highly Rated", fetchHighlyRatedBooks)} 
-        />
-    );
-};
+  // ... rest of the component code remains the same ...
 
-export default HighlyRated;
+  return (
+    <BookCards
+      title="Highly Rated"
+      fetchBooks={fetchHighlyRatedBooks}
+      onSeeMoreClick={() => onSeeMoreClick("Highly Rated", fetchHighlyRatedBooks)}
+    />
+  )
+}
+
+export default HighlyRated
+

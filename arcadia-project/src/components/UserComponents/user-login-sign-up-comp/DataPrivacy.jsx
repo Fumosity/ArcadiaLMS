@@ -20,7 +20,7 @@ export default function DataPrivacy({ onBack, onContinue }) {
     <div className="uMain-cont flex h-[600px] bg-white">
       <div className="max-w-md mx-auto p-8  flex flex-col items-center text-center">
         <div className="mb-6">
-          <h3 className="text-5xl font-semibold">Before we end...</h3>
+          <h3 className="text-5xl font-semibold">Before we start...</h3>
         </div>
 
         <p className="text-black mb-6">

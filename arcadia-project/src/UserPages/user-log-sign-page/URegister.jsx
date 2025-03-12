@@ -6,7 +6,7 @@ import DataPrivacy from "../../components/UserComponents/user-login-sign-up-comp
 import Onboarding from "../../components/UserComponents/user-login-sign-up-comp/Onboarding";
 
 export default function URegister() {
-    const [step, setStep] = useState("register");
+    const [step, setStep] = useState("privacy");
     const [userData, setUserData] = useState(null); // Store user data
     const [selectedGenres, setSelectedGenres] = useState(null); // Store user data
 
@@ -17,7 +17,7 @@ export default function URegister() {
 
     const handleContinue = (data) => {
         setSelectedGenres(data); // Save user data
-        setStep("privacy");
+        setStep("finish");
     };
 
     return (
@@ -33,11 +33,13 @@ export default function URegister() {
 
             <main className="relative flex-1 flex justify-center items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
                 <div className="userContent-container flex justify-center items-center">
-                    {step === "register" && <RegisterForm onRegister={handleRegister} />}
+                    {step === "privacy" && <DataPrivacy  onContinue={() => setStep("register")} />}
+                                                        {/* onBack={() => setStep("interests")}     */}
+                    {step === "register" && <RegisterForm onBack={() => setStep("privacy")} onRegister={handleRegister} />}
                     {step === "interests" && (
                         <UserInterests userData={userData} onBack={() => setStep("register")} onContinue={handleContinue} />
                     )}
-                    {step === "privacy" && <DataPrivacy onBack={() => setStep("interests")} onContinue={() => setStep("finish")} />}
+                    {/* {step === "privacy" && <DataPrivacy onBack={() => setStep("interests")} onContinue={() => setStep("finish")} />} */}
                     {step === "finish" && (
                         <Onboarding userData={userData} selectedGenres={selectedGenres} />
                     )}
