@@ -8,9 +8,12 @@ import SimRsrch from "../../components/UserComponents/user-rsrch-catalog-comp/Si
 import ResearchRecommend from "../../components/UserComponents/user-rsrch-catalog-comp/ResearchRecommend";
 import NewAddResearch from "../../components/UserComponents/user-rsrch-catalog-comp/NewAddResearch";
 import { useUser } from "../../backend/UserContext";
+import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
+import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
+import Services from "../../components/UserComponents/user-main-comp/Services";
 
 const URsrchCatalog = () => {
-    const [searchQuery, setSearchQuery] = useState("");
+    const [query, setSearchQuery] = useState("");
     const { user, updateUser } = useUser();
     const queryParams = new URLSearchParams(location.search);
     const researchID = queryParams.get("researchID");
@@ -18,7 +21,7 @@ const URsrchCatalog = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    
+
     console.log(user)
 
     useEffect(() => {
@@ -51,17 +54,22 @@ const URsrchCatalog = () => {
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />
-            <USearchBarR placeholder="Search for research..." onSearch={setSearchQuery}/>
+            <USearchBarR placeholder="Search for research..." onSearch={setSearchQuery} />
             <Title>Research Catalog</Title>
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
-                    <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mr-5">
+                    {query.trim() && <div className="lg:w-1/4 md:w-1/3 w-full space-y-4 sticky top-5">
                         <URFilterSidebar />
-                    </div>
+                    </div>}
+                    {!query.trim() && <div className="lg:w-1/4 md:w-1/3 w-full space-y-4">
+                        <ArcOpHr />
+                        <UpEvents />
+                        <Services />
+                    </div>}
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
-                    {searchQuery && <UResResults query={searchQuery} />}
-                    <ResearchRecommend/>
-                    <NewAddResearch/>
+                        {query && <UResResults query={query} />}
+                        <ResearchRecommend />
+                        <NewAddResearch />
                     </div>
                 </div>
             </main>

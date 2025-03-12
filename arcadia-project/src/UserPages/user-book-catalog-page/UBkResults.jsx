@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import Trie from "../../backend/trie";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar, faStarHalfAlt, faStar as faRegularStar } from "@fortawesome/free-solid-svg-icons";
 
 const UBkResults = ({ query }) => {
     const [books, setBooks] = useState([]);
@@ -11,24 +13,43 @@ const UBkResults = ({ query }) => {
     const entriesPerPage = 4;
     const navigate = useNavigate();
 
-    // Helper function to render star ratings with average rating number
-    const renderStars = (averageRating) => {
-        const fullStars = Math.floor(averageRating); // Number of full stars
-        const halfStar = averageRating % 1 >= 0.5 ? 1 : 0; // One half-star if needed
-        const emptyStars = 5 - fullStars - halfStar; // Remaining empty stars
+
+    const renderStars = (rating) => {
+        const roundedRating = Math.round(rating * 10) / 10;
+        const fullStars = Math.floor(roundedRating);
+        const halfStar = (roundedRating * 2) % 2 !== 0;
+
+        let emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        emptyStars = Math.max(0, emptyStars);
 
         return (
-            <span className="flex items-center">
-                {[...Array(fullStars)].map((_, i) => (
-                    <span key={`full-${i}`} className="text-yellow-500 text-lg">★</span>
-                ))}
-                {halfStar === 1 && <span className="text-yellow-500 text-lg">☆</span>}
-                {[...Array(emptyStars)].map((_, i) => (
-                    <span key={`empty-${i}`} className="text-gray-300 text-lg">☆</span>
-                ))}
-                <span className="ml-2 text-gray-700 text-sm">
-                    {averageRating ? averageRating.toFixed(1) : "0.0"} / 5
+            <span className="flex gap-1 items-center space-x-2">
+                <span className="flex">
+                    {[...Array(fullStars)].map((_, i) => (
+                        <FontAwesomeIcon
+                            key={i}
+                            icon={faStar}
+                            className="text-arcadia-yellow cursor-pointer"
+                            onClick={() => handleStarClick(i + 1)}
+                        />
+                    ))}
+                    {halfStar && (
+                        <FontAwesomeIcon
+                            icon={faStarHalfAlt}
+                            className="text-arcadia-yellow cursor-pointer"
+                            onClick={() => handleStarClick(fullStars + 1)}
+                        />
+                    )}
+                    {[...Array(emptyStars)].map((_, i) => (
+                        <FontAwesomeIcon
+                            key={i}
+                            icon={faRegularStar}
+                            className="text-grey cursor-pointer"
+                            onClick={() => handleStarClick(fullStars + 1 + (halfStar ? 1 : i))}
+                        />
+                    ))}
                 </span>
+                <span className="text-md">{rating ? rating.toFixed(1) : "No rating"}</span>
             </span>
         );
     };
@@ -39,8 +60,9 @@ const UBkResults = ({ query }) => {
             try {
                 const { data: booksData, error: booksError } = await supabase
                     .from("book_titles")
-                    .select("*");
+                    .select("*, book_indiv(bookStatus)");
                 if (booksError) throw booksError;
+
                 const { data: ratingsData, error: ratingsError } = await supabase
                     .from("ratings")
                     .select("titleID, ratingValue");
@@ -57,6 +79,24 @@ const UBkResults = ({ query }) => {
                     return acc;
                 }, {});
 
+                // Fetch book genres
+                const { data: bookGenres, error: genreError } = await supabase
+                    .from("book_genre_link")
+                    .select("titleID, genres(genreID, genreName, category)");
+                if (genreError) throw genreError;
+
+                // Group genres by titleID
+                const bookGenresMap = bookGenres.reduce((acc, curr) => {
+                    if (!acc[curr.titleID]) {
+                        acc[curr.titleID] = {
+                            category: curr.genres?.category || "Uncategorized",
+                            genres: []
+                        };
+                    }
+                    acc[curr.titleID].genres.push(curr.genres?.genreName);
+                    return acc;
+                }, {});
+
                 const booksWithDetails = booksData.map((book) => {
                     const avgRating =
                         averageRatings[book.titleID]?.count > 0
@@ -68,11 +108,17 @@ const UBkResults = ({ query }) => {
                         ...book,
                         image_url: book.cover || "https://via.placeholder.com/150x300", // Default placeholder
                         averageRating: avgRating,
+                        totalRatings: averageRatings[book.titleID]?.count || 0,
+                        category: bookGenresMap[book.titleID]?.category || "Uncategorized",
+                        genres: bookGenresMap[book.titleID]?.genres || [],
+                        book_indiv: book.book_indiv || [],
+                        publishedYear: book.originalPubDate ? new Date(book.originalPubDate).getFullYear() : "Unknown Year"
                     };
                 });
 
                 setBooks(booksWithDetails);
 
+                console.log(booksWithDetails)
 
                 const newTrie = new Trie();
                 booksWithDetails.forEach((book) => {
@@ -137,7 +183,7 @@ const UBkResults = ({ query }) => {
             )}
 
             {displayedBooks.map((book, index) => (
-                <div key={index} className="genCard-cont flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg mb-6">
+                <div key={index} className="genCard-cont flex w-full gap-4 p-4 border border-grey bg-silver rounded-lg mb-4">
                     <div className="flex-shrink-0 w-[200px]">
                         <img
                             src={book.image_url}
@@ -147,30 +193,47 @@ const UBkResults = ({ query }) => {
                     </div>
 
                     <div className="flex-1">
-                        <h3 className="text-lg font-semibold">{book.title}</h3>
-                        <div className="text-sm text-gray-700 mt-3">
-                            <p><span>Author(s):</span> <b>{book.author && book.author.join(", ")}</b></p>
-                            <div className="flex space-x-6 mt-3">
-                                <p><span>Category:</span> <b>{book.category}</b></p>
-                                <p><span>Published:</span> <b>{new Date(book.originalPubDate).getFullYear()}</b></p>
-                            </div>
-                            <p className="mt-3 text-yellow-600 font-semibold flex items-center">
-                                <span>Average Rating:</span> {renderStars(book.averageRating)}
+                        <h3 className="text-2xl font-ZenSerif">{book.title}</h3>
+                        <div className="text-md text-gray-700 mt-1 space-y-1">
+                            <p><span className="font-semibold">Author:</span> {book.author.join(", ")}</p>
+                            <p><span className="font-semibold">Published:</span> {book.publishedYear}</p>
+                            <p><span className="font-semibold">Category:</span> {book.category} <span className="font-semibold">Genres:</span> {book.genres.join(", ")}</p>
+                            <p className="min-h-[6rem] leading-relaxed">
+                                <span className="font-semibold"></span> {book.synopsis || "No synopsis available."}
                             </p>
-                        </div>
 
-                        <p className="text-sm text-gray-600 mt-3">
-                            {book.synopsis || "No synopsis available"}
-                        </p>
-                        <div className="flex align-baseline items-center justify-end gap-2 mt-2">
-                            <span className="text-sm text-green-700 font-semibold ml-2 text-green">✓</span>
-                            <span className="text-sm text-green-700 font-semibold">Is Available</span>
-                            <button
-                                className="viewRsrch-btn"
-                                onClick={() => navigate(`/user/bookview?titleID=${book.titleID}`)} // Navigate with title_id
-                            >
-                                View Book
-                            </button>
+                            <div className="flex space-x-1 items-center text-yellow-600 w-1/2">
+                                {renderStars(book.averageRating)}
+                                <span className="text-md text-gray-500">
+                                    ({book.totalRatings >= 1000 ? "1000+" : book.totalRatings} Ratings)
+                                </span>
+                            </div>
+                            <div className="justify-start space-x-2 w-1/2">
+
+                                <button
+                                    className="w-1/3 bg-arcadia-red hover:bg-red hover:text-white text-white py-1 px-2 mt-4 rounded-xl text-md"
+                                    onClick={() => {
+                                        window.scrollTo({ top: 0, behavior: "smooth" })
+                                        navigate(`/user/bookview?titleID=${book.titleID}`)
+                                    }} // Navigate with title_id
+                                >
+                                    View Book
+                                </button>
+                                {book.book_indiv.length > 0 &&
+                                    book.book_indiv.some((indivBook) => indivBook.bookStatus === "Available") ? (
+                                    <>
+                                        <span className="text-green font-semibold">✓</span>
+                                        <span className="ml-2">Book is Available</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="text-red font-semibold">✗</span>
+                                        <span className="ml-2">Book is Unavailable</span>
+                                    </>
+                                )}
+
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -180,7 +243,9 @@ const UBkResults = ({ query }) => {
                 <div className="flex justify-center items-center mt-6 space-x-4">
                     <button
                         className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-red hover:font-semibold"}`}
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        onClick={() => {
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }}
                         disabled={currentPage === 1}
                     >
                         Previous Page
@@ -188,7 +253,9 @@ const UBkResults = ({ query }) => {
                     <span className="text-xs">Page {currentPage} of {totalPages}</span>
                     <button
                         className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-red"}`}
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        onClick={() => {
+                            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                        }}
                         disabled={currentPage === totalPages}
                     >
                         Next Page
