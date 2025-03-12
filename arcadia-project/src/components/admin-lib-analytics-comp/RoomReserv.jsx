@@ -1,172 +1,213 @@
-import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useState, useEffect, useMemo} from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { supabase } from "../../supabaseClient";
 
-const data = [
-    { name: 'Jun 2023', Quarterly: 30, Annual: 2 },
-    { name: 'Sep 2023', Quarterly: 32, Annual: 0 },
-    { name: 'Dec 2023', Quarterly: 34, Annual: 1 },
-    { name: 'Mar 2024', Quarterly: 36, Annual: 3 },
-    { name: 'Jun 2024', Quarterly: 32, Annual: 1 },
-];
+const RoomReserv = () => {
+    const [timeFrame, setTimeFrame] = useState("month");
+    const [reservations, setReservations] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-const reservations = [
-    { room: 'ARC-1', status: 'Reserved', date: 'August 23', time: '10:00AM - 12:00PM', borrower: 'Henry Avery', purpose: 'CS101 Group Study' },
-    { room: 'ARC-2', status: 'Reserved', date: 'August 23', time: '10:00AM - 12:00PM', borrower: 'Henry Avery', purpose: 'CS101 Group Study' },
-    { room: 'ARC-3', status: 'Cancelled', date: 'August 23', time: '10:00AM - 12:00PM', borrower: 'Henry Avery', purpose: 'CS101 Group Study' },
-    { room: 'ARC-4', status: 'Cancelled', date: 'August 23', time: '10:00AM - 12:00PM', borrower: 'Henry Avery', purpose: 'CS101 Group Study' },
-    { room: 'ARC-5', status: 'Finished', date: 'August 23', time: '10:00AM - 12:00PM', borrower: 'Henry Avery', purpose: 'CS101 Group Study' },
-    { room: 'ARC-6', status: 'Finished', date: 'August 23', time: '10:00AM - 12:00PM', borrower: 'Henry Avery', purpose: 'CS101 Group Study' },
-];
-
-export default function RoomReserv() {
-    const [activeTab, setActiveTab] = useState('Quarterly');
-    const [sortOrder, setSortOrder] = useState("Descending");
-    const [typeFilter, setTypeFilter] = useState("Type");
-    const [typeOrder, setTypeOrder] = useState("Borrow");
+    const [sortOrder, setSortOrder] = useState("Ascending");
+    const [roomFilter, setRoomFilter] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [entries, setEntries] = useState(5);
+    const [entriesPerPage, setEntriesPerPage] = useState(10);
 
-    const indexOfLastItem = currentPage * entries;
-    const indexOfFirstItem = indexOfLastItem - entries;
-    const currentItems = reservations.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(reservations.length / entries);
+        // Filter, Sort, and Search Logic
+        const filteredReservations = useMemo(() => {
+            let filtered = [...reservations];
+    
+            // Filtering by Room
+            if (roomFilter !== "All") {
+                filtered = filtered.filter(res => res.room === roomFilter);
+            }
+    
+            // Searching (Matches Room, Borrower, or Purpose)
+            if (searchTerm.trim() !== "") {
+                filtered = filtered.filter(res => 
+                    res.room.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    res.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    res.purpose.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+    
+            // Sorting by Date
+            filtered.sort((a, b) => {
+                return sortOrder === "Ascending"
+                    ? new Date(a.date) - new Date(b.date)
+                    : new Date(b.date) - new Date(a.date);
+            });
+    
+            return filtered;
+        }, [reservations, sortOrder, roomFilter, searchTerm]);
+    
+    useEffect(() => {
+        const fetchReservations = async () => {
+            try {
+                setLoading(true);
+                const { data, error } = await supabase
+                    .from("reservation")
+                    .select("reservationData, user_accounts(userFName, userLName)");
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+                if (error) {
+                    console.error("Error fetching reservations:", error.message);
+                } else {
+                    const formattedData = data.map((item) => ({
+                        date: item.reservationData.date,
+                        room: item.reservationData.room,
+                        purpose: item.reservationData.title,
+                        period: `${item.reservationData.startTime} - ${item.reservationData.endTime}`,
+                        name: item.user_accounts
+                            ? `${item.user_accounts.userFName} ${item.user_accounts.userLName}`
+                            : "N/A",
+                    }));
+
+                    setReservations(formattedData);
+                }
+                setLoading(false);
+            } catch (error) {
+                console.error("Error: ", error);
+                setLoading(false);
+            }
+        };
+
+        fetchReservations();
+    }, []);
+
+    // Process data for the chart
+    const chartData = reservations.reduce((acc, res) => {
+        const existingEntry = acc.find((entry) => entry.date === res.date);
+        if (existingEntry) {
+            existingEntry.count += 1;
+        } else {
+            acc.push({ date: res.date, count: 1 });
+        }
+        return acc;
+    }, []);
 
     return (
         <div className="bg-white p-4 rounded-lg border-grey border">
-            <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-semibold mb-2">Room Reservations</h3>
-                <button className="px-2.5 py-0.5 border border-grey rounded-full hover:bg-blue-600 transition-colors">
-                    Go to Reservations
-                </button>
+            <h3 className="text-2xl font-semibold mb-4">Room Reservation Data</h3>
+
+            {/* Time Frame Selector */}
+            <div className="mb-4">
+                <label htmlFor="time-frame" className="mr-2">Select Time Frame:</label>
+                <select
+                    id="time-frame"
+                    onChange={(e) => setTimeFrame(e.target.value)}
+                    value={timeFrame}
+                    className="border border-gray-300 rounded-md py-1 px-2"
+                >
+                    <option value="day">Day</option>
+                    <option value="week">Week</option>
+                    <option value="month">Month</option>
+                </select>
             </div>
 
-            <div className="mb-6">
-                <div className="flex space-x-4 mb-4">
-                    <button
-                        className={`px-4 py-2 rounded ${activeTab === 'Quarterly' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                        onClick={() => setActiveTab('Quarterly')}
-                    >
-                        Quarterly
-                    </button>
-                    <button
-                        className={`px-4 py-2 rounded ${activeTab === 'Annual' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-                        onClick={() => setActiveTab('Annual')}
-                    >
-                        Annual
-                    </button>
-                </div>
-
-                <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={data}>
+            {/* Bar Chart for Room Reservations */}
+            <div className="w-full mb-6">
+                <ResponsiveContainer width="100%" aspect={3}>
+                    <BarChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
+                        <XAxis dataKey="date" />
+                        <YAxis allowDecimals={false} />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey={activeTab} fill="#3b82f6" />
+                        <Bar dataKey="count" fill="#FFB200" name="Reservations" />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
 
-            <div className="flex flex-wrap items-center mb-6 space-x-4">
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Sort By:</span>
-                    <button
-                        onClick={() => setSortOrder(sortOrder === "Descending" ? "Ascending" : "Descending")}
-                        className="sort-by bg-gray-200 py-1 px-3 rounded-full text-xs"
-                        style={{ borderRadius: "40px" }}
-                    >
-                        {sortOrder}
-                    </button>
+            {/* Table of Reservations */}
+            <div>
+            {/* Controls for sort, filter, and search */}
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center space-x-2">
+                        <span className="font-medium text-sm">Sort:</span>
+                        <button
+                            onClick={() => setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")}
+                            className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+                        >
+                            {sortOrder}
+                        </button>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <span className="font-medium text-sm">Room:</span>
+                        <select
+                            className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+                            value={roomFilter}
+                            onChange={(e) => setRoomFilter(e.target.value)}
+                        >
+                            <option value="All">All</option>
+                            {[...new Set(reservations.map(res => res.room))].map((room, idx) => (
+                                <option key={idx} value={room}>{room}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <span className="font-medium text-sm">Entries:</span>
+                        <select
+                            className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
+                            value={entriesPerPage}
+                            onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+                        >
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
                 </div>
-
-                <div className="flex items-center space-x-2">
-                    <span className="font-medium text-sm">Filter By:</span>
-                    <span
-                        className="bg-gray-200 border border-gray-300 py-1 px-3 rounded-full text-xs"
-                        style={{ borderRadius: "40px" }}
-                    >
-                        {typeOrder}
-                    </span>
-                    <span
-                        className="bg-gray-200 border border-gray-300 py-1 px-3 rounded-full text-xs"
-                        style={{ borderRadius: "40px" }}
-                    >
-                        {typeFilter}
-                    </span>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="search" className="text-sm">Search:</label>
+                <div className="flex items-center space-x-2 min-w-[0]">
+                    <label htmlFor="search" className="font-medium text-sm">Search:</label>
                     <input
                         type="text"
                         id="search"
+                        className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+                        placeholder="Room, borrower, or purpose"
                         value={searchTerm}
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm"
-                        style={{ borderRadius: "40px" }}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Room, date, or borrower"
                     />
                 </div>
             </div>
-
+            
             <div className="overflow-x-auto">
-                <table className="w-full table-auto">
-                    <thead className="bg-gray-50 rounded-t-lg" style={{ borderRadius: "40px" }}>
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead>
                         <tr>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrower</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
+                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Room</th>
+                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Period</th>
+                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Borrower</th>
+                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Purpose</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {currentItems.map((item, index) => (
-                            <tr key={index}>
-                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.room}</td>
-                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                    ${item.status === 'Reserved' ? 'bg-green-100 text-green-800' :
-                                            item.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                                                'bg-gray-100 text-gray-800'}`}>
-                                        {item.status}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.date}</td>
-                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.time}</td>
-                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.borrower}</td>
-                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.purpose}</td>
+                        {loading ? (
+                            <tr>
+                                <td colSpan="5" className="px-4 py-2 text-center">Loading data...</td>
                             </tr>
-                        ))}
+                        ) : filteredReservations.length > 0 ? (
+                            filteredReservations.slice(0, entriesPerPage).map((res, index) => (
+                                <tr key={index} className="hover:bg-light-gray">
+                                    <td className="px-4 py-3 text-sm text-center">{res.room}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{res.date}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{res.period}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{res.name}</td>
+                                    <td className="px-4 py-3 text-sm text-center">{res.purpose}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" className="px-4 py-2 text-center text-zinc-600">No data available.</td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
-
-
-            <div className="flex justify-center items-center space-x-4">
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    style={{ borderRadius: "40px" }}
-                    onClick={() => paginate(Math.max(currentPage - 1, 1))}
-                    disabled={currentPage === 1}
-                >
-                    Previous Page
-                </button>
-                <span className="text-sm">Page {currentPage} of {totalPages}</span>
-                <button
-                    className={`bg-gray-200 py-1 px-3 rounded-full text-xs ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
-                    style={{ borderRadius: "40px" }}
-                    onClick={() => paginate(Math.min(currentPage + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                >
-                    Next Page
-                </button>
-            </div>
+        </div>
         </div>
     );
-}
+};
+
+export default RoomReserv;

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import MainHeader from "../components/main-comp/MainHeader";
 import Title from "../components/main-comp/Title";
 import ResearchModify from "../components/admin-research-modify/ResearchModify";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import ARAddPreview from "../components/admin-research-add-comp/ARAddPreview";
+import {supabase} from "../supabaseClient"
 
 const ARModify = () => {
-      const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); // Initialize useNavigate
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
-  
+
   // Retrieve research details from query params
   const formData = {
     title: queryParams.get("title") || '',
@@ -21,13 +21,36 @@ const ARModify = () => {
     keywords: queryParams.get("keywords") || '',
     pubDate: queryParams.get("pubDate") || '',
     location: queryParams.get("location") || '',
-    thesisID: queryParams.get("thesisID") || '',
+    researchID: queryParams.get("researchID") || '',
     arcID: queryParams.get("arcID") || '',
     cover: queryParams.get("cover") || '',
   };
 
   const [formDataState, setFormData] = useState(formData);
 
+  const handleResearchDelete = async () => {
+    const researchID = formDataState.researchID;
+
+    if (!researchID) {
+      alert("No research title selected for deletion.");
+      return;
+    }
+
+    const confirmDelete = window.confirm("Are you sure you want to delete this research?");
+    if (!confirmDelete) return;
+
+    const { error } = await supabase
+      .from("research")
+      .delete()
+      .eq("researchID", researchID);
+
+    if (error) {
+      alert("Failed to delete research: " + error.message);
+    } else {
+      alert("Research deleted successfully.");
+      navigate("/admin/researchmanagement");
+    }
+  };
   return (
     <div className="min-h-screen bg-white">
       {/* Main header */}
@@ -42,14 +65,20 @@ const ARModify = () => {
             >
               Return to Book Inventory
             </button>
+            <button
+              className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg bg-arcadia-red hover:red text-white"
+              onClick={handleResearchDelete}
+            >
+              Delete Research
+            </button>
           </div>
-            {/* Pass formDataState and setFormData to ResearchModify */}
-            <ResearchModify formData={formDataState} setFormData={setFormData} />
-          </div>
-          <div className="flex flex-col items-start flex-shrink-0 w-1/4">
-          <ARAddPreview formData={formDataState} />
-          </div>
+          {/* Pass formDataState and setFormData to ResearchModify */}
+          <ResearchModify formData={formDataState} setFormData={setFormData} />
         </div>
+        <div className="flex flex-col items-start flex-shrink-0 w-1/4">
+          <ARAddPreview formData={formDataState} />
+        </div>
+      </div>
     </div>
   );
 };

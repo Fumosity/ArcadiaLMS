@@ -38,7 +38,6 @@ import UFooter from './components/UserComponents/user-main-comp/UFooter';
 import UHeader from './components/UserComponents/user-main-comp/UHeader';
 import UHomePage from './UserPages/user-home-page/UHomePage';
 import UCopyright from './components/UserComponents/user-main-comp/UCopyright';
-import UBkSearchCatalog from './UserPages/user-book-search-page/UBkSearchCatalog';
 import URsrchCatalog from './UserPages/user-rsrch-catalog-page/URsrchCatalog';
 
 import UDiscussionReserv from './UserPages/user-room-reserv-page/UDiscussionReserv';
@@ -51,13 +50,9 @@ import ASupportViewPage from './admin-report/ASupportViewPage';
 import ULogin from './UserPages/user-log-sign-page/ULogin';
 import UBookView from './UserPages/user-book-view-page/UBookView.jsx';
 
-// Testing modals
-import ModalTest from './z_modals/ModalTest';
-
 import ErrorPage from './UserPages/ErrorPage';
 import URegister from './UserPages/user-log-sign-page/URegister';
 import AUAccView from './admin-user-account-view/AUAccView';
-import UserInformations from './components/admin-user-account-view-comp/UserInformations';
 import AAccountView from './admin-account-view/AAccountView';
 import UAccountProfile from './UserPages/user-account-page/UAccountProfile';
 import UBkCatalog from './UserPages/user-book-catalog-page/UBkCatalog';
@@ -95,7 +90,6 @@ function App() {
               <Route path="/user/support" element={<USupport />} />  
               <Route path="/user/support/supportticket" element={<USupportTix />} />
               <Route path="/user/support/reportticket" element={<UReports />} />
-              {/* <Route path="/user/accountview" element={<ProtectedRoute><UAccountProfile /></ProtectedRoute>} /> */}
               <Route path="/user/accountview" element={<UAccountProfile />} />
               <Route path="/user/faqs" element={<UFAQs />} />
               <Route path="/user/mostpopularbooks" element={<UMostPop />} />

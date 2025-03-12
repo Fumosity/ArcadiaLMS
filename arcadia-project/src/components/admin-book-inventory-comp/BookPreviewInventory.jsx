@@ -1,12 +1,10 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import "react-loading-skeleton/dist/skeleton.css"
 import { supabase } from "../../supabaseClient"
 import WrngDeleteTitle from "../../z_modals/warning-modals/WrmgDeleteTitle"
 import ViewSynopsis from "../../z_modals/ViewSynopsis"
-import { toast } from "react-toastify"
+
 import "react-toastify/ReactToastify.css"
 
 const BookPreviewInventory = ({ book, onBookUpdate }) => {
@@ -35,10 +33,6 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
     )
   }
 
-  if (loading) {
-    // ... (loading skeleton code remains the same)
-  }
-
   const bookDetails = {
     title: book.title,
     author: Array.isArray(book.author) ? book.author.join(', ') : (book.author ?? '').split(';').join(',') || '',
@@ -54,6 +48,7 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
     cover: book.cover,
     price: book.price,
     arcID: book.arcID,
+    titleID: book.titleID,
   };
 
   const handleModifyBook = () => {
@@ -66,33 +61,7 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
     console.log("Title in BookPreviewInventory:", bookDetails.title)
     navigate(`/admin/copymanagement?titleID=${bookDetails.titleID}`)
   }
-
-  const handleDeleteBook = () => {
-    setIsDeleteModalOpen(true)
-  }
-
-  const confirmDeleteBook = async () => {
-    try {
-      const { error } = await supabase.from("book_titles").delete().eq("titleID", bookDetails.titleID)
-
-      if (error) {
-        console.error("Error deleting book:", error.message)
-        toast.error("Failed to delete book.")
-        return
-      }
-
-      toast.success("Book deleted successfully!")
-      setIsDeleteModalOpen(false)
-
-      setTimeout(() => {
-        window.location.reload()
-      }, 1500)
-    } catch (err) {
-      console.error("Unexpected error:", err)
-      toast.error("An error occurred while deleting the book.")
-    }
-  }
-
+  
   return (
     <div className="">
       <div className="flex justify-center gap-2">
@@ -107,12 +76,6 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
           onClick={handleManageCopies}
         >
           Manage Copies
-        </button>
-        <button
-          className="add-book text-sm w-full mb-2 px-2 py-2 rounded-lg border-grey hover:bg-arcadia-red hover:text-white"
-          onClick={handleDeleteBook}
-        >
-          Delete Book
         </button>
       </div>
 
@@ -164,12 +127,6 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
           </tbody>
         </table>
       </div>
-      <WrngDeleteTitle
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={confirmDeleteBook}
-        itemName={bookDetails.title}
-      />
       <ViewSynopsis isOpen={isViewOpen} onClose={() => setViewOpen(false)} synopsisContent={synopsisContent} />
     </div>
   )

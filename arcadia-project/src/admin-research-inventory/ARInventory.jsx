@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MainHeader from "../components/main-comp/MainHeader";
-import PopularAmong from "../components/admin-book-viewer-comp/PopularAmong";
-import SimilarTo from "../components/admin-book-viewer-comp/SimilarTo";
 import Title from "../components/main-comp/Title";
 import CurrentResearchInventory from "../components/admin-research-inventory/CurrentResearchInventory";
 import ResearchPreviewInv from "../components/admin-research-inventory/ResearchPreviewInv";

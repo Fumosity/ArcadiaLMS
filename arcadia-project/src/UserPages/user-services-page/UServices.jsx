@@ -27,14 +27,11 @@ const UServices = () => {
                         <UpEvents />
                         <Services />
                     </div>
-
                     {/* Main Content */}
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
                         {/* Hero Section */}
                         <UHero />
                         <LibServ />
-
-
                     </div>
                 </div>
             </main>

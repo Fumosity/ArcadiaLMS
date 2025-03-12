@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
 import BookCopiesIndiv from "./BookCopiesIndiv";
+import { toast } from "react-toastify"
 
 const BookModify = ({ formData, setFormData, onSave }) => {
   const fileInputRef = useRef(null);
@@ -42,6 +43,10 @@ const BookModify = ({ formData, setFormData, onSave }) => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const handleDeleteBook = () => {
+    setIsDeleteModalOpen(true)
+  }
 
   const uploadCover = async (e) => {
     let coverFile = e.target.files[0];

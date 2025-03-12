@@ -64,6 +64,7 @@ const UpdateProfilePic = ({ isOpen, onClose }) => {
         if (updateError) throw updateError;
 
         console.log('Update successful:', data);
+        window.location.reload("/accountview");
       } catch (updateError) {
         console.error('Error updating user_accounts:', updateError);
         setErrorMessage(`Error updating profile: ${updateError.message}`);
