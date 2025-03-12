@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from "../../supabaseClient.js";
+import WrmgDeleteBookCopy from "../../z_modals/warning-modals/WrmgDeleteBookCopy.jsx";
 
 export default function ABCopiesMgmt({ formData, setFormData, originalFormData, setOriginalFormData, onRefresh, titleID, isAddMode }) {
     const [validationErrors, setValidationErrors] = useState({});
     const [statusColor, setStatusColor] = useState('');
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
-        if (formData && formData.bookStatus) {
+        if (formData?.bookStatus) {
             setStatusColor(statusColorMap[formData.bookStatus] || '');
+        } else {
+            setStatusColor('');
         }
-    }, [formData.bookStatus]);
+    }, [formData?.bookStatus]);
 
     useEffect(() => {
         if (isAddMode) {
@@ -43,6 +47,30 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
         }
     };
 
+    const handleDeleteCopy = async () => {
+        if (!formData || !formData.bookID) {
+            console.error("No bookID found. Cannot delete.");
+            return;
+        }
+        try {
+            const { error } = await supabase
+                .from('book_indiv')
+                .delete()
+                .eq('bookID', formData.bookID);
+    
+            if (error) {
+                console.error("Error deleting book copy:", error);
+            } else {
+                console.log("Book copy deleted successfully");
+                onRefresh();
+                setFormData({}); // Instead of null, reset to an empty object
+                setIsDeleteModalOpen(false);
+            }
+        } catch (error) {
+            console.error("An unexpected error occurred:", error);
+        }
+    };
+    
     const handleSubmit = async () => {
         const { bookStatus, bookBarcode, bookAcqDate } = formData;
         console.log("Are we in Add Mode?", isAddMode)
@@ -201,8 +229,8 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
             <div className="flex justify-end w-full gap-2">
                 {!isAddMode && (
                     <button
-                        className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:text-white hover:bg-arcadia-red transition"
-                        onClick={() => console.log("foo")}
+                        className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+                        onClick={() => setIsDeleteModalOpen(true)}
                     >
                         Delete Copy
                     </button>
@@ -221,6 +249,12 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
 
                 </button>
             </div>
+            <WrmgDeleteBookCopy
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteCopy}
+                itemName={formData.bookBarcode || "this book copy"}
+            />
         </div>
     )
 }

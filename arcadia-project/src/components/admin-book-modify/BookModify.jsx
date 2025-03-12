@@ -44,10 +44,6 @@ const BookModify = ({ formData, setFormData, onSave }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleDeleteBook = () => {
-    setIsDeleteModalOpen(true)
-  }
-
   const uploadCover = async (e) => {
     let coverFile = e.target.files[0];
     const filePath = `${uuidv4()}_${coverFile.name}`;

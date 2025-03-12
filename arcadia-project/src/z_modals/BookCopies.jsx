@@ -22,7 +22,7 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
 
         const { data: copies, error: copiesError } = await supabase
           .from("book_indiv")
-          .select("bookBarcode, bookARCID, bookStatus")
+          .select("bookBarcode, bookStatus")
           .eq("titleID", titleID);
 
         if (copiesError) throw copiesError;
