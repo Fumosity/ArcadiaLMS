@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "../../supabaseClient.js"; // Adjust the import path as necessary.
 import { useNavigate } from "react-router-dom"; // Ensure you're using the useNavigate hook
 
@@ -11,6 +11,21 @@ const ListOfAdminAcc = () => {
     const [userData, setUserData] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const adminAccountsRef = useRef(null);
+
+
+    useEffect(() => {
+        const scrollToUserAccounts = () => {
+            if (location.hash === "#admin-accounts-list" && adminAccountsRef.current) {
+                adminAccountsRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+        }
+
+        // Scroll after a short delay to ensure the component has rendered
+        const timeoutId = setTimeout(scrollToUserAccounts, 100)
+
+        return () => clearTimeout(timeoutId)
+    }, [location])
 
     useEffect(() => {
         const fetchUserAccounts = async () => {
@@ -92,7 +107,7 @@ const ListOfAdminAcc = () => {
     };
 
     return (
-        <div className="">
+        <div ref={adminAccountsRef} id="admin-accounts-list" className="scroll-mt-16">
             <div className="bg-white border border-grey p-4 rounded-lg">
                 <h2 className="text-2xl font-semibold mb-4">List of Admin Accounts</h2>
 

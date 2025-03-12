@@ -115,6 +115,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
     } catch (err) {
       console.error("Error updating research:", err);
     }
+    alert("Changes saved successfully!");
   };
 
   const updateDepartmentOptions = (college) => {
