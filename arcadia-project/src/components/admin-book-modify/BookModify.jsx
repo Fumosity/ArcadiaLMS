@@ -445,7 +445,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
                 />
               </div>
 
-              <div className="justify-between items-center">
+              <div className="justify-between items-center hidden">
                 <label className="w-1/4">Title ID*:</label>
                 <input type="text" name="titleID" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"

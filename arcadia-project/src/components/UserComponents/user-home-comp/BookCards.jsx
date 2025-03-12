@@ -74,7 +74,7 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
           {[...Array(fullStars)].map((_, i) => (
             <FontAwesomeIcon key={i} icon={faStar} className="text-arcadia-yellow" />
           ))}
-          {halfStar && <FontAwesomeIcon icon={faStarHalfAlt} className="text-grey" />}
+          {halfStar && <FontAwesomeIcon icon={faStarHalfAlt} className="text-arcadia-yellow" />}
           {[...Array(emptyStars)].map((_, i) => (
             <FontAwesomeIcon key={i} icon={faRegularStar} className="text-grey" />
           ))}

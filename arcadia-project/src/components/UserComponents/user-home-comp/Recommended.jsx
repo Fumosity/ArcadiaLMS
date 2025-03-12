@@ -15,6 +15,8 @@ const fetchRecommendedBooks = async (userID, titleID) => {
 
         if (recommendations.length === 0) return [];
 
+        console.log(recommendations)
+
         // Fetch genres and categories from book_genre_link and genre tables
         const titleIDs = recommendations.map(book => book.titleID);
         const { data: genreData, error: genreError } = await supabase
@@ -33,12 +35,41 @@ const fetchRecommendedBooks = async (userID, titleID) => {
             genreMap[titleID].genres.push(genres.genreName);
         });
 
+        const { data: ratings, error: ratingError } = await supabase
+            .from("ratings")
+            .select("ratingValue, titleID")
+            .in("titleID", titleIDs);
+
+        if (ratingError) throw ratingError;
+
+        const ratingMap = ratings.reduce((acc, { titleID, ratingValue }) => {
+            if (!acc[titleID]) {
+                acc[titleID] = { total: 0, count: 0 };
+            }
+            acc[titleID].total += ratingValue;
+            acc[titleID].count += 1;
+            return acc;
+        }, {});
+
         // Merge recommendations with genre and category data
-        return recommendations.map(book => ({
-            ...book,
-            genres: genreMap[book.titleID]?.genres || [],
-            category: genreMap[book.titleID]?.category || "Unknown",
-        }));
+        const books = Object.values(recommendations).map(book => {
+            const titleID = book.titleID;
+            const avgRating =
+                ratingMap[titleID]?.count > 0
+                    ? ratingMap[titleID].total / ratingMap[titleID].count
+                    : 0;
+
+            return {
+                ...book,
+                weightedAvg: avgRating,
+                totalRatings: ratingMap[titleID]?.count || 0,
+                category: genreMap[book.titleID]?.category || "Unknown",
+            }
+        });
+
+        console.log({books})
+
+        return { books }
     } catch (error) {
         console.error("Error fetching recommended books:", error);
         return [];
@@ -57,11 +88,11 @@ const Recommended = ({ titleID, onSeeMoreClick }) => {
         return;
     }
 
-    return(
-        <BookCards 
-            title="Recommended for You" 
-            fetchBooks={() => fetchRecommendedBooks(user.userID, titleID)} 
-            onSeeMoreClick={() => onSeeMoreClick("Recommended for You", () => fetchRecommendedBooks(user.userID, titleID))} 
+    return (
+        <BookCards
+            title="Recommended for You"
+            fetchBooks={() => fetchRecommendedBooks(user.userID, titleID)}
+            onSeeMoreClick={() => onSeeMoreClick("Recommended for You", () => fetchRecommendedBooks(user.userID, titleID))}
         />
     )
 };

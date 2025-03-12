@@ -101,7 +101,7 @@ def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_
         book_indices = [i[0] for i in combined_scores]
 
         return books_df[
-            ["titleID", "title", "genreName", "category", "keywords", "average_rating", "cover"]
+            ["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]
         ].iloc[book_indices]
 
     else:  # Collaborative filtering (user-based)
@@ -130,5 +130,5 @@ def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_
         filtered_recommendations = [titleID for titleID in recommended_books if titleID in valid_titleIDs]
 
         return books_df[
-            ["titleID", "title", "genreName", "category", "keywords", "average_rating", "cover"]
+            ["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]
         ].reindex(filtered_recommendations).dropna().head(5)

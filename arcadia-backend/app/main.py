@@ -490,7 +490,6 @@ async def recommend(request: RecommendationRequest):
     if isinstance(recommendations, pd.DataFrame):
         recommendations = recommendations.to_dict(orient='records')
 
-    print(recommendations)  
     for rec in recommendations:
         # Handle NaN values in 'average_rating'
         if isinstance(rec['average_rating'], float) and math.isnan(rec['average_rating']):
@@ -499,7 +498,7 @@ async def recommend(request: RecommendationRequest):
         rec['titleID'] = int(rec['titleID'])
         rec['rating'] = int(rec['average_rating']) 
 
-
+    print("Recommendations Found:", recommendations)
     return {"recommendations": recommendations}
 
 class RsrchRecommendationRequest(BaseModel):

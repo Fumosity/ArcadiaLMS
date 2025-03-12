@@ -16,7 +16,7 @@ const UBkResults = ({ query }) => {
         const fullStars = Math.floor(averageRating); // Number of full stars
         const halfStar = averageRating % 1 >= 0.5 ? 1 : 0; // One half-star if needed
         const emptyStars = 5 - fullStars - halfStar; // Remaining empty stars
-    
+
         return (
             <span className="flex items-center">
                 {[...Array(fullStars)].map((_, i) => (
@@ -32,7 +32,7 @@ const UBkResults = ({ query }) => {
             </span>
         );
     };
-    
+
 
     useEffect(() => {
         const fetchBooksAndRatings = async () => {
@@ -61,8 +61,8 @@ const UBkResults = ({ query }) => {
                     const avgRating =
                         averageRatings[book.titleID]?.count > 0
                             ? averageRatings[book.titleID].sum /
-                              averageRatings[book.titleID].count
-                            : 0; 
+                            averageRatings[book.titleID].count
+                            : 0;
 
                     return {
                         ...book,
@@ -73,7 +73,7 @@ const UBkResults = ({ query }) => {
 
                 setBooks(booksWithDetails);
 
-             
+
                 const newTrie = new Trie();
                 booksWithDetails.forEach((book) => {
                     newTrie.insert(book.title.toLowerCase());
@@ -131,7 +131,9 @@ const UBkResults = ({ query }) => {
             )}
 
             {query && filteredBooks.length === 0 && (
-                <p className="text-lg text-gray-500 mb-4">No results for "{query}"</p>
+                <h2 className="text-xl font-semibold mb-4">
+                    No results for "{query}"
+                </h2>
             )}
 
             {displayedBooks.map((book, index) => (

@@ -55,8 +55,6 @@ const fetchBooksByUserInterest = async (userID) => {
                 };
             });
 
-
-
         return { genreName: randomGenre.genres.genreName, books: { books } };
     } catch (error) {
         console.error("Error fetching books by user interest:", error);

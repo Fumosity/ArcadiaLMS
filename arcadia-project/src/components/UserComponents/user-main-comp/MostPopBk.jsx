@@ -117,7 +117,7 @@ const MostPopBk = ({ onSeeMoreClick }) => {
     }, [user?.userID]);
 
     const filledBooks = books.length < 5 ? [...books, ...Array(5 - books.length).fill(null)] : books;
-    console.log(filledBooks)
+    //console.log(filledBooks)
     return (
         <div className="uSidebar-filter">
             <div className="flex justify-between items-center mb-2.5">
@@ -143,7 +143,7 @@ const MostPopBk = ({ onSeeMoreClick }) => {
                                 >
                                     {book.title}
                                 </a>
-                                <span className="w-12 p-1 flex justify-center">{book.weightedAvg.toFixed(2)}</span>
+                                <span className="w-12 p-1 flex justify-center">{book.weightedAvg.toFixed(1)}</span>
                             </>
                         ) : (
                             <>
