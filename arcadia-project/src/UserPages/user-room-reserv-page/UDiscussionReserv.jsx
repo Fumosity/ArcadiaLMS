@@ -8,6 +8,18 @@ import CurrentReservations from "../../components/UserComponents/user-room-reser
 import ReservHero from "../../components/UserComponents/user-room-reser-comp/ReservHero";
 
 const UDiscussionReserv = () => {
+    React.useEffect(() => {
+            if (window.location.hash) {
+                const id = window.location.hash.substring(1)
+                const element = document.getElementById(id)
+                if (element) {
+                    setTimeout(() => {
+                        element.scrollIntoView({ behavior: "smooth" })
+                    }, 300)
+                }
+            }
+        }, [])
+
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />
@@ -23,8 +35,12 @@ const UDiscussionReserv = () => {
                     </div>
 
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
-                        <ReservHero />
-                        <CurrentReservations />
+                        <div id="reserv-a-room">
+                            <ReservHero />
+                        </div>
+                        <div id="room-reservs">
+                            <CurrentReservations />
+                        </div>
                     </div>
                 </div>
             </main>

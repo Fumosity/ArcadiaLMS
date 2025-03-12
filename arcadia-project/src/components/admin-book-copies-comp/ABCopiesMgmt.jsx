@@ -229,7 +229,7 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
             <div className="flex justify-end w-full gap-2">
                 {!isAddMode && (
                     <button
-                        className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+                        className="add-book w-full mb-2 px-4 py-2 rounded-lg bg-arcadia-red text-white hover:bg-red transition"
                         onClick={() => setIsDeleteModalOpen(true)}
                     >
                         Delete Copy

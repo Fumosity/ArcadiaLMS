@@ -100,8 +100,42 @@ const UFooter = () => {
               </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
-              <li>Reservation History</li>
-              <li>Room Status</li>
+              <li>
+              <Link
+                                to="/user/reservations#reserv-a-room"
+                                className="hover:underline"
+                                onClick={() => {
+                                    // Navigate to the page first
+                                    setTimeout(() => {
+                                        // After navigation, find and scroll to the element
+                                        const element = document.getElementById("reserv-a-room")
+                                        if (element) {
+                                            element.scrollIntoView({ behavior: "smooth" })
+                                        }
+                                    }, 100)
+                                }}
+                            >
+                Reserve A Room
+                </Link>
+                </li>
+              <li>
+              <Link
+                                to="/user/reservations#room-reservs"
+                                className="hover:underline"
+                                onClick={() => {
+                                    // Navigate to the page first
+                                    setTimeout(() => {
+                                        // After navigation, find and scroll to the element
+                                        const element = document.getElementById("room-reservs")
+                                        if (element) {
+                                            element.scrollIntoView({ behavior: "smooth" })
+                                        }
+                                    }, 100)
+                                }}
+                            >
+                Reservation Schedule
+                </Link>
+                </li>
             </ul>
           </div>
           <div>
