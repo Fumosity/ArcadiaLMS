@@ -70,15 +70,18 @@ const Header = () => {
                         Manage Account
                       </Link>
                     </li>
-                    
+
                     {/* Admin option to go to User Side */}
                     <li>
-                      <Link
-                        to="/"
+                      <button
+                        onClick={() => {
+                          localStorage.setItem("mode", "user");
+                          navigate("/");
+                        }}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       >
-                        Go to User side
-                      </Link>
+                        Go to User Side
+                      </button>
                     </li>
                     {/* End */}
 

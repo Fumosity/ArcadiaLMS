@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 const UFooter = () => {
   const navigate = useNavigate()
 
+  
   const handleHighlyRatedClick = () => {
     // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
     navigate("/?view=highlyRated")

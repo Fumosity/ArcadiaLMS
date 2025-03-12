@@ -1,5 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { createContext, useState, useContext, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const UserContext = createContext();
 
@@ -7,6 +7,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -17,15 +18,19 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      navigateBasedOnRole(user.userAccountType);
+    const mode = localStorage.getItem("mode");
+    if (user && !loading && mode !== "user") {
+      if (!isValidRoute(location.pathname, user.userAccountType)) {
+        navigateBasedOnRole(user.userAccountType);
+      }
     }
-  }, [user]);
+  }, [user, loading, location.pathname]);
 
   const updateUser = (newUser) => {
     if (newUser) {
       localStorage.setItem("user", JSON.stringify(newUser));
       setUser(newUser);
+      navigateBasedOnRole(newUser.userAccountType); // Navigate immediately
     } else {
       localStorage.removeItem("user");
       setUser(null);
@@ -47,22 +52,29 @@ export const UserProvider = ({ children }) => {
       navigate("/user/login");
       return;
     }
-    switch (userAccountType) {
-      case "Admin":
-      case "Superadmin":
-      case "Intern":
-        navigate("/admin");
-        break;
-      case "Student":
-      case "Teacher":
-        navigate("/");
-        break;
-      case "Guest":
-        navigate("/");
-        break;
-      default:
-        navigate("/user/login");
+
+    const userRoutes = ["/", "/bookmanagement", "/catalog", "/research"];
+
+    if (["Admin", "Superadmin", "Intern"].includes(userAccountType)) {
+      navigate("/admin");
+    } else if (["Student", "Teacher", "Guest"].includes(userAccountType)) {
+      navigate(userRoutes.includes(location.pathname) ? location.pathname : "/");
+    } else {
+      navigate("/user/login");
     }
+  };
+
+  const isValidRoute = (path, userType) => {
+    const adminRoutes = ["/admin", "/admin/bookmanagement", "/admin/analytics"];
+    const userRoutes = ["/", "/bookmanagement", "/catalog", "/research"];
+
+    if (["Admin", "Superadmin", "Intern"].includes(userType)) {
+      return adminRoutes.some((route) => path.startsWith(route));
+    }
+    if (["Student", "Teacher", "Guest"].includes(userType)) {
+      return userRoutes.some((route) => path.startsWith(route));
+    }
+    return false;
   };
 
   if (loading) {

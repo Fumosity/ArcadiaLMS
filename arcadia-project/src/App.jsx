@@ -83,7 +83,6 @@ function App() {
               <Route path="/" element={<UHomePage />} />
               <Route path="/user/register" element={<UsrRegistration />} />
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
-              <Route path="/user/bookcatalog" element={<UBkCatalog />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
               <Route path="/user/reservations" element={<ProtectedRoute><UDiscussionReserv /></ProtectedRoute>} />
               <Route path="/user/services" element={<ProtectedRoute><UServices /></ProtectedRoute>} />
