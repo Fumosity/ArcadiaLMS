@@ -51,12 +51,12 @@ const GenrePage = ({ selectedGenre, onBackClick }) => {
       // 🟢 Fetch borrow count data
       const { data: transactions, error: transactionError } = await supabase
         .from("book_transactions")
-        .select("bookID");
+        .select("bookBarcode");
   
       if (transactionError) throw transactionError;
   
       const borrowCountMap = transactions.reduce((acc, transaction) => {
-        acc[transaction.bookID] = (acc[transaction.bookID] || 0) + 1;
+        acc[transaction.bookBarcode] = (acc[transaction.bookBarcode] || 0) + 1;
         return acc;
       }, {});
   
@@ -89,6 +89,7 @@ const GenrePage = ({ selectedGenre, onBackClick }) => {
           category: genreMap[titleID]?.categories.join(", ") || "Unknown",
           borrowCount,
           weightedAvg: avgRating,
+          titleID: book.titleID
         };
       });
   
