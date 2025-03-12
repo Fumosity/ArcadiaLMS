@@ -43,7 +43,7 @@ const UFooter = () => {
       <div className="container mx-auto max-w-6xl">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-items-center text-center">
           <div>
-            <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <h4 className="text-lg font-semibold text-left mb-4 text-white">
             <Link 
               to="/user/bookmanagement" 
               className="hover:underline" 
@@ -86,7 +86,7 @@ const UFooter = () => {
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <h4 className="text-lg font-semibold text-left mb-4 text-white">
               <Link 
               to="/user/researchmanagement" 
               className="hover:underline" 
@@ -104,7 +104,7 @@ const UFooter = () => {
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <h4 className="text-lg font-semibold text-left mb-4 text-white">
               <Link 
               to="/user/reservations" 
               className="hover:underline"
@@ -153,7 +153,7 @@ const UFooter = () => {
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <h4 className="text-lg font-semibold text-left mb-4 text-white">
             <Link 
               to="/user/services" 
               className="hover:underline" 
@@ -176,7 +176,7 @@ const UFooter = () => {
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <h4 className="text-lg font-semibold text-left mb-4 text-white">
             <Link 
               to="/user/support" 
               className="hover:underline" 
@@ -216,7 +216,7 @@ const UFooter = () => {
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <h4 className="text-lg font-semibold text-left mb-4 text-white">
             <Link 
               to="/user/accountview" 
               className="hover:underline" 

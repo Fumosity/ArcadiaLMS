@@ -1,16 +1,22 @@
 import { Link } from "react-router-dom"
 
 const Footer = () => (
-    <footer className="bg-arcadia-black w-full px-4 py-10">
-        <div className="container mx-auto max-w-6xl">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-4 justify-items-center text-center">
+    <footer className="bg-arcadia-black w-full px-4 py-10 justify-center">
+        <div className="mx-auto w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-9 gap-4 justify-items-center text-center">
                 <div>
-                    <h4 className="text-sm text-left font-semibold mb-4 text-white">
+                    <h4 className="text-lg text-left font-semibold mb-4 text-white">
+                        <Link
+                            to="/admin/analytics"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
                             Library Analytics
+                        </Link>
                     </h4>
                     <ul className="text-sm text-grey text-left space-y-2">
                         <li>
-                        <Link
+                            <Link
                                 to="/admin/analytics#book-circulation-demographics"
                                 className="hover:underline"
                                 onClick={() => {
@@ -24,11 +30,11 @@ const Footer = () => (
                                     }, 100)
                                 }}
                             >
-                            Book Circulation
-                                </Link>
+                                Book Circulation
+                            </Link>
                         </li>
                         <li>
-                        <Link
+                            <Link
                                 to="/admin/useraccounts#history"
                                 className="hover:underline"
                                 onClick={() => {
@@ -42,11 +48,11 @@ const Footer = () => (
                                     }, 100)
                                 }}
                             >
-                            History Demographics
-                                </Link>
-                            </li>
+                                History Demographics
+                            </Link>
+                        </li>
                         <li>
-                        <Link
+                            <Link
                                 to="/admin/useraccounts#room-reserv-demographics"
                                 className="hover:underline"
                                 onClick={() => {
@@ -60,14 +66,22 @@ const Footer = () => (
                                     }, 100)
                                 }}
                             >
-                            Room Reservation Demographics
+                                Room Reservation Demographics
                             </Link>
-                            </li>
+                        </li>
                         <li>Highest Rated Theses</li>
                     </ul>
                 </div>
                 <div>
-                    <h4 className="text-sm text-left font-semibold mb-4 text-white">Circulation</h4>
+                    <h4 className="text-lg text-left font-semibold mb-4 text-white">
+                        <Link
+                            to="/admin/circulatoryhistory"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
+                            Circulation
+                        </Link>
+                    </h4>
                     <ul className="text-sm text-grey text-left space-y-2">
                         <li>
                             <Link
@@ -162,8 +176,14 @@ const Footer = () => (
                     </ul>
                 </div>
                 <div>
-                    <h4 className="text-sm text-left font-semibold mb-4 text-white">
+                    <h4 className="text-lg text-left font-semibold mb-4 text-white">
+                    <Link
+                            to="/admin/bookmanagement"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
                         Book Management
+                    </Link>
                     </h4>
                     <ul className="text-sm text-grey text-left space-y-2">
                         <li>
@@ -223,8 +243,14 @@ const Footer = () => (
                     </ul>
                 </div>
                 <div>
-                    <h4 className="text-sm text-left font-semibold mb-4 text-white">
+                    <h4 className="text-lg text-left font-semibold mb-4 text-white">
+                    <Link
+                            to="/admin/researchmanagement"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
                         Research Management
+                    </Link>
                     </h4>
                     <ul className="text-sm text-grey text-left space-y-2">
                         <li>
@@ -257,8 +283,14 @@ const Footer = () => (
                     </ul>
                 </div>
                 <div>
-                    <h4 className="text-sm text-left font-semibold mb-4 text-white">
+                    <h4 className="text-lg text-left font-semibold mb-4 text-white">
+                    <Link
+                            to="/admin/useraccounts"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
                         User Accounts
+                    </Link>
                     </h4>
                     <ul className="text-sm text-grey text-left space-y-2">
                         <li>
@@ -318,8 +350,14 @@ const Footer = () => (
                     </ul>
                 </div>
                 <div>
-                    <h4 className="text-sm text-left font-semibold mb-4 text-white">
+                    <h4 className="text-lg text-left font-semibold mb-4 text-white">
+                    <Link
+                            to="/admin/support"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
                         Support
+                    </Link>
                     </h4>
                     <ul className="text-sm text-grey text-left space-y-2">
                         <li>
@@ -397,8 +435,14 @@ const Footer = () => (
                     </ul>
                 </div>
                 <div>
-                    <h4 className="text-sm text-left font-semibold mb-4 text-white">
-                            Reservations
+                    <h4 className="text-lg text-left font-semibold mb-4 text-white">
+                    <Link
+                            to="/admin/reservations"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
+                        Reservations
+                    </Link>
                     </h4>
                     <ul className="text-sm text-grey text-left space-y-2">
                         <li>
@@ -453,6 +497,95 @@ const Footer = () => (
                                 }}
                             >
                                 Reserved Rooms
+                            </Link>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="text-lg text-left font-semibold mb-4 text-white">
+                    <Link
+                            to="/admin/systemreports"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
+                        System Reports
+                    </Link>
+                    </h4>
+                    <ul className="text-sm text-grey text-left space-y-2">
+                        <li>
+                            <Link
+                                to="/admin/systemreports#outstanding-fines"
+                                className="hover:underline"
+                                onClick={() => {
+                                    // Navigate to the page first
+                                    setTimeout(() => {
+                                        // After navigation, find and scroll to the element
+                                        const element = document.getElementById("outstanding-fines")
+                                        if (element) {
+                                            element.scrollIntoView({ behavior: "smooth" })
+                                        }
+                                    }, 100)
+                                }}
+                            >
+                                Accounts with Fines
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                to="/admin/systemreports#summary-report"
+                                className="hover:underline"
+                                onClick={() => {
+                                    // Navigate to the page first
+                                    setTimeout(() => {
+                                        // After navigation, find and scroll to the element
+                                        const element = document.getElementById("summary-report")
+                                        if (element) {
+                                            element.scrollIntoView({ behavior: "smooth" })
+                                        }
+                                    }, 100)
+                                }}
+                            >
+                                Summary of Fines
+                            </Link>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="text-lg text-left font-semibold mb-4 text-white">
+                    <Link
+                            to="/admin/schedule"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
+                        Schedule
+                    </Link>
+                    </h4>
+                    <ul className="text-sm text-grey text-left space-y-2">
+                        <li>
+                            <Link
+                                to="/admin/schedule#set-sched"
+                                className="hover:underline"
+                                onClick={() => {
+                                    // Navigate to the page first
+                                    setTimeout(() => {
+                                        // After navigation, find and scroll to the element
+                                        const element = document.getElementById("set-sched")
+                                        if (element) {
+                                            element.scrollIntoView({ behavior: "smooth" })
+                                        }
+                                    }, 100)
+                                }}
+                            >
+                                Set an Event
+                            </Link>
+                        </li>
+                        <li>
+                        <Link
+                            to="/admin/schedule"
+                            className="hover:underline"
+                            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        >
+                                ARC Operating Hours
                             </Link>
                         </li>
                     </ul>
