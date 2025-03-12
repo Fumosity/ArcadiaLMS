@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar"
 import Recommended from "../../components/UserComponents/user-home-comp/Recommended"
 import InterestedGenre from "../../components/UserComponents/user-home-comp/InterestedGenre"
 import UHero from "../../components/UserComponents/user-home-comp/UHero"
-import MostPopular from "../../components/UserComponents/user-home-comp/MostPopular"
-import HighlyRated from "../../components/UserComponents/user-home-comp/HighlyRated"
+import MostPopular, { fetchMostPopularBooks } from "../../components/UserComponents/user-home-comp/MostPopular"
+import HighlyRated, { fetchHighlyRatedBooks } from "../../components/UserComponents/user-home-comp/HighlyRated"
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr"
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents"
 import Services from "../../components/UserComponents/user-main-comp/Services"
@@ -22,40 +23,70 @@ const UHomePage = () => {
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
   const [seeMoreGenresComponent, setSeeMoreGenresComponent] = useState(null)
 
+  // Get location to check for query parameters
+  const location = useLocation()
+
+  // Check URL query parameters on component mount
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search)
+    const view = queryParams.get("view")
+
+    // If the view parameter is 'highlyRated', show the expanded HighlyRated component
+    if (view === "highlyRated") {
+      setSeeMoreComponent({
+        title: "Highly Rated",
+        fetchBooks: fetchHighlyRatedBooks,
+        onGenreClick: handleGenreClick,
+      })
+    }
+    if (view === "mostPopular") {
+      setSeeMoreComponent({
+        title: "Most Popular",
+        fetchBooks: fetchMostPopularBooks,
+        onGenreClick: handleGenreClick,
+      })
+    }
+  }, [location])
+
   const handleGenreClick = (genre) => {
     setSelectedGenre(genre)
     console.log("selected genre", genre)
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const handleBackClick = () => {
     setSelectedGenre(null)
     setSeeMoreComponent(null)
     setSeeMoreGenresComponent(null)
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" })
+
+    // Clear the URL query parameter when going back
+    const url = new URL(window.location)
+    url.searchParams.delete("view")
+    window.history.pushState({}, "", url)
   }
 
   const handleSeeMoreClick = (component, fetchFunction) => {
     if (typeof fetchFunction !== "function") {
-      console.error("fetchFunction is not a function", fetchFunction);
-      return;
+      console.error("fetchFunction is not a function", fetchFunction)
+      return
     }
     setSeeMoreComponent({
       title: component,
       fetchBooks: fetchFunction,
-      onGenreClick: handleGenreClick
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+      onGenreClick: handleGenreClick,
+    })
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
 
   const handleSeeMoreGenresClick = (component, fetchData) => {
-    setSeeMoreGenresComponent({ 
-      title: component, 
+    setSeeMoreGenresComponent({
+      title: component,
       fetchAllGenres: fetchData,
-      onGenreClick: handleGenreClick  // Pass onGenreClick
-    });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+      onGenreClick: handleGenreClick, // Pass onGenreClick
+    })
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
 
   return (
     <div className="min-h-screen bg-light-white">

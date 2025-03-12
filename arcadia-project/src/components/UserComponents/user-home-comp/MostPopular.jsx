@@ -2,7 +2,7 @@ import React from "react";
 import BookCards from "./BookCards";
 import { supabase } from "/src/supabaseClient.js";
 
-const fetchMostPopularBooks = async () => {
+export const fetchMostPopularBooks = async () => {
     try {
         // Step 1: Fetch all borrow transactions
         const { data: transactions, error: transactionError } = await supabase
@@ -94,7 +94,7 @@ const fetchMostPopularBooks = async () => {
         return {books}
     } catch (error) {
         console.error("Error fetching most popular books:", error);
-        return [];
+        return { books: [] };
     }
 };
 
@@ -105,7 +105,8 @@ const MostPopular = ({ onSeeMoreClick }) => {
             title="Most Popular" 
             fetchBooks={fetchMostPopularBooks} 
             onSeeMoreClick={() => onSeeMoreClick("Most Popular", fetchMostPopularBooks)} 
-        />)
+        />
+    )
 };
 
 export default MostPopular;

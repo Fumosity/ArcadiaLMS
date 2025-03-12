@@ -1,7 +1,25 @@
-import React from 'react';
-import { Link } from "react-router-dom";
+"use client"
+import { Link, useNavigate } from "react-router-dom"
 
 const UFooter = () => {
+  const navigate = useNavigate()
+
+  const handleHighlyRatedClick = () => {
+    // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
+    navigate("/?view=highlyRated")
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleMostPopularClick = () => {
+    // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
+    navigate("/?view=mostPopular")
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
 
   return (
     <footer className="bg-arcadia-black w-full px-4 py-10">
@@ -14,8 +32,20 @@ const UFooter = () => {
               </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
-              <li>Most Popular Books</li>
-              <li>Highest Rated Books</li>
+              <li><button
+                onClick={handleMostPopularClick}
+                className="text-grey hover:text-white hover:underline cursor-pointer text-left"
+              >
+                Most Popular Books
+              </button></li>
+              <li>
+                <button
+                  onClick={handleHighlyRatedClick}
+                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
+                >
+                  Highest Rated Books
+                </button>
+              </li>
               <li>Most Popular Theses</li>
               <li>Highest Rated Theses</li>
             </ul>

@@ -1,7 +1,8 @@
 import BookCards from "./BookCards"
 import { supabase } from "/src/supabaseClient.js"
 
-const fetchHighlyRatedBooks = async () => {
+// Export the fetch function so it can be imported elsewhere
+export const fetchHighlyRatedBooks = async () => {
   try {
     // Step 1: Fetch all ratings with titleID
     const { data: ratings, error: ratingError } = await supabase.from("ratings").select("ratingValue, titleID")
@@ -110,8 +111,6 @@ const fetchHighlyRatedBooks = async () => {
 }
 
 const HighlyRated = ({ onSeeMoreClick }) => {
-  // ... rest of the component code remains the same ...
-
   return (
     <BookCards
       title="Highly Rated"
