@@ -1,15 +1,13 @@
-"use client"
-
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "/src/supabaseClient.js"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
-import { useUser } from "../../../backend/UserContext" // Adjust this path as needed
+import { useUser } from "../../../backend/UserContext"
 
 const SupportStatus = ({ onSupportSelect }) => {
   const [supportData, setSupportData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const { user } = useUser() // Get logged-in user info
+  const { user } = useUser()
 
   const fetchSupports = useCallback(async () => {
     if (!user?.userID) {
@@ -23,7 +21,7 @@ const SupportStatus = ({ onSupportSelect }) => {
       const { data, error } = await supabase
         .from("support_ticket")
         .select("supportID, type, status, subject, date, time")
-        .eq("userID", user.userID) // Filter by user ID
+        .eq("userID", user.userID)
 
       if (error) throw error
 
@@ -35,7 +33,6 @@ const SupportStatus = ({ onSupportSelect }) => {
     }
   }, [user?.userID])
 
-  // Fetch supports on component mount
   useEffect(() => {
     fetchSupports()
   }, [fetchSupports])
@@ -53,8 +50,7 @@ const SupportStatus = ({ onSupportSelect }) => {
         </button>
       </div>
       <p className="text-sm mb-4">
-        These are all the user supports that you have made. Click on the support ID to view the contents of the support and
-        the ARC's reply.
+        These are all the user supports that you have made. Click on the support ID or subject to view the contents of the support and the ARC's reply.
       </p>
 
       <div className="overflow-x-auto">
@@ -73,24 +69,12 @@ const SupportStatus = ({ onSupportSelect }) => {
             {isLoading ? (
               [...Array(5)].map((_, index) => (
                 <tr key={index}>
-                  <td>
-                    <Skeleton height={20} />
-                  </td>
-                  <td>
-                    <Skeleton height={20} />
-                  </td>
-                  <td>
-                    <Skeleton height={20} />
-                  </td>
-                  <td>
-                    <Skeleton height={20} />
-                  </td>
-                  <td>
-                    <Skeleton height={20} />
-                  </td>
-                  <td>
-                    <Skeleton height={20} />
-                  </td>
+                  <td><Skeleton height={20} /></td>
+                  <td><Skeleton height={20} /></td>
+                  <td><Skeleton height={20} /></td>
+                  <td><Skeleton height={20} /></td>
+                  <td><Skeleton height={20} /></td>
+                  <td><Skeleton height={20} /></td>
                 </tr>
               ))
             ) : supportData.length > 0 ? (
@@ -101,16 +85,34 @@ const SupportStatus = ({ onSupportSelect }) => {
                   </td>
                   <td className="px-4 py-2 text-sm">
                     <span
-                      className={`px-4 py-1 rounded-full text-xs font-semibold ${support.status === "Ongoing" ? "bg-yellow" : support.status === "Resolved" ? "bg-green" : support.status === "Intended" ? "bg-red" : "bg-gray-200"}`}
+                      className={`px-4 py-1 rounded-full text-xs font-semibold ${support.status === "Ongoing"
+                          ? "bg-yellow"
+                          : support.status === "Resolved"
+                          ? "bg-green"
+                          : support.status === "Intended"
+                          ? "bg-red"
+                          : "bg-gray-200"
+                        }`}
                     >
                       {support.status || "N/A"}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-sm">{support.subject || "N/A"}</td>
+
+                  <td
+                    className="px-4 py-2 text-sm text-arcadia-red font-medium hover:underline cursor-pointer"
+                    onClick={() => handleSupportClick(support.supportID)}
+                  >
+                    {support.subject || "N/A"}
+                  </td>
+
                   <td className="px-4 py-2 text-sm">{support.date || "N/A"}</td>
                   <td className="px-4 py-2 text-sm">{support.time || "N/A"}</td>
-                  <td className="px-4 py-2 text-sm text-red-600 font-medium hover:underline cursor-pointer">
-                    <span onClick={() => handleSupportClick(support.supportID)}>{support.supportID || "N/A"}</span>
+
+                  <td
+                    className="px-4 py-2 text-sm text-arcadia-red font-medium hover:underline cursor-pointer"
+                    onClick={() => handleSupportClick(support.supportID)}
+                  >
+                    {support.supportID || "N/A"}
                   </td>
                 </tr>
               ))
@@ -129,4 +131,3 @@ const SupportStatus = ({ onSupportSelect }) => {
 }
 
 export default SupportStatus
-
