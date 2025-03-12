@@ -4,25 +4,47 @@ import { supabase } from "/src/supabaseClient.js";
 
 const fetchMostPopularBooks = async () => {
     try {
-        // Step 1: Get all "Borrowed" transactions with the bookID
+        // Step 1: Fetch all borrow transactions
         const { data: transactions, error: transactionError } = await supabase
             .from("book_transactions")
-            .select("bookID");
+            .select("bookBarcode");
 
         if (transactionError) throw transactionError;
 
+        // Step 2: Count borrows per bookBarcode
+        const borrowCountMap = transactions.reduce((acc, { bookBarcode }) => {
+            acc[bookBarcode] = (acc[bookBarcode] || 0) + 1;
+            return acc;
+        }, {});
+
+        // Step 3: Fetch book metadata (bookBarcode, titleID, and book_titles details)
+        const { data: bookMetadata, error: bookError } = await supabase
+            .from("book_indiv")
+            .select("bookBarcode, titleID, book_titles(titleID, title, author, cover)");
+
+        if (bookError) throw bookError;
+
+        // Step 4: Aggregate borrow counts by titleID
+        const titleBorrowMap = {};
+
+        bookMetadata.forEach(({ bookBarcode, titleID, book_titles }) => {
+            if (!titleBorrowMap[titleID]) {
+                titleBorrowMap[titleID] = {
+                    ...book_titles,
+                    borrowCount: 0, // Initialize borrow count
+                };
+            }
+            titleBorrowMap[titleID].borrowCount += borrowCountMap[bookBarcode] || 0;
+        });
+
+        // Step 5: Fetch ratings
         const { data: ratings, error: ratingError } = await supabase
             .from("ratings")
             .select("ratingValue, titleID");
 
         if (ratingError) throw ratingError;
 
-        // Step 2: Count the number of borrows for each bookID
-        const borrowCountMap = transactions.reduce((acc, transaction) => {
-            acc[transaction.bookID] = (acc[transaction.bookID] || 0) + 1;
-            return acc;
-        }, {});
-
+        // Step 6: Compute average rating per titleID
         const ratingMap = ratings.reduce((acc, { titleID, ratingValue }) => {
             if (!acc[titleID]) {
                 acc[titleID] = { total: 0, count: 0 };
@@ -32,17 +54,8 @@ const fetchMostPopularBooks = async () => {
             return acc;
         }, {});
 
-        // Step 3: Get book details for each bookID, joining with book_titles
-        const bookIDs = Object.keys(borrowCountMap);
-        const { data: bookMetadata, error: bookError } = await supabase
-            .from("book_indiv")
-            .select("bookID, book_titles(titleID, title, author, cover)")
-            .in("bookID", bookIDs);
-
-        if (bookError) throw bookError;
-
-        // Step 4: Fetch genres and categories using book_genre_link and genre tables
-        const titleIDs = bookMetadata.map(book => book.book_titles.titleID);
+        // Step 7: Fetch genres and categories
+        const titleIDs = Object.keys(titleBorrowMap);
         const { data: genreData, error: genreError } = await supabase
             .from("book_genre_link")
             .select("titleID, genreID, genres(genreID, genreName, category)")
@@ -50,7 +63,7 @@ const fetchMostPopularBooks = async () => {
 
         if (genreError) throw genreError;
 
-        // Step 5: Structure genres and categories
+        // Step 8: Structure genres and categories
         const genreMap = {};
         genreData.forEach(({ titleID, genres }) => {
             if (!genreMap[titleID]) {
@@ -59,26 +72,32 @@ const fetchMostPopularBooks = async () => {
             genreMap[titleID].genres.push(genres.genreName);
         });
 
-        // Step 6: Combine book data with genres, category, and rating
-        const booksWithDetails = bookMetadata.map(book => {
-            const titleID = book.book_titles.titleID;
-            const avgRating = ratingMap[titleID].total / ratingMap[titleID].count;
+        // Step 9: Add genres, categories, and ratings to books
+        const booksWithDetails = Object.values(titleBorrowMap).map(book => {
+            const titleID = book.titleID;
+            const avgRating =
+                ratingMap[titleID]?.count > 0
+                    ? ratingMap[titleID].total / ratingMap[titleID].count
+                    : 0;
+
             return {
-                ...book.book_titles,
+                ...book,
                 weightedAvg: avgRating,
-                totalRatings: ratingMap[titleID].count,
+                totalRatings: ratingMap[titleID]?.count || 0,
                 genres: genreMap[titleID]?.genres || [],
                 category: genreMap[titleID]?.category || "Unknown",
             };
         });
 
-        let books = booksWithDetails.sort((a, b) => b.borrowCount - a.borrowCount)
-        return { books };
+        // Step 10: Sort by borrow count and return the books
+        const books = booksWithDetails.sort((a, b) => b.borrowCount - a.borrowCount);
+        return {books}
     } catch (error) {
         console.error("Error fetching most popular books:", error);
         return [];
     }
 };
+
 
 const MostPopular = ({ onSeeMoreClick }) => {
     return(

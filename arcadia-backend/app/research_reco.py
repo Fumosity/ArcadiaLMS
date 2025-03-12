@@ -9,11 +9,11 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Fetch book data
-data = supabase.table("research").select("researchID", "title", "author", "college", "department", "keyword").execute()
+data = supabase.table("research").select("researchID", "title", "author", "college", "department", "keywords").execute()
 df = pd.DataFrame(data.data)
 
 # Preprocess data
-df['features'] = df['college'].astype(str) + ' ' + df['department'].astype(str) + ' ' + df['keyword'].astype(str)
+df['features'] = df['college'].astype(str) + ' ' + df['department'].astype(str) + ' ' + df['keywords'].astype(str)
 
 # Calculate TF-IDF vectors
 tfidf = TfidfVectorizer()
@@ -30,6 +30,6 @@ def get_rsrch_recommendations(researchID, cosine_sim=cosine_sim, df=df):
     book_indices = [i[0] for i in sim_scores]
 
     print(f"Chosen Book (ID: {researchID}):")
-    print(df[['title', 'college', 'department', 'keyword']].iloc[idx])
+    print(df[['title', 'college', 'department', 'keywords']].iloc[idx])
     print("\nRecommendations:")
-    return df[['researchID', 'title', 'college', 'department', 'keyword']].iloc[book_indices]
+    return df[['researchID', 'title', 'college', 'department', 'keywords']].iloc[book_indices]
