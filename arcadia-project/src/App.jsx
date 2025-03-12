@@ -31,6 +31,7 @@ import AGenreMgmt from './admin-genre-mgmt/AGenreMgmt.jsx';
 import AGAdd from './admin-genre-add/AGAdd.jsx';
 import AGModify from './admin-genre-modify/AGModify.jsx';
 import ABExport from './admin-book-export/ABExport.jsx';
+import ADPAPage from './ADPAPage.jsx';
 
 // User Components
 import UsrRegistration from './UserPages/user-registration-page/UsrRegistration';
@@ -66,6 +67,7 @@ import URsrchView from './UserPages/user-rsrch-view-page/URsrchView.jsx';
 import AuthComplete from './UserPages/AuthComplete.jsx';
 import GenrePage from './components/UserComponents/user-genre-cat/GenrePage.jsx';
 import ARExport from './admin-research-export/ARExport.jsx';
+import DPAPage from './UserPages/DPAPage.jsx';
 
 function App() {
   return (
@@ -98,6 +100,7 @@ function App() {
               <Route path="*" element={<ErrorPage />} /> 
               <Route path="/auth-complete" element={<AuthComplete />} />
               <Route path="/genre/page" element={<GenrePage />} />
+              <Route path="/user/privacypolicy" element={<DPAPage />} />
             </Routes>
             <UFooter />
             <UCopyright />
@@ -145,6 +148,7 @@ function App() {
               <Route path="systemreports" element={<ASystemReports />} />
               <Route path="adminerrorpage" element={<AdminErrorPage />} />
               <Route path="*" element={<AdminErrorPage />} />
+              <Route path="data-privacy" element={<ADPAPage />} />
             </Routes>
             <Footer />
             <Copyright />

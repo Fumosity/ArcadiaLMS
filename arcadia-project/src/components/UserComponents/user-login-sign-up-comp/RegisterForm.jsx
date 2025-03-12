@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import bcrypt from "bcryptjs"
 
-export default function RegisterForm({ onRegister }) {
+export default function RegisterForm({ onBack, onRegister }) {
   const [new_data, setNewData] = useState({
     firstName: "First Name",
     lastName: "Last Name",
@@ -265,9 +265,9 @@ export default function RegisterForm({ onRegister }) {
           {passwordError && <p className="text-red text-sm">{passwordError}</p>}
 
           <div className="flex justify-center items-center gap-4">
-            <Link to="/user/login" className="registerBtn">
-              Return
-            </Link>
+          <button onClick={onBack} className="registerBtn">
+            Return
+          </button>
             <button
               type="submit"
               className="genRedBtns"
