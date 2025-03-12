@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Star } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar, faStarHalfAlt, faStar as faRegularStar } from "@fortawesome/free-solid-svg-icons";
 import { supabase } from "../../../supabaseClient"; // Import your Supabase client
 import { useUser } from "../../../backend/UserContext"; // Import UserContext
 import { useNavigate } from "react-router-dom";
@@ -12,7 +13,6 @@ export default function BookInformation({ book }) {
     const [message, setMessage] = useState(""); // Feedback message
 
     useEffect(() => {
-        // Fetch the user's existing rating for the book
         const fetchExistingRating = async () => {
             if (!user || !user.userID || !book || user.userAccountType === "Guest") return;
 
@@ -39,13 +39,13 @@ export default function BookInformation({ book }) {
     }, [user, book]);
 
     const handleStarClick = (rating) => {
-        setSelectedRating(rating); 
-        setMessage(""); 
+        setSelectedRating(rating);
+        setMessage("");
     };
 
     const handleSubmitRating = async () => {
         if (!user) {
-            navigate("/user/login"); 
+            navigate("/user/login");
             return;
         }
 
@@ -88,7 +88,7 @@ export default function BookInformation({ book }) {
                     console.error("Error submitting new rating:", error);
                     setMessage("Error submitting rating. Please try again.");
                 } else {
-                    setExistingRatingID(data.ratingID); // Save the new rating ID
+                    setExistingRatingID(data.ratingID);
                     setMessage("Rating submitted successfully!");
                 }
             }
@@ -98,10 +98,50 @@ export default function BookInformation({ book }) {
         }
     };
 
+    const renderStars = (rating) => {
+        const roundedRating = Math.round(rating * 10) / 10;
+        const fullStars = Math.floor(roundedRating);
+        const halfStar = (roundedRating * 2) % 2 !== 0;
+
+        let emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        emptyStars = Math.max(0, emptyStars);
+
+        return (
+            <span className="flex gap-1 items-center">
+                <span className="flex">
+                    {[...Array(fullStars)].map((_, i) => (
+                        <FontAwesomeIcon
+                            key={i}
+                            icon={faStar}
+                            className="text-arcadia-yellow cursor-pointer"
+                            onClick={() => handleStarClick(i + 1)}
+                        />
+                    ))}
+                    {halfStar && (
+                        <FontAwesomeIcon
+                            icon={faStarHalfAlt}
+                            className="text-arcadia-yellow cursor-pointer"
+                            onClick={() => handleStarClick(fullStars + 1)}
+                        />
+                    )}
+                    {[...Array(emptyStars)].map((_, i) => (
+                        <FontAwesomeIcon
+                            key={i}
+                            icon={faRegularStar}
+                            className="text-grey cursor-pointer"
+                            onClick={() => handleStarClick(fullStars + 1 + (halfStar ? 1 : i))}
+                        />
+                    ))}
+                </span>
+                <span className="ml-2 text-md text-gray-600">{selectedRating || "No rating selected"}</span>
+            </span>
+        );
+    };
+
     return (
         <div className="uMain-cont">
             {/* Main Book Info */}
-            <div className="flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm">
+            <div className="flex w--full gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm">
                 <div className="flex-shrink-0 w-[200px]">
                     <img
                         src={book.image_url || "https://via.placeholder.com/150x300"}
@@ -115,30 +155,24 @@ export default function BookInformation({ book }) {
                 </div>
 
                 <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{book.title}</h3>
-                    <div className="text-sm text-gray-700 mt-1">
-                        <p><span className="font-semibold">Author:</span> {book.author}</p>
+                    <h3 className="text-3xl font-ZenSerif">{book.title}</h3>
+                    <div className="text-md text-gray-700 mt-1 space-y-1">
+                        <p><span className="font-semibold">Author:</span> {book.author.join(", ")}</p>
                         <p><span className="font-semibold">Published:</span> {book.publishedYear}</p>
-                        <p className="mt-2"><span className="font-semibold"></span> {book.synopsis || "No synopsis available."}</p>
+                        <p><span className="font-semibold">Category:</span> {book.category} <span className="font-semibold">Genres:</span> {book.genres.join(", ")}</p>
+                        <p className="min-h-[6rem] leading-relaxed">
+                            <span className="font-semibold"></span> {book.synopsis || "No synopsis available."}
+                        </p>
                     </div>
 
                     {user && user.userAccountType !== "Guest" && (
-                        <>
+                        <div className="flex w-full justify-start space-x-2">
                             <div className="flex items-center justify-start gap-1 mt-2">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star
-                                        key={i}
-                                        className={`w-4 h-4 cursor-pointer ${
-                                            i < selectedRating ? "fill-bright-yellow" : "fill-grey"
-                                        }`}
-                                        onClick={() => handleStarClick(i + 1)}
-                                    />
-                                ))}
-                                <span className="text-sm text-gray-600 ml-1">{selectedRating || "No rating selected"}</span>
+                                {renderStars(selectedRating)}
                             </div>
 
                             <button
-                                className="viewBk-btn ml-3"
+                                className="mt-2 w-1/6 bg-arcadia-red hover:bg-red hover:text-white text-white py-1 px-2 rounded-xl text-sm"
                                 onClick={() => {
                                     if (!user) {
                                         navigate("/user/login");
@@ -148,31 +182,29 @@ export default function BookInformation({ book }) {
                                 }}
                             >
                                 {!user ? "Log In to Rate" : existingRatingID ? "Update Rating" : "Rate"}
-                            </button>
-
-                            {message && <p className="text-sm text-center mt-2 text-gray-500">{message}</p>}
-                        </>
+                            </button>                          
+                        </div>
                     )}
+                    {message && <p className="w-full text-sm text-left mt-2 text-gray-500">{message}</p>}
                 </div>
             </div>
-
             {/* Additional Information Section */}
             <div className="mt-4 border-t border-grey p-2">
                 <h3 className="text-2xl font-semibold mt-4 mb-2">Additional Information</h3>
-                <div>
-                    <p><span className="font-semibold">Category:</span> {book.category || "No category available"}</p>
-                    <br />
-                    <p><span className="font-semibold">Genre:</span> {book.genre || "No genre available"}</p>
-                    <br />
+                <div className="flex w-full">
+                    <div className="flex flex-col space-y-2 w-1/2">
+                        <p><span className="font-semibold">Category:</span> {book.category || "No category available"}</p>
+                        <p><span className="font-semibold">Genre:</span> {book.genres.join(", ") || "No genre available"}</p>
+                        <p><span className="font-semibold">Location:</span> {book.location || "No location available"}</p>
+                        <p><span className="font-semibold">Call Number:</span> {book.arcID || "No location available"}</p>
+                        <p><span className="font-semibold">Keywords:</span> {book.keywords.join(", ") || "No keywords available"}</p>
+                    </div>
+                    <div className="flex flex-col space-y-2 w-1/2">
                     <p><span className="font-semibold">Publisher:</span> {book.publisher || "No publisher information"}</p>
-                    <br />
-                    <p><span className="font-semibold">Keywords:</span> {book.keyword || "No keywords available"}</p>
-                    <br />
-                    <p><span className="font-semibold">Location:</span> {book.location || "No location available"}</p>
-                    <br />
-                    <p><span className="font-semibold">ISBN:</span> {book.ISBN || "No ISBN available"}</p>
-                    <br />
-                    <p><span className="font-semibold">Language:</span> {book.language || "No information available"}</p>
+                        <p><span className="font-semibold">Current Date Published:</span> {book.currentPubDate || "No date information"}</p>
+                        <p><span className="font-semibold">Original Date Published:</span> {book.originalPubDate || "No date information"}</p>
+                        <p><span className="font-semibold">ISBN:</span> {book.isbn || "No ISBN available"}</p>
+                    </div>
                 </div>
             </div>
         </div>

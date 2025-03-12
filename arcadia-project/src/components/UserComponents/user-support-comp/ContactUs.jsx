@@ -9,9 +9,11 @@ const ContactUs = () => {
     ];
 
     return (
-        <div className="uMain-cont p-6 bg-white rounded-lg border border-gray-200">
-            <h2 className="text-lg font-semibold mb-4">Contact Us</h2>
-
+        <div className="uMain-cont">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Contact Us</h2>
+            </div>
+            
             <p className="text-sm mb-4">
                 If you have any inquiries or want to book an appointment with the staff, then you may contact us through these lines of communication:
             </p>

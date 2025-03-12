@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Astar } from "fast-astar";
 import { supabase } from "../../../supabaseClient";
+import { useLocation } from "react-router-dom";
 
 export default function Pathfinder({ book }) {
     const [gridData, setGridData] = useState([]);
@@ -9,6 +10,7 @@ export default function Pathfinder({ book }) {
     const [selectedShelf, setSelectedShelf] = useState("A1"); // Default destination
     const [destinationDirection, setDestinationDirection] = useState("");
     const [currentLocation, setCurrentLocation] = useState("4th Floor, Highschool and Multimedia Section");
+    const location = useLocation();
 
     const callNo = book.arcID
     const callNoPrefix = callNo.split(" ")[0].trim(); // Extract only the alphabetical prefix
@@ -264,7 +266,8 @@ export default function Pathfinder({ book }) {
 
     useEffect(() => {
         console.log(book)
-
+        setPath([]);
+        setCurrentLocation("")
         if (!isNaN(callNoPrefix)) {
             // If callNoPrefix is a number  
             setCurrentLocation("4th Floor, Highschool and Multimedia Section");
@@ -405,7 +408,7 @@ export default function Pathfinder({ book }) {
         }
         setGridData(newGrid);
         console.log(book)
-    }, [selectedStart, selectedShelf]);
+    }, [selectedStart, selectedShelf, location]);
 
 
     return (
@@ -413,18 +416,9 @@ export default function Pathfinder({ book }) {
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Location</h2>
             </div>
-            <table>
-                <tr>
-                    <td>
-                    Call Number: <strong>{callNo}</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                    Location: <strong>{currentLocation}</strong>
-                    </td>
-                </tr>
-            </table>
+            <div className="w-full text-center font-semibold text-lg">
+                {currentLocation}
+            </div>
             <div className="my-2 flex justify-center items-center w-full">
                 <div className="w-fit" style={{ display: "grid", gridTemplateColumns: `repeat(${locations[currentLocation]?.w}, 24px)` }}>
                     {gridData.flat().map((cell, index) => (

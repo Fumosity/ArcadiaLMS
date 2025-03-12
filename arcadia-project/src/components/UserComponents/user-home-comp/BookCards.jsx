@@ -92,9 +92,12 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
     <div className="uMain-cont">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">{title}</h2>
-        <button className="uSee-more" onClick={onSeeMoreClick}>
-          See more
-        </button>
+        {onSeeMoreClick != null && (
+          <button className="uSee-more" onClick={onSeeMoreClick}>
+            See more
+          </button>
+        )}
+
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2 my-4">
         {isLoading ? (
@@ -118,6 +121,7 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
                 to={`/user/bookview?titleID=${book.titleID}`}
                 className="block genCard-cont"
                 title={book.title}
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
                 <img
                   src={book.cover || "/image/arcadia_gray.png"}

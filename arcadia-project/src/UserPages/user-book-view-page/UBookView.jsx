@@ -32,7 +32,11 @@ const UBookView = () => {
 
       try {
         // Fetch book details
-        const { data, error } = await supabase.from("book_titles").select("*").eq("titleID", titleId).single()
+        const { data, error } = await supabase
+          .from("book_titles")
+          .select("*, book_indiv(titleID, *)")
+          .eq("titleID", titleId)
+          .single()
 
         if (error || !data) {
           console.error("Error fetching or no data:", error)
@@ -62,12 +66,56 @@ const UBookView = () => {
           setRatingInfo({ avgRating, totalRatings })
         }
 
+        const { data: genreData, error: genreError } = await supabase
+          .from("book_genre_link")
+          .select("titleID, genreID, genres(genreID, genreName, category)")
+          .in("titleID", [Number(titleId)]); // Ensure titleID is treated as an array of numbers
+
+        if (genreError) {
+          console.error("Error fetching genres:", genreError);
+        } else {
+          console.log("Fetched genre data:", genreData);
+        }
+
+        const genreMap = {};
+        genreData.forEach(({ titleID, genres }) => {
+          if (!genreMap[titleID]) {
+            genreMap[titleID] = { genres: [], category: genres.category };
+          }
+          genreMap[titleID].genres.push(genres.genreName);
+        });
+
+        console.log(genreMap)
         const publishedYear = data.originalPubDate ? new Date(data.originalPubDate).getFullYear() : "Unknown Year"
+
+        const callNo = data.arcID
+        const callNoPrefix = callNo.split(" ")[0].trim(); // Extract only the alphabetical prefix
+        console.log(callNo)
+        let currentLocation = ""
+
+        if (!isNaN(callNoPrefix)) {
+          // If callNoPrefix is a number  
+          currentLocation = "4th Floor, Highschool and Multimedia Section";
+        } else {
+          // Extract year from pubDate (assuming it's a string in "yyyy-mm-dd" format)
+          const pubYear = parseInt(data.currentPubDate.split("-")[0], 10);
+
+          if (pubYear <= 2009) {
+            currentLocation = "4th Floor, Circulation Section";
+          } else {
+            currentLocation = "2nd Floor, Circulation Section";
+          }
+        }
+
+        console.log(currentLocation)
 
         setBookDetails({
           ...data,
           image_url: data.cover || "https://via.placeholder.com/150x300",
           publishedYear,
+          genres: genreMap[titleId]?.genres || [],
+          category: genreMap[titleId]?.category || "Unknown",
+          location: currentLocation
         })
       } catch (err) {
         console.error("Unexpected error:", err)
@@ -111,11 +159,11 @@ const UBookView = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
-          <div className="lg:w-1/4 md:w-1/3 w-full space-y-8 mt-4 mr-5">
-            <BookAvailability isAvailable={bookDetails?.isAvailable || false} />
+          <div className="lg:w-1/4 md:w-1/3 w-full space-y-4">
+            <BookAvailability book={bookDetails} />
           </div>
 
-          <div className="userMain-content lg:w-3/4 w-full mt-4 ml-5">
+          <div className="userMain-content lg:w-3/4 w-full ml-5">
             <ReturnToSearch />
             <BookInformation
               book={bookDetails}
