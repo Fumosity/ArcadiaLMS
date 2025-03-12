@@ -44,7 +44,13 @@ const UFooter = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-items-center text-center">
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <Link 
+              to="/user/bookmanagement" 
+              className="hover:underline" 
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              >
               Book Catalog
+              </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
               <li><button
@@ -81,7 +87,11 @@ const UFooter = () => {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
-              <Link to="/user/researchmanagement" className="hover:underline">
+              <Link 
+              to="/user/researchmanagement" 
+              className="hover:underline" 
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              >
                 Research Catalog (WIP)
               </Link>
             </h4>
@@ -95,7 +105,11 @@ const UFooter = () => {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
-              <Link to="/user/reservations" className="hover:underline">
+              <Link 
+              to="/user/reservations" 
+              className="hover:underline"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              >
                 Reservations
               </Link>
             </h4>
@@ -140,7 +154,13 @@ const UFooter = () => {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <Link 
+              to="/user/services" 
+              className="hover:underline" 
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              >
               Services
+              </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
               <li>
@@ -157,7 +177,13 @@ const UFooter = () => {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <Link 
+              to="/user/support" 
+              className="hover:underline" 
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              >
               Support
+              </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
               <li>
@@ -191,7 +217,13 @@ const UFooter = () => {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
+            <Link 
+              to="/user/accountview" 
+              className="hover:underline" 
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              >
               User Account
+              </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
               <li>

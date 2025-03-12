@@ -157,7 +157,6 @@ const UBkCatalog = () => {
                     </div>
 
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
-                        {/* ✅ SEE MORE COMPONENT RENDERING */}
                         {seeMoreComponent ? (
                             <SeeMore
                                 selectedComponent={seeMoreComponent.title}
@@ -173,6 +172,12 @@ const UBkCatalog = () => {
                                         userID={user.userID}
                                         category={
                                             bookDetails?.category || "General"
+                                        }
+                                        onSeeMoreClick={(title, fetchFunc) =>
+                                            handleSeeMoreClick(
+                                                title,
+                                                fetchFunc
+                                            )
                                         }
                                     />
                                 )}
