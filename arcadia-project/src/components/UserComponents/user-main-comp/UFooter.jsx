@@ -7,7 +7,7 @@ const UFooter = () => {
   
   const handleHighlyRatedClick = () => {
     // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
-    navigate("/?view=highlyRated")
+    navigate("/user/bookmanagement/?view=highlyRated")
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -15,7 +15,23 @@ const UFooter = () => {
 
   const handleMostPopularClick = () => {
     // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
-    navigate("/?view=mostPopular")
+    navigate("/user/bookmanagement/?view=mostPopular")
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleFictionBooks = () => {
+    // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
+    navigate("/user/bookmanagement/?view=fictionBooks")
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleNonfictionBooks = () => {
+    // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
+    navigate("/user/bookmanagement/?view=nonFictionBooks")
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -28,9 +44,7 @@ const UFooter = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-items-center text-center">
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
-              <Link to="/user/bookmanagement" className="hover:underline">
-                Book Catalog
-              </Link>
+              Book Catalog
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
               <li><button
@@ -47,14 +61,28 @@ const UFooter = () => {
                   Highest Rated Books
                 </button>
               </li>
-              <li>Most Popular Theses</li>
-              <li>Highest Rated Theses</li>
+              <li>
+                <button
+                  onClick={handleFictionBooks}
+                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
+                >
+                  Fiction
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={handleNonfictionBooks}
+                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
+                >
+                  Non-fiction
+                </button>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
               <Link to="/user/researchmanagement" className="hover:underline">
-                Research Catalog
+                Research Catalog (WIP)
               </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
@@ -78,37 +106,81 @@ const UFooter = () => {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
-              <Link to="/user/services" className="hover:underline">
-                Services
-              </Link>
+              Services
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
-              <li>Printing</li>
-              <li>Arcadia Chatbot</li>
-              <li>ARC Cafe</li>
+              <li>
+                <Link
+                  to="/user/faqs"
+                  className="hover:underline"
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                  FAQs
+                </Link>
+              </li>
+
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
-              <Link to="/user/support" className="hover:underline">
-                Support
-              </Link>
+              Support
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
-              <li>User Reports</li>
-              <li>Support Tickets</li>
-              <li>Contacts</li>
+              <li>
+                <Link
+                  to="/user/support/reportticket"
+                  className="hover:underline"
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                  User Reports
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/user/support/supportticket"
+                  className="hover:underline"
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                  Support Tickets
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/user/support"
+                  className="hover:underline"
+                  onClick={() => window.scrollTo({ bottom: 0, behavior: "smooth" })}
+                >
+                  Contacts
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-left mb-4 text-white">
-              <Link to="/user/accountview" className="hover:underline">
-                User Account
-              </Link>
+              User Account
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
-              <li>View Account</li>
-              <li>Circulation History</li>
+              <li>
+                <Link
+                  to="/user/accountview"
+                  className="hover:underline"
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                  View Account
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/user/accountview"
+                  className="hover:underline"
+                  onClick={() => {
+                    const middleOfPage = Math.floor(document.documentElement.scrollHeight / 2);
+                    window.scrollTo({ top: middleOfPage, behavior: "smooth" });
+                  }}
+                >
+                  Circulation History
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

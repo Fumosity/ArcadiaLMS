@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient"; // Adjust the path as needed
 import TodayReserv from "../components/admin-reserv-comp/TodayReserv";
-import MainHeader from "../components/main-comp/MainHeader";
+import ReservSupport from "../components/admin-user-support-report-view-comp/ReservSupport";
 import Title from "../components/main-comp/Title";
 import ARoomBooking from "../components/admin-room-reserv-comp/ARoomBooking";
 import ARoomReservations from "../components/admin-room-reserv-comp/ARoomReservations";
@@ -52,8 +52,15 @@ const AReserv = () => {
       <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
 
         <div className="flex-shrink-0 w-3/4 space-y-2">
+          <div id="room-reserv">
+            <ReservSupport />
+          </div>
+          <div id="room-booking">
             <ARoomBooking addReservation={addReservation} />
+          </div>
+          <div id="reserved-rooms">
             <ARoomReservations events={events} />
+          </div>
             <ToastContainer />
         </div>
 

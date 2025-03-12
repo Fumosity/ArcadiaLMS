@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar"

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "/src/supabaseClient.js";
 import BookCards from "../user-home-comp/BookCards";
 
-const fetchNonfictionBooks = async () => {
+export const fetchNonfictionBooks = async () => {
     try {
         // Fetch books metadata
         const { data: bookMetadata, error: bookError } = await supabase

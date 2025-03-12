@@ -13,6 +13,18 @@ const ABInventory = () => {
     setSelectedBook(book); // Update selected book
   };
 
+  React.useEffect(() => {
+      if (window.location.hash) {
+        const id = window.location.hash.substring(1)
+        const element = document.getElementById(id)
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: "smooth" })
+          }, 300)
+        }
+      }
+    }, [])
+
   return (
     <div className="min-h-screen bg-white">
       <Title>Book Inventory</Title>
@@ -40,7 +52,9 @@ const ABInventory = () => {
               Export Book Inventory
             </button>
           </div>
+          <div id="book-inventory">
           <CurrentBookInventory onBookSelect={handleBookSelect} />
+          </div>'
         </div>
         <div className="flex flex-col items-start flex-shrink-0 w-1/4">
           <div className="w-full">

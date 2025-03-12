@@ -4,7 +4,7 @@ import { supabase } from "/src/supabaseClient.js";
 
 const FileATix = () => {
     const [searchParams] = useSearchParams();
-    const [type, setType] = useState("select-type");
+    const [type, setType] = useState("General Inquiry");
     const [subject, setSubject] = useState("");
     const [content, setContent] = useState("");
     const [userID, setUserID] = useState(null);
@@ -62,6 +62,12 @@ const FileATix = () => {
         }
     };
 
+    // Define the placeholder based on the selected type
+    const contentPlaceholder =
+        type === "Room Reservation"
+            ? `Enter Room Name Here:\nDate:\nSet Starting & End Time:\nReason for reserving the room:`
+            : "Enter the content of your ticket.";
+
     return (
         <div className="uHero-cont p-6 bg-white rounded-lg border border-grey">
             <h3 className="text-lg font-semibold mb-4">File A Ticket</h3>
@@ -78,6 +84,7 @@ const FileATix = () => {
                     <option value="Account" className="text-center">Account</option>
                     <option value="Book" className="text-center">Book</option>
                     <option value="Research" className="text-center">Research</option>
+                    <option value="Room Reservation" className="text-center">Room Reservation</option>
                 </select>
 
                 <label className="text-sm ml-4 mr-2 font-semibold">Subject:</label>
@@ -92,9 +99,10 @@ const FileATix = () => {
             <label className="text-sm text-left mb-4 mr-2 font-semibold">Content:</label>
             <textarea
                 className="w-full px-3 py-2 border border-grey rounded-2xl text-sm mt-2 mb-4"
-                placeholder="Enter the content of your ticket."
+                placeholder={contentPlaceholder}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
+                rows={6} // Optional: makes it bigger if needed
             ></textarea>
             <div className="flex justify-center">
                 <button

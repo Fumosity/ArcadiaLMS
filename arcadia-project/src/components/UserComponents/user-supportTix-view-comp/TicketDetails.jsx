@@ -64,6 +64,9 @@ const TicketDetails = ({ supportID, onBack }) => {
           <option value="research" className="text-center">
             Research
           </option>
+          <option value="research" className="text-center">
+            Room Reservation
+          </option>
         </select>
 
         <span className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
