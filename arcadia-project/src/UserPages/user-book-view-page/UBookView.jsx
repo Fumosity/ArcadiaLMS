@@ -89,7 +89,7 @@ const UBookView = () => {
         const publishedYear = data.originalPubDate ? new Date(data.originalPubDate).getFullYear() : "Unknown Year"
 
         const callNo = data.arcID
-        const callNoPrefix = callNo.split(" ")[0].trim(); // Extract only the alphabetical prefix
+        const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
         console.log(callNo)
         let currentLocation = ""
 

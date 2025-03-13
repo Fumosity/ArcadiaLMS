@@ -1,33 +1,49 @@
 import React from "react";
 
-export default function RsrchAvailability() {
-    // Sample data for the book
-    const rsrch = {
-        availability: "Is Available",
-        arcFloor: "ARC 1st Floor",
-        roomLocation: "Research Library",
-        shelf: "DCS Shelf",
-        quantity: "Quantity in Inventory: 1",
-    };
+export default function RsrchAvailability({ research }) {
+    console.log(research)
+
+    const callNo = research.researchARCID
+    console.log(callNo)
+    const callNoPrefix = callNo.split("-")[0].trim();
+    console.log(callNoPrefix)
+    let currentLocation = ""
+
+    if (!isNaN(callNoPrefix)) {
+        // If callNoPrefix is a number  
+        currentLocation = "4th Floor, Highschool and Multimedia Section";
+    } else {
+        // Extract year from pubDate (assuming it's a string in "yyyy-mm-dd" format)
+        const pubYear = parseInt(research.pubDate.split("-")[0], 10);
+
+        if (pubYear <= 2009) {
+            currentLocation = "4th Floor, Circulation Section";
+        } else {
+            currentLocation = "2nd Floor, Circulation Section";
+        }
+    }
 
     return (
-        <div className="uSidebar-cont">
-            <h2 className="text-lg font-semibold mb-3">Availability</h2>
-            
-            <div className="flex mb-4 item-center justify-center text-center ">
-                <span className="text-green font-semibold">✓</span>
-                <span className="ml-2">{rsrch.availability}</span>
+        <div className="uSidebar-filter">
+            <div className="flex justify-between items-center mb-2.5">
+                <h2 className="text-xl font-semibold">Availability</h2>
             </div>
 
-            <div className="item-center justify-center text-center text-black text-sm mb-2">
-                <p>{rsrch.arcFloor}</p>
-                <p>{rsrch.roomLocation}</p>
-                <p>{rsrch.shelf}</p>
+            <div className="flex m-6 item-center justify-center text-center ">
+                <div className="text-lg">
+                    <span className="text-green font-semibold">✓</span>
+                    <span className="ml-2">Paper is Available</span>
+                </div>
             </div>
 
-            <p className="item-center justify-center text-center text-sm mb-4">{rsrch.quantity}</p>
+            <div className="item-center justify-center text-center text-black mb-2">
+                <p className="text-sm">Call Number:</p>
+                <h4 className="text-lg font-semibold mb-2">{research.researchARCID}</h4>
+                <p className="text-sm">Location:</p>
+                <h4 className="text-md">{currentLocation}</h4>
+            </div>
 
-            <button className="mt-2 w-full bg-arcadia-red hover:bg-red hover:text-white text-white py-0.5 px-4 rounded-xl text-sm">
+            <button className="mt-2 w-full bg-arcadia-red hover:bg-red hover:text-white text-white py-1 px-4 rounded-xl text-sm">
                 Contact the Help Desk
             </button>
         </div>

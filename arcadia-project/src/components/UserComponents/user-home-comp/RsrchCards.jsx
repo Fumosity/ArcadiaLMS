@@ -5,7 +5,7 @@ import { Link } from "react-router-dom" // Import Link from react-router-dom
 
 const RsrchCards = ({ title, fetchResearch, onSeeMoreClick }) => {
   const [currentPage, setCurrentPage] = useState(1)
-  const [books, setBooks] = useState([])
+  const [research, setResearch] = useState([])
   const [error, setError] = useState(null)
   const entriesPerPage = 5
   const maxPages = 5
@@ -16,9 +16,9 @@ const RsrchCards = ({ title, fetchResearch, onSeeMoreClick }) => {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const fetchedBooks = await fetchResearch()
-        console.log(title, fetchedBooks)
-        setBooks(fetchedBooks.books || [])
+        const fetchedResearch = await fetchResearch()
+        console.log(title, fetchedResearch)
+        setResearch(fetchedResearch.research || [])
       } catch (error) {
         setError(error.message)
         console.error("Error fetching data:", error)
@@ -29,12 +29,12 @@ const RsrchCards = ({ title, fetchResearch, onSeeMoreClick }) => {
     fetchData()
   }, [fetchResearch])
 
-  const totalEntries = books.length
+  const totalEntries = research.length
   const totalPages = Math.min(Math.ceil(totalEntries / entriesPerPage), maxPages)
-  const paginatedBooks = books.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage)
+  const paginatedResearch = research.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage)
 
   const generatePlaceholders = () => {
-    const numPlaceholders = entriesPerPage - paginatedBooks.length
+    const numPlaceholders = entriesPerPage - paginatedResearch.length
     return Array(numPlaceholders).fill(null)
   }
 
@@ -58,6 +58,12 @@ const RsrchCards = ({ title, fetchResearch, onSeeMoreClick }) => {
       .join(", ")
   }
 
+  const formatPubDate = (dateString) => {
+    if (!dateString) return "Unknown Date";
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+  };
+
   return (
     <div className="uMain-cont">
       <div className="flex justify-between items-center">
@@ -75,7 +81,6 @@ const RsrchCards = ({ title, fetchResearch, onSeeMoreClick }) => {
             .fill(null)
             .map((_, index) => (
               <div key={index} className="genCard-cont animate-pulse">
-                <div className="w-full h-60 rounded-lg mb-2 bg-light-gray"></div>
                 <div className="text-lg font-semibold mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-400 mb-1 truncate bg-light-gray">&nbsp;</div>
@@ -83,49 +88,46 @@ const RsrchCards = ({ title, fetchResearch, onSeeMoreClick }) => {
             ))
         ) : (
           <>
-            {paginatedBooks.map((book, index) => (
+            {paginatedResearch.map((research, index) => (
               // Replace <a> with <Link> for client-side navigation
               <Link
                 key={index}
-                to={`/user/researchview?researchID=${book.researchID}`}
+                to={`/user/researchview?researchID=${research.researchID}`}
                 className="block genCard-cont"
-                title={book.title}
+                title={research.title}
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
 
                 <div className="w-full flex flex-col">
-                  <div className="flex justify-between items-center">
-                    <h3 className="w-7/8 text-lg h-auto leading-tight font-semibold whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">
-                      {book.title}
+                  <div className="flex justify-between items-start">
+                    <h3 className="w-3/4 text-xl h-auto leading-tight font-ZenSerif whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">
+                      {research.title}
                     </h3>
-                    {book.pdf &&
-                      <div className="w-1/8 bg-arcadia-red rounded-full text-white text-xs px-2 py-1">
+                    {research.pdf &&
+                      <div className="w-1/8 bg-arcadia-red rounded-full font-semibold text-white text-center text-xs px-2 py-1">
                         Preview Available
                       </div>
                     }
                   </div>
 
-                  <p className="text-sm text-gray-500 mb-1 truncate">
-                    {Array.isArray(formatAuthor(book.author)) ? book.author.join(", ") : formatAuthor(book.author)}
+                  <p className="text-gray-500 mb-1 truncate">
+                    {Array.isArray(formatAuthor(research.author)) ? research.author.join(", ") : formatAuthor(research.author)}
                   </p>
-                  <p className="text-sm text-gray-400 mb-1 truncate">
-                    {book.college}
+                  <p className="text-gray-400 mb-1 truncate">
+                    {research.college}
                     <span className="ml-1">
-                      {book.department != "" && `- ${book.department} `}
+                      {research.department && research.department !== "N/A" && `- ${research.department} `}
                     </span>
-                    <span className="">
-                      &nbsp;•&nbsp;&nbsp;{book.pubDate}
-                    </span>
+                    <span className="">&nbsp;•&nbsp;&nbsp;{formatPubDate(research.pubDate)}</span>
                   </p>
-                  <p className="text-sm w-full leading-tight whitespace-pre-wrap line-clamp-2 truncate break-words">
-                    {book.abstract}
+                  <p className="w-full leading-tight whitespace-pre-wrap line-clamp-3 truncate break-words">
+                    {research.abstract}
                   </p>
                 </div>
               </Link>
             ))}
             {generatePlaceholders().map((_, index) => (
               <div key={`placeholder-${index}`} className="bg-white border border-grey rounded-xl p-4">
-                <div className="w-full h-60 rounded-lg mb-2 bg-light-gray"></div>
                 <div className="text-lg h-[3rem] font-semibold mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-400 mb-1 truncate bg-light-gray">&nbsp;</div>

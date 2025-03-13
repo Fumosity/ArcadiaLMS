@@ -68,8 +68,8 @@ const URsrchCatalog = () => {
                     </div>}
                     <div className="userMain-content lg:w-3/4 w-full ml-5">
                         {query && <UResResults query={query} />}
-                        <ResearchRecommend />
-                        <NewAddResearch />
+                        {!query && <ResearchRecommend />}
+                        {!query && <NewAddResearch />}
                     </div>
                 </div>
             </main>

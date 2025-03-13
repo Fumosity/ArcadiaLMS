@@ -155,7 +155,7 @@ export default function BookInformation({ book }) {
                 </div>
 
                 <div className="flex-1">
-                    <h3 className="text-2xl font-ZenSerif">{book.title}</h3>
+                    <h3 className="text-xl font-ZenSerif">{book.title}</h3>
                     <div className="text-md text-gray-700 mt-1 space-y-1">
                         <p><span className="font-semibold">Author:</span> {book.author.join(", ")}</p>
                         <p><span className="font-semibold">Published:</span> {book.publishedYear}</p>

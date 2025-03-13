@@ -6,7 +6,7 @@ const UResResults = ({ query }) => {
     const [researchList, setResearchList] = useState([]);
     const [filteredResearch, setFilteredResearch] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const entriesPerPage = 4;
+    const entriesPerPage = 8;
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -45,6 +45,28 @@ const UResResults = ({ query }) => {
         currentPage * entriesPerPage
     );
 
+    const formatAuthor = (authors) => {
+        if (!authors || !Array.isArray(authors) || authors.length === 0) {
+            return "Unknown Author"
+        }
+
+        return authors
+            .map((authorName) => {
+                const trimmedName = authorName.trim()
+                const names = trimmedName.split(" ")
+                const lastName = names.pop()
+                const initials = names.map((name) => name[0] + ".").join("")
+                return initials ? `${initials} ${lastName}` : lastName
+            })
+            .join(", ")
+    }
+
+    const formatPubDate = (dateString) => {
+        if (!dateString) return "Unknown Date";
+        const date = new Date(dateString);
+        return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+    };
+
     return (
         <div className="uMain-cont">
             {query && filteredResearch.length > 0 && (
@@ -54,64 +76,83 @@ const UResResults = ({ query }) => {
             )}
 
             {query && filteredResearch.length === 0 && (
-                <p className="text-lg text-gray-500 mb-4">No results for "{query}"</p>
+                <h2 className="text-xl font-semibold mb-4">
+                    No results for "{query}"
+                </h2>
             )}
 
-            {displayedResearch.map((research, index) => (
-                <div
-                    key={index}
-                    className="genCard-cont flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg mb-6"
-                >
-                    <div className="flex-1">
-                        <h3 className="text-lg font-semibold">{research.title}</h3>
-                        <div className="text-sm text-gray-700 mt-3">
-                            <p>
-                                <span>Author(s):</span> <b>{research.author}</b>
+            <div className="flex flex-col w-full space-y-2 my-4">
+                {displayedResearch.map((research, index) => (
+                    <div
+                        key={index}
+                        className="block genCard-cont"
+                    >
+                        <div className="w-full flex flex-col">
+                            <div className="flex justify-between items-start">
+                                <h3 className="w-3/4 text-xl h-auto leading-tight font-ZenSerif whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">
+                                    {research.title}
+                                </h3>
+                                {research.pdf &&
+                                    <div className="w-1/8 bg-arcadia-red rounded-full font-semibold text-white text-center text-xs px-2 py-1">
+                                        Preview Available
+                                    </div>
+                                }
+                            </div>
+                            <p className="text-gray-500 mb-1 truncate">
+                                {Array.isArray(formatAuthor(research.author)) ? research.author.join(", ") : formatAuthor(research.author)}
                             </p>
-                            <p className="mt-3">
-                                <span>Published:</span> <b>{research.pubDate}</b>
+                            <p className="text-gray-400 mb-1 truncate">
+                                {research.college}
+                                <span className="ml-1">
+                                    {research.department && research.department !== "N/A" && `- ${research.department} `}
+                                </span>
+                                <span className="">&nbsp;•&nbsp;&nbsp;{formatPubDate(research.pubDate)}</span>
+                            </p>
+                            <p className="w-full leading-tight whitespace-pre-wrap line-clamp-3 truncate break-words">
+                                {research.abstract}
                             </p>
                         </div>
-
-                        <p className="text-sm text-gray-600 mt-3">
-                            {research.abstract || "No abstract available"}
-                        </p>
-                        <div className="flex align-baseline items-center justify-end gap-2 mt-2">
+                        <div className="flex align-baseline items-center justify-start gap-2 mt-2">
                             <button
-                                className="viewRsrch-btn"
-                                onClick={() => navigate(`/user/researchview?researchID=${research.researchID}`)}
+                                className="w-1/8 hover:bg-arcadia-red rounded-lg hover:text-white text-center text-sm px-2 py-1 bg-white text-arcadia-red border border-arcadia-red"
+                                onClick={() => {
+                                    window.scrollTo({ top: 0, behavior: "smooth" })
+                                    navigate(`/user/researchview?researchID=${research.researchID}`)}
+                                }
                             >
                                 View Research
                             </button>
                         </div>
                     </div>
-                </div>
-            ))}
-
-            {filteredResearch.length > 0 && (
-                <div className="flex justify-center items-center mt-6 space-x-4">
-                    <button
-                        className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-red"
-                            }`}
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
-                        Previous Page
-                    </button>
-                    <span className="text-xs">
-                        Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                        className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-red"
-                            }`}
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                    >
-                        Next Page
-                    </button>
-                </div>
-            )}
-        </div>
+                ))
+                }
+            </div >
+            {
+                    filteredResearch.length > 0 && (
+                        <div className="flex justify-center items-center mt-6 space-x-4">
+                            <button
+                                className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-red"
+                                    }`}
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                            >
+                                Previous Page
+                            </button>
+                            <span className="text-xs">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-red"
+                                    }`}
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                            >
+                                Next Page
+                            </button>
+                        </div>
+                    )
+                }
+        </div >
     );
 };
 

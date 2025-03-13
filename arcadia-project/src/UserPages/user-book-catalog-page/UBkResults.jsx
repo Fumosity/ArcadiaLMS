@@ -181,63 +181,64 @@ const UBkResults = ({ query }) => {
                     No results for "{query}"
                 </h2>
             )}
+            
+            <div className="flex flex-col w-full space-y-2 my-4">
+                {displayedBooks.map((book, index) => (
+                    <div key={index} className="genCard-cont flex w-full gap-4 p-4 border border-grey bg-silver rounded-lg">
+                        <div className="flex-shrink-0 w-[200px]">
+                            <img
+                                src={book.image_url}
+                                alt={book.title}
+                                className="w-full h-[300px] bg-grey object-cover border border-grey rounded-md"
+                            />
+                        </div>
 
-            {displayedBooks.map((book, index) => (
-                <div key={index} className="genCard-cont flex w-full gap-4 p-4 border border-grey bg-silver rounded-lg mb-4">
-                    <div className="flex-shrink-0 w-[200px]">
-                        <img
-                            src={book.image_url}
-                            alt={book.title}
-                            className="w-full h-[300px] bg-grey object-cover border border-grey rounded-md"
-                        />
-                    </div>
+                        <div className="flex-1">
+                            <h3 className="text-xl font-ZenSerif">{book.title}</h3>
+                            <div className="text-md text-gray-700 mt-1 space-y-1">
+                                <p><span className="font-semibold">Author:</span> {book.author.join(", ")}</p>
+                                <p><span className="font-semibold">Published:</span> {book.publishedYear}</p>
+                                <p><span className="font-semibold">Category:</span> {book.category} <span className="font-semibold">Genres:</span> {book.genres.join(", ")}</p>
+                                <p className="min-h-[6rem] leading-relaxed">
+                                    <span className="font-semibold"></span> {book.synopsis || "No synopsis available."}
+                                </p>
 
-                    <div className="flex-1">
-                        <h3 className="text-2xl font-ZenSerif">{book.title}</h3>
-                        <div className="text-md text-gray-700 mt-1 space-y-1">
-                            <p><span className="font-semibold">Author:</span> {book.author.join(", ")}</p>
-                            <p><span className="font-semibold">Published:</span> {book.publishedYear}</p>
-                            <p><span className="font-semibold">Category:</span> {book.category} <span className="font-semibold">Genres:</span> {book.genres.join(", ")}</p>
-                            <p className="min-h-[6rem] leading-relaxed">
-                                <span className="font-semibold"></span> {book.synopsis || "No synopsis available."}
-                            </p>
+                                <div className="flex space-x-1 items-center text-yellow-600 w-1/2">
+                                    {renderStars(book.averageRating)}
+                                    <span className="text-md text-gray-500">
+                                        ({book.totalRatings >= 1000 ? "1000+" : book.totalRatings} Ratings)
+                                    </span>
+                                </div>
+                                <div className="justify-start space-x-2 w-1/2">
 
-                            <div className="flex space-x-1 items-center text-yellow-600 w-1/2">
-                                {renderStars(book.averageRating)}
-                                <span className="text-md text-gray-500">
-                                    ({book.totalRatings >= 1000 ? "1000+" : book.totalRatings} Ratings)
-                                </span>
+                                    <button
+                                        className="w-1/8 hover:bg-arcadia-red rounded-lg hover:text-white text-center text-sm px-2 py-1 bg-white text-arcadia-red border border-arcadia-red"
+                                        onClick={() => {
+                                            window.scrollTo({ top: 0, behavior: "smooth" })
+                                            navigate(`/user/bookview?titleID=${book.titleID}`)
+                                        }} // Navigate with title_id
+                                    >
+                                        View Book
+                                    </button>
+                                    {book.book_indiv.length > 0 &&
+                                        book.book_indiv.some((indivBook) => indivBook.bookStatus === "Available") ? (
+                                        <>
+                                            <span className="text-green font-semibold">✓</span>
+                                            <span className="ml-2">Book is Available</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="text-red font-semibold">✗</span>
+                                            <span className="ml-2">Book is Unavailable</span>
+                                        </>
+                                    )}
+
+                                </div>
                             </div>
-                            <div className="justify-start space-x-2 w-1/2">
-
-                                <button
-                                    className="w-1/3 bg-arcadia-red hover:bg-red hover:text-white text-white py-1 px-2 mt-4 rounded-xl text-md"
-                                    onClick={() => {
-                                        window.scrollTo({ top: 0, behavior: "smooth" })
-                                        navigate(`/user/bookview?titleID=${book.titleID}`)
-                                    }} // Navigate with title_id
-                                >
-                                    View Book
-                                </button>
-                                {book.book_indiv.length > 0 &&
-                                    book.book_indiv.some((indivBook) => indivBook.bookStatus === "Available") ? (
-                                    <>
-                                        <span className="text-green font-semibold">✓</span>
-                                        <span className="ml-2">Book is Available</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="text-red font-semibold">✗</span>
-                                        <span className="ml-2">Book is Unavailable</span>
-                                    </>
-                                )}
-
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
 
             {filteredBooks.length > 0 && (
                 <div className="flex justify-center items-center mt-6 space-x-4">

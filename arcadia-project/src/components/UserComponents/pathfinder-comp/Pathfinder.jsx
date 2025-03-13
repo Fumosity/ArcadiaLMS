@@ -12,9 +12,11 @@ export default function Pathfinder({ book }) {
     const [currentLocation, setCurrentLocation] = useState("4th Floor, Highschool and Multimedia Section");
     const location = useLocation();
 
-    const callNo = book.arcID
-    const callNoPrefix = callNo.split(" ")[0].trim(); // Extract only the alphabetical prefix
+    console.log(book)
 
+    const callNo = book.arcID || book.researchARCID;
+    const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
+    console.log(callNoPrefix)
     const locations = {
         "2nd Floor, Circulation Section": { w: 28, h: 19 },
         "4th Floor, Circulation Section": { w: 27, h: 11 },
@@ -273,8 +275,9 @@ export default function Pathfinder({ book }) {
             setCurrentLocation("4th Floor, Highschool and Multimedia Section");
         } else {
             // Extract year from pubDate (assuming it's a string in "yyyy-mm-dd" format)
-            const pubYear = parseInt(book.currentPubDate.split("-")[0], 10);
-
+            const pubDate = book.currentPubDate || book.pubDate; // Use currentPubDate first, fallback to pubDate
+            const pubYear = pubDate ? parseInt(pubDate.split("-")[0], 10) : "Unknown Year";
+            
             if (pubYear <= 2009) {
                 setCurrentLocation("4th Floor, Circulation Section");
             } else {
