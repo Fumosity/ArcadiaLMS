@@ -1,69 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import RsrchCards from "../user-home-comp/RsrchCards";
+import { useUser } from "../../../backend/UserContext";
+import { supabase } from "../../../supabaseClient";
 
-const ResearchRecommend = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalEntries = 5; // Total number of recommended books
-    const entriesPerPage = 4; // Books per page
-    const totalPages = Math.ceil(totalEntries / entriesPerPage);
-
+const fetchRecommendedBooks = async (userID, titleID) => {
     // Placeholder book data
     const books = [
-        { title: "Designing Data-Intensive Applications", author: "Martin Kleppmann", rating: 4.35, img: "https://via.placeholder.com/150x200", category: "Nonfiction; Guide, Educational" },
-        { title: "System Design Interview", author: "Alex Xu", rating: 3.21, img: "https://via.placeholder.com/150x200", category: "Nonfiction; Guide, Educational" },
-        { title: "Agile Practice Guide", author: "Project Management Institute", rating: 3.69, img: "https://via.placeholder.com/150x200", category: "Nonfiction; Guide, Educational" },
-        { title: "Why Machines Learn", author: "Anil Ananthaswamy", rating: 4.65, img: "https://via.placeholder.com/150x200", category: "Nonfiction; Guide, Educational" },
-        { title: "CCNA 200-301", author: "Wendell Odom", rating: 4.93, img: "https://via.placeholder.com/150x200", category: "Nonfiction; Guide, Educational" },
+        { pdf: "dadad", researchID: 12, title: "Designing Data-Intensive Applications", author: ["Marcus Oliveira", "Israel Quinto", "Takumi Sato", "Gwenne Masila"], college: "COECSA", department: "DCS", pubDate: 2023, abstract: "The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham." },
+        { researchID: 34, title: "Departing Tourism in War-torn Areas of Mindanao", author: ["Karen Rubio", "Rafael Villafuerte", "Lucia Ferrer"], college: "CITHM", department: "", pubDate: 2020, abstract: "The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham." },
+        { pdf: "dadad",researchID: 21, title: "Feasibility Study of Crypto-based Public Transport", author: ["Ellaine Mambato", "Michael Arroyo"], college: "CBA", department: "", pubDate: 2019, abstract: "The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham." },
+        { researchID: 25, title: "Aftereffects of Steroidal Solutions for Victims of Blunt-force Trauma", author: ["John Carlo Flores", "Christian Mercado", "Andrea Mendoza"],  college: "CAMS", department: "", pubDate: 2014, abstract: "The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham." },
+        { researchID: 52, title: "Anime and its Consequences", author: ["Han Jae-in", "Julian Torres"],  college: "CLAE", department: "", pubDate: 2018, abstract: "The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham." },
     ];
+    return { books }
+}
+
+const Recommended = ({ titleID, onSeeMoreClick }) => {
+    const { user } = useUser(); // Global user state from context
+
+    useEffect(() => {
+        if (!user || !user.userID) return; // Ensure user is loaded before fetching
+    }, [user, titleID]);
+
+    if (!user || !user.userID) {
+        console.log("Recommended: Guest Mode");
+        return;
+    }
 
     return (
-        <div className="cred-cont">
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold">Recommended for You</h2>
-                <button className="uSee-more">
-                    See more
-                </button>
-            </div>
-
-            {/* Book Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
-                {books.map((book, index) => (
-                    <a key={index} className="genCard-cont">
-                        <img
-                            src={book.img}
-                            alt={book.title}
-                            className="w-full h-40 object-cover rounded-lg mb-4"
-                        />
-                        <h3 className="text-lg font-semibold mb-2 truncate">{book.title}</h3>
-                        <p className="text-sm text-gray-500 mb-2 truncate">{book.author}</p>
-                        <p className="text-xs text-gray-400 mb-2 truncate">{book.category}</p>
-                        <div className="flex items-center space-x-1">
-                            <span className="text-bright-yellow text-sm">★</span>
-                            <p className=" text-sm">{book.rating.toFixed(2)}</p>
-                        </div>
-                    </a>
-                ))}
-            </div>
-
-            {/* Pagination */}
-            <div className="flex justify-center items-center mt-6 space-x-4">
-                <button
-                    className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                >
-                    Previous Page
-                </button>
-                <span className="text-xs text-arcadia-red">Page {currentPage}</span>
-                <button
-                    className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                >
-                    Next Page
-                </button>
-            </div>
-        </div>
-    );
+        <RsrchCards
+            title="Recommended for You"
+            fetchResearch={() => fetchRecommendedBooks(user.userID, titleID)}
+            onSeeMoreClick={() => onSeeMoreClick("Recommended for You", () => fetchRecommendedBooks(user.userID, titleID))}
+        />
+    )
 };
 
-export default ResearchRecommend;
+export default Recommended;

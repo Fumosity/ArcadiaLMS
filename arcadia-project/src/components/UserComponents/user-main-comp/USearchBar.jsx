@@ -36,7 +36,7 @@ const USearchBar = ({ placeholder, structureType, onSearch }) => {
 
     return (
         <section className="userSearch-section">
-            <h2 className="userSearch-title">What are you looking for?</h2>
+            <h2 className="userSearch-title">What book are you looking for?</h2>
             <input
                 type="text"
                 className="userSearch-input"

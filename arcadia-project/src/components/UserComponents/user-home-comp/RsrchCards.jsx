@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom" // Import Link from react-router-dom
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faStar, faStarHalfAlt, faStar as faRegularStar } from "@fortawesome/free-solid-svg-icons"
 
-const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
+const RsrchCards = ({ title, fetchResearch, onSeeMoreClick }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [books, setBooks] = useState([])
   const [error, setError] = useState(null)
@@ -18,7 +16,7 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const fetchedBooks = await fetchBooks()
+        const fetchedBooks = await fetchResearch()
         console.log(title, fetchedBooks)
         setBooks(fetchedBooks.books || [])
       } catch (error) {
@@ -29,7 +27,7 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
       }
     }
     fetchData()
-  }, [fetchBooks])
+  }, [fetchResearch])
 
   const totalEntries = books.length
   const totalPages = Math.min(Math.ceil(totalEntries / entriesPerPage), maxPages)
@@ -60,34 +58,6 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
       .join(", ")
   }
 
-  const renderStars = (rating) => {
-    const roundedRating = Math.round(rating * 10) / 10
-    const fullStars = Math.floor(roundedRating)
-    const halfStar = (roundedRating * 2) % 2 !== 0
-
-    let emptyStars = 5 - fullStars - (halfStar ? 1 : 0)
-    emptyStars = Math.max(0, emptyStars)
-
-    return (
-      <span className="flex gap-1 items-center">
-        <span className="flex">
-          {[...Array(fullStars)].map((_, i) => (
-            <FontAwesomeIcon key={i} icon={faStar} className="text-arcadia-yellow" />
-          ))}
-          {halfStar && <FontAwesomeIcon icon={faStarHalfAlt} className="text-arcadia-yellow" />}
-          {[...Array(emptyStars)].map((_, i) => (
-            <FontAwesomeIcon key={i} icon={faRegularStar} className="text-grey" />
-          ))}
-        </span>
-        {formatRating(rating)}
-      </span>
-    )
-  }
-
-  const formatRating = (rating) => {
-    return rating.toFixed(1)
-  }
-
   return (
     <div className="uMain-cont">
       <div className="flex justify-between items-center">
@@ -99,7 +69,7 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
         )}
 
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2 my-4">
+      <div className="flex flex-col w-full space-y-2 my-4">
         {isLoading ? (
           Array(entriesPerPage)
             .fill(null)
@@ -109,7 +79,6 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
                 <div className="text-lg font-semibold mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-400 mb-1 truncate bg-light-gray">&nbsp;</div>
-                <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
               </div>
             ))
         ) : (
@@ -118,34 +87,40 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
               // Replace <a> with <Link> for client-side navigation
               <Link
                 key={index}
-                to={`/user/bookview?titleID=${book.titleID}`}
+                to={`/user/researchview?researchID=${book.researchID}`}
                 className="block genCard-cont"
                 title={book.title}
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
-                <img
-                  src={book.cover || "/image/arcadia_gray.png"}
-                  alt={book.title}
-                  className="w-full h-60 object-cover rounded-lg mb-2 bg-light-gray"
-                />
-                <h3 className="text-lg h-[3rem] leading-tight font-semibold whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">
-                  {book.title}
-                </h3>
-                <p className="text-sm text-gray-500 mb-1 truncate">
-                  {Array.isArray(formatAuthor(book.author)) ? book.author.join(", ") : formatAuthor(book.author)}
-                </p>
-                <p className="text-sm text-gray-400 mb-1 truncate">{book.category}</p>
-                <p className="text-sm text-gray-500 mb-1 truncate">
-                  {book.weightedAvg && (
-                    <span className="flex items-center gap-1">
-                      {renderStars(book.weightedAvg)}
-                      <span className="text-xs text-gray-500">
-                        ({book.totalRatings >= 1000 ? "1000+" : book.totalRatings})
-                      </span>
+
+                <div className="w-full flex flex-col">
+                  <div className="flex justify-between items-center">
+                    <h3 className="w-7/8 text-lg h-auto leading-tight font-semibold whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">
+                      {book.title}
+                    </h3>
+                    {book.pdf &&
+                      <div className="w-1/8 bg-arcadia-red rounded-full text-white text-xs px-2 py-1">
+                        Preview Available
+                      </div>
+                    }
+                  </div>
+
+                  <p className="text-sm text-gray-500 mb-1 truncate">
+                    {Array.isArray(formatAuthor(book.author)) ? book.author.join(", ") : formatAuthor(book.author)}
+                  </p>
+                  <p className="text-sm text-gray-400 mb-1 truncate">
+                    {book.college}
+                    <span className="ml-1">
+                      {book.department != "" && `- ${book.department} `}
                     </span>
-                  )}
-                  {!book.weightedAvg && "Rating not available"}
-                </p>
+                    <span className="">
+                      &nbsp;•&nbsp;&nbsp;{book.pubDate}
+                    </span>
+                  </p>
+                  <p className="text-sm w-full leading-tight whitespace-pre-wrap line-clamp-2 truncate break-words">
+                    {book.abstract}
+                  </p>
+                </div>
               </Link>
             ))}
             {generatePlaceholders().map((_, index) => (
@@ -154,7 +129,6 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
                 <div className="text-lg h-[3rem] font-semibold mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-400 mb-1 truncate bg-light-gray">&nbsp;</div>
-                <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
               </div>
             ))}
           </>
@@ -181,5 +155,5 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
   )
 }
 
-export default BookCards
+export default RsrchCards
 

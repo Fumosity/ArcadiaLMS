@@ -6,7 +6,7 @@ export default function BookAvailability({ book }) {
     return (
         <div className="uSidebar-filter">
             <div className="flex justify-between items-center mb-2.5">
-                <h2 className="text-xl font-semibold">Most Popular Books</h2>
+                <h2 className="text-xl font-semibold">Availability</h2>
             </div>
 
             <div className="flex m-6 item-center justify-center text-center ">

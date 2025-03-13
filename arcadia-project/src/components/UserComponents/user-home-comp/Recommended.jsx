@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import BookCards from "./BookCards";
-import { useUser } from "../../../backend/UserContext"; // Adjust path as needed
+import { useUser } from "../../../backend/UserContext";
 import { supabase } from "../../../supabaseClient";
 
 const fetchRecommendedBooks = async (userID, titleID) => {

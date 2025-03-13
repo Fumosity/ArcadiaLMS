@@ -408,7 +408,7 @@ export default function Pathfinder({ book }) {
         }
         setGridData(newGrid);
         console.log(book)
-    }, [selectedStart, selectedShelf, location]);
+    }, [selectedStart, selectedShelf, location, currentLocation]);
 
 
     return (
