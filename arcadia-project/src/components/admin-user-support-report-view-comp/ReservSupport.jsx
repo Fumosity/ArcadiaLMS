@@ -156,7 +156,6 @@ const ReservSupport = () => {
       <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr>
-            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Type</th>
             <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Status</th>
             <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-3/12">Subject</th>
             <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">User</th>
@@ -178,11 +177,11 @@ const ReservSupport = () => {
           ) : displayedSupports.length > 0 ? (
             displayedSupports.map((support, index) => (
               <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                <td className="px-4 py-2 text-sm text-gray-900 text-center">
+                {/* <td className="px-4 py-2 text-sm text-gray-900 text-center">
                   <div className="py-1 px-3 rounded-full bg-grey font-semibold">
                     {support.type || "N/A"}
                   </div>
-                </td>
+                </td> */}
                 <td className="px-4 py-2 text-sm text-gray-900 text-center">
                   <div className={`py-1 px-3 rounded-full font-semibold ${checkStatusColor(support.status)}`}>
                     {support.status || "N/A"}

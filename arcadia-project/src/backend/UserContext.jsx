@@ -57,7 +57,7 @@ export const UserProvider = ({ children }) => {
 
     if (["Admin", "Superadmin", "Intern"].includes(userAccountType)) {
       navigate("/admin");
-    } else if (["Student", "Teacher", "Guest"].includes(userAccountType)) {
+    } else if (["Student", "Faculty", "Guest"].includes(userAccountType)) {
       navigate(userRoutes.includes(location.pathname) ? location.pathname : "/");
     } else {
       navigate("/user/login");

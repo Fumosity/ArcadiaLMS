@@ -33,7 +33,6 @@ const UBkCatalog = () => {
     const [error, setError] = useState(null);
     const [seeMoreComponent, setSeeMoreComponent] = useState(null);
 
-    // ✅ Check URL query parameters on component mount
     useEffect(() => {
         if (viewParam === "highlyRated") {
             setSeeMoreComponent({
