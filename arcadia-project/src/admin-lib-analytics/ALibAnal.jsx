@@ -32,7 +32,6 @@ const ALibAnal = () => {
                 <div id="history">
                     <BCHistory />
                 </div>
-                    <BCHistory />
                 <div id="room-reserv-demographics">
                     <RoomReserv />
                 </div>
