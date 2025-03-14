@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useCallback } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { supabase } from "/src/supabaseClient.js"
@@ -147,9 +145,10 @@ const ReportSupportBarPlot = () => {
     setTimeFrame(newTimeFrame)
   }
 
-  // if (isLoading) {
-  //   return <div>Loading...</div>
-  // }
+  // Format Y-axis ticks as integers
+  const formatYAxisTick = (value) => {
+    return Math.round(value)
+  }
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border h-fit">
@@ -168,8 +167,8 @@ const ReportSupportBarPlot = () => {
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
+          <YAxis tickFormatter={formatYAxisTick} allowDecimals={false} />
+          <Tooltip formatter={(value) => [Math.round(value), ""]} />
           <Legend />
           <Bar dataKey="reports" fill="#A31D1D" />
           <Bar dataKey="supports" fill="#FFB200" />
