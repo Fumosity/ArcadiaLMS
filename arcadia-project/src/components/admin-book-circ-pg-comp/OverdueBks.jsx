@@ -119,6 +119,7 @@ const OverdueBks = () => {
             <h3 className="text-2xl font-semibold mb-2">Overdue Books</h3>
 
             {/* Table */}
+            <div className='overflow-x-auto'>
             <table className="min-w-full divide-y divide-gray-200 text-center">
                 <thead className="bg-gray-50">
                     <tr>
@@ -168,6 +169,7 @@ const OverdueBks = () => {
                     )}
                 </tbody>
             </table>
+            </div>
 
             {/* Pagination */}
             <div className="flex justify-center items-center mt-2 space-x-4">

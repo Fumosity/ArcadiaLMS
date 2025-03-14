@@ -84,7 +84,7 @@ const ReportSupportPieChart = () => {
   return (
     <div className="bg-white p-4 rounded-lg border-grey border h-fit">
       <h3 className="text-2xl font-semibold mb-6">Reports and Supports Status</h3>
-      <div className="flex justify-center items-start">
+      <div className="flex justify-center items-start overflow-auto">
         {renderPieChart(reportData, "Reports")}
         {renderPieChart(supportData, "Supports")}
       </div>

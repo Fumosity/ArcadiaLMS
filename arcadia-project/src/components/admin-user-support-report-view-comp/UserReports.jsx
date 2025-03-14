@@ -103,7 +103,7 @@ const UserReports = () => {
       <h3 className="text-2xl font-semibold mb-4">User Reports</h3>
 
       {/* Controls for sort, filter, and search */}
-      <div className="mb-4 flex flex-wrap justify-between space-x-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex gap-4">
           {/* Sort By */}
           <div className="flex items-center space-x-2">
@@ -149,19 +149,19 @@ const UserReports = () => {
           </div>
         </div>
         {/* Search */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 min-w-[0]">
           <label htmlFor="search" className="font-medium text-sm">Search:</label>
           <input
             type="text"
             id="search"
-            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-64"
+            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
             placeholder="Subject or report ID"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
-
+      <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr>
@@ -249,6 +249,7 @@ const UserReports = () => {
         </tbody>
         
       </table>
+      </div>                                          
       {/* Pagination Controls */}
       <div className="flex justify-center items-center mt-2 space-x-4">
           <button className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>

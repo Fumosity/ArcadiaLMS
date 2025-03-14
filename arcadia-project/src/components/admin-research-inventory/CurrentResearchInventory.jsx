@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { supabase } from "/src/supabaseClient.js"
 import { Link } from "react-router-dom"

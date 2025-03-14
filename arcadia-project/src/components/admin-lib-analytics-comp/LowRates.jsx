@@ -84,6 +84,7 @@ const LowRates = () => {
     return (
         <div className="bg-white border border-grey p-4 rounded-lg w-full">
             <h3 className="text-2xl font-semibold mb-4">Lowest Rated Books</h3>
+            <div className="overflow-auto">
             <table className="min-w-full divide-y divide-gray-200">
                 <thead>
                     <tr>
@@ -94,7 +95,7 @@ const LowRates = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                     {books.map((book, index) => (
                         <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                            <td className="w-3/4 px-4 py-2 text-arcadia-red font-semibold text-left text-sm truncate">
+                            <td className="w-2/3 px-4 py-2 text-left text-sm text-arcadia-red font-semibold">
                                 <Link
                                     to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
                                     className="text-blue-600 hover:underline"
@@ -102,11 +103,12 @@ const LowRates = () => {
                                     {book.title}
                                 </Link>
                             </td>
-                            <td className="w-1/4 px-4 py-2 text-center text-sm truncate">{book.avgRating}</td>
+                            <td className="w-1/3 px-4 py-2 text-center text-sm truncate">{book.avgRating}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            </div>
         </div>
     );
 };

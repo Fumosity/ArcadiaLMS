@@ -68,7 +68,7 @@ const TodayReserv = () => {
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-2xl font-semibold">Today's Reservations</h3>
       </div>
-
+      <div className="overflow-auto">
       <table className="min-w-full divide-y divide-gray-200">
         <thead>
           <tr>
@@ -95,9 +95,9 @@ const TodayReserv = () => {
           ) : roomRes.length > 0 ? (
             roomRes.map((room, index) => (
               <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                <td className="px-4 py-2 text-center text-sm truncate">{room.room}</td>
-                <td className="px-4 py-2 text-center text-sm truncate">{room.time}</td>
-                <td className="px-4 py-2 text-center text-sm truncate">{room.booker}</td>
+                <td className="w-2/3 px-4 py-2 text-left text-sm text-arcadia-red font-semibold">{room.room}</td>
+                <td className="w-2/3 px-4 py-2 text-left text-sm text-arcadia-red font-semibold">{room.time}</td>
+                <td className="w-2/3 px-4 py-2 text-left text-sm text-arcadia-red font-semibold">{room.booker}</td>
               </tr>
             ))
           ) : (
@@ -107,6 +107,7 @@ const TodayReserv = () => {
           )}
         </tbody>
       </table>
+      </div>
 
     </div>
   );

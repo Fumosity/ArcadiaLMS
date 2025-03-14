@@ -65,7 +65,7 @@ export const AdminSettings = ({ options = settingsOptions }) => {
   }
 
   return (
-    <div className="uMain-cont">
+    <div className="uMain-cont bg-light-white">
       <h2 className="text-xl font-medium text-arcadia-black mb-6">Account Settings</h2>
       <div className="space-y-4">
         {options.map((option) => (

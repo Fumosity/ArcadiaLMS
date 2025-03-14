@@ -92,7 +92,7 @@ export function UserInterests() {
     }
 
     return (
-        <div className="cred-cont">
+        <div className="uMain-cont">
             <h2 className="text-xl font-medium text-arcadia-black mb-6">User Interests</h2>
             <div className="mb-4">
                 Below are your current interests, which will be used to recommend books.

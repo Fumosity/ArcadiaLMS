@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { supabase } from "/src/supabaseClient.js"
 import { Link } from "react-router-dom"
@@ -291,7 +289,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           />
         </div>
       </div>
-      <div className="">
+      <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

@@ -112,8 +112,8 @@ const ListOfAdminAcc = () => {
                 <h2 className="text-2xl font-semibold mb-4">List of Admin Accounts</h2>
 
                 {/* Controls for sort, filter, and search */}
-                <div className="mb-4 flex flex-wrap justify-between space-x-4">
-                    <div className="flex gap-4">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex flex-wrap items-center gap-4">
                         {/* Sort By */}
                         <div className="flex items-center space-x-2">
                             <span className="font-medium text-sm">Sort:</span>
@@ -131,7 +131,7 @@ const ListOfAdminAcc = () => {
                         <div className="flex items-center space-x-2">
                             <span className="font-medium text-sm">Filter:</span>
                             <select
-                                className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+                                className="py-1 px-3 border rounded-lg text-sm w-32"
                                 value={typeFilter}
                                 onChange={(e) => setTypeFilter(e.target.value)}
                             >
@@ -143,12 +143,12 @@ const ListOfAdminAcc = () => {
                         </div>
                     </div>
                     {/* Search */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 min-w-[0]">
                         <label htmlFor="search" className="font-medium text-sm">Search:</label>
                         <input
                             type="text"
                             id="search"
-                            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-64"
+                            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
                             placeholder="Name, email, or ID"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -157,16 +157,17 @@ const ListOfAdminAcc = () => {
                 </div>
 
                 {/* Table */}
-                <table className="min-w-full divide-y divide-gray-200">
+                <div className="overflow-x-auto">
+                <table className="min-w-full divide-y ">
                     <thead>
                         <tr>
-                            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">School ID</th>
+                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">School ID</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y ">
                         {displayedUsers.map((user, index) => (
                             <tr key={index} className="hover:bg-light-gray cursor-pointer">
                                 <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
@@ -192,6 +193,7 @@ const ListOfAdminAcc = () => {
                         ))}
                     </tbody>
                 </table>
+                </div>
 
                 {/* Pagination Controls */}
                 <div className="flex justify-center items-center mt-2 space-x-4">

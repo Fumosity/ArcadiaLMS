@@ -179,9 +179,9 @@ export default function RcntLibVisit() {
 
       <div className="flex space-x-2 w-full">
         {/* By College Section */}
-        <div className="bg-white border border-grey p-4 rounded-lg w-full">
+        <div className="bg-white border border-grey p-4 rounded-lg min-w-36 w-full">
           <h2 className="text-2xl font-semibold mb-4 text-left">Circulation By College</h2>
-          <div>
+          <div className="pb-4 overflow-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr className="bg-gray-200">
@@ -212,9 +212,9 @@ export default function RcntLibVisit() {
         </div>
 
         {/* By Department Section */}
-        <div className="bg-white border border-grey p-4 rounded-lg w-full">
+        <div className="bg-white border border-grey p-4 rounded-lg min-w-36 w-full">
           <h2 className="text-2xl font-semibold mb-4 text-left">Circulation By Department</h2>
-          <div>
+          <div className="pb-4 overflow-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr className="bg-gray-200">

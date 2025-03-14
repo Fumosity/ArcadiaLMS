@@ -123,6 +123,7 @@ const BorrowedBks = () => {
             {loading ? (
                 <div className="text-center">Loading...</div>
             ) : (
+                <div className='overflow-x-auto'>
                 <table className="min-w-full divide-y divide-gray-200 text-center">
                     <thead className="bg-gray-50 rounded-t-lg" style={{ borderRadius: "40px" }}>
                         <tr>
@@ -175,6 +176,7 @@ const BorrowedBks = () => {
                         )}
                     </tbody>
                 </table>
+                </div>
             )}
 
             {/* Pagination Controls */}

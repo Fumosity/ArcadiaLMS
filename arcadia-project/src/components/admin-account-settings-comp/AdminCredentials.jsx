@@ -32,7 +32,7 @@ export function AdminCredentials({ user = defaultUser }) {
   }, []);
 
   return (
-    <div className="uMain-cont">
+    <div className="uMain-cont bg-light-white">
       {/* User Profile Section */}
       <div className="flex flex-col items-center mb-8">
         <div className="w-24 h-24 border border-grey rounded-full overflow-hidden mb-4">

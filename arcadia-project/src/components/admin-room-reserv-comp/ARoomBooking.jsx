@@ -244,9 +244,9 @@ export default function ARoomBooking({ addReservation }) {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg border-grey border">
+    <div className="bg-white p-4 rounded-lg border-grey border overflow-x-auto">
       <h3 className="text-2xl font-semibold mb-4">Room Booking</h3>
-      <div className="flex space-x-4">
+      <div className="flex space-x-4 pb-5 overflow-x-auto">
         <div className="space-y-2 flex-1">
           <div className="flex items-center">
             <span className="w-1/3 text-md capitalize">School ID*:</span>

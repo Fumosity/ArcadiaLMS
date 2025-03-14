@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 const defaultUser = {
   name: "Shiori Novella",
   schoolId: "2021-2-01080",
@@ -33,7 +32,7 @@ export function UserCredentials({ user = defaultUser }) {
   }, []);
 
   return (
-    <div className="cred-cont">
+    <div className="uMain-cont">
       {/* User Profile Section */}
       <div className="flex flex-col items-center mb-8">
         <div className="w-24 h-24 border border-grey rounded-full overflow-hidden mb-4">

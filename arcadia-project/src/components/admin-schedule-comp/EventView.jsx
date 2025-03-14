@@ -67,11 +67,11 @@ const EventView = () => {
       <h3 className="text-2xl font-semibold">Upcoming Events</h3>
       
       {/* Calendar Component */}
-      <div className="bg-gray-100 p-4 rounded-lg mb-4">
+      <div className="bg-gray-100 p-4 rounded-lg mb-4 ">
         <Calendar
           onChange={setDate}
           value={date}
-          className="mx-auto"
+          className="mx-auto overflow-x-auto"
           tileClassName={tileClassName}
         />
       </div>

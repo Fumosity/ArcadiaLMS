@@ -116,7 +116,7 @@ const ReturnedBks = () => {
         <div className="bg-white p-4 rounded-lg border-grey border">
             {/* Title */}
             <h3 className="text-2xl font-semibold mb-2">Returned Books</h3>
-
+            <div className='overflow-x-auto'>
             <table className="min-w-full divide-y divide-gray-200 text-center">
                 <thead className="bg-gray-50 rounded-t-lg" style={{ borderRadius: "40px" }}>
                     <tr>
@@ -168,6 +168,7 @@ const ReturnedBks = () => {
                     )}
                 </tbody>
             </table>
+            </div>
 
             {/* Pagination Controls */}
             <div className="flex justify-center items-center mt-2 space-x-4">

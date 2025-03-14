@@ -87,6 +87,7 @@ const SBFines = () => {
     return (
         <div className="bg-white border border-grey p-4 rounded-lg w-full">
             <h3 className="text-2xl font-semibold">Outstanding Fines</h3>
+            <div className="overflow-auto">
             <table className="min-w-full divide-y divide-gray-200">
                 <thead>
                     <tr>
@@ -131,6 +132,7 @@ const SBFines = () => {
                     )}
                 </tbody>
             </table>
+            </div>
         </div>
     );
 };
