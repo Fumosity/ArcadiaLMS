@@ -99,7 +99,7 @@ export default function SearchByGenre({ onGenreClick, onSeeMoreGenresClick }) {
   }, [user?.userID]);
 
   return (
-    <div className="uMain-cont w-full px-4 py-6">
+    <div className="uMain-cont px-4 py-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Search by Genre</h2>
         <button

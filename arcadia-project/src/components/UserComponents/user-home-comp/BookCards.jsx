@@ -99,7 +99,7 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
         )}
 
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-2 my-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 my-4">
         {isLoading ? (
           Array(entriesPerPage)
             .fill(null)
@@ -137,7 +137,7 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
                 <p className="text-sm text-gray-400 mb-1 truncate">{book.category}</p>
                 <p className="text-sm text-gray-500 mb-1 truncate">
                   {book.weightedAvg && (
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center justify-start gap-1">
                       {renderStars(book.weightedAvg)}
                       <span className="text-xs text-gray-500">
                         ({book.totalRatings >= 1000 ? "1000+" : book.totalRatings})

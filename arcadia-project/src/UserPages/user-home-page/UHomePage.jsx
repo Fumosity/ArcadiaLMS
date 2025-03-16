@@ -90,48 +90,46 @@ const UHomePage = () => {
     <div className="min-h-screen bg-light-white">
       <UNavbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="userContent-container flex flex-col lg:flex-row gap-8 justify-center items-start">
-          <div className="lg:w-1/4 md:w-1/3 w-full space-y-4">
-            <ArcOpHr />
-            <UpEvents />
-            <Services />
-            <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-            <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-          </div>
-
-          <div className="userMain-content lg:w-3/4 w-full ml-5">
-            {selectedGenre ? (
-              <GenrePage selectedGenre={selectedGenre} onBackClick={handleBackClick} />
-            ) : seeMoreComponent ? (
-              <SeeMore
-                selectedComponent={seeMoreComponent.title}
-                onBackClick={handleBackClick}
-                fetchBooks={seeMoreComponent.fetchBooks}
-              />
-            ) : seeMoreGenresComponent ? (
-              <SeeMoreGenres
-                onGenreClick={handleGenreClick}
-                selectedComponent={seeMoreGenresComponent.title}
-                onBackClick={handleBackClick}
-                fetchAllGenres={seeMoreGenresComponent.fetchAllGenres}
-              />
-            ) : (
-              <>
-                <UHero />
-                <SearchByGenre
-                  onGenreClick={handleGenreClick}
-                  onSeeMoreGenresClick={(title, fetchData) => handleSeeMoreGenresClick(title, fetchData)}
-                />
-                <Recommended onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                <InterestedGenre onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-              </>
-            )}
-          </div>
+      <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
+        <div className="lg:w-1/4 lg:block md:hidden space-y-4">
+          <ArcOpHr />
+          <UpEvents />
+          <Services />
+          <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+          <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
         </div>
-      </main>
+
+        <div className="userMain-content lg:w-3/4 md:w-full">
+          {selectedGenre ? (
+            <GenrePage selectedGenre={selectedGenre} onBackClick={handleBackClick} />
+          ) : seeMoreComponent ? (
+            <SeeMore
+              selectedComponent={seeMoreComponent.title}
+              onBackClick={handleBackClick}
+              fetchBooks={seeMoreComponent.fetchBooks}
+            />
+          ) : seeMoreGenresComponent ? (
+            <SeeMoreGenres
+              onGenreClick={handleGenreClick}
+              selectedComponent={seeMoreGenresComponent.title}
+              onBackClick={handleBackClick}
+              fetchAllGenres={seeMoreGenresComponent.fetchAllGenres}
+            />
+          ) : (
+            <>
+              <UHero />
+              <SearchByGenre
+                onGenreClick={handleGenreClick}
+                onSeeMoreGenresClick={(title, fetchData) => handleSeeMoreGenresClick(title, fetchData)}
+              />
+              <Recommended onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+              <InterestedGenre onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+              <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+              <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+            </>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
