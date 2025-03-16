@@ -51,6 +51,32 @@ export default function Onboarding({ userData, selectedGenres }) {
         const newUserID = userInsertData[0].userID;
         console.log("New userID:", newUserID);
 
+        // Send authentication email
+        try {
+            const response = await fetch("http://localhost:5000/send-email", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: userData.email + userData.emailSuffix,
+                    firstName: userData.firstName,
+                    lpuID: userData.studentNumber,
+                }),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                console.log("Verification email sent:", result);
+                alert("A verification email has been sent. Please check your inbox.");
+            } else {
+                console.error("Email sending failed:", result.error);
+                alert("Failed to send verification email. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error sending verification email:", error);
+            alert("An error occurred while sending the verification email.");
+        }
 
         /* user interest submission to user_genre_link supabase table */
 
