@@ -21,6 +21,7 @@ import Services from "../../components/UserComponents/user-main-comp/Services"
 import MostPopBk from "../../components/UserComponents/user-main-comp/MostPopBk"
 import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghestRatedBk"
 import { FilterProvider } from "../../backend/filterContext"
+import { Filter } from "lucide-react"
 
 const UBkCatalog = () => {
   const [query, setQuery] = useState("")
@@ -33,6 +34,7 @@ const UBkCatalog = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
 
   useEffect(() => {
     if (viewParam === "highlyRated") {
@@ -95,6 +97,11 @@ const UBkCatalog = () => {
     }
   }, [titleId])
 
+  // Reset mobile filters when query changes
+  useEffect(() => {
+    setShowMobileFilters(false)
+  }, [query])
+
   if (!user) {
     return <div>Loading...</div>
   }
@@ -121,6 +128,10 @@ const UBkCatalog = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  const toggleMobileFilters = () => {
+    setShowMobileFilters(!showMobileFilters)
+  }
+
   return (
     <div className="min-h-screen bg-light-white">
       <UNavbar />
@@ -128,57 +139,95 @@ const UBkCatalog = () => {
       <Title>Book Catalog</Title>
 
       <FilterProvider>
-        <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
-          {query.trim() && <FilterSidebar />}
-          {!query.trim() && (
-            <div className="lg:w-1/4 lg:block md:hidden space-y-4">
-              <ArcOpHr />
-              <UpEvents />
-              <Services />
-              <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+        {/* Mobile Filter Toggle Button - Only show when searching */}
+        {query.trim() && (
+          <div className="lg:hidden w-10/12 mx-auto mt-4">
+            <button
+              onClick={toggleMobileFilters}
+              className="flex items-center gap-2 px-4 py-2 bg-arcadia-red text-white rounded-xl shadow-sm"
+            >
+              <Filter size={18} />
+              {showMobileFilters ? "Hide Filters" : "Show Filters"}
+            </button>
+          </div>
+        )}
 
-              <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-            </div>
-          )}
-
-          <div className="userMain-content lg:w-3/4 md:w-full">
-            {seeMoreComponent ? (
-              <SeeMore
-                selectedComponent={seeMoreComponent.title}
-                onBackClick={handleBackClick}
-                fetchBooks={seeMoreComponent.fetchBooks}
-              />
-            ) : (
-              <>
-                {query.trim() && <UBkResults query={query} />}
-                {!query.trim() && (
-                  <Recommended
-                    titleID={titleId}
-                    userID={user.userID}
-                    category={bookDetails?.category || "General"}
-                    onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}
-                  />
-                )}
-                {!query.trim() && (
-                  <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                )}
-                {!query.trim() && (
-                  <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                )}
-                {!query.trim() && (
-                  <NewlyAdded onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                )}
-                {!query.trim() && (
-                  <ReleasedThisYear onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                )}
-                {!query.trim() && (
-                  <Fiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                )}
-                {!query.trim() && (
-                  <Nonfiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                )}
-              </>
+        <div className="w-10/12 mx-auto py-8 userContent-container relative">
+          {/* Main content layout */}
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Sidebar for desktop */}
+            {query.trim() && (
+              <div className="lg:block hidden sticky top-5">
+                <FilterSidebar />
+              </div>
             )}
+
+            {/* Mobile sidebar overlay */}
+            {query.trim() && showMobileFilters && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={toggleMobileFilters}>
+                <div
+                  className="absolute right-0 top-0 h-full w-3/4 max-w-xs bg-white overflow-y-auto z-50 p-4"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-bold text-lg">Filters</h3>
+                  </div>
+                  <FilterSidebar onClose={toggleMobileFilters} />
+                </div>
+              </div>
+            )}
+
+            {/* Regular sidebar for non-search state */}
+            {!query.trim() && (
+              <div className="lg:w-1/4 lg:block hidden space-y-4 sticky top-5">
+                <ArcOpHr />
+                <UpEvents />
+                <Services />
+                <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+              </div>
+            )}
+
+            {/* Main content area */}
+            <div className="userMain-content lg:w-3/4 w-full">
+              {seeMoreComponent ? (
+                <SeeMore
+                  selectedComponent={seeMoreComponent.title}
+                  onBackClick={handleBackClick}
+                  fetchBooks={seeMoreComponent.fetchBooks}
+                />
+              ) : (
+                <>
+                  {query.trim() && <UBkResults query={query} />}
+                  {!query.trim() && (
+                    <Recommended
+                      titleID={titleId}
+                      userID={user.userID}
+                      category={bookDetails?.category || "General"}
+                      onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}
+                    />
+                  )}
+                  {!query.trim() && (
+                    <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                  )}
+                  {!query.trim() && (
+                    <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                  )}
+                  {!query.trim() && (
+                    <NewlyAdded onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                  )}
+                  {!query.trim() && (
+                    <ReleasedThisYear onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                  )}
+                  {!query.trim() && (
+                    <Fiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                  )}
+                  {!query.trim() && (
+                    <Nonfiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </FilterProvider>

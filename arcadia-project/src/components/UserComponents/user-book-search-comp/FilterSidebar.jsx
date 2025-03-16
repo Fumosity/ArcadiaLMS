@@ -1,25 +1,35 @@
 import CatGenre from "./CatGenre"
 import PublicationYear from "./PublicationYear"
 import { useFilters } from "../../../backend/filterContext"
+import { X } from "lucide-react"
 
-export default function FilterSidebar() {
+export default function FilterSidebar({ onClose }) {
   const { clearFilters, sortOption, setSortOption } = useFilters()
 
   return (
-    <div className="lg:w-1/4 md:w-1/3 w-full space-y-4 sticky top-5">
+    <div className="space-y-4 w-full">
+      {/* Mobile close button - only shown in mobile view */}
+      {onClose && (
+        <div className="flex justify-end lg:hidden">
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100" aria-label="Close filters">
+            <X size={20} />
+          </button>
+        </div>
+      )}
+
       <button
         onClick={clearFilters}
-        className="uSidebar-filter text-arcadia-red px-3 py-0.5 text-sm font-semibold text-left border border-grey rounded-xl hover:underline"
+        className="uSidebar-filter text-arcadia-red px-3 py-0.5 text-sm font-semibold text-left border border-grey rounded-xl hover:underline w-full"
       >
         Clear Filters
       </button>
 
-      <div className="uSidebar-filter flex items-center space-x-2 px-3 py-0.5 border border-grey rounded-full">
-        <label htmlFor="sort" className="text-sm font-semibold w-32">
+      <div className="uSidebar-filter flex flex-col sm:flex-row items-start sm:items-center sm:space-x-2 px-3 py-0.5 border border-grey rounded-full">
+        <label htmlFor="sort" className="text-sm font-semibold w-32 mb-1 sm:mb-0">
           Sort:
         </label>
         {/* Select Dropdown with Custom Arrow */}
-        <div className="relative w-64">
+        <div className="relative w-full sm:w-64">
           <select
             id="sort"
             className="text-sm rounded-xl border border-grey bg-white focus:outline-none focus:ring-0 appearance-none px-4 py-2 w-full"
@@ -56,7 +66,7 @@ export default function FilterSidebar() {
 
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="uSidebar-filter text-arcadia-red px-3 py-0.5 text-sm font-semibold text-left border border-grey rounded-xl hover:bg-arcadia-red hover:text-white"
+        className="uSidebar-filter text-arcadia-red px-3 py-0.5 text-sm font-semibold text-left border border-grey rounded-xl hover:bg-arcadia-red hover:text-white w-full"
       >
         Return to Top
       </button>
