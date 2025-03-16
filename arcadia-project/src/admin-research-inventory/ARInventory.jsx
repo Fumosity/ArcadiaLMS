@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Title from "../components/main-comp/Title";
 import CurrentResearchInventory from "../components/admin-research-inventory/CurrentResearchInventory";
 import ResearchPreviewInv from "../components/admin-research-inventory/ResearchPreviewInv";
+import {supabase} from "../supabaseClient";
+import ExcellentExport from "excellentexport";
 
 const ARInventory = () => {
   const [selectedResearch, setSelectedResearch] = useState(null);
@@ -10,6 +12,46 @@ const ARInventory = () => {
   const handleResearchSelect = (researchItem) => {
     setSelectedResearch(researchItem);
   };
+
+  const exportAsXLSX = async () => {
+    const table = document.createElement("table");
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    const headerRow = table.insertRow();
+    const headers = ["Research Call No.", "Title", "Author", "College", "Department", "PubDate"];
+    headers.forEach(header => {
+        const cell = headerRow.insertCell();
+        cell.textContent = header;
+    });
+
+    const { data, error } = await supabase
+        .from('research')
+        .select("researchCallNum, title, author, college, department, pubDate");
+
+    if (error) {
+        console.error("Error fetching book inventory:", error);
+        return;
+    }
+
+    data.forEach(research => {
+        const row = table.insertRow();
+        row.insertCell().textContent = research.researchCallNum;
+        row.insertCell().textContent = research.title;research
+        row.insertCell().textContent = research.author;
+        row.insertCell().textContent = research.college;
+        row.insertCell().textContent = research.department;
+        row.insertCell().textContent = research.pubDate;
+    });
+
+    const link = document.createElement("a");
+    document.body.appendChild(link);
+    ExcellentExport.convert(
+      { anchor: link, filename: `Research_Inventory${currentDate}`, format: "xlsx" },
+        [{ name: "Research Inventory", from: { table } }]
+    );
+    link.click();
+    document.body.removeChild(link);
+};
 
   return (
     <div className="min-h-screen bg-white">
@@ -27,7 +69,7 @@ const ARInventory = () => {
             </button>
             <button
               className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-              onClick={() => navigate('/admin/researchexport')}
+              onClick={exportAsXLSX}
             >
               Export Research Inventory
             </button>

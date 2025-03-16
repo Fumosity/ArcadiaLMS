@@ -111,7 +111,7 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
     college: research.college,
     department: research.department,
     abstract: abstractContent, // Use the state variable instead of research.abstract
-    researchARCID: research.researchARCID,
+    researchCallNum: research.researchCallNum,
     pages: research.pages,
     keywords: research.keywords,
     pubDate: research.pubDate,
@@ -155,8 +155,8 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
                 <td className="px-1 py-1 font-semibold capitalize w-1/3">
                   {key === "pubDate"
                     ? "Original Pub. Date:"
-                    : key === "researchARCID"
-                      ? "ARC ID:"
+                    : key === "researchCallNum"
+                      ? "Call No."
                       : key.replace(/([A-Z])/g, " $1") + ":"}
                 </td>
                 <td className="px-1 py-1 text-sm break-words w-2/3">

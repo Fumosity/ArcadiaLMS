@@ -88,7 +88,7 @@ const UBookView = () => {
         //console.log(genreMap)
         const publishedYear = data.originalPubDate ? new Date(data.originalPubDate).getFullYear() : "Unknown Year"
 
-        const callNo = data.arcID
+        const callNo = data.titleCallNum
         const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
         //console.log(callNo)
         let currentLocation = ""

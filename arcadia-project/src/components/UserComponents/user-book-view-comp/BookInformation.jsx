@@ -196,7 +196,7 @@ export default function BookInformation({ book }) {
                         <p><span className="font-semibold">Category:</span> {book.category || "No category available"}</p>
                         <p><span className="font-semibold">Genre:</span> {book.genres.join(", ") || "No genre available"}</p>
                         <p><span className="font-semibold">Location:</span> {book.location || "No location available"}</p>
-                        <p><span className="font-semibold">Call Number:</span> {book.arcID || "No location available"}</p>
+                        <p><span className="font-semibold">Call Number:</span> {book.titleCallNum || "No location available"}</p>
                         <p><span className="font-semibold">Keywords:</span> {book.keywords.join(", ") || "No keywords available"}</p>
                     </div>
                     <div className="flex flex-col space-y-2 w-1/2">

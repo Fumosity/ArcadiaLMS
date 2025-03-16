@@ -1,11 +1,9 @@
 import React from "react";
-
 import Title from "../components/main-comp/Title";
 import AccessTable from "../components/admin-home-page-comp/AccessTable";
 import BksDueTdy from "../components/admin-book-circ-pg-comp/BksDueTdy";
 import CheckingContainer from "../components/admin-book-check-in-out-comp/CheckingContainer";
-import BCHistory from "../components/admin-book-circ-pg-comp/BCHistory";
-import MainHeader from "../components/main-comp/MainHeader";
+
 
 const ABChecking = () => (
     <div className="min-h-screen bg-white flex flex-col">

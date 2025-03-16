@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 export default function RsrchAvailability({ research }) {
   const navigate = useNavigate()
 
-  const callNo = research.researchARCID
+  const callNo = research.researchCallNum
   const callNoPrefix = callNo.split("-")[0].trim()
   let currentLocation = ""
 
@@ -47,7 +47,7 @@ export default function RsrchAvailability({ research }) {
 
       <div className="item-center justify-center text-center text-black mb-2">
         <p className="text-sm">Call Number:</p>
-        <h4 className="text-lg font-semibold mb-2">{research.researchARCID}</h4>
+        <h4 className="text-lg font-semibold mb-2">{research.researchCallNum}</h4>
         <p className="text-sm">Location:</p>
         <h4 className="text-md">{currentLocation}</h4>
       </div>

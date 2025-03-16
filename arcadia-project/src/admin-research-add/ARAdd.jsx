@@ -20,7 +20,7 @@ const ARAdd = () => {
     abstract: '',
     keywords: [],
     location: '',
-    researchARCID: '',
+    researchCallNum: '',
     pubDate: '',
     cover: '',
     pdf: ''

@@ -143,7 +143,7 @@ const ABAdding = ({ formData, setFormData }) => {
       isbn: '',
       cover: '',
       price: '',
-      titleARCID: '',
+      titleCallNum: '',
     });
     console.log("post addBook")
 
@@ -328,11 +328,11 @@ const ABAdding = ({ formData, setFormData }) => {
 
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Call No.:</label>
-                <input type="text" name="titleARCID" required
+                <input type="text" name="titleCallNum" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.titleARCID}
+                  value={formData.titleCallNum}
                   onChange={handleChange}
-                  style={validationErrors.titleARCID ? errorStyle : {}}
+                  style={validationErrors.titleCallNum ? errorStyle : {}}
                   placeholder="Book Title Call Number"
                 />
               </div>

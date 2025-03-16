@@ -192,7 +192,7 @@ const ARAdding = ({ formData, setFormData }) => {
   //Handles the submission to the database
   const handleSubmit = async () => {
 
-    const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "researchID", "researchARCID",];
+    const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "researchID", "researchCallNum",];
 
     // Ensure formData is fully updated
     const updatedFormData = { ...formData }; // Capture current formData
@@ -208,7 +208,7 @@ const ARAdding = ({ formData, setFormData }) => {
     }
 
     const arcIdRegex = /^LPUCAV\d{6}$/;
-    if (!arcIdRegex.test(formData.researchARCID)) {
+    if (!arcIdRegex.test(formData.researchCallNum)) {
       alert("ARC ID must follow the format (e.g., LPUCAV012345).");
       return;
     }
@@ -264,7 +264,7 @@ const ARAdding = ({ formData, setFormData }) => {
       abstract: '',
       keywords: [],
       location: '',
-      researchARCID: '',
+      researchCallNum: '',
       pubDate: '',
       cover: '',
       pdf: '',
@@ -393,8 +393,8 @@ const ARAdding = ({ formData, setFormData }) => {
                 <input type="number" name="researchID" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchID} onChange={handleChange} required />
               </div>
               <div className="flex justify-between items-center">
-                <label className="w-1/4">ARC ID:</label>
-                <input type="text" name="researchARCID" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchARCID} onChange={handleChange} placeholder="ARC Issued ID, eg. LPUCAV012345" required />
+                <label className="w-1/4">Call Number:</label>
+                <input type="text" name="researchCallNum" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchCallNum} onChange={handleChange} placeholder="ARC Issued ID, eg. LPUCAV012345" required />
               </div>
             </form>
           </div>

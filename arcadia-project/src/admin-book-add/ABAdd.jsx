@@ -1,8 +1,4 @@
 import React, { useState } from "react";
-import MainHeader from "../components/main-comp/MainHeader";
-import Navbar from "../components/main-comp/Navbar";
-import Footer from "../components/main-comp/Footer";
-import Copyright from "../components/main-comp/Copyright";
 import ABAdding from "../components/admin-book-add-comp/ABAdding";
 import ABAddPreview from "../components/admin-book-add-comp/ABAddPreview";
 import Title from "../components/main-comp/Title";

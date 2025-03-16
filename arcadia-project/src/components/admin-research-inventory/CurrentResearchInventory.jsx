@@ -24,7 +24,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
         const { data, error } = await supabase
           .from("research")
           .select(
-            "researchID, title, college, department, abstract, location, researchARCID, pubDate, cover, author, keywords, pages",
+            "researchID, title, college, department, abstract, location, researchCallNum, pubDate, cover, author, keywords, pages",
           )
 
         if (error) {
@@ -259,7 +259,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                 Authors
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8">
-                Thesis ID
+                Call No.
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8">
                 Pub. Date
@@ -338,7 +338,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                     </div>
                   </td>
 
-                  <td className="px-4 py-4 text-center text-sm text-gray-500 w-1/8">{item.researchARCID}</td>
+                  <td className="px-4 py-4 text-center text-sm text-gray-500 w-1/8">{item.researchCallNum}</td>
 
                   <td className="px-4 py-4 text-center text-sm text-gray-500 w-1/8">{item.pubDate}</td>
                 </tr>

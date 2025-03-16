@@ -1,34 +1,77 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import MainHeader from "../components/main-comp/MainHeader";
 import CurrentBookInventory from "../components/admin-book-inventory-comp/CurrentBookInventory";
 import BookPreviewInv from "../components/admin-book-inventory-comp/BookPreviewInventory";
 import Title from "../components/main-comp/Title";
+import ExcellentExport from "excellentexport";
+import {supabase} from "../supabaseClient";
 
 const ABInventory = () => {
   const navigate = useNavigate(); // Initialize useNavigate
   const [selectedBook, setSelectedBook] = useState(null); // State to hold the selected book details
+  const currentDate = new Date().toISOString().split('T')[0];
 
   const handleBookSelect = (book) => {
     setSelectedBook(book); // Update selected book
   };
 
+  const exportAsXLSX = async () => {
+    const table = document.createElement("table");
+
+    const headerRow = table.insertRow();
+    const headers = ["Title Call No.", "Title", "Author", "Publisher", "ISBN", "Current Pub Date", "Original Pub Date", "Procurement Date", "Price"];
+    headers.forEach(header => {
+        const cell = headerRow.insertCell();
+        cell.textContent = header;
+    });
+
+    const { data, error } = await supabase
+        .from('book_titles')
+        .select("titleCallNum, title, author, publisher, isbn, currentPubDate, originalPubDate, procurementDate, price");
+
+    if (error) {
+        console.error("Error fetching book inventory:", error);
+        return;
+    }
+
+    data.forEach(book => {
+        const row = table.insertRow();
+        row.insertCell().textContent = book.titleCallNum;
+        row.insertCell().textContent = book.title;
+        row.insertCell().textContent = book.author;
+        row.insertCell().textContent = book.publisher;
+        row.insertCell().textContent = book.isbn;
+        row.insertCell().textContent = book.currentPubDate;
+        row.insertCell().textContent = book.originalPubDate;
+        row.insertCell().textContent = book.procurementDate;
+        row.insertCell().textContent = book.price;
+    });
+
+    const link = document.createElement("a");
+    document.body.appendChild(link);
+    ExcellentExport.convert(
+      { anchor: link, filename: `BookInventory_${currentDate}`, format: "xlsx" },
+        [{ name: "Book Inventory", from: { table } }]
+    );
+    link.click();
+    document.body.removeChild(link);
+};
+
   React.useEffect(() => {
-      if (window.location.hash) {
-        const id = window.location.hash.substring(1)
-        const element = document.getElementById(id)
-        if (element) {
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: "smooth" })
-          }, 300)
-        }
+    if (window.location.hash) {
+      const id = window.location.hash.substring(1)
+      const element = document.getElementById(id)
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth" })
+        }, 300)
       }
-    }, [])
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-white">
       <Title>Book Inventory</Title>
-      {/* <MainHeader /> */}
 
       <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
         <div className="flex-shrink-0 w-3/4">
@@ -47,13 +90,13 @@ const ABInventory = () => {
             </button>
             <button
               className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-              onClick={() => navigate('/admin/bookexport')} // Navigate to ABAdd on click
+              onClick={exportAsXLSX}
             >
               Export Book Inventory
             </button>
           </div>
           <div id="book-inventory">
-          <CurrentBookInventory onBookSelect={handleBookSelect} />
+            <CurrentBookInventory onBookSelect={handleBookSelect} />
           </div>'
         </div>
         <div className="flex flex-col items-start flex-shrink-0 w-1/4">

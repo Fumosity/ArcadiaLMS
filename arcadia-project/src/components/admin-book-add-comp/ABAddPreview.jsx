@@ -13,7 +13,7 @@ const ABAddPreview = ({ formData }) => {
     originalPubDate: formData.originalPubDate || '',
     procurementDate: formData.procDate || '',
     location: formData.location || '',
-    arcID: formData.arcID || '',
+    titleCallNum: formData.titleCallNum || '',
     isbn: formData.isbn || '',
     price: formData.price || '',
     cover: formData.cover || '',
@@ -31,7 +31,7 @@ const ABAddPreview = ({ formData }) => {
         <table className="min-w-full border-collapse">
           <tbody>
             {Object.entries(bookDetails)
-              .filter(([key]) => !["cover", "procurementDate", "arcID", "titleID"].includes(key)) // Exclude multiple keys
+              .filter(([key]) => !["cover", "procurementDate", "titleCallNum", "titleID"].includes(key)) // Exclude multiple keys
               .map(([key, value], index) => {
               if (key === 'currentPubDate' || key === 'originalPubDate') {
                 return (
@@ -58,7 +58,7 @@ const ABAddPreview = ({ formData }) => {
                       ? 'Database ID' 
                       :key === "isbn"
                       ? "ISBN"
-                      : key === 'arcID' 
+                      : key === 'titleCallNum' 
                       ? 'ARC ID' 
                       : key.replace(/([A-Z])/g, ' $1')}:
                     </td>

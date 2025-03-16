@@ -178,7 +178,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
       !searchTerm ||
       matchesSearchTerm(book.title) ||
       matchesSearchTerm(book.category) ||
-      matchesSearchTerm(book.arcID) ||
+      matchesSearchTerm(book.titleCallNum) ||
       matchesSearchTerm(book.keywords) ||
       (book.author &&
         ((typeof book.author === "string" && matchesSearchTerm(book.author)) ||
@@ -398,7 +398,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center text-sm text-gray-500 truncate min-w-4">
-                      {item.arcID || "N/A"}
+                      {item.titleCallNum || "N/A"}
                     </td>
                     <td className="px-4 py-4 text-center text-sm text-gray-500 truncate min-w-8">
                       {item.originalPubDate}

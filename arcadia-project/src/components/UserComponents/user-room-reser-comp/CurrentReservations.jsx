@@ -25,8 +25,6 @@ export default function RoomReservation() {
         return;
       }
 
-      console.log("Raw Data from Supabase:", data);
-
       const availability = {};
       periods.forEach(period => {
         availability[period] = {};
@@ -38,37 +36,20 @@ export default function RoomReservation() {
       data.forEach(({ reservationData }) => {
         const { date, room, startTime, endTime } = reservationData;
 
-        // Log raw date
-        console.log("Raw date from DB:", date);
-
-        // Convert to a Date object in UTC
         let utcDate = new Date(`${date}T00:00:00Z`);
-        console.log("UTC Date Object:", utcDate);
-
-        // Convert to Philippine Time (PHT)
         let phtDate = new Date(utcDate.getTime() + (8 * 60 * 60 * 1000));
-        console.log("PHT Date Object Before Adjustment:", phtDate);
-
-        // Adjust date to match selectedDate exactly
         let adjustedPHTDate = new Date(phtDate);
         adjustedPHTDate.setDate(adjustedPHTDate.getDate() - 1);
-        console.log("Final Adjusted Date (PHT):", adjustedPHTDate.toISOString().split('T')[0]);
 
-        // Format as YYYY-MM-DD for comparison
         const formattedDate = adjustedPHTDate.toISOString().split('T')[0];
-        console.log("Final Adjusted Date (PHT):", formattedDate);
-        console.log("Selected Date:", selectedDate);
 
         if (formattedDate === selectedDate) {
           periods.forEach(period => {
-            const [startHour] = period.split(':'); // Extracts hours from "07:00 - 08:00"
+            const [startHour] = period.split(':');
             const periodStartTime = parseInt(startHour, 10);
-
-            // Ensure we parse startTime and endTime as integers
             const startHourInt = parseInt(startTime.split(':')[0], 10);
             const endHourInt = parseInt(endTime.split(':')[0], 10);
 
-            // Check if this period falls within the reserved time range
             if (periodStartTime >= startHourInt && periodStartTime < endHourInt) {
               availability[period][room] = "Reserved";
             }
@@ -76,7 +57,6 @@ export default function RoomReservation() {
         }
       });
 
-      console.log("Final Processed Reservations:", availability);
       setReservations(availability);
     }
 
@@ -111,59 +91,59 @@ export default function RoomReservation() {
   }
 
   return (
-    <div className="border p-2 space-y-3 max-w-xs mx-auto">
-      <h2 className="text-lg font-semibold text-center">Room Reservations</h2>
+    <div className="flex border border-grey rounded-md p-2 space-x-4 max-w-4xl mx-auto">
+      <div className="w-1/2">
+        <h2 className="text-lg font-semibold text-center">Room Reservations</h2>
+        <div className="flex justify-between items-center text-sm my-2">
+          <button onClick={() => changeMonth(-1)} className="px-2 py-1 bg-red rounded">Prev</button>
+          <h3>{new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>
+          <button onClick={() => changeMonth(1)} className="px-2 py-1 bg-red rounded">Next</button>
+        </div>
+        <div className="grid grid-cols-7 gap-4 p-1 text-sm">
+          {calendarDays.map((date, i) => {
+            const dateString = date ? date.toISOString().split('T')[0] : null;
+            const isPast = date && date < new Date().setHours(0, 0, 0, 0);
+            const isSunday = date && date.getDay() === 0;
 
-      <div className="flex justify-between items-center text-sm">
-        <button onClick={() => changeMonth(-1)} className="px-2 py-1 bg-red rounded">Prev</button>
-        <h3>{new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>
-        <button onClick={() => changeMonth(1)} className="px-2 py-1 bg-red rounded">Next</button>
-      </div>
-
-      <div className="grid grid-cols-7 gap p-1 text-sm">
-        {calendarDays.map((date, i) => {
-          const dateString = date ? date.toISOString().split('T')[0] : null;
-          const isPast = date && date < new Date().setHours(0, 0, 0, 0); // Check if the date is in the past
-          const isSunday = date && date.getDay() === 0; // Check if the day is Sunday
-
-          return (
-            <div
-              key={i}
-              className={`h-8 w-8 flex items-center justify-center cursor-pointer rounded 
-          ${selectedDate === dateString ? 'bg-grey text-black' : 'bg-gray'} 
+            return (
+              <div
+                key={i}
+                className={`h-8 w-8 flex items-center justify-center cursor-pointer rounded 
+          ${selectedDate === dateString ? 'bg-grey text-black' : 'bg-white'} 
           hover:bg-gray ${!date ? 'opacity-0' : ''} 
           ${isPast || isSunday ? 'text-grey cursor-not-allowed' : ''}`}
-              onClick={() => !(isPast || isSunday) && date && setSelectedDate(dateString)}
-            >
-              {date ? date.getDate() : ""}
-            </div>
-          );
-        })}
+                onClick={() => !(isPast || isSunday) && date && setSelectedDate(dateString)}
+              >
+                {date ? date.getDate() : ""}
+              </div>
+            );
+          })}
+        </div>
       </div>
-
-      <table className="w-full text-xs border mt-2">
-        <thead>
-          <tr>
-            <th className="p-1 border">Period</th>
-            {rooms.map(room => (
-              <th key={room} className="p-1 border">{room}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {periods.map(period => (
-            <tr key={period}>
-              <td className="p-1 border">{period}</td>
+      <div className="w-1/2 mt-10">
+        <table className="w-full text-xs border">
+          <thead>
+            <tr>
+              <th className="p-1 border ">Period</th>
               {rooms.map(room => (
-                <td key={room} className={`p-1 border ${reservations[period]?.[room] === "Reserved" ? 'bg-red text-white' : 'bg-green text-white'}`}>
-                  {reservations[period]?.[room] || "Available"}
-                </td>
+                <th key={room} className="p-1 border">{room}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {periods.map(period => (
+              <tr key={period}>
+                <td className="p-1 border">{period}</td>
+                {rooms.map(room => (
+                  <td key={room} className={`p-1 border ${reservations[period]?.[room] === "Reserved" ? 'bg-red text-white' : 'bg-green text-white'}`}>
+                    {reservations[period]?.[room] || "Available"}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
-
   );
 }

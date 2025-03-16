@@ -11,7 +11,7 @@ export default function Pathfinder({ book }) {
     const location = useLocation();
     const prevPathRef = useRef([]);
 
-    const callNo = book.arcID || book.researchARCID;
+    const callNo = book.titleCallNum || book.researchCallNum;
     const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
     
     const locations = {

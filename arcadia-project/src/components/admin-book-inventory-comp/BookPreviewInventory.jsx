@@ -47,7 +47,7 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
     isbn: book.isbn,
     cover: book.cover,
     price: book.price,
-    arcID: book.arcID,
+    titleCallNum: book.titleCallNum,
     titleID: book.titleID,
   };
 
@@ -103,7 +103,7 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
                         ? "Original Pub. Date:"
                         : key === "isbn"
                           ? "ISBN:"
-                          : key === "arcID"
+                          : key === "titleCallNum"
                             ? "Call No.:"
                             : key.replace(/([A-Z])/g, " $1") + ":"}
                   </td>

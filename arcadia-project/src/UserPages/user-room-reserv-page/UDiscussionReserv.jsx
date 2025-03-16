@@ -37,7 +37,7 @@ const UDiscussionReserv = () => {
                         <div id="reserv-a-room">
                             <ReservHero />
                         </div>
-                        <div id="room-reservs">
+                        <div id="room-reservs lg:w-3/4 md:w-full">
                             <CurrentReservations />
                         </div>
                     </div>

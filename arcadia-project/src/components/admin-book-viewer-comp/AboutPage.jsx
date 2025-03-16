@@ -31,7 +31,7 @@ const AboutPage = ({ book }) => {
     isbn: book.isbn,
     cover: book.cover,
     price: book.price,
-    arcID: book.arcID,
+    titleCallNum: book.titleCallNum,
   };
 
   const handleModifyBook = () => {
@@ -88,8 +88,8 @@ const AboutPage = ({ book }) => {
                         ? "Original Pub. Date:"
                         : key === "isbn"
                           ? "ISBN:"
-                          : key === "arcID"
-                            ? "ARC ID:"
+                          : key === "titleCallNum"
+                            ? "Call No."
                             : key.replace(/([A-Z])/g, " $1") + ":"}
                   </td>
                   <td
