@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 const UFooter = () => {
   const navigate = useNavigate()
 
-  
+
   const handleHighlyRatedClick = () => {
     // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
     navigate("/user/bookmanagement/?view=highlyRated")
@@ -44,12 +44,12 @@ const UFooter = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-items-center text-center">
           <div>
             <h4 className="text-lg font-semibold text-left mb-4 text-white">
-            <Link 
-              to="/user/bookmanagement" 
-              className="hover:underline" 
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              <Link
+                to="/user/bookmanagement"
+                className="hover:underline"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
-              Book Catalog
+                Book Catalog
               </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
@@ -87,79 +87,110 @@ const UFooter = () => {
           </div>
           <div>
             <h4 className="text-lg font-semibold text-left mb-4 text-white">
-              <Link 
-              to="/user/researchmanagement" 
-              className="hover:underline" 
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              <Link
+                to="/user/researchmanagement"
+                className="hover:underline"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
-                Research Catalog (WIP)
+                Research Catalog
               </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
-              <li>Book Checking</li>
-              <li>History</li>
-              <li>Borrowed Books</li>
-              <li>Returned Books</li>
-              <li>Overdue Books</li>
+              <li>
+                <Link
+                  to="/user/researchmanagement#research"
+                  className="hover:underline"
+                  onClick={() => {
+                    // Navigate to the page first
+                    setTimeout(() => {
+                      // After navigation, find and scroll to the element
+                      const element = document.getElementById("research")
+                      if (element) {
+                        element.scrollIntoView({ behavior: "smooth" })
+                      }
+                    }, 100)
+                  }}
+                >
+                  Recommended Research
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/user/researchmanagement#new-research"
+                  className="hover:underline"
+                  onClick={() => {
+                    // Navigate to the page first
+                    setTimeout(() => {
+                      // After navigation, find and scroll to the element
+                      const element = document.getElementById("new-research")
+                      if (element) {
+                        element.scrollIntoView({ behavior: "smooth" })
+                      }
+                    }, 100)
+                  }}
+                >
+                  Newly Added Research
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="text-lg font-semibold text-left mb-4 text-white">
-              <Link 
-              to="/user/reservations" 
-              className="hover:underline"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              <Link
+                to="/user/reservations"
+                className="hover:underline"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
                 Reservations
               </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
               <li>
-              <Link
-                                to="/user/reservations#reserv-a-room"
-                                className="hover:underline"
-                                onClick={() => {
-                                    // Navigate to the page first
-                                    setTimeout(() => {
-                                        // After navigation, find and scroll to the element
-                                        const element = document.getElementById("reserv-a-room")
-                                        if (element) {
-                                            element.scrollIntoView({ behavior: "smooth" })
-                                        }
-                                    }, 100)
-                                }}
-                            >
-                Reserve A Room
+                <Link
+                  to="/user/reservations#reserv-a-room"
+                  className="hover:underline"
+                  onClick={() => {
+                    // Navigate to the page first
+                    setTimeout(() => {
+                      // After navigation, find and scroll to the element
+                      const element = document.getElementById("reserv-a-room")
+                      if (element) {
+                        element.scrollIntoView({ behavior: "smooth" })
+                      }
+                    }, 100)
+                  }}
+                >
+                  Reserve A Room
                 </Link>
-                </li>
+              </li>
               <li>
-              <Link
-                                to="/user/reservations#room-reservs"
-                                className="hover:underline"
-                                onClick={() => {
-                                    // Navigate to the page first
-                                    setTimeout(() => {
-                                        // After navigation, find and scroll to the element
-                                        const element = document.getElementById("room-reservs")
-                                        if (element) {
-                                            element.scrollIntoView({ behavior: "smooth" })
-                                        }
-                                    }, 100)
-                                }}
-                            >
-                Reservation Schedule
+                <Link
+                  to="/user/reservations#room-reservs"
+                  className="hover:underline"
+                  onClick={() => {
+                    // Navigate to the page first
+                    setTimeout(() => {
+                      // After navigation, find and scroll to the element
+                      const element = document.getElementById("room-reservs")
+                      if (element) {
+                        element.scrollIntoView({ behavior: "smooth" })
+                      }
+                    }, 100)
+                  }}
+                >
+                  Reservation Schedule
                 </Link>
-                </li>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="text-lg font-semibold text-left mb-4 text-white">
-            <Link 
-              to="/user/services" 
-              className="hover:underline" 
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              <Link
+                to="/user/services"
+                className="hover:underline"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
-              Services
+                Services
               </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
@@ -177,12 +208,12 @@ const UFooter = () => {
           </div>
           <div>
             <h4 className="text-lg font-semibold text-left mb-4 text-white">
-            <Link 
-              to="/user/support" 
-              className="hover:underline" 
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              <Link
+                to="/user/support"
+                className="hover:underline"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
-              Support
+                Support
               </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
@@ -217,12 +248,12 @@ const UFooter = () => {
           </div>
           <div>
             <h4 className="text-lg font-semibold text-left mb-4 text-white">
-            <Link 
-              to="/user/accountview" 
-              className="hover:underline" 
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              <Link
+                to="/user/accountview"
+                className="hover:underline"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
-              User Account
+                User Account
               </Link>
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">

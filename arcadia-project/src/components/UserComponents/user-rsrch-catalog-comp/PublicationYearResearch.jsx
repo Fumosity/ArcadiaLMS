@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
-import { useFilters } from "../../../backend/filterContext"
+import { useResearchFilters } from "../../../backend/ResearchFilterContext"
 import { supabase } from "../../../supabaseClient"
 
-export default function PublicationYear() {
-  const { selectedYear, setSelectedYear, yearRange, applyYearRange } = useFilters()
+export default function PublicationYearResearch() {
+  const { selectedYear, setSelectedYear, yearRange, applyYearRange } = useResearchFilters()
   const [fromYear, setFromYear] = useState(yearRange.from)
   const [toYear, setToYear] = useState(yearRange.to)
   const [availableYears, setAvailableYears] = useState([])
@@ -15,10 +15,7 @@ export default function PublicationYear() {
     async function fetchPublicationYears() {
       try {
         setLoading(true)
-        const { data, error } = await supabase
-          .from("book_titles")
-          .select("originalPubDate")
-          .not("originalPubDate", "is", null)
+        const { data, error } = await supabase.from("research").select("pubDate").not("pubDate", "is", null)
 
         if (error) {
           console.error("Error fetching publication years:", error)
@@ -27,7 +24,7 @@ export default function PublicationYear() {
 
         // Extract years from dates and remove duplicates
         const years = data
-          .map((book) => new Date(book.originalPubDate).getFullYear())
+          .map((research) => new Date(research.pubDate).getFullYear())
           .filter((year) => !isNaN(year))
           .sort((a, b) => b - a) // Sort descending (newest first)
 

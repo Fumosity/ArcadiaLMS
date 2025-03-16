@@ -69,7 +69,7 @@ const FileATix = () => {
             : "Enter the content of your ticket.";
 
     return (
-        <div className="uHero-cont p-6 bg-white rounded-lg border border-grey">
+        <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
             <h3 className="text-lg font-semibold mb-4">File A Ticket</h3>
             <div className="flex items-center mb-4">
                 <label className="text-sm mr-2 font-semibold">Type:</label>

@@ -45,7 +45,7 @@ const ReportStatus = ({ onReportSelect }) => {
   }
 
   return (
-    <div className="uHero-cont p-6 bg-white rounded-lg border border-grey">
+    <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">User Report Status</h2>
         <button className="modifyButton" onClick={fetchReports}>
@@ -97,7 +97,7 @@ const ReportStatus = ({ onReportSelect }) => {
               reportData.map((report) => (
                 <tr key={report.reportID}>
                   <td className="px-4 py-2 text-sm">
-                    <div className="text-center border rounded-xl text-arcadia-red">{report.type || "N/A"}</div>
+                    <div className="text-center px-1 border rounded-xl text-arcadia-red">{report.type || "N/A"}</div>
                   </td>
                   <td className="px-4 py-2 text-sm">
                     <span

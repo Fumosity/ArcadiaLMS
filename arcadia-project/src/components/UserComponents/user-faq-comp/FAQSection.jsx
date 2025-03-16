@@ -41,7 +41,7 @@ export default function FAQSection() {
       <h2 className="text-xl font-semibold mb-4">Frequently Asked Questions</h2>
       <div className="space-y-2">
         {faqData.map((item, index) => (
-          <div key={index} className="w-[950px] border border-grey rounded-lg overflow-hidden">
+          <div key={index} className="max-w-[1240px] border border-grey rounded-lg overflow-hidden">
             <button
               className="w-full text-left px-4 py-3 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-white"
               onClick={() => toggleAccordion(index)}

@@ -1,72 +1,175 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react"
+import { useResearchFilters } from "../../../backend/ResearchFilterContext"
+import { supabase } from "../../../supabaseClient"
 
 export default function CollegeAndDept() {
-    const [selectedCollege, setSelectedCollege] = useState("COECSA");
-    const [selectedDept, setSelectedDept] = useState("DCS");
+  const { selectedCollege, setSelectedCollege, selectedDepartment, setSelectedDepartment } = useResearchFilters()
 
-    const collegeOptions = ["All", "CAMS", "CLAE", "CBA", "COECSA", "CFAD", "CITHM", "CON"];
-    const deptOptions = ["All", "DOA", "DOE", "DCS"];
+  const [colleges, setColleges] = useState([])
+  const [departments, setDepartments] = useState([])
+  const [loading, setLoading] = useState(true)
 
-    return (
-        <div className="uSidebar-filter">
-            <h2 className="text-xl font-semibold mb-2.5">College and Department</h2>
-            
-            {/* College Dropdown */}
-            <Dropdown 
-                label="College"
-                options={collegeOptions}
-                selectedValue={selectedCollege}
-                onChange={(value) => {
-                    setSelectedCollege(value);
-                    if (value !== "COECSA") setSelectedDept(""); // Reset department if not COECSA
-                }}
-            />
+  // Fetch colleges and departments from the database
+  useEffect(() => {
+    async function fetchCollegesAndDepartments() {
+      try {
+        setLoading(true)
 
-            {/* Department Dropdown (Only Visible if COECSA is Selected) */}
-            {selectedCollege === "COECSA" && (
-                <Dropdown 
-                    label="Department"
-                    options={deptOptions}
-                    selectedValue={selectedDept}
-                    onChange={setSelectedDept}
-                />
-            )}
-        </div>
-    );
-}
+        // Fetch unique colleges
+        const { data: collegeData, error: collegeError } = await supabase
+          .from("research")
+          .select("college")
+          .not("college", "is", null)
 
-// Reusable Dropdown Component
-const Dropdown = ({ label, options, selectedValue, onChange }) => (
-    <div className="mb-2">
-        <label className="text-sm font-semibold block mb-1">{label}:</label>
+        if (collegeError) {
+          console.error("Error fetching colleges:", collegeError)
+          return
+        }
+
+        // Extract unique colleges
+        const uniqueColleges = [...new Set(collegeData.map((item) => item.college))]
+          .filter((college) => college) // Remove empty values
+          .sort()
+
+        setColleges(uniqueColleges)
+
+        // Fetch departments for the selected college
+        await fetchDepartments(selectedCollege)
+      } catch (error) {
+        console.error("Error processing colleges:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCollegesAndDepartments()
+  }, [])
+
+  // Fetch departments based on selected college
+  const fetchDepartments = async (college) => {
+    try {
+      let query = supabase.from("research").select("department").not("department", "is", null)
+
+      // If a college is selected (and not "All"), filter by that college
+      if (college && college !== "All") {
+        query = query.eq("college", college)
+      }
+
+      const { data, error } = await query
+
+      if (error) {
+        console.error("Error fetching departments:", error)
+        return
+      }
+
+      // Extract unique department names
+      const uniqueDepartments = [...new Set(data.map((item) => item.department))]
+        .filter((department) => department) // Remove empty values
+        .sort()
+
+      setDepartments(uniqueDepartments)
+    } catch (error) {
+      console.error("Error processing departments:", error)
+    }
+  }
+
+  // Update departments when college changes
+  useEffect(() => {
+    fetchDepartments(selectedCollege)
+    // Reset department selection when college changes
+    if (selectedCollege !== "All") {
+      setSelectedDepartment("")
+    }
+  }, [selectedCollege])
+
+  return (
+    <div className="uSidebar-filter">
+      <h2 className="text-xl font-semibold mb-2.5">College and Department</h2>
+
+      {/* College Dropdown */}
+      <div className="mb-2">
+        <label className="text-sm font-semibold block mb-1">College:</label>
         <div className="relative w-full">
-            <select
-                className="text-sm rounded-xl border border-grey bg-white focus:outline-none focus:ring-0 appearance-none px-4 py-2 w-full"
-                value={selectedValue}
-                onChange={(e) => onChange(e.target.value)}
+          <select
+            className="text-sm rounded-xl border border-grey bg-white focus:outline-none focus:ring-0 appearance-none px-4 py-2 w-full"
+            value={selectedCollege}
+            onChange={(e) => setSelectedCollege(e.target.value)}
+          >
+            <option value="">All</option>
+            {loading ? (
+              <option value="" disabled>
+                Loading colleges...
+              </option>
+            ) : (
+              colleges.map((college) => (
+                <option key={college} value={college}>
+                  {college}
+                </option>
+              ))
+            )}
+          </select>
+
+          {/* Custom dropdown arrow */}
+          <span className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+            <svg
+              className="w-4 h-4 text-black"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
             >
-                {options.map((option) => (
-                    <option key={option} value={option}>
-                        {option}
-                    </option>
-                ))}
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      {/* Department Dropdown (Only Visible if a College is Selected) */}
+      {selectedCollege && selectedCollege !== "All" && (
+        <div className="mb-2">
+          <label className="text-sm font-semibold block mb-1">Department:</label>
+          <div className="relative w-full">
+            <select
+              className="text-sm rounded-xl border border-grey bg-white focus:outline-none focus:ring-0 appearance-none px-4 py-2 w-full"
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+            >
+              <option value="">All</option>
+              {loading ? (
+                <option value="" disabled>
+                  Loading departments...
+                </option>
+              ) : (
+                departments.map((department) => (
+                  <option key={department} value={department}>
+                    {department}
+                  </option>
+                ))
+              )}
             </select>
 
             {/* Custom dropdown arrow */}
             <span className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <svg
-                    className="w-4 h-4 text-black"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                    />
-                </svg>
+              <svg
+                className="w-4 h-4 text-black"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
             </span>
+          </div>
         </div>
+      )}
     </div>
-);
+  )
+}
+

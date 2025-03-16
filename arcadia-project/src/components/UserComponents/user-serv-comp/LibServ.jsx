@@ -7,10 +7,10 @@ const LibServ = () => {
     const totalPages = Math.ceil(totalEntries / entriesPerPage);
 
     const libserv = [
-        { title: "ARC E-Library", desc: "Connect to the internet to do your own research, create your presentations, or simply learn how to code through our e-library!", img: "/image/e-lib.png"},
-        { title: "Electronic Databases", desc: "Expand on your research on related literature through the electronic databases that the ARC is affiliated with!", img: "/image/e-db.png"},
-        { title: "Printing Services", desc: "Need a document printed? Our library offers convenient and affordable printing services. Simply bring in your digital file (USB, email, or cloud storage) and we'll print it out for you. We have a variety of paper options and printing sizes to suit your needs.", img: "/image/print.png"},
-        { title: "ARC Café", desc: "Take a break and enjoy a delicious treat. Our cafe offers a variety of snacks and beverages to enjoy while you relax and recharge. From coffee and tea to pastries and sandwiches, there's something for everyone.", more: "Read More", img: "/image/cafe.png"},
+        { title: "ARC E-Library", desc: "Connect to the internet to do your own research, create your presentations, or simply learn how to code through our e-library!", img: "/image/e-lib.png" },
+        { title: "Electronic Databases", desc: "Expand on your research on related literature through the electronic databases that the ARC is affiliated with!", img: "/image/e-db.png" },
+        { title: "Printing Services", desc: "Need a document printed? Our library offers convenient and affordable printing services. Simply bring in your digital file (USB, email, or cloud storage) and we'll print it out for you. We have a variety of paper options and printing sizes to suit your needs.", img: "/image/print.png" },
+        { title: "ARC Café", desc: "Take a break and enjoy a delicious treat. Our cafe offers a variety of snacks and beverages to enjoy while you relax and recharge. From coffee and tea to pastries and sandwiches, there's something for everyone.", img: "/image/cafe.png" },
     ];
 
     return (
@@ -20,11 +20,11 @@ const LibServ = () => {
             </div>
 
             <div className="space-y-6">
-                <div className="flex flex-col md:flex-row md:space-x-6">
-                    {libserv.slice(0, 2).map((services, index) => (
+                <div className="flex flex-wrap gap-4 justify-center">
+                    {libserv.slice(0, 3).map((services, index) => (
                         <div
                             key={index}
-                            className="genCard-cont flex-none w-[465px] h-[535px] bg-white border border-gray-200 rounded-lg p-4 flex flex-col justify-between"
+                            className="genCard-cont flex flex-col justify-between bg-white border border-grey rounded-lg p-4 w-full sm:w-[48%] md:w-[31%] h-[450px]"
                         >
                             <div>
                                 <img
@@ -42,11 +42,12 @@ const LibServ = () => {
                     ))}
                 </div>
 
+
                 <div className="flex flex-col md:flex-row md:space-x-6">
-                    {libserv.slice(2).map((services, index) => (
+                    {libserv.slice(3).map((services, index) => (
                         <div
                             key={index}
-                            className="genCard-cont flex-none w-[465px] h-[535px] bg-white border border-grey rounded-lg p-4 flex flex-col justify-between"
+                            className="genCard-cont max-w-full flex-none h-[450px] bg-white border border-grey rounded-lg p-4 flex flex-col justify-between"
                         >
                             <div>
                                 <img

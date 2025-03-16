@@ -164,8 +164,8 @@ const UserCirculationHistory = () => {
       <h3 className="text-xl font-medium text-arcadia-black mb-6">My Circulation History</h3>
 
       {/* Controls for sort, filter, and search */}
-      <div className="mb-4 flex flex-wrap justify-between space-x-4">
-        <div className="flex gap-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           {/* Sort By */}
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Sort:</span>

@@ -42,7 +42,7 @@ const SupportStatus = ({ onSupportSelect }) => {
   }
 
   return (
-    <div className="uHero-cont p-6 bg-white rounded-lg border border-grey">
+    <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">User Support Status</h2>
         <button className="modifyButton" onClick={fetchSupports}>
@@ -81,7 +81,7 @@ const SupportStatus = ({ onSupportSelect }) => {
               supportData.map((support) => (
                 <tr key={support.supportID}>
                   <td className="px-4 py-2 text-sm">
-                    <div className="text-center border rounded-xl text-arcadia-red">{support.type || "N/A"}</div>
+                    <div className="text-center border rounded-xl px-1 text-arcadia-red">{support.type || "N/A"}</div>
                   </td>
                   <td className="px-4 py-2 text-sm">
                     <span
