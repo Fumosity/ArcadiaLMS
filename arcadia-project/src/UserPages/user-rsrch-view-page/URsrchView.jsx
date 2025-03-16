@@ -29,9 +29,12 @@ const URsrchView = () => {
         if (error) {
           console.error("Error fetching research:", error);
         } else {
+          let currentLocation = "2nd Floor, Circulation Section";
+
+          data.location = currentLocation
+
           setResearch(data);
           setLoading(false)
-
         }
 
         console.log(research)
@@ -73,7 +76,7 @@ const URsrchView = () => {
           <div className="userMain-content lg:w-3/4 w-full ml-5">
             <ReturnToSearch research={research}/>
             <RsrchInformation research={research} />
-            <Pathfinder book={research} />
+            <Pathfinder book={research}/>
             <SimRsrch research={research} />
           </div>
         </div>

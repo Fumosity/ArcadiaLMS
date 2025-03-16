@@ -74,7 +74,7 @@ const UBookView = () => {
         if (genreError) {
           console.error("Error fetching genres:", genreError);
         } else {
-          console.log("Fetched genre data:", genreData);
+          //console.log("Fetched genre data:", genreData);
         }
 
         const genreMap = {};
@@ -85,15 +85,15 @@ const UBookView = () => {
           genreMap[titleID].genres.push(genres.genreName);
         });
 
-        console.log(genreMap)
+        //console.log(genreMap)
         const publishedYear = data.originalPubDate ? new Date(data.originalPubDate).getFullYear() : "Unknown Year"
 
         const callNo = data.arcID
         const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
-        console.log(callNo)
+        //console.log(callNo)
         let currentLocation = ""
 
-        if (!isNaN(callNoPrefix)) {
+        if (/^\d+$/.test(callNoPrefix)) {
           // If callNoPrefix is a number  
           currentLocation = "4th Floor, Highschool and Multimedia Section";
         } else {
@@ -107,7 +107,7 @@ const UBookView = () => {
           }
         }
 
-        console.log(currentLocation)
+        //console.log(currentLocation)
 
         setBookDetails({
           ...data,
@@ -174,7 +174,7 @@ const UBookView = () => {
                 formattedRatingCount: formatRatingCount(ratingInfo.totalRatings),
               }}
             />
-            <Pathfinder book={bookDetails} />
+            <Pathfinder book={bookDetails}/>
             <SimBooks titleID={titleId} userID={user.userID} category={bookDetails?.category} />
           </div>
         </div>

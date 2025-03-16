@@ -1,8 +1,6 @@
 import { React, useEffect, useState } from "react";
 
 export default function BookAvailability({ book }) {
-    console.log(book)  
-
     return (
         <div className="uSidebar-filter">
             <div className="flex justify-between items-center mb-2.5">

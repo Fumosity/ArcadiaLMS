@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Grid, Astar } from "fast-astar";
 import { supabase } from "../../../supabaseClient";
 import { useLocation } from "react-router-dom";
@@ -8,15 +8,12 @@ export default function Pathfinder({ book }) {
     const [path, setPath] = useState([]);
     const [selectedStart, setSelectedStart] = useState("1"); // Default start point
     const [selectedShelf, setSelectedShelf] = useState("A1"); // Default destination
-    const [destinationDirection, setDestinationDirection] = useState("");
-    const [currentLocation, setCurrentLocation] = useState("4th Floor, Highschool and Multimedia Section");
     const location = useLocation();
-
-    console.log(book)
+    const prevPathRef = useRef([]);
 
     const callNo = book.arcID || book.researchARCID;
     const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
-    console.log(callNoPrefix)
+    
     const locations = {
         "2nd Floor, Circulation Section": { w: 28, h: 19 },
         "4th Floor, Circulation Section": { w: 27, h: 11 },
@@ -192,24 +189,26 @@ export default function Pathfinder({ book }) {
         }
     };
 
-    const expandedShelves = {};
+    // Function to Expand Shelves Data
+    const expandShelves = (shelves) => {
+        const expanded = {};
+        Object.entries(shelves).forEach(([section, details]) => {
+            if (details.x_min !== undefined && details.x_max !== undefined) {
+                for (let x = details.x_min; x <= details.x_max; x++) {
+                    expanded[`${section}${x}`] = { x, y: details.y, ...details };
+                }
+            } else if (details.y_min !== undefined && details.y_max !== undefined) {
+                for (let y = details.y_min; y <= details.y_max; y++) {
+                    expanded[`${section}${y}`] = { x: details.x, y, ...details };
+                }
+            } else {
+                expanded[section] = details;
+            }
+        });
+        return expanded;
+    };
 
-    Object.entries(shelves[currentLocation]).forEach(([section, details]) => {
-        if (details.x_min !== undefined && details.x_max !== undefined) {
-            // For sections with multiple X positions (row-based)
-            for (let x = details.x_min; x <= details.x_max; x++) {
-                expandedShelves[`${section}${x}`] = { x, y: details.y, ...details };
-            }
-        } else if (details.y_min !== undefined && details.y_max !== undefined) {
-            // For sections with multiple Y positions (column-based)
-            for (let y = details.y_min; y <= details.y_max; y++) {
-                expandedShelves[`${section}${y}`] = { x: details.x, y, ...details };
-            }
-        } else {
-            // Single shelf location case
-            expandedShelves[section] = details;
-        }
-    });
+    const expandedShelves = expandShelves(shelves[book.location]);
 
     const starts = {
         "2nd Floor, Circulation Section": {
@@ -229,6 +228,12 @@ export default function Pathfinder({ book }) {
     function isInRange(call, from, to) {
         return from <= call && call <= to;
     }
+
+    useEffect(() => {
+        console.log("Book info:", book);
+        console.log("Call Number Prefix:", callNoPrefix);
+        console.log(book.location)
+    }, [book]);
 
     useEffect(() => {
         if (path.length === 0) return;
@@ -267,33 +272,17 @@ export default function Pathfinder({ book }) {
     }, [path]); // Re-run when `path` changes
 
     useEffect(() => {
-        console.log(book)
-        setPath([]);
-        setCurrentLocation("")
-        if (!isNaN(callNoPrefix)) {
-            // If callNoPrefix is a number  
-            setCurrentLocation("4th Floor, Highschool and Multimedia Section");
-        } else {
-            // Extract year from pubDate (assuming it's a string in "yyyy-mm-dd" format)
-            const pubDate = book.currentPubDate || book.pubDate; // Use currentPubDate first, fallback to pubDate
-            const pubYear = pubDate ? parseInt(pubDate.split("-")[0], 10) : "Unknown Year";
-            
-            if (pubYear <= 2009) {
-                setCurrentLocation("4th Floor, Circulation Section");
-            } else {
-                setCurrentLocation("2nd Floor, Circulation Section");
-            }
-        }
+        console.log("LOCATION RESULTS", book.title, callNoPrefix, book.location)
 
-        console.log(callNoPrefix, currentLocation)
-
-        const cols = locations[currentLocation]?.w;
-        const rows = locations[currentLocation]?.h;
+        const cols = locations[book.location]?.w;
+        const rows = locations[book.location]?.h;
         let grid = new Grid({ col: cols, row: rows });
 
-        console.log(cols, rows)
+        if (locations[book.location]) {
+            setGridColumns(`repeat(${locations[book.location].w}, 24px)`);
+        }
 
-        let obstacles = obstacleLoc[currentLocation]?.map(({ x, y }) => [x, y]) || [];
+        let obstacles = obstacleLoc[book.location]?.map(({ x, y }) => [x, y]) || [];
 
         Object.entries(expandedShelves).forEach(([name, { x, y }]) => {
             if (name !== selectedShelf) {
@@ -378,11 +367,14 @@ export default function Pathfinder({ book }) {
         console.log("Target shelf:", targetShelf, "Target position:", targetPosition);
 
         setSelectedShelf(targetShelf);
-        setDestinationDirection(targetDirection);
+
+        console.log(book.location)
 
         let astar = new Astar(grid);
-        let startPos = starts[currentLocation]?.[selectedStart];
+        let startPos = starts[book.location]?.[selectedStart];
         let endPos = targetPosition;
+
+        console.log(startPos, endPos)
 
         let pathResult = astar.search(
             [startPos.x, startPos.y],
@@ -390,10 +382,17 @@ export default function Pathfinder({ book }) {
             { rightAngle: true, optimalResult: true }
         );
 
+        if (!arePathsEqual(prevPathRef.current, pathResult)) {
+            setPath(pathResult.map(coord => ({ x: coord[0], y: coord[1] })));
+            prevPathRef.current = pathResult; // Store for next render
+        }
+
+        setPath([]);
         if (Array.isArray(pathResult)) {
             setPath(pathResult.map(coord => ({ x: coord[0], y: coord[1] })));
         }
 
+        setGridData([]);
         let newGrid = [];
         for (let r = 0; r < rows; r++) {
             let row = [];
@@ -403,7 +402,7 @@ export default function Pathfinder({ book }) {
                 );
                 let isObstacle = !isShelf && obstacles.some(([x, y]) => x === c && y === r);
                 let isPath = pathResult.some(([x, y]) => x === c && y === r);
-                let startName = Object.keys(starts[currentLocation]?.[selectedStart]).find(name => starts[currentLocation]?.[selectedStart][name].x === c && starts[currentLocation]?.[selectedStart][name].y === r);
+                let startName = Object.keys(starts[book.location]?.[selectedStart]).find(name => starts[book.location]?.[selectedStart][name].x === c && starts[book.location]?.[selectedStart][name].y === r);
 
                 row.push({ x: c, y: r, isObstacle, isPath, startName, isShelf });
             }
@@ -411,8 +410,23 @@ export default function Pathfinder({ book }) {
         }
         setGridData(newGrid);
         console.log(book)
-    }, [selectedStart, selectedShelf, location, currentLocation]);
+    }, [selectedStart, selectedShelf, location, callNo]);
 
+    const arePathsEqual = (pathA, pathB) => {
+        if (pathA.length !== pathB.length) return false; // Different lengths → different paths
+
+        return pathA.every((point, index) =>
+            point.x === pathB[index][0] && point.y === pathB[index][1]
+        );
+    };
+
+    const [gridColumns, setGridColumns] = useState("");
+
+    // Then use gridColumns in your style:
+    const gridStyle = {
+        display: "grid",
+        gridTemplateColumns: gridColumns,
+    };
 
     return (
         <div className="uMain-cont">
@@ -420,10 +434,10 @@ export default function Pathfinder({ book }) {
                 <h2 className="text-2xl font-semibold">Location</h2>
             </div>
             <div className="w-full text-center font-semibold text-lg">
-                {currentLocation}
+                {callNo} is located at the {book.location}
             </div>
             <div className="my-2 flex justify-center items-center w-full">
-                <div className="w-fit" style={{ display: "grid", gridTemplateColumns: `repeat(${locations[currentLocation]?.w}, 24px)` }}>
+                <div className="w-fit" style={gridStyle}>
                     {gridData.flat().map((cell, index) => (
                         <div
                             key={index}

@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";  // To read URL params
 import { Star } from "lucide-react";
-import { Document, Page, pdfjs } from "react-pdf"; 
+import { Document, Page, pdfjs } from "react-pdf";
 import { GlobalWorkerOptions } from "pdfjs-dist";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdfjs-dist/pdf.worker.min.mjs";
 
-export default function RsrchInformation({research}) {
+export default function RsrchInformation({ research }) {
     const [pageNumber, setPageNumber] = useState(1);
-    const [numPages, setNumPages] = useState(10); 
+    const [numPages, setNumPages] = useState(10);
     const [isLoading, setIsLoading] = useState(true);
 
-    
+
 
     const onLoadSuccess = ({ numPages }) => {
-        setNumPages(Math.min(numPages, 10)); 
-        setIsLoading(false); 
+        setNumPages(Math.min(numPages, 10));
+        setIsLoading(false);
     };
 
     const onLoadError = (error) => {
@@ -29,21 +29,26 @@ export default function RsrchInformation({research}) {
     const goToNextPage = () => setPageNumber((prev) => Math.min(prev + 1, numPages));
 
     if (!research) {
-        return <p>Loading...</p>; 
+        return <p>Loading...</p>;
     }
 
     return (
         <div className="uMain-cont">
-            <div className="flex w-[950px] gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm mb-8">
-                <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{research.title}</h3>
-                    <p className="text-sm text-gray-700 mt-3">
-                        <b>Authors:</b> {research.author}
-                    </p>
-                    <div className="flex space-x-6 mt-3">
+            <div className="flex w-full gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm">
+            <div className="flex-1">
+                    <h3 className="text-2xl font-ZenSerif">{research.title}</h3>
+                    <div className="text-md text-gray-700 mt-1 space-y-1">
+                        <p><b>Authors:</b> {research.author.join(", ")}</p>
                         <p><b>Published:</b> {research.pubDate}</p>
-                        <p><b>College:</b> {research.college}</p>
-                        <p><b>Department:</b> {research.department}</p>
+                        <span>
+                            <p><b>College:</b> {research.college}&nbsp;&nbsp;
+                                {research.department && research.department !== "N/A" && (
+                                    <>
+                                        <b>Department:</b> {research.department}
+                                    </>
+                                )}
+                            </p>
+                        </span>
                     </div>
                     <p className="text-sm text-gray-600 mt-3">
                         {research.abstract || "No abstract available"}
@@ -51,8 +56,8 @@ export default function RsrchInformation({research}) {
                 </div>
             </div>
 
-            <div className="mt-4 border-t border-grey">
-                <h4 className="text-lg font-semibold mt-4 mb-2">Full Text Preview</h4>
+            <div className="mt-4 border-t border-grey p-2">
+                <h3 className="text-2xl font-semibold mt-4 mb-2">Full Text Preview</h3>
                 <div className="h-100 p-2.5 flex justify-center items-center">
                     {research.pdf ? (
                         <div className="p-2.5 pdf-viewer w-full max-w-4xl flex justify-center border border-grey rounded-lg" style={{ height: "725px" }}>

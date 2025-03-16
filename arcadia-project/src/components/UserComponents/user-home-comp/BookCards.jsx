@@ -19,7 +19,7 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
       setIsLoading(true)
       try {
         const fetchedBooks = await fetchBooks()
-        console.log(title, fetchedBooks)
+        //console.log(title, fetchedBooks)
         setBooks(fetchedBooks.books || [])
       } catch (error) {
         setError(error.message)
