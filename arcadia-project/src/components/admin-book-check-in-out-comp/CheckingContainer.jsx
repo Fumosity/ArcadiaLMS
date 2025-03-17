@@ -260,13 +260,28 @@ const CheckingContainer = () => {
 
     // Check borrowing limits for Check Out operations
     if (checkMode === "Check Out") {
-      const { userAccountType, borrowedBooksCount } = borrowerInfo
+      const { userAccountType } = borrowerInfo
+
+      // Fetch the CURRENT count of borrowed books to ensure accuracy
+      const { data: currentBorrowedBooks, error: countError } = await supabase
+        .from("book_transactions")
+        .select("transactionID")
+        .eq("userID", formData.userID)
+        .eq("transactionType", "Borrowed")
+
+      if (countError) {
+        console.error("Error checking borrowed books count:", countError)
+        alert("Unable to verify borrowing limits. Please try again.")
+        return
+      }
+
+      const currentBorrowedCount = currentBorrowedBooks?.length || 0
 
       // Check borrowing limits based on account type
-      if (userAccountType === "Student" && borrowedBooksCount >= 10) {
+      if (userAccountType === "Student" && currentBorrowedCount >= 10) {
         alert("Students can only borrow up to 10 books at a time. Please return some books before borrowing more.")
         return
-      } else if (userAccountType === "Faculty" && borrowedBooksCount >= 15) {
+      } else if (userAccountType === "Faculty" && currentBorrowedCount >= 15) {
         alert(
           "Faculty members can only borrow up to 15 books at a time. Please return some books before borrowing more.",
         )
