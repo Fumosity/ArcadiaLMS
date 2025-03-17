@@ -1,4 +1,3 @@
-// src/backend/trie.js
 
 export class TrieNode {
     constructor() {
