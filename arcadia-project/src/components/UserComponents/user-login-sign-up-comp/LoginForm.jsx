@@ -45,7 +45,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="uMain-cont flex h-[600px] bg-white">
+    <div className="uMain-cont flex max-h-auto max-w-[950px] h-full w-full bg-white">
       <div className="max-w-md mx-auto p-8 ">
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-1">
@@ -109,7 +109,7 @@ export default function LoginForm() {
       </div>
 
       <div
-        className="w-1/2 relative rounded-2xl bg-cover bg-center"
+        className="w-1/2 relative rounded-2xl bg-cover bg-center hidden md:block max-h-[600px]"
       >
           <img
                         src="/image/hero2.jpeg"
