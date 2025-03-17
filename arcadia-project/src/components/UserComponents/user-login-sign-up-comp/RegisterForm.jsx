@@ -31,7 +31,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
   const [isChecking, setIsChecking] = useState(false)
   const [isPasswordHashed, setIsPasswordHashed] = useState(false)
 
-  const colleges = ["COECSA", "CITHM", "CAMS", "CON", "CBA", "Law", "IHS"]
+  const colleges = ["COECSA", "CITHM", "CAMS", "CON", "CBA", "Law", "IHS", "ASP", "Graduate School"]
 
   const departments = {
     COECSA: ["DCS", "DOA", "DOE"],
@@ -42,6 +42,8 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
     CBA: [],
     Law: [],
     IHS: ["JHS", "SHS"],
+    ASP: [],
+    "Graduate School": [],
   }
 
   // Initialize form with userData if available (when returning from next step)
