@@ -1,8 +1,10 @@
 import React from "react";
+import Title from "./components/main-comp/Title";
 
 const ADPAPage = () => {
   return (
     <div>
+      <Title>Privacy Policy</Title>
     <div className="max-w-4xl mx-auto p-6 text-black">
       <h1 className="text-3xl font-bold mb-6 text-center">
         Data Privacy for Library Users

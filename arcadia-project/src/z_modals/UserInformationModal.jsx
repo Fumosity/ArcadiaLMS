@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { supabase } from "../supabaseClient"
 import WrngPromoteToIntern from "./warning-modals/WrngPromoteToIntern"

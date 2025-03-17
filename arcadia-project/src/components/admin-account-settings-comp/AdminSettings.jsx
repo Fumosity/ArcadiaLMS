@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { ChevronRight } from "lucide-react"
 import UpdateProfilePic from "../../z_modals/UpdateProfilePic" // Adjust the import path as needed

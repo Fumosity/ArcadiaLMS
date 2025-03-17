@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { Clock, ChevronLeft, ChevronRight, Calendar, Search } from 'lucide-react'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'

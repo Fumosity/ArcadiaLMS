@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { supabase } from "../../../supabaseClient"
 import ReportResponse from "./ReportResponse"
@@ -35,7 +33,7 @@ const ReportDetails = ({ reportID, onBack }) => {
   }
 
   return (
-    <div className="uHero-cont p-6 bg-white rounded-lg border border-grey">
+    <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Report Details</h3>
         <button

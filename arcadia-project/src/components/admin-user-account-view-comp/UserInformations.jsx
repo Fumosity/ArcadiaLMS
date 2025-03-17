@@ -1,4 +1,3 @@
-"use client"
 import { useLocation } from "react-router-dom"
 import UserInformationModal from "../../z_modals/UserInformationModal"
 import DeleteUserAcc from "../../z_modals/attention-modals/DeleteUserAcc"

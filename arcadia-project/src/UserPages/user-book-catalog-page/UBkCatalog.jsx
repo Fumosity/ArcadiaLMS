@@ -35,6 +35,7 @@ const UBkCatalog = () => {
   const [error, setError] = useState(null)
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [resultsLoading, setResultsLoading] = useState(false)
 
   useEffect(() => {
     if (viewParam === "highlyRated") {
@@ -97,6 +98,18 @@ const UBkCatalog = () => {
     }
   }, [titleId])
 
+  // Set loading state when query changes
+  useEffect(() => {
+    if (query.trim()) {
+      setResultsLoading(true)
+      // Simulate loading time for search results
+      const timer = setTimeout(() => {
+        setResultsLoading(false)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [query])
+
   // Reset mobile filters when query changes
   useEffect(() => {
     setShowMobileFilters(false)
@@ -152,82 +165,91 @@ const UBkCatalog = () => {
           </div>
         )}
 
-        <div className="w-10/12 mx-auto py-8 userContent-container relative">
-          {/* Main content layout */}
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Sidebar for desktop */}
-            {query.trim() && (
-              <div className="lg:block hidden sticky top-5">
-                <FilterSidebar />
-              </div>
-            )}
-
-            {/* Mobile sidebar overlay */}
-            {query.trim() && showMobileFilters && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={toggleMobileFilters}>
-                <div
-                  className="absolute right-0 top-0 h-full w-3/4 max-w-xs bg-white overflow-y-auto z-50 p-4"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-bold text-lg">Filters</h3>
-                  </div>
-                  <FilterSidebar onClose={toggleMobileFilters} />
-                </div>
-              </div>
-            )}
-
-            {/* Regular sidebar for non-search state */}
-            {!query.trim() && (
-              <div className="lg:w-1/4 lg:block hidden space-y-4 sticky top-5">
-                <ArcOpHr />
-                <UpEvents />
-                <Services />
-                <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-              </div>
-            )}
-
-            {/* Main content area */}
-            <div className="userMain-content lg:w-3/4 w-full">
-              {seeMoreComponent ? (
-                <SeeMore
-                  selectedComponent={seeMoreComponent.title}
-                  onBackClick={handleBackClick}
-                  fetchBooks={seeMoreComponent.fetchBooks}
-                />
-              ) : (
-                <>
-                  {query.trim() && <UBkResults query={query} />}
-                  {!query.trim() && (
-                    <Recommended
-                      titleID={titleId}
-                      userID={user.userID}
-                      category={bookDetails?.category || "General"}
-                      onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}
-                    />
-                  )}
-                  {!query.trim() && (
-                    <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                  )}
-                  {!query.trim() && (
-                    <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                  )}
-                  {!query.trim() && (
-                    <NewlyAdded onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                  )}
-                  {!query.trim() && (
-                    <ReleasedThisYear onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                  )}
-                  {!query.trim() && (
-                    <Fiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                  )}
-                  {!query.trim() && (
-                    <Nonfiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-                  )}
-                </>
-              )}
+        <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
+          {/* Sidebar - match exact structure from UHomePage */}
+          {query.trim() ? (
+            <div className="lg:w-1/4 lg:block md:hidden space-y-4 sticky top-5">
+              <FilterSidebar />
             </div>
+          ) : (
+            <div className="lg:w-1/4 lg:block md:hidden space-y-4">
+              <ArcOpHr />
+              <UpEvents />
+              <Services />
+              <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+              <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+            </div>
+          )}
+
+          {/* Mobile sidebar overlay - Fixed to position fixed and left-0 to ensure full width coverage */}
+          {query.trim() && showMobileFilters && (
+            <>
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                onClick={toggleMobileFilters}
+                style={{ left: 0, right: 0 }}
+              />
+              <div
+                className="fixed right-0 top-0 h-full w-3/4 max-w-xs bg-white overflow-y-auto z-50 p-4 lg:hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-lg">Filters</h3>
+                </div>
+                <FilterSidebar onClose={toggleMobileFilters} />
+              </div>
+            </>
+          )}
+
+          {/* Main content area - match exact structure from UHomePage */}
+          <div className="userMain-content lg:w-3/4 md:w-full">
+            {seeMoreComponent ? (
+              <SeeMore
+                selectedComponent={seeMoreComponent.title}
+                onBackClick={handleBackClick}
+                fetchBooks={seeMoreComponent.fetchBooks}
+              />
+            ) : (
+              <>
+                {query.trim() && (
+                  <>
+                    {resultsLoading ? (
+                      <div className="flex justify-center items-center min-h-[200px]">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-arcadia-red"></div>
+                      </div>
+                    ) : (
+                      <UBkResults query={query} />
+                    )}
+                  </>
+                )}
+                {!query.trim() && (
+                  <Recommended
+                    titleID={titleId}
+                    userID={user.userID}
+                    category={bookDetails?.category || "General"}
+                    onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)}
+                  />
+                )}
+                {!query.trim() && (
+                  <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                )}
+                {!query.trim() && (
+                  <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                )}
+                {!query.trim() && (
+                  <NewlyAdded onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                )}
+                {!query.trim() && (
+                  <ReleasedThisYear onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                )}
+                {!query.trim() && (
+                  <Fiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                )}
+                {!query.trim() && (
+                  <Nonfiction onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                )}
+              </>
+            )}
           </div>
         </div>
       </FilterProvider>

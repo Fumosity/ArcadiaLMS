@@ -33,7 +33,7 @@ const TicketDetails = ({ supportID, onBack }) => {
   }
 
   return (
-    <div className="uHero-cont p-6 bg-white rounded-lg border border-grey">
+    <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Support Ticket Details</h3>
         <button

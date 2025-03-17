@@ -9,6 +9,7 @@ import URFilterSidebar from "../../components/UserComponents/user-rsrch-catalog-
 import UResResults from "./UResResults"
 import ResearchRecommend from "../../components/UserComponents/user-rsrch-catalog-comp/ResearchRecommend"
 import NewAddResearch from "../../components/UserComponents/user-rsrch-catalog-comp/NewAddResearch"
+import SeeMoreResearch from "../../components/UserComponents/user-home-comp/SeeMoreResearch"
 import { useUser } from "../../backend/UserContext"
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr"
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents"
@@ -22,10 +23,13 @@ const URsrchCatalog = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const researchID = queryParams.get("researchID")
+  const viewParam = queryParams.get("view")
   const [bookDetails, setBookDetails] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [resultsLoading, setResultsLoading] = useState(false)
+  const [seeMoreComponent, setSeeMoreComponent] = useState(null)
 
   React.useEffect(() => {
     if (window.location.hash) {
@@ -38,6 +42,27 @@ const URsrchCatalog = () => {
       }
     }
   }, [])
+
+  // Check URL query parameters on component mount
+  useEffect(() => {
+    const viewParam = queryParams.get("view")
+
+    if (viewParam === "recommended") {
+      // Set up the recommended research component
+      setSeeMoreComponent({
+        title: "Recommended for You",
+        fetchResearch: () => fetchRecommendedResearch(user?.userCollege, user?.userDepartment),
+      })
+    }
+
+    if (viewParam === "recentlyPublished") {
+      // Set up the recently published research component
+      setSeeMoreComponent({
+        title: "Recently Published",
+        fetchResearch: fetchNewlyAddedResearch,
+      })
+    }
+  }, [location, user])
 
   useEffect(() => {
     const fetchBookDetails = async () => {
@@ -67,6 +92,18 @@ const URsrchCatalog = () => {
     }
   }, [researchID])
 
+  // Set loading state when query changes
+  useEffect(() => {
+    if (query.trim()) {
+      setResultsLoading(true)
+      // Simulate loading time for search results
+      const timer = setTimeout(() => {
+        setResultsLoading(false)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [query])
+
   // Reset mobile filters when query changes
   useEffect(() => {
     setShowMobileFilters(false)
@@ -74,6 +111,114 @@ const URsrchCatalog = () => {
 
   const toggleMobileFilters = () => {
     setShowMobileFilters(!showMobileFilters)
+  }
+
+  const handleBackClick = () => {
+    setSeeMoreComponent(null)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+
+    // Clear the URL query parameter when going back
+    const url = new URL(window.location)
+    url.searchParams.delete("view")
+    window.history.pushState({}, "", url)
+  }
+
+  const handleSeeMoreClick = (component, fetchFunction) => {
+    if (typeof fetchFunction !== "function") {
+      console.error("fetchFunction is not a function", fetchFunction)
+      return
+    }
+    setSeeMoreComponent({
+      title: component,
+      fetchResearch: fetchFunction,
+    })
+    window.scrollTo({ top: 0, behavior: "smooth" })
+
+    // Update URL to reflect the current view
+    const url = new URL(window.location)
+    if (component === "Recommended for You") {
+      url.searchParams.set("view", "recommended")
+    } else if (component === "Recently Published") {
+      url.searchParams.set("view", "recentlyPublished")
+    }
+    window.history.pushState({}, "", url)
+  }
+
+  // These functions are placeholders to match the expected function signatures
+  // They should be imported from the actual components in a real implementation
+  const fetchRecommendedResearch = async (userCollege, userDepartment) => {
+    try {
+      console.log(userCollege, userDepartment)
+
+      const query = supabase.from("research").select("*")
+
+      if (userCollege === "COECSA") {
+        // Fetch COECSA research (prioritizing same department)
+        const { data: research, error: researchError } = await query.eq("college", "COECSA")
+
+        if (researchError) throw researchError
+
+        const currentYear = new Date().getFullYear()
+        const fiveYearsAgo = currentYear - 5
+
+        // Sort by department first, then prioritize within COECSA
+        const sortedResearch = research
+          .map((paper) => ({
+            ...paper,
+            isSameDepartment: paper.department === userDepartment ? 1 : 0, // Highest priority
+            priority: (paper.pdf ? 2 : 0) + (paper.pubdate >= fiveYearsAgo ? 1 : 0),
+            random: Math.random(),
+          }))
+          .sort(
+            (a, b) =>
+              b.isSameDepartment - a.isSameDepartment || // Same department first
+              b.priority - a.priority ||
+              b.random - a.random,
+          )
+
+        console.log({ sortedResearch })
+        return { research: sortedResearch }
+      } else {
+        // Default behavior for other colleges
+        const { data: research, error: researchError } = await query.eq("college", userCollege)
+
+        if (researchError) throw researchError
+
+        const currentYear = new Date().getFullYear()
+        const fiveYearsAgo = currentYear - 5
+
+        const sortedResearch = research
+          .map((paper) => ({
+            ...paper,
+            priority: (paper.pdf ? 2 : 0) + (paper.pubdate >= fiveYearsAgo ? 1 : 0),
+            random: Math.random(),
+          }))
+          .sort((a, b) => b.priority - a.priority || b.random - a.random)
+
+        console.log({ sortedResearch })
+        return { research: sortedResearch }
+      }
+    } catch (error) {
+      console.error("Error fetching recommended research:", error)
+      return { research: [] }
+    }
+  }
+
+  const fetchNewlyAddedResearch = async () => {
+    try {
+      const { data: research, error } = await supabase
+        .from("research")
+        .select("*")
+        .order("pubDate", { ascending: false })
+
+      if (error) throw error
+
+      console.log({ research })
+      return { research }
+    } catch (error) {
+      console.error("Error fetching newly added research:", error)
+      return { research: [] }
+    }
   }
 
   return (
@@ -96,46 +241,75 @@ const URsrchCatalog = () => {
           </div>
         )}
 
-        <div className="w-10/12 mx-auto py-8 userContent-container relative">
-          {/* Main content layout */}
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Sidebar for desktop */}
-            {query.trim() && (
-              <div className="lg:block hidden sticky top-5">
-                <URFilterSidebar />
-              </div>
-            )}
-
-            {/* Mobile sidebar overlay */}
-            {query.trim() && showMobileFilters && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" onClick={toggleMobileFilters}>
-                <div
-                  className="absolute right-0 top-0 h-full w-3/4 max-w-xs bg-white overflow-y-auto z-50 p-4"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-bold text-lg">Filters</h3>
-                  </div>
-                  <URFilterSidebar onClose={toggleMobileFilters} />
-                </div>
-              </div>
-            )}
-
-            {/* Regular sidebar for non-search state */}
-            {!query.trim() && (
-              <div className="lg:w-1/4 lg:block hidden space-y-4 sticky top-5">
-                <ArcOpHr />
-                <UpEvents />
-                <Services />
-              </div>
-            )}
-
-            {/* Main content area */}
-            <div className="userMain-content lg:w-3/4 w-full">
-              {query.trim() && <UResResults query={query} />}
-              <div id="research">{!query.trim() && <ResearchRecommend />}</div>
-              <div id="new-research">{!query.trim() && <NewAddResearch />}</div>
+        <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
+          {/* Sidebar - match exact structure from UHomePage */}
+          {query.trim() ? (
+            <div className="lg:w-1/4 lg:block md:hidden space-y-4 sticky top-5">
+              <URFilterSidebar />
             </div>
+          ) : (
+            <div className="lg:w-1/4 lg:block md:hidden space-y-4">
+              <ArcOpHr />
+              <UpEvents />
+              <Services />
+            </div>
+          )}
+
+          {/* Mobile sidebar overlay - Fixed to position fixed and left-0 to ensure full width coverage */}
+          {query.trim() && showMobileFilters && (
+            <>
+              {/* Full-screen overlay positioned relative to viewport */}
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                onClick={toggleMobileFilters}
+                style={{ left: 0, right: 0 }}
+              />
+              {/* Filter sidebar positioned on top of overlay */}
+              <div
+                className="fixed right-0 top-0 h-full w-3/4 max-w-xs bg-white overflow-y-auto z-50 p-4 lg:hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-lg">Filters</h3>
+                </div>
+                <URFilterSidebar onClose={toggleMobileFilters} />
+              </div>
+            </>
+          )}
+
+          {/* Main content area - match exact structure from UHomePage */}
+          <div className="userMain-content lg:w-3/4 md:w-full">
+            {seeMoreComponent ? (
+              <SeeMoreResearch
+                selectedComponent={seeMoreComponent.title}
+                onBackClick={handleBackClick}
+                fetchResearch={seeMoreComponent.fetchResearch}
+              />
+            ) : (
+              <>
+                {query.trim() && (
+                  <>
+                    {resultsLoading ? (
+                      <div className="flex justify-center items-center min-h-[200px]">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-arcadia-red"></div>
+                      </div>
+                    ) : (
+                      <UResResults query={query} />
+                    )}
+                  </>
+                )}
+                {!query.trim() && (
+                  <>
+                    <div id="research">
+                      <ResearchRecommend onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                    </div>
+                    <div id="new-research">
+                      <NewAddResearch onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                    </div>
+                  </>
+                )}
+              </>
+            )}
           </div>
         </div>
       </ResearchFilterProvider>

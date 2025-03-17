@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar"
 import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar"

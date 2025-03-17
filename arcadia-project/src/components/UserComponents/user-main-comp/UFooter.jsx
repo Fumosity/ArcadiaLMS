@@ -4,6 +4,18 @@ import { Link, useNavigate } from "react-router-dom"
 const UFooter = () => {
   const navigate = useNavigate()
 
+  const handleRecommendedResearch = () => {
+    navigate("/user/researchmanagement/?view=recommended")
+
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleRecentlyPubliched = () => {
+    navigate("/user/researchmanagement/?view=recentlyPublished")
+
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
 
   const handleHighlyRatedClick = () => {
     // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
@@ -97,40 +109,20 @@ const UFooter = () => {
             </h4>
             <ul className="text-sm text-grey text-left space-y-2">
               <li>
-                <Link
-                  to="/user/researchmanagement#research"
-                  className="hover:underline"
-                  onClick={() => {
-                    // Navigate to the page first
-                    setTimeout(() => {
-                      // After navigation, find and scroll to the element
-                      const element = document.getElementById("research")
-                      if (element) {
-                        element.scrollIntoView({ behavior: "smooth" })
-                      }
-                    }, 100)
-                  }}
+              <button
+                  onClick={handleRecommendedResearch}
+                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
                 >
                   Recommended Research
-                </Link>
+                </button>
               </li>
               <li>
-                <Link
-                  to="/user/researchmanagement#new-research"
-                  className="hover:underline"
-                  onClick={() => {
-                    // Navigate to the page first
-                    setTimeout(() => {
-                      // After navigation, find and scroll to the element
-                      const element = document.getElementById("new-research")
-                      if (element) {
-                        element.scrollIntoView({ behavior: "smooth" })
-                      }
-                    }, 100)
-                  }}
+              <button
+                  onClick={handleRecentlyPubliched}
+                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
                 >
                   Newly Added Research
-                </Link>
+                </button>
               </li>
             </ul>
           </div>

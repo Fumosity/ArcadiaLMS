@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 
 const ModifyAbstract = ({ isOpen, onClose, onModify, initialAbstract, isUpdating = false }) => {

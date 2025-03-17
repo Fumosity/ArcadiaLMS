@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import Skeleton from "react-loading-skeleton"
