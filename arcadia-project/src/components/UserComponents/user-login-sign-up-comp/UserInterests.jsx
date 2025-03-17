@@ -49,7 +49,7 @@ export default function UserInterests({ userData, onBack, onContinue }) {
     : genres;
 
   return (
-    <div className="uMain-cont flex h-[600px] bg-white">
+    <div className="uMain-cont flex max-h-[600px]  max-w-[950px] h-full w-full bg-white">
       <div className="w-1/2 p-12 flex flex-col">
         <h3 className="text-5xl font-semibold text-center mb-6">Hello {userData.firstName}!</h3>
         <p className="text-gray-600 mb-4">Select a number of interests or genres that you want to see!</p>

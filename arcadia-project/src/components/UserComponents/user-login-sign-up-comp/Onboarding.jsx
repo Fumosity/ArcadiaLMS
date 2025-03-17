@@ -100,7 +100,7 @@ export default function Onboarding({ userData, selectedGenres }) {
     }
 
     return (
-        <div className="uMain-cont flex h-[600px] bg-white">
+        <div className="uMain-cont flex max-h-auto max-w-[950px] h-full w-full bg-white">
             {/* Left Section */}
             <div className="max-w-md mx-auto p-8  flex flex-col items-center text-center">
                 <div className="mb-6">
@@ -124,9 +124,7 @@ export default function Onboarding({ userData, selectedGenres }) {
             </div>
 
 
-            <div
-                className="w-1/2 relative rounded-2xl bg-cover bg-center"
-            >
+            <div className="w-1/2 relative rounded-2xl bg-cover bg-center hidden md:block max-h-[600px]">
                 <img
                     src="/image/hero2.jpeg"
                     alt="Hero Background"

@@ -29,7 +29,7 @@ export default function Agreement({ onContinue }) {
     const isContinueEnabled = termsAccepted && privacyAccepted;
 
     return (
-        <div className="uMain-cont flex h-[600px] bg-white">
+        <div className="uMain-cont flex max-h-auto max-w-[950px] h-full w-full bg-white">
             <div className="max-w-md mx-auto p-8 flex flex-col items-center text-center">
                 <div className="mb-6">
                     <h3 className="text-5xl font-semibold">Before we start...</h3>
@@ -41,7 +41,7 @@ export default function Agreement({ onContinue }) {
                 </p>
 
                 {/* Privacy Agreement Scrollable Box */}
-                <div className="w-[450px] h-[250px] border border-gray-400 rounded-md p-4 overflow-y-scroll text-left text-black mb-4"
+                <div className="w-[425px] h-[250px] border border-gray-400 rounded-md p-4 overflow-y-scroll text-left text-black mb-4"
                     ref={privacyTextRef}
                     onScroll={handleScroll}
                 >
@@ -121,7 +121,7 @@ export default function Agreement({ onContinue }) {
                 </div>
             </div>
 
-            <div className="w-1/2 relative rounded-2xl bg-cover bg-center">
+            <div className="w-1/2 relative rounded-2xl bg-cover bg-center hidden md:block max-h-[600px]">
                 <img
                     src="/image/hero2.jpeg"
                     alt="Hero Background"

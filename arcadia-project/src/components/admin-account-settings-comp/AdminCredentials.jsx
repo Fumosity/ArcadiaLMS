@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 
 const defaultUser = {
   name: "Shiori Novella",
@@ -9,14 +9,14 @@ const defaultUser = {
   accountType: "Student",
   photoUrl: "/placeholder.svg?height=100&width=100",
   userPicture: "/placeholder.svg?height=100&width=100",
-};
+}
 
 export function AdminCredentials({ user = defaultUser }) {
-  const [currentUser, setCurrentUser] = useState(user);
+  const [currentUser, setCurrentUser] = useState(user)
 
   useEffect(() => {
     // Fetch the current user data from localStorage
-    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}")
     if (storedUser) {
       setCurrentUser({
         name: `${storedUser.userFName} ${storedUser.userLName}`,
@@ -27,9 +27,27 @@ export function AdminCredentials({ user = defaultUser }) {
         accountType: storedUser.userAccountType,
         // Use userPicture or fallback to placeholder
         photoUrl: storedUser.userPicture || "/placeholder.svg?height=100&width=100",
-      });
+      })
     }
-  }, []);
+  }, [])
+
+  // Format student ID to match RegisterForm.jsx format
+  const formatStudentId = (id) => {
+    if (!id) return ""
+
+    // If the ID is already formatted (contains hyphens), return as is
+    if (id.includes("-")) return id
+
+    // Assuming the format is YYYY-T-NNNNN (year-term-sequence)
+    if (id.length >= 9) {
+      const year = id.substring(0, 4)
+      const term = id.substring(4, 5)
+      const sequence = id.substring(5)
+      return `${year}-${term}-${sequence.padStart(5, "0")}`
+    }
+
+    return id
+  }
 
   return (
     <div className="uMain-cont bg-light-white">
@@ -37,7 +55,7 @@ export function AdminCredentials({ user = defaultUser }) {
       <div className="flex flex-col items-center mb-8">
         <div className="w-24 h-24 border border-grey rounded-full overflow-hidden mb-4">
           <img
-            src={currentUser.photoUrl}
+            src={currentUser.photoUrl || "/placeholder.svg"}
             alt={`${currentUser.name}'s profile photo`}
             className="w-full h-full object-cover"
           />
@@ -51,30 +69,15 @@ export function AdminCredentials({ user = defaultUser }) {
         <div className="space-y-2">
           <div>
             <span className="text-sm text-dark-gray">Name:</span>
-            <input
-              type="text"
-              value={currentUser.name}
-              className="inputBox w-full"
-              readOnly
-            />
+            <input type="text" value={currentUser.name} className="inputBox w-full" readOnly />
           </div>
           <div>
             <span className="text-sm text-dark-gray">College:</span>
-            <input
-              type="text"
-              value={currentUser.college}
-              className="inputBox w-full"
-              readOnly
-            />
+            <input type="text" value={currentUser.college} className="inputBox w-full" readOnly />
           </div>
           <div>
             <span className="text-sm text-dark-gray">Email:</span>
-            <input
-              type="email"
-              value={currentUser.email}
-              className="inputBox w-full"
-              readOnly
-            />
+            <input type="email" value={currentUser.email} className="inputBox w-full" readOnly />
           </div>
         </div>
 
@@ -82,33 +85,19 @@ export function AdminCredentials({ user = defaultUser }) {
         <div className="space-y-2">
           <div>
             <span className="text-sm text-dark-gray">School ID No.:</span>
-            <input
-              type="text"
-              value={currentUser.schoolId}
-              className="inputBox w-full"
-              readOnly
-            />
+            <input type="text" value={formatStudentId(currentUser.schoolId)} className="inputBox w-full" readOnly />
           </div>
           <div>
             <span className="text-sm text-dark-gray">Department:</span>
-            <input
-              type="text"
-              value={currentUser.department}
-              className="inputBox w-full"
-              readOnly
-            />
+            <input type="text" value={currentUser.department} className="inputBox w-full" readOnly />
           </div>
           <div>
             <span className="text-sm text-dark-gray">Account Type:</span>
-            <input
-              type="text"
-              value={currentUser.accountType}
-              className="inputBox w-full"
-              readOnly
-            />
+            <input type="text" value={currentUser.accountType} className="inputBox w-full" readOnly />
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
+

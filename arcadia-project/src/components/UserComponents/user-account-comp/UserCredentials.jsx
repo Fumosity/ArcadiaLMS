@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 const defaultUser = {
   name: "Shiori Novella",
   schoolId: "2021-2-01080",
@@ -8,16 +8,21 @@ const defaultUser = {
   accountType: "Student",
   photoUrl: "/placeholder.svg?height=100&width=100",
   userPicture: "/placeholder.svg?height=100&width=100",
-};
+}
 
 export function UserCredentials({ user = defaultUser }) {
-  const [currentUser, setCurrentUser] = useState(user);
+  const [currentUser, setCurrentUser] = useState(user)
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser && (storedUser.userAccountType === "Student" || storedUser.userAccountType === "Faculty" || storedUser.userAccountType === "Admin"
-       || storedUser.userAccountType === "Superadmin" || storedUser.userAccountType === "Intern"
-    )) {
+    const storedUser = JSON.parse(localStorage.getItem("user"))
+    if (
+      storedUser &&
+      (storedUser.userAccountType === "Student" ||
+        storedUser.userAccountType === "Faculty" ||
+        storedUser.userAccountType === "Admin" ||
+        storedUser.userAccountType === "Superadmin" ||
+        storedUser.userAccountType === "Intern")
+    ) {
       setCurrentUser({
         name: `${storedUser.userFName} ${storedUser.userLName}`,
         schoolId: storedUser.userLPUID,
@@ -27,9 +32,27 @@ export function UserCredentials({ user = defaultUser }) {
         accountType: storedUser.userAccountType,
         photoUrl: storedUser.photoUrl || "/placeholder.svg?height=100&width=100",
         userPicture: storedUser.userPicture || "/placeholder.svg?height=100&width=100",
-      });
+      })
     }
-  }, []);
+  }, [])
+
+  // Format student ID to match RegisterForm.jsx format
+  const formatStudentId = (id) => {
+    if (!id) return ""
+
+    // If the ID is already formatted (contains hyphens), return as is
+    if (id.includes("-")) return id
+
+    // Assuming the format is YYYY-T-NNNNN (year-term-sequence)
+    if (id.length >= 9) {
+      const year = id.substring(0, 4)
+      const term = id.substring(4, 5)
+      const sequence = id.substring(5)
+      return `${year}-${term}-${sequence.padStart(5, "0")}`
+    }
+
+    return id
+  }
 
   return (
     <div className="uMain-cont">
@@ -65,7 +88,7 @@ export function UserCredentials({ user = defaultUser }) {
         <div className="space-y-2">
           <div>
             <span className="text-sm text-dark-gray">School ID No.:</span>
-            <input type="text" value={currentUser.schoolId} className="inputBox w-full" readOnly />
+            <input type="text" value={formatStudentId(currentUser.schoolId)} className="inputBox w-full" readOnly />
           </div>
           <div>
             <span className="text-sm text-dark-gray">Department:</span>
@@ -78,5 +101,6 @@ export function UserCredentials({ user = defaultUser }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
+
