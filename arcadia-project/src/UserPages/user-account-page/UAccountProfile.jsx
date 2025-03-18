@@ -11,6 +11,7 @@ import { UserCredentials } from "../../components/UserComponents/user-account-co
 import { UserInterests } from "../../components/UserComponents/user-account-comp/UserInterests";
 import { AccountSettings } from "../../components/UserComponents/user-account-comp/AccountSettings";
 import UserCirculationHistory from "../../components/UserComponents/user-account-comp/UserCirculationHistory";
+import AccountRequests from "../../components/UserComponents/user-account-comp/AccountRequests";
 
 const UAccountProfile = () => {
     return (
@@ -31,9 +32,8 @@ const UAccountProfile = () => {
                     <UserCredentials />
                     <UserInterests />
                     <AccountSettings />
+                    <AccountRequests/>
                     <UserCirculationHistory />
-
-
                 </div>
             </div>
 

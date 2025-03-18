@@ -68,6 +68,7 @@ import AuthComplete from './UserPages/AuthComplete.jsx';
 import GenrePage from './components/UserComponents/user-genre-cat/GenrePage.jsx';
 import ARExport from './admin-research-export/ARExport.jsx';
 import DPAPage from './UserPages/DPAPage.jsx';
+import BookReservation from './components/UserComponents/user-book-view-comp/BookReservation.jsx';
 
 function App() {
   return (
@@ -85,6 +86,7 @@ function App() {
               <Route path="/" element={<UHomePage />} />
               <Route path="/user/register" element={<UsrRegistration />} />
               <Route path="/user/bookmanagement" element={<UBkCatalog />} />
+              <Route path="/user/bookreservation" element={<BookReservation />} />
               <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
               <Route path="/user/reservations" element={<ProtectedRoute><UDiscussionReserv /></ProtectedRoute>} />
               <Route path="/user/services" element={<ProtectedRoute><UServices /></ProtectedRoute>} />

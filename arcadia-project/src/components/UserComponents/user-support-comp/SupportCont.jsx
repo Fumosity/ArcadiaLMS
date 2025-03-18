@@ -12,6 +12,7 @@ const SupportCont = () => {
             more: "Read the FAQs",
             link: "/user/faqs",
         },
+        
     ];
 
     if (user?.userID) {
