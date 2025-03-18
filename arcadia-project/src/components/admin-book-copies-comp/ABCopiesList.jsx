@@ -33,7 +33,7 @@ export default function ABCopiesList({ titleID, onRowSelect, refreshList }) {
                             *,
                             book_titles (
                             titleID,
-                            arcID,
+                            titleCallNum,
                             location
                             )
                         `)

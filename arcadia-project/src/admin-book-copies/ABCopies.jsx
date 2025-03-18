@@ -21,10 +21,10 @@ const ABCopies = () => {
     const [formData, setFormData] = useState({
         bookStatus: '',
         bookBarcode: '',
-        bookCallNo: '',
+        titleCallNum: '',
         bookLocation: '',
         bookAcqDate: '',
-        bookID: null,
+        titleID: null,
     })
 
     const [originalFormData, setOriginalFormData] = useState(null);
@@ -34,10 +34,10 @@ const ABCopies = () => {
         const newFormData = {
             bookStatus: selectedCopy.bookStatus || '',
             bookBarcode: selectedCopy.bookBarcode || '',
-            bookCallNo: selectedCopy.book_titles.arcID || '',
+            titleCallNum: selectedCopy.book_titles.titleCallNum || '',
             bookLocation: selectedCopy.book_titles.location || '',
             bookAcqDate: selectedCopy.bookAcqDate || '',
-            bookID: selectedCopy.bookID
+            titleID: selectedCopy.titleID
         };
 
         setFormData(newFormData);
@@ -50,11 +50,11 @@ const ABCopies = () => {
         setIsAddMode(true); // Set to add mode
         setOriginalFormData(null);
 
-        // Fetch bookCallNo and bookLocation using titleID
+
         if (titleID) {
             const { data, error } = await supabase
                 .from('book_titles')
-                .select('arcID, location')
+                .select('titleCallNum, location')
                 .eq('titleID', titleID)
                 .single();
 
@@ -67,20 +67,20 @@ const ABCopies = () => {
                 setFormData({
                     bookStatus: '',
                     bookBarcode: '',
-                    bookCallNo: data.arcID || '',
+                    titleCallNum: data.titleCallNum || '',
                     bookLocation: data.location || '',
                     bookAcqDate: '',
-                    bookID: null,
+                    titleID: null,
                 });
             } else {
                 //Handle case where book title is not found.
                 setFormData({
                     bookStatus: '',
                     bookBarcode: '',
-                    bookCallNo: '',
+                    titleCallNum: '',
                     bookLocation: '',
                     bookAcqDate: '',
-                    bookID: null,
+                    titleID: null,
                 });
                 console.error("Book title not found");
             }
@@ -88,10 +88,10 @@ const ABCopies = () => {
             setFormData({
                 bookStatus: '',
                 bookBarcode: '',
-                bookCallNo: '',
+                titleCallNum: '',
                 bookLocation: '',
                 bookAcqDate: '',
-                bookID: null,
+                titleID: null,
             });
             console.error("titleID is not set");
         }
