@@ -24,7 +24,7 @@ export default function URegister() {
   return (
     <div className="min-h-screen  flex flex-col relative">
       <div className="absolute inset-0">
-        <img src="/image/login-bg.jpeg" alt="Background" className="w-full h-full object-cover" />
+        <img src="/image/arc2.JPG" alt="Background" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-arcadia-red opacity-95" />
       </div>
 

@@ -7,7 +7,7 @@ export default function Navbar(){
     <nav className="flex justify-center items-center px-4">
       <div className="navbar-content flex">
         <CustomLink to="/admin" className="nav-link">Home</CustomLink>
-        <CustomLink to="/admin/analytics" className="nav-link">Analytics</CustomLink>
+        {/* <CustomLink to="/admin/analytics" className="nav-link">Analytics</CustomLink> */}
         <CustomLink to="/admin/circulationhistory" className="nav-link">Circulation History</CustomLink>
         <CustomLink to="/admin/bookmanagement" className="nav-link">Book Management</CustomLink>
         <CustomLink to="/admin/researchmanagement" className="nav-link">Research Management</CustomLink>

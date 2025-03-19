@@ -64,7 +64,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
   useEffect(() => {
     setNewData((prev) => ({
       ...prev,
-      department: ["COECSA", "IHS"].includes(prev.college) ? prev.department : "",
+      department: ["COECSA", "IS"].includes(prev.college) ? prev.department : "",
     }))
   }, [new_data.college])
 
@@ -138,8 +138,8 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
       }
     }
 
-    // Department is required for COECSA and IHS
-    if (["COECSA", "IHS"].includes(new_data.college) && !new_data.department) {
+    // Department is required for COECSA and IS
+    if (["COECSA", "IS"].includes(new_data.college) && !new_data.department) {
       setFormError("Please select a department for your college")
       return
     }
@@ -266,7 +266,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
                   id="department"
                   value={new_data.department}
                   onChange={(e) => setNewData((prev) => ({ ...prev, department: e.target.value }))}
-                  disabled={!["COECSA", "IHS"].includes(new_data.college)}
+                  disabled={!["COECSA", "IS"].includes(new_data.college)}
                   className="w-full px-2.5 py-1 border border-gray rounded-full"
                 >
                   <option value="">Select Department</option>

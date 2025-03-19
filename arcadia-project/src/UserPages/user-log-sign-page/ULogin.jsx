@@ -6,7 +6,7 @@ const ULogin = () => {
     <div className="min-h-screen flex flex-col relative">
       <div className="absolute inset-0">
         <img
-          src="/image/login-bg.jpeg"
+          src="/image/arc1.JPG"
           alt="Background"
           className="w-full h-full object-cover"
         />

@@ -48,7 +48,7 @@ const ReservHero = () => {
                     />
                 ))}
 
-        <div className="absolute inset-0 z-10 flex flex-col items-start justify-center text-center w-full h-full px-4 py-16 bg-black/50">
+        <div className="absolute inset-0 flex flex-col items-start justify-center text-center w-full h-full px-4 py-16 bg-black/50">
           <h1 className="justify-start text-left userHero-title pl-4 text-white text-4xl md:text-5xl font-bold mb-4">
             Reserve discussion rooms <br />
             for group presentations, <br /> consultations, and meetings.
