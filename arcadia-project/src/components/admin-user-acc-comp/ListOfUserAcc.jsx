@@ -124,14 +124,13 @@ const ListOfUserAcc = () => {
 
             {/* Filter By */}
             <div className="flex items-center space-x-2">
-              <span className="font-medium text-sm">Filter:</span>
+              <span className="font-medium text-sm">Type:</span>
               <select
                 className="py-1 px-3 border rounded-lg text-sm w-32"
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
               >
                 <option value="All">All</option>
-                <option value="User">User</option>
                 <option value="Student">Student</option>
                 <option value="Faculty">Faculty</option>
                 <option value="Intern">Intern</option>
@@ -185,7 +184,7 @@ const ListOfUserAcc = () => {
                     Name
                 </th>
                 <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  School ID
+                  ID Number
                 </th>
                 <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   College

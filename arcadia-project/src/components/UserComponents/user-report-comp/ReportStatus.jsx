@@ -99,15 +99,17 @@ const ReportStatus = ({ onReportSelect }) => {
                   </td>
                   <td className="px-4 py-2 text-sm">
                     <span
-                      className={`px-4 py-1 rounded-full text-xs font-semibold ${report.status === "Ongoing" ? "bg-yellow" : report.status === "Resolved" ? "bg-green" : report.status === "Intended" ? "bg-red" : "bg-gray-200"}`}
+                      className={`px-4 py-1 rounded-full text-xs font-semibold ${report.status === "Ongoing" ? "bg-ongoing" : report.status === "Resolved" ? "bg-resolved text-white" : report.status === "Intended" ? "bg-intended text-white" : "bg-grey"}`}
                     >
                       {report.status || "N/A"}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-sm">{report.subject || "N/A"}</td>
+                  <td className="px-4 py-2 text-sm text-arcadia-red font-medium hover:underline cursor-pointer"
+                  onClick={() => handleReportClick(report.reportID)}
+                  >{report.subject || "N/A"}</td>
                   <td className="px-4 py-2 text-sm">{report.date || "N/A"}</td>
                   <td className="px-4 py-2 text-sm">{report.time || "N/A"}</td>
-                  <td className="px-4 py-2 text-sm text-red-600 font-medium hover:underline cursor-pointer">
+                  <td className="px-4 py-2 text-sm text-arcadia-red font-medium hover:underline cursor-pointer">
                     <span onClick={() => handleReportClick(report.reportID)}>{report.reportID || "N/A"}</span>
                   </td>
                 </tr>

@@ -25,7 +25,7 @@ export default function RsrchAvailability({ research }) {
     // Create query parameters for type and subject
     const queryParams = new URLSearchParams({
       type: "Research",
-      subject: `Inquiry about research: ${research.title}`,
+      subject: `Inquiry about research: ${research.researchCallNum}`,
     }).toString()
 
     // Navigate to the support ticket page with query parameters

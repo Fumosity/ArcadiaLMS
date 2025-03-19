@@ -96,8 +96,8 @@ const PastReviews = ({ titleID }) => {
         <h3 className="text-2xl font-semibold">Rating Breakdown</h3>
         {!loading && totalRatings > 0 && (
           <div className="text-right">
-            <p className="text-lg font-medium">{averageRating} / 5</p>
-            <p className="text-sm text-gray-500">Based on {totalRatings} ratings</p>
+            <p className="text-xl font-medium">{averageRating} / 5</p>
+            <p className="text-lg text-gray-500">Based on {totalRatings} ratings</p>
           </div>
         )}
       </div>

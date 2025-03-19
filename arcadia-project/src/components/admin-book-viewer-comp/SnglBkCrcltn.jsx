@@ -168,8 +168,8 @@ const SnglBkCrcltn = ({ titleID }) => {
   }
 
   return (
-    <div className="bg-white p-4 rounded-lg border-grey border">
-      <h3 className="text-2xl font-semibold mb-4">Book Circulation History</h3>
+    <div>
+      {/* <h3 className="text-2xl font-semibold mb-4">Book Circulation History</h3> */}
 
       {/* Controls for sort, filter, and search */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -263,7 +263,7 @@ const SnglBkCrcltn = ({ titleID }) => {
                   <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
                     <span
                       className={`inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
-                      ${book.type === "Returned" ? "bg-[#118B50]" : book.type === "Borrowed" ? "bg-[#FFB200]" : "bg-grey"}`}
+                      ${book.type === "Returned" ? "bg-[#118B50] text-white" : book.type === "Borrowed" ? "bg-[#FFB200]" : "bg-grey"}`}
                     >
                       {book.type}
                     </span>

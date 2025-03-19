@@ -56,9 +56,9 @@ const MakeReport = () => {
           onChange={(e) => setType(e.target.value)}
         >
           <option value="select-type" className="text-center text-grey">Select Type</option>
-          <option value="system" className="text-center">System</option>
-          <option value="book" className="text-center">Book</option>
-          <option value="feedback" className="text-center">Research</option>
+          <option value="System" className="text-center">System</option>
+          <option value="Book" className="text-center">Book</option>
+          <option value="Feedback" className="text-center">Research</option>
         </select>
 
         <label className="text-sm ml-4 mr-2 font-semibold">Subject:</label>

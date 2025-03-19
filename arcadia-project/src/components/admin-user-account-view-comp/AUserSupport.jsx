@@ -1,15 +1,16 @@
-import { Link } from "react-router-dom"
-import { useUserCirculation } from "../../backend/AUserCircBackend"
+import { useUserSupport } from "../../backend/AUserSupportBackend"
 import { useEffect } from "react"
 
-const AUserCirc = ({ user }) => {
+const AUserSupport = ({ user }) => {
   const {
     sortOrder,
     setSortOrder,
     entriesPerPage,
     setEntriesPerPage,
-    typeOrder,
+    typeFilter,
     setTypeFilter,
+    statusFilter,
+    setStatusFilter,
     dateRange,
     setDateRange,
     searchTerm,
@@ -19,28 +20,28 @@ const AUserCirc = ({ user }) => {
     paginatedData,
     totalPages,
     loading,
-    handleUserClick,
-    truncateTitle,
+    handleSupportClick,
+    truncateText,
     totalEntries,
-  } = useUserCirculation(user)
+  } = useUserSupport(user)
 
   // Log when component receives new user data
   useEffect(() => {
-    console.log("AUserCirc received user data:", user)
+    console.log("AUserSupport received user data:", user)
   }, [user])
 
   if (loading) {
     return (
       <div className="bg-white p-4 rounded-lg border-grey border">
-        <h3 className="text-2xl font-semibold mb-4">User Book Circulation History</h3>
-        <div className="text-center py-4">Loading circulation history...</div>
+        <h3 className="text-2xl font-semibold mb-4">User Support Tickets</h3>
+        <div className="text-center py-4">Loading support tickets...</div>
       </div>
     )
   }
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
-      <h3 className="text-2xl font-semibold mb-4">User Book Circulation History</h3>
+      <h3 className="text-2xl font-semibold mb-4">User Support Tickets</h3>
 
       {/* Controls */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -56,17 +57,33 @@ const AUserCirc = ({ user }) => {
             </button>
           </div>
 
-          {/* Type */}
+          {/* Type Filter */}
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Type:</span>
             <select
               className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
-              value={typeOrder}
+              value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
             >
               <option value="All">All</option>
-              <option value="Borrowed">Borrowed</option>
-              <option value="Returned">Returned</option>
+              <option value="Account">Account</option>
+              <option value="Book">Book</option>
+              <option value="Research">Research</option>
+            </select>
+          </div>
+
+          {/* Status Filter */}
+          <div className="flex items-center space-x-2">
+            <span className="font-medium text-sm">Status:</span>
+            <select
+              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="All">All</option>
+              <option value="Pending">Pending</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Approved">Approved</option>
             </select>
           </div>
 
@@ -110,9 +127,9 @@ const AUserCirc = ({ user }) => {
             type="text"
             id="search"
             value={searchTerm}
-            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[300px]"
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Title, borrower, or barcode"
+            placeholder="Subject or ticket ID"
           />
         </div>
       </div>
@@ -123,53 +140,59 @@ const AUserCirc = ({ user }) => {
           <thead>
             <tr>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Subject
+              </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Borrower
-              </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Book Title
-              </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Barcode
+                Ticket ID
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedData.length > 0 ? (
-              paginatedData.map((book, index) => (
+              paginatedData.map((support, index) => (
                 <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                  <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
-                    <span
-                      className={`inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
-                      ${book.type === "Returned" ? "bg-resolved text-white" : book.type === "Borrowed" ? "bg-ongoing" : "bg-grey"}`}
-                    >
-                      {book.type}
+                    {/* Type */}
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">
+                    <span className="inline-block font-medium border border-grey bg-grey rounded-full px-3 py-1 bg-gray-200">
+                      {support.type}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.date}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.time}</td>
-                  <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
-                    <button onClick={() => handleUserClick(book)} className="text-blue-500 hover:underline">
-                      {book.borrower}
+                  {/* Status */}
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">
+                    <span
+                      className={`inline-block font-medium rounded-full px-3 py-1 ${support.statusColor}`}
+                    >
+                      {support.status}
+                    </span>
+                  </td>
+                  {/* Subject */}
+                  <td className="px-4 py-3 text-sm text-arcadia-red font-semibold text-center truncate">
+                    <button 
+                        onClick={() => handleSupportClick(support)} 
+                        className="text-blue-500 hover:underline"
+                    >
+                      {truncateText(support.subject)}
                     </button>
                   </td>
-                  <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
-                    <Link
-                      to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      {truncateTitle(book.bookTitle)}
-                    </Link>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{support.date}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{support.time}</td>
+                  <td className="px-4 py-3 text-sm text-arcadia-red font-semibold text-center">
+                    <button onClick={() => handleSupportClick(support)} className="text-blue-500 hover:underline">
+                      {support.id}
+                    </button>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
-                  No data available.
+                  No support tickets found.
                 </td>
               </tr>
             )}
@@ -199,5 +222,5 @@ const AUserCirc = ({ user }) => {
   )
 }
 
-export default AUserCirc
+export default AUserSupport
 

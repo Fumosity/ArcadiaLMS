@@ -17,12 +17,12 @@ const ReservSupport = () => {
 
   function checkStatusColor(status) {
     switch (status) {
-      case 'Resolved':
-        return "bg-resolved"
-      case 'Ongoing':
+      case 'Approved':
+        return "bg-resolved text-white"
+      case 'Pending':
         return "bg-ongoing"
-      case 'Intended':
-        return "bg-intended"
+      case 'Rejected':
+        return "bg-intended text-white"
       default:
         return "bg-grey"
     }
@@ -131,9 +131,9 @@ const ReservSupport = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="All">All</option>
-              <option value="Ongoing">Ongoing</option>
-              <option value="Intended">Intended</option>
-              <option value="Resolved">Resolved</option>
+              <option value="Pending">Pending</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Approved">Approved</option>
             </select>
           </div>
         </div>

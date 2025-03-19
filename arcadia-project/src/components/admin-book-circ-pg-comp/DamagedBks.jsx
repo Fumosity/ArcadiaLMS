@@ -1,59 +1,55 @@
 import { supabase } from "../../supabaseClient"
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import LibBookCirc from "../admin-lib-analytics-comp/LibBookCirc"
 
-const BCHistory = () => {
-  const [currentPage, setCurrentPage] = useState(1)
+const DamagedBks = () => {
+  const [sortOrder, setSortOrder] = useState("Descending")
   const [entriesPerPage, setEntriesPerPage] = useState(10)
   const [searchTerm, setSearchTerm] = useState("")
-  const [sortOrder, setSortOrder] = useState("Descending")
-  const [typeFilter, setTypeFilter] = useState("All")
-  const [dateRange, setDateRange] = useState("All Time")
-  const [bkhistoryData, setBkhistoryData] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [damagedData, setDamagedData] = useState([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
+  const [dateRange, setDateRange] = useState("All Time")
 
   useEffect(() => {
+    // Fetch damaged book data from Supabase
     const fetchData = async () => {
       try {
         setLoading(true)
-        const { data, error } = await supabase.from("book_transactions").select(`
-                        transactionType, 
-                        checkinDate, 
-                        checkinTime, 
-                        checkoutDate, 
-                        checkoutTime, 
-                        userID, 
-                        bookBarcode, 
-                        book_indiv(
-                            bookBarcode,
-                            bookStatus,
-                            book_titles (
-                                titleID,
-                                title,
-                                price
-                            )
+        const { data, error } = await supabase
+          .from("book_indiv")
+          .select(`
+                        bookBarcode,
+                        bookStatus,
+                        bookAcqDate,
+                        book_titles (
+                            titleID,
+                            title,
+                            publisher,
+                            price
                         ),
-                        user_accounts (
-                            userFName,
-                            userLName,
-                            userLPUID
-                        )`)
+                        book_transactions (
+                            userID,
+                            user_accounts (
+                                userFName,
+                                userLName,
+                                userLPUID
+                            )
+                        )
+                    `)
+          .eq("bookStatus", "Damaged")
 
         if (error) {
           console.error("Error fetching data: ", error.message)
         } else {
-          console.log("History data from Supabase:", data) // Debugging: raw data from Supabase
+          console.log("Damaged books data from Supabase:", data) // Debugging: raw data from Supabase
 
           const formattedData = data.map((item) => {
-            const date = item.checkinDate || item.checkoutDate
-            const time = item.checkinTime || item.checkoutTime
-
             // Format date to "Month Day, Year" format
             let formattedDate = null
-            if (date) {
-              const [year, month, day] = date.split("-")
+            if (item.bookAcqDate) {
+              const [year, month, day] = item.bookAcqDate.split("-")
               const dateObj = new Date(year, month - 1, day)
               formattedDate = dateObj.toLocaleDateString("en-US", {
                 year: "numeric",
@@ -62,35 +58,37 @@ const BCHistory = () => {
               })
             }
 
-            let formattedTime = null
-            if (time) {
-              // Ensure time is in the format HH:mm (24-hour format)
-              const timeString = time.includes(":") ? time : `${time.slice(0, 2)}:${time.slice(2)}`
+            // Get the most recent borrower if available
+            let borrower = "N/A"
+            let userId = null
 
-              // Convert time into 12-hour format with AM/PM, no 'Z' for local time
-              formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString("en-PH", {
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              })
+            if (item.book_transactions && item.book_transactions.length > 0) {
+              // Find the most recent transaction
+              const lastTransaction = item.book_transactions[item.book_transactions.length - 1]
+              if (lastTransaction.user_accounts) {
+                borrower = `${lastTransaction.user_accounts.userFName} ${lastTransaction.user_accounts.userLName}`
+                userId = lastTransaction.userID
+              }
             }
 
-            const bookDetails = item.book_indiv?.book_titles || {}
+            const bookDetails = item.book_titles || {}
 
             return {
-              type: item.transactionType,
-              rawDate: date, // Keep the original date for sorting if needed
-              date: formattedDate,
-              time: formattedTime,
-              borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
-              bookTitle: bookDetails.title,
-              bookBarcode: item.book_indiv.bookBarcode,
-              userId: item.userID,
+              type: "Damaged",
+              status: item.bookStatus,
+              rawDate: item.bookAcqDate, // Keep original for sorting
+              dateAcquired: formattedDate,
+              borrower: borrower,
+              bookTitle: bookDetails.title || "Unknown Title",
+              publisher: bookDetails.publisher || "Unknown Publisher",
+              bookBarcode: item.bookBarcode,
+              userId: userId,
               titleID: bookDetails.titleID,
+              price: bookDetails.price || "N/A",
             }
           })
 
-          setBkhistoryData(formattedData)
+          setDamagedData(formattedData)
         }
         setLoading(false)
       } catch (error) {
@@ -100,22 +98,20 @@ const BCHistory = () => {
     }
 
     fetchData()
-  }, [])
+  }, []) // Empty dependency array means this will run once when the component mounts
 
-  const totalPages = Math.ceil(bkhistoryData.length / entriesPerPage)
+  const totalPages = Math.ceil(damagedData.length / entriesPerPage)
 
-  // Handle sorting by borrower name
-  const sortedData = [...bkhistoryData].sort((a, b) => {
-    const nameA = a.borrower.toLowerCase()
-    const nameB = b.borrower.toLowerCase()
+  // Handle sorting by book title
+  const sortedData = [...damagedData].sort((a, b) => {
+    const titleA = a.bookTitle.toLowerCase()
+    const titleB = b.bookTitle.toLowerCase()
 
-    return sortOrder === "Ascending" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+    return sortOrder === "Ascending" ? titleA.localeCompare(titleB) : titleB.localeCompare(titleA)
   })
 
   // Handle filtering and searching
   const filteredData = sortedData.filter((book) => {
-    const matchesType = typeFilter === "All" || book.type === typeFilter
-
     // Date range filtering
     let matchesDateRange = true
     if (dateRange !== "All Time" && book.rawDate) {
@@ -148,11 +144,12 @@ const BCHistory = () => {
     }
 
     const matchesSearch =
-      book.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.borrower.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.bookBarcode.includes(searchTerm)
+      (book.bookTitle && book.bookTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (book.publisher && book.publisher.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (book.borrower && book.borrower.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (book.bookBarcode && book.bookBarcode.includes(searchTerm))
 
-    return matchesType && matchesDateRange && matchesSearch
+    return matchesDateRange && matchesSearch
   })
 
   // Pagination logic
@@ -160,22 +157,23 @@ const BCHistory = () => {
   const displayedBooks = filteredData.slice(startIndex, startIndex + entriesPerPage)
 
   const handleUserClick = (book) => {
-    console.log("userid", book.userId, "user", book.borrower, book)
-    navigate("/admin/useraccounts/viewusers", {
-      state: { userId: book.userId, user: book },
-    })
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    if (book.userId) {
+      console.log("userid", book.userId, "user", book.borrower, book)
+      navigate("/admin/useraccounts/viewusers", {
+        state: { userId: book.userId, user: book },
+      })
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
   }
 
   const truncateTitle = (title, maxLength = 25) => {
+    if (!title) return "Unknown"
     return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title
   }
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
-      <h3 className="text-2xl font-semibold mb-4">Book Circulation History</h3>
-
-      <LibBookCirc />
+      <h3 className="text-2xl font-semibold mb-4">Damaged Books</h3>
 
       {/* Controls for sort, filter, and search */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -191,17 +189,18 @@ const BCHistory = () => {
             </button>
           </div>
 
-          {/* Filter By Type */}
+          {/* Entries Per Page */}
           <div className="flex items-center space-x-2">
-            <span className="font-medium text-sm">Type:</span>
+            <span className="font-medium text-sm">Entries:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
+              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
+              value={entriesPerPage}
+              onChange={(e) => setEntriesPerPage(Number(e.target.value))}
             >
-              <option value="All">All</option>
-              <option value="Borrowed">Borrowed</option>
-              <option value="Returned">Returned</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
             </select>
           </div>
 
@@ -220,21 +219,6 @@ const BCHistory = () => {
               <option value="This Year">This Year</option>
             </select>
           </div>
-
-          {/* Entries Per Page */}
-          <div className="flex items-center space-x-2">
-            <span className="font-medium text-sm">Entries:</span>
-            <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
-              value={entriesPerPage}
-              onChange={(e) => setEntriesPerPage(Number(e.target.value))}
-            >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-            </select>
-          </div>
         </div>
 
         {/* Search */}
@@ -246,7 +230,7 @@ const BCHistory = () => {
             type="text"
             id="search"
             className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
-            placeholder="Title, borrower, or barcode"
+            placeholder="Title, publisher, borrower, or barcode"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -258,17 +242,23 @@ const BCHistory = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Borrower
+                Status
+              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date Acquired
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Book Title
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Publisher
+              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Barcode
+              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Last Borrower
               </th>
             </tr>
           </thead>
@@ -284,19 +274,13 @@ const BCHistory = () => {
                 <tr key={index} className="hover:bg-light-gray cursor-pointer">
                   <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
                     <span
-                      className={`inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
-                                            ${book.type === "Returned" ? "bg-resolved text-white" : book.type === "Borrowed" ? "bg-ongoing" : "bg-grey"}`}
+                      className="inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
+                        bg-dark-blue text-white"
                     >
-                      {book.type}
+                      {book.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.date}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.time}</td>
-                  <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
-                    <button onClick={() => handleUserClick(book)} className="text-blue-500 hover:underline">
-                      {book.borrower}
-                    </button>
-                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.dateAcquired || "N/A"}</td>
                   <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
                     <Link
                       to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
@@ -305,13 +289,23 @@ const BCHistory = () => {
                       {truncateTitle(book.bookTitle)}
                     </Link>
                   </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{truncateTitle(book.publisher)}</td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
+                  <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
+                    {book.userId ? (
+                      <button onClick={() => handleUserClick(book)} className="text-blue-500 hover:underline">
+                        {book.borrower}
+                      </button>
+                    ) : (
+                      <span>{book.borrower}</span>
+                    )}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
-                  No data available.
+                  No damaged books found.
                 </td>
               </tr>
             )}
@@ -341,5 +335,5 @@ const BCHistory = () => {
   )
 }
 
-export default BCHistory
+export default DamagedBks
 

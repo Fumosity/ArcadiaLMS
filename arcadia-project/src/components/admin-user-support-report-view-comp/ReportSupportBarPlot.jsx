@@ -5,6 +5,7 @@ import { supabase } from "/src/supabaseClient.js"
 const ReportSupportBarPlot = () => {
   const [data, setData] = useState([])
   const [timeFrame, setTimeFrame] = useState("week")
+  const [currentDate, setCurrentDate] = useState(new Date())
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
@@ -32,20 +33,20 @@ const ReportSupportBarPlot = () => {
     const groupedData = processData(reports, supports, timeFrame)
     setData(groupedData)
     setIsLoading(false)
-  }, [timeFrame])
+  }, [timeFrame, currentDate])
 
   useEffect(() => {
     fetchData()
   }, [fetchData])
 
   const getDateRange = (frame) => {
-    const currentDate = new Date()
+    const date = new Date(currentDate)
     let startDate, endDate
 
     if (frame === "week") {
       // Get Monday of current week
-      startDate = new Date(currentDate)
-      startDate.setDate(currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -5 : 2))
+      startDate = new Date(date)
+      startDate.setDate(date.getDate() - date.getDay() + (date.getDay() === 0 ? -5 : 2))
       startDate.setHours(0, 0, 0, 0)
 
       // Get Friday of current week
@@ -54,9 +55,15 @@ const ReportSupportBarPlot = () => {
       endDate.setHours(23, 59, 59, 999)
     } else if (frame === "month") {
       // Start of current month
-      startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 2)
+      startDate = new Date(date.getFullYear(), date.getMonth(), 1)
       // End of current month
-      endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
+      endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+      endDate.setHours(23, 59, 59, 999)
+    } else if (frame === "year") {
+      // Start of current year
+      startDate = new Date(date.getFullYear(), 1)
+      // End of current year
+      endDate = new Date(date.getFullYear(), 11, 31)
       endDate.setHours(23, 59, 59, 999)
     }
 
@@ -64,6 +71,29 @@ const ReportSupportBarPlot = () => {
       startDate: startDate.toISOString().split("T")[0],
       endDate: endDate.toISOString().split("T")[0],
     }
+  }
+
+  const getTimeLabels = (selectedTimeFrame) => {
+    const { startDate, endDate } = getDateRange(selectedTimeFrame)
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const labels = []
+
+    if (selectedTimeFrame === "year") {
+      for (let month = 0; month < 12; month++) {
+        const monthDate = new Date(currentDate.getFullYear(), month, 1)
+        labels.push(monthDate.toLocaleDateString("en-CA"))
+      }
+      
+    } else {
+      // For week and month, use days
+      while (start <= end) {
+        labels.push(start.toISOString().split("T")[0])
+        start.setDate(start.getDate() + 1)
+      }
+    }
+
+    return labels
   }
 
   const processData = (reports, supports, selectedTimeFrame) => {
@@ -91,28 +121,32 @@ const ReportSupportBarPlot = () => {
     })
 
     // Convert to array format for chart
-    return Object.keys(chartData)
-      .sort((a, b) => new Date(a) - new Date(b))
-      .map((key) => ({
-        name: formatDisplayLabel(key, selectedTimeFrame),
-        reports: chartData[key].reports,
-        supports: chartData[key].supports,
-        date: key, // Keep original date for sorting
-      }))
-  }
-
-  const getTimeLabels = (selectedTimeFrame) => {
-    const { startDate, endDate } = getDateRange(selectedTimeFrame)
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-    const labels = []
-
-    while (start <= end) {
-      labels.push(start.toISOString().split("T")[0])
-      start.setDate(start.getDate() + 1)
+    if (selectedTimeFrame === "year") {
+      // For year view, sort by month number (0-11)
+      return Object.keys(chartData)
+        .sort((a, b) => {
+          const monthA = new Date(a).getMonth()
+          const monthB = new Date(b).getMonth()
+          return monthA - monthB
+        })
+        .map((key) => ({
+          name: formatDisplayLabel(key, selectedTimeFrame),
+          reports: chartData[key].reports,
+          supports: chartData[key].supports,
+          date: key,
+          monthIndex: new Date(key).getMonth(), // Add month index for sorting
+        }))
+    } else {
+      // For week and month views, sort by date
+      return Object.keys(chartData)
+        .sort((a, b) => new Date(a) - new Date(b))
+        .map((key) => ({
+          name: formatDisplayLabel(key, selectedTimeFrame),
+          reports: chartData[key].reports,
+          supports: chartData[key].supports,
+          date: key,
+        }))
     }
-
-    return labels
   }
 
   const initializeChartData = (labels) => {
@@ -124,21 +158,64 @@ const ReportSupportBarPlot = () => {
   }
 
   const formatTimeLabel = (date, selectedTimeFrame) => {
-    return date.toISOString().split("T")[0] // YYYY-MM-DD format
+    if (selectedTimeFrame === "year") {
+      // For year view, group by month (first day of each month)
+      return new Date(date.getFullYear(), date.getMonth(), 1).toLocaleDateString("en-CA")
+    }
+    return new Date(date).toLocaleDateString("en-CA")
   }
+  
 
   const formatDisplayLabel = (dateStr, selectedTimeFrame) => {
     const date = new Date(dateStr)
 
     if (selectedTimeFrame === "week") {
       const weekday = date.toLocaleDateString("en-US", { weekday: "long" })
-      const formattedDate = date.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "numeric" })
+      const formattedDate = date.toLocaleDateString("en-US", { month: "numeric", day: "numeric" })
       return `${weekday} (${formattedDate})`
     } else if (selectedTimeFrame === "month") {
       return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    } else if (selectedTimeFrame === "year") {
+      return date.toLocaleDateString("en-US", { month: "long" })
     }
 
     return dateStr
+  }
+
+  const navigatePrevious = () => {
+    const newDate = new Date(currentDate)
+    if (timeFrame === "week") {
+      newDate.setDate(newDate.getDate() - 7)
+    } else if (timeFrame === "month") {
+      newDate.setMonth(newDate.getMonth() - 1)
+    } else if (timeFrame === "year") {
+      newDate.setFullYear(newDate.getFullYear() - 1)
+    }
+    setCurrentDate(newDate)
+  }
+
+  const navigateNext = () => {
+    const newDate = new Date(currentDate)
+    if (timeFrame === "week") {
+      newDate.setDate(newDate.getDate() + 7)
+    } else if (timeFrame === "month") {
+      newDate.setMonth(newDate.getMonth() + 1)
+    } else if (timeFrame === "year") {
+      newDate.setFullYear(newDate.getFullYear() + 1)
+    }
+    setCurrentDate(newDate)
+  }
+
+  const formatDateRange = () => {
+    if (timeFrame === "week") {
+      const { startDate, endDate } = getDateRange(timeFrame)
+      return `${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`
+    } else if (timeFrame === "month") {
+      return currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    } else if (timeFrame === "year") {
+      return currentDate.getFullYear().toString()
+    }
+    return ""
   }
 
   const handleTimeFrameChange = (newTimeFrame) => {
@@ -150,28 +227,53 @@ const ReportSupportBarPlot = () => {
     return Math.round(value)
   }
 
+  const customTooltipFormatter = (value, name) => {
+    // Capitalize the first letter of the data key
+    const formattedName = name === "reports" ? "Reports" : name === "supports" ? "Supports" : name // fallback to the original name if it doesn't match
+    return [Math.round(value), formattedName]
+  }
+
   return (
     <div className="bg-white p-4 rounded-lg border-grey border h-fit">
-      <h3 className="text-2xl font-semibold mb-4">Reports and Supports Over Time</h3>
-      <div className="mb-4">
+      <h3 className="text-2xl font-semibold mb-2">Reports and Supports Over Time</h3>
+
+      <div className="flex items-center justify-between mb-6">
+        
         <select
           value={timeFrame}
           onChange={(e) => handleTimeFrameChange(e.target.value)}
-          className="p-2 border rounded"
+          className="bg-white p-2 border border-grey rounded-md"
         >
           <option value="week">Week</option>
           <option value="month">Month</option>
+          <option value="year">Year</option>
         </select>
+        
+        <div className="flex justify-center  items-center gap-2 border border-grey rounded">
+          <button onClick={navigatePrevious} className="p-2 hover:bg-grey">
+            &lt;
+          </button>
+          <span className="font-medium">{formatDateRange()}</span>
+          <button onClick={navigateNext} className="p-2 hover:bg-grey">
+            &gt;
+          </button>
+        </div>
+
       </div>
+
       <ResponsiveContainer width="100%" height={400}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis tickFormatter={formatYAxisTick} allowDecimals={false} />
-          <Tooltip formatter={(value) => [Math.round(value), ""]} />
-          <Legend />
-          <Bar dataKey="reports" fill="#A31D1D" />
-          <Bar dataKey="supports" fill="#FFB200" />
+          <Tooltip formatter={customTooltipFormatter} />
+          <Legend
+            formatter={
+              (value) => (value === "reports" ? "Reports" : value === "supports" ? "Supports" : value) // fallback if it's neither
+            }
+          />
+          <Bar dataKey="reports" name="Reports" fill="#A31D1D" />
+          <Bar dataKey="supports" name="Supports" fill="#FFB200" />
         </BarChart>
       </ResponsiveContainer>
     </div>

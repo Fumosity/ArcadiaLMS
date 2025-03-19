@@ -75,7 +75,7 @@ const Footer = () => (
                 <div>
                     <h4 className="text-lg text-left font-semibold mb-4 text-white">
                         <Link
-                            to="/admin/circulatoryhistory"
+                            to="/admin/circulationhistory"
                             className="hover:underline"
                             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                         >
@@ -94,7 +94,7 @@ const Footer = () => (
                         </li>
                         <li>
                             <Link
-                                to="/admin/circulatoryhistory"
+                                to="/admin/circulationhistory"
                                 className="hover:underline"
                                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                             >
@@ -103,7 +103,7 @@ const Footer = () => (
                         </li>
                         <li>
                             <Link
-                                to="/admin/circulatoryhistory#history"
+                                to="/admin/circulationhistory#history"
                                 className="hover:underline"
                                 onClick={() => {
                                     // Navigate to the page first
@@ -121,7 +121,7 @@ const Footer = () => (
                         </li>
                         <li>
                             <Link
-                                to="/admin/circulatoryhistory#borrowed-books"
+                                to="/admin/circulationhistory#borrowed-books"
                                 className="hover:underline"
                                 onClick={() => {
                                     // Navigate to the page first
@@ -139,7 +139,7 @@ const Footer = () => (
                         </li>
                         <li>
                             <Link
-                                to="/admin/circulatoryhistory#returned-books"
+                                to="/admin/circulationhistory#returned-books"
                                 className="hover:underline"
                                 onClick={() => {
                                     // Navigate to the page first
@@ -157,7 +157,7 @@ const Footer = () => (
                         </li>
                         <li>
                             <Link
-                                to="/admin/circulatoryhistory#overdue-books"
+                                to="/admin/circulationhistory#overdue-books"
                                 className="hover:underline"
                                 onClick={() => {
                                     // Navigate to the page first

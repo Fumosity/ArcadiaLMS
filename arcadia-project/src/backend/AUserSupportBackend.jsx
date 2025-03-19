@@ -2,26 +2,37 @@ import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { supabase } from "../supabaseClient"
 
-export const useUserCirculation = (propUser) => {
+export const useUserSupport = (propUser) => {
   const [sortOrder, setSortOrder] = useState("Descending")
   const [entriesPerPage, setEntriesPerPage] = useState(10)
-  const [typeOrder, setTypeOrder] = useState("All")
+  const [typeFilter, setTypeFilter] = useState("All")
+  const [statusFilter, setStatusFilter] = useState("All")
   const [dateRange, setDateRange] = useState("All Time")
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [bkhistoryData, setBkhistoryData] = useState([])
+  const [supportData, setSupportData] = useState([])
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const location = useLocation()
+
+  function checkStatusColor(status) {
+    switch (status) {
+      case "Approved":
+        return "bg-resolved text-white"
+      case "Pending":
+        return "bg-ongoing"
+      case "Rejected":
+        return "bg-intended text-white"
+      default:
+        return "bg-grey"
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
       try {
         // Get userId from multiple possible sources
-        // 1. From props directly
-        // 2. From location state (navigation)
-        // 3. From nested objects in either source
         let userId = null
 
         // Try to get userId from props
@@ -50,45 +61,34 @@ export const useUserCirculation = (propUser) => {
           return
         }
 
-        console.log("Fetching circulation data for user ID:", userId)
+        console.log("Fetching support data for user ID:", userId)
 
         const { data, error } = await supabase
-          .from("book_transactions")
+          .from("support_ticket")
           .select(`
-            transactionType, 
-            checkinDate, 
-            checkinTime, 
-            checkoutDate, 
-            checkoutTime, 
-            userID, 
-            bookBarcode, 
-            book_indiv(
-              bookBarcode,
-              bookStatus,
-              book_titles (
-                titleID,
-                title,
-                price
-              )
-            ),
+            supportID, 
+            type, 
+            status, 
+            subject, 
+            date, 
+            time, 
+            content, 
+            userID,
             user_accounts (
               userFName,
-              userLName,
-              userLPUID
-            )`)
+              userLName
+            )
+          `)
           .eq("userID", userId)
 
         if (error) {
-          console.error("Error fetching data: ", error.message)
+          console.error("Error fetching support data:", error.message)
         } else {
           const formattedData = data.map((item) => {
-            const date = item.checkinDate || item.checkoutDate
-            const time = item.checkinTime || item.checkoutTime
-
             // Format date to "Month Day, Year" format
             let formattedDate = null
-            if (date) {
-              const [year, month, day] = date.split("-")
+            if (item.date) {
+              const [year, month, day] = item.date.split("-")
               const dateObj = new Date(year, month - 1, day)
               formattedDate = dateObj.toLocaleDateString("en-US", {
                 year: "numeric",
@@ -97,12 +97,13 @@ export const useUserCirculation = (propUser) => {
               })
             }
 
+            // Format time if available
             let formattedTime = null
-            if (time) {
+            if (item.time) {
               // Ensure time is in the format HH:mm (24-hour format)
-              const timeString = time.includes(":") ? time : `${time.slice(0, 2)}:${time.slice(2)}`
+              const timeString = item.time.includes(":") ? item.time : `${item.time.slice(0, 2)}:${item.time.slice(2)}`
 
-              // Convert time into 12-hour format with AM/PM, no 'Z' for local time
+              // Convert time into 12-hour format with AM/PM
               formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString("en-PH", {
                 hour: "numeric",
                 minute: "numeric",
@@ -110,66 +111,72 @@ export const useUserCirculation = (propUser) => {
               })
             }
 
-            const bookDetails = item.book_indiv?.book_titles || {}
-
             return {
-              type: item.transactionType,
-              rawDate: date, // Keep original for sorting and filtering
+              id: item.supportID,
+              type: item.type,
+              status: item.status,
+              subject: item.subject,
+              rawDate: item.date,
               date: formattedDate,
-              rawTime: time, // Keep original for sorting
+              rawTime: item.time,
               time: formattedTime,
-              borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
-              bookTitle: bookDetails.title,
-              bookBarcode: item.bookBarcode,
+              content: item.content,
               user_id: item.userID,
-              titleID: bookDetails.titleID,
+              userName: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
+              statusColor: checkStatusColor(item.status),
             }
           })
 
-          setBkhistoryData(formattedData)
+          setSupportData(formattedData)
         }
       } catch (error) {
-        console.error("Error: ", error)
+        console.error("Error:", error)
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [propUser, location.state]) // Add location.state as a dependency to react to navigation changes
+  }, [propUser, location.state])
 
   // Filter by type
   const filterByType = (data) => {
-    if (typeOrder === "All") return data
-    return data.filter((book) => book.type === typeOrder)
+    if (typeFilter === "All") return data
+    return data.filter((item) => item.type === typeFilter)
+  }
+
+  // Filter by status
+  const filterByStatus = (data) => {
+    if (statusFilter === "All") return data
+    return data.filter((item) => item.status === statusFilter)
   }
 
   // Filter by date range
   const filterByDateRange = (data) => {
     if (dateRange === "All Time") return data
 
-    return data.filter((book) => {
-      if (!book.rawDate) return false
+    return data.filter((item) => {
+      if (!item.rawDate) return false
 
-      const bookDate = new Date(book.rawDate)
+      const itemDate = new Date(item.rawDate)
       const today = new Date()
 
       switch (dateRange) {
         case "Last 7 Days":
           const sevenDaysAgo = new Date()
           sevenDaysAgo.setDate(today.getDate() - 7)
-          return bookDate >= sevenDaysAgo
+          return itemDate >= sevenDaysAgo
         case "Last 30 Days":
           const thirtyDaysAgo = new Date()
           thirtyDaysAgo.setDate(today.getDate() - 30)
-          return bookDate >= thirtyDaysAgo
+          return itemDate >= thirtyDaysAgo
         case "Last 90 Days":
           const ninetyDaysAgo = new Date()
           ninetyDaysAgo.setDate(today.getDate() - 90)
-          return bookDate >= ninetyDaysAgo
+          return itemDate >= ninetyDaysAgo
         case "This Year":
           const startOfYear = new Date(today.getFullYear(), 0, 1)
-          return bookDate >= startOfYear
+          return itemDate >= startOfYear
         default:
           return true
       }
@@ -181,10 +188,9 @@ export const useUserCirculation = (propUser) => {
     if (!searchTerm) return data
     const searchLower = searchTerm.toLowerCase()
     return data.filter(
-      (book) =>
-        (book.bookTitle && book.bookTitle.toLowerCase().includes(searchLower)) ||
-        (book.borrower && book.borrower.toLowerCase().includes(searchLower)) ||
-        (book.bookBarcode && book.bookBarcode.toLowerCase().includes(searchLower)),
+      (item) =>
+        (item.subject && item.subject.toLowerCase().includes(searchLower)) ||
+        (item.id && item.id.toString().includes(searchLower)),
     )
   }
 
@@ -212,8 +218,9 @@ export const useUserCirculation = (propUser) => {
 
   // Process data through filters and sorting
   const processData = () => {
-    let processed = bkhistoryData
+    let processed = supportData
     processed = filterByType(processed)
+    processed = filterByStatus(processed)
     processed = filterByDateRange(processed)
     processed = filterBySearch(processed)
     processed = sortData(processed)
@@ -225,20 +232,25 @@ export const useUserCirculation = (propUser) => {
   const totalPages = Math.ceil(totalEntries / entriesPerPage)
   const paginatedData = processedData.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage)
 
-  const handleUserClick = (book) => {
-    navigate("/admin/useraccounts/viewusers", {
-      state: { userId: book.user_id },
+  const handleSupportClick = (support) => {
+    navigate("/admin/supportticket", {
+      state: { support: support },
     })
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  const truncateTitle = (title, maxLength = 25) => {
-    if (!title) return "Unknown"
-    return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title
+  const truncateText = (text, maxLength = 25) => {
+    if (!text) return "Unknown"
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text
   }
 
-  const setTypeFilter = (value) => {
-    setTypeOrder(value)
+  const setTypeFilterValue = (value) => {
+    setTypeFilter(value)
+    setCurrentPage(1) // Reset to first page when changing filter
+  }
+
+  const setStatusFilterValue = (value) => {
+    setStatusFilter(value)
     setCurrentPage(1) // Reset to first page when changing filter
   }
 
@@ -247,8 +259,10 @@ export const useUserCirculation = (propUser) => {
     setSortOrder,
     entriesPerPage,
     setEntriesPerPage,
-    typeOrder,
-    setTypeFilter,
+    typeFilter,
+    setTypeFilter: setTypeFilterValue,
+    statusFilter,
+    setStatusFilter: setStatusFilterValue,
     dateRange,
     setDateRange,
     searchTerm,
@@ -258,9 +272,10 @@ export const useUserCirculation = (propUser) => {
     paginatedData,
     totalPages,
     loading,
-    handleUserClick,
-    truncateTitle,
+    handleSupportClick,
+    truncateText,
     totalEntries,
+    checkStatusColor,
   }
 }
 

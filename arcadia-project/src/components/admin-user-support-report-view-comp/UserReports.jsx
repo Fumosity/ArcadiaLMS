@@ -19,11 +19,11 @@ const UserReports = () => {
   function checkStatusColor(status) {
     switch (status) {
       case 'Resolved':
-        return "bg-resolved"
+        return "bg-resolved text-white font-semibold"
       case 'Ongoing':
-        return "bg-ongoing"
+        return "bg-ongoing font-semibold"
       case 'Intended':
-        return "bg-intended"
+        return "bg-intended text-white font-semibold"
       default:
         return "bg-grey"
     }
@@ -222,11 +222,19 @@ const UserReports = () => {
                   {report.user_accounts.userFName} {report.user_accounts.userLName}
                 </td>
                 <td className="px-4 py-2 text-sm text-gray-900 text-center w-2/12">
-                  {report.date}
-                </td>
-                <td className="px-4 py-2 text-sm text-gray-900 text-center w-1/12">
-                  {report.time}
-                </td>
+                    {new Date(report.date).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </td>
+                  <td className="px-4 py-2 text-sm text-gray-900 text-center w-1/12">
+                    {new Date(`2000-01-01T${report.time}`).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </td>
                 <td className="px-4 py-2 text-sm  text-arcadia-red font-semibold text-center w-1/12">
                   <button
                     onClick={() => handleReportClick(report)}

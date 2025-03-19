@@ -225,7 +225,7 @@ const ReportView = () => {
               onClick={submitReplyAndStatus}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Submitting..." : "Submit Update"}
+              {isSubmitting ? "Submitting..." : "Update"}
             </button>
           </div>
         </div>

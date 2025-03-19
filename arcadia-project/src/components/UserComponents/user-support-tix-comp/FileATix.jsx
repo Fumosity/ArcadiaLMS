@@ -43,7 +43,7 @@ const FileATix = () => {
             {
                 userID,
                 type,
-                status: "Ongoing",
+                status: "Pending",
                 date,
                 time,
                 subject,

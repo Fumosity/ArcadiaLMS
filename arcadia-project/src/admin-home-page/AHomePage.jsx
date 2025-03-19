@@ -6,6 +6,7 @@ import BCHistory from '../components/admin-book-circ-pg-comp/BCHistory';
 import RoomReserv from '../components/admin-lib-analytics-comp/RoomReserv';
 import MostPop from '../components/admin-lib-analytics-comp/MostPop';
 import HighRates from '../components/admin-lib-analytics-comp/HighRates';
+import LowRates from '../components/admin-lib-analytics-comp/LowRates';
 import Title from '../components/main-comp/Title';
 import RecentReports from '../components/admin-user-support-report-view-comp/RecentReports';
 import RecentSupport from '../components/admin-user-support-report-view-comp/RecentSupport';
@@ -30,6 +31,7 @@ const AHomePage = () => {
           <AccessTable />
           <TodayReserv />
           <MostPop />
+          <LowRates />
           <HighRates />
           <div className="space-y-2 w-full">
             <RecentReports />

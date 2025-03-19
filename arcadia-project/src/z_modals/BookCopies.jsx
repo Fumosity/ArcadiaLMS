@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "/src/supabaseClient.js";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -7,18 +6,22 @@ import 'react-loading-skeleton/dist/skeleton.css';
 const BookCopies = ({ isOpen, onClose, titleID }) => {
   const [bookCopies, setBookCopies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [bookTitle, setBookTitle] = useState(""); // Add this state for the title
 
   useEffect(() => {
     const fetchBookCopies = async () => {
       setIsLoading(true);
       try {
-        const { data: bookTitle, error: titleError } = await supabase
+        const { data: titleData, error: titleError } = await supabase
           .from("book_titles")
-          .select("titleID, procurementDate")
+          .select("titleID, procurementDate, title")
           .eq("titleID", titleID)
           .single();
 
         if (titleError) throw titleError;
+
+        // Set the title to display
+        setBookTitle(titleData.title);
 
         const { data: copies, error: copiesError } = await supabase
           .from("book_indiv")
@@ -29,7 +32,7 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
 
         const combinedData = copies.map((copy) => ({
           ...copy,
-          procurementDate: bookTitle.procurementDate,
+          procurementDate: titleData.procurementDate,
         }));
 
         setBookCopies(combinedData);
@@ -48,13 +51,13 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
   const getStatusStyle = (bookStatus) => {
     switch (bookStatus) {
       case "Available":
-        return "bg-green text-white";
+        return "bg-resolved text-white";
       case "Reserved":
-        return "bg-yellow text-white";
+        return "bg-grey text-black";
       case "Unavailable":
-        return "bg-orange text-white";
+        return "bg-ongoing text-black";
       case "Damaged":
-        return "bg-red text-white";
+        return "bg-intended text-white";
       default:
         return "bg-grey text-black";
     }
@@ -67,23 +70,23 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
       <div className="bg-white p-4 rounded-xl max-w-2xl w-full shadow-lg relative">
 
         <header className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-medium text-zinc-900">Book Copies</h2>
+          <h2 className="text-2xl font-medium text-zinc-900">
+            Book Copies of {bookTitle || "Loading..."}
+          </h2>
         </header>
 
-        <div className="">
+        <div>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {["Barcode", "Call No.", "Status", "Date Acq."].map(
-                  (header) => (
-                    <th
-                      key={header}
-                      className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {header}
-                    </th>
-                  )
-                )}
+                {["Barcode", "Status"].map((header) => (
+                  <th
+                    key={header}
+                    className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -96,17 +99,11 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
                     <td className="px-4 py-2 text-sm">
                       <Skeleton className="w-1/4" />
                     </td>
-                    <td className="px-4 py-2 text-sm text-gray-900 truncate max-w-xs">
-                      <Skeleton className="w-1/4" />
-                    </td>
-                    <td className="px-4 py-2 text-sm text-gray-900 truncate max-w-xs">
-                      <Skeleton className="w-1/4" />
-                    </td>
                   </tr>
                 ))
               ) : bookCopies.length === 0 ? (
                 <tr>
-                  <td className="text-center text-zinc-600 m-2" colSpan="4">
+                  <td className="text-center text-zinc-600 m-2" colSpan="2">
                     Title does not have any copies.
                   </td>
                 </tr>
@@ -117,17 +114,15 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
                     className="hover:bg-light-gray cursor-pointer"
                     onClick={() => handleRowClick(book)}
                   >
-                    <td className="flex-1 text-center">{book.bookBarcode}</td>
-                    <td className="flex-1 text-center">{book.bookARCID}</td>
-                    <td
-                      className={`px-2 py-0.5 rounded-full text-center ${getStatusStyle(
-                        book.bookStatus
-                      )}`}
-                    >
-                      {book.bookStatus}
-                    </td>
-                    <td className="flex-1 text-center">
-                      {new Date(book.procurementDate).toLocaleDateString()}
+                    <td className="text-center">{book.bookBarcode}</td>
+                    <td className="text-center py-2">
+                      <span
+                        className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${getStatusStyle(
+                          book.bookStatus
+                        )}`}
+                      >
+                        {book.bookStatus}
+                      </span>
                     </td>
                   </tr>
                 ))
@@ -145,7 +140,6 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };

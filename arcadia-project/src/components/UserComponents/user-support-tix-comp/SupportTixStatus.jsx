@@ -86,12 +86,12 @@ const SupportStatus = ({ onSupportSelect }) => {
                   <td className="px-4 py-2 text-sm">
                     <span
                       className={`px-4 py-1 rounded-full text-xs font-semibold ${support.status === "Ongoing"
-                          ? "bg-yellow"
-                          : support.status === "Resolved"
-                          ? "bg-green"
-                          : support.status === "Intended"
-                          ? "bg-red"
-                          : "bg-gray-200"
+                          ? "bg-ongoing"
+                          : support.status === "Approved"
+                          ? "bg-resolved text-white"
+                          : support.status === "Rejected"
+                          ? "bg-intended text-white"
+                          : "bg-grey"
                         }`}
                     >
                       {support.status || "N/A"}

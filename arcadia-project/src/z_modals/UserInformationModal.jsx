@@ -197,7 +197,7 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-4xl p-8 sm:p-10">
-        <h3 className="text-2xl font-semibold mb-4 text-center">{accountTitle}</h3>
+        <h3 className="text-2xl font-semibold mb-4">{accountTitle}</h3>
 
         <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
           <div className="flex-1 space-y-4 min-w-0">
@@ -220,23 +220,11 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
                     <option value="Intern">Intern</option>
                     <option value="Teacher">Teacher</option>
                     <option value="Student">Student</option>
-                    <option value="User">User</option>
                   </>
                 )}
               </select>
             </div>
 
-
-            <div className="flex items-center">
-              <span className="w-32 text-sm font-medium">User ID:</span>
-              <input
-                type="text"
-                name="userID"
-                value={modifiedUser.userID}
-                className="flex-1 px-3 py-1.5 border border-gray-300 rounded-full"
-                onChange={handleInputChange}
-              />
-            </div>
 
             <div className="flex items-center">
               <span className="w-32 text-sm font-medium">School ID No.:</span>

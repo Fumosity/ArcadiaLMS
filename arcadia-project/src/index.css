@@ -472,7 +472,28 @@
 }
 
 .genCard-cont {
-  @apply bg-white border border-grey rounded-xl p-4 transform transition duration-300 hover:shadow-lg hover:scale-105 will-change-transform;
+  background-color: white;
+  border: 1px solid #d1d5db; /* Assuming 'grey' is close to this color */
+  border-radius: 0.75rem; /* xl rounded corners */
+  padding: 1rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+  will-change: transform;
+}
+
+.genCard-cont:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.genCard-cont:hover {
+  --tw-scale-x: 1.01;
+  --tw-scale-y: 1.01;
+  transform: 
+    translate(var(--tw-translate-x, 0), var(--tw-translate-y, 0))
+    rotate(var(--tw-rotate, 0))
+    skewX(var(--tw-skew-x, 0))
+    skewY(var(--tw-skew-y, 0))
+    scaleX(var(--tw-scale-x, 1))
+    scaleY(var(--tw-scale-y, 1));
 }
 
 .uHero-cont {

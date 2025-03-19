@@ -34,7 +34,9 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center w-full">
         {/* Left-aligned Logo and Text */}
         <div className="flex items-center">
+          <Link to="/admin/">
           <img src="/image/logo_admin.png" alt="Arcadia logo" className="h-8 mr-2" />
+          </Link>
         </div>
 
         {/* Right-aligned User Info */}
@@ -60,9 +62,9 @@ const Header = () => {
 
               {/* Dropdown Menu */}
               {isDropdownVisible && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-                  <ul className="py-1">
-                    <li>
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md border border-grey z-10">
+                  <ul className="py-2 px-2 divide-y divide-gray">
+                    <li className="hover:bg-light-gray cursor-pointer ">
                       <Link
                         to="accountview"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -72,7 +74,7 @@ const Header = () => {
                     </li>
 
                     {/* Admin option to go to User Side */}
-                    <li>
+                    <li className="hover:bg-light-gray cursor-pointer">
                       <button
                         onClick={() => {
                           localStorage.setItem("mode", "user");
@@ -85,7 +87,7 @@ const Header = () => {
                     </li>
                     {/* End */}
 
-                    <li>
+                    <li className="hover:bg-light-gray cursor-pointer">
                       <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"

@@ -7,6 +7,7 @@ import OverdueBks from "../components/admin-book-circ-pg-comp/OverdueBks"
 import BksDueTdy from "../components/admin-book-circ-pg-comp/BksDueTdy"
 import Title from "../components/main-comp/Title"
 import SBOverdue from "../components/admin-system-reports-comp/SBOverdue"
+import DamagedBks from "../components/admin-book-circ-pg-comp/DamagedBks"
 
 export default function ABCirculationPage() {
   // Check if there's a hash in the URL and scroll to it after render
@@ -31,13 +32,14 @@ export default function ABCirculationPage() {
             <BCHistory />
           </div>
           <div id="borrowed-books">
-            <BorrowedBks />
           </div>
           <div id="returned-books">
-            <ReturnedBks />
           </div>
           <div id="overdue-books">
             <OverdueBks />
+          </div>
+          <div id="damaged-books">
+            <DamagedBks />
           </div>
         </div>
 

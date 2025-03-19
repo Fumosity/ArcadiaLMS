@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "/src/supabaseClient.js"
 import Skeleton from "react-loading-skeleton"
@@ -82,12 +83,24 @@ const RecentSupport = () => {
     <div className="bg-white border border-grey p-4 rounded-lg w-full">
       <div className="flex justify-between items-center mb-4 overflow-hidden">
         <h3 className="text-2xl font-semibold">Recent Tickets</h3>
-        <button
-          onClick={fetchRecentSupports}
+        
+        <Link
+          to="/admin/support#support-tickets"
           className="rounded-full py-1 px-3 text-sm border border-grey hover:bg-light-gray whitespace-nowrap"
+          onClick={() => {
+            // Navigate to the page first
+            setTimeout(() => {
+              // After navigation, find and scroll to the element
+              const element = document.getElementById("support-tickets")
+              if (element) {
+                element.scrollIntoView({ behavior: "smooth" })
+              }
+            }, 100)
+          }}
         >
-          Refresh
-        </button>
+
+          See More
+        </Link>
       </div>
 
       <div className="overflow-x-auto">
@@ -126,10 +139,10 @@ const RecentSupport = () => {
                       {support.user_accounts.userFName} {support.user_accounts.userLName}
                     </button>
                   </td>
-                  <td className="px-4 py-2 text-center whitespace-nowrap">
+                  <td className="px-4 py-2 text-center text-sm">
                     <button
                       onClick={() => handleSupportClick(support)}
-                      className="text-blue-500 hover:underline"
+                      className="border border-grey px-2 rounded-full hover:bg-grey"
                     >
                       View
                     </button>

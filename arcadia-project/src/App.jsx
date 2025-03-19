@@ -120,7 +120,7 @@ function App() {
             <Routes>
               <Route path="/" element={<AHomePage />} />
               <Route path="analytics" element={<ALibAnal />} />
-              <Route path="circulatoryhistory" element={<ABCirculationPage />} />
+              <Route path="circulationhistory" element={<ABCirculationPage />} />
               <Route path="bookmanagement" element={<ABInventory />} />
               <Route path="researchmanagement" element={<ARInventory />} />
               <Route path="useraccounts" element={<AUsrAcc />} />

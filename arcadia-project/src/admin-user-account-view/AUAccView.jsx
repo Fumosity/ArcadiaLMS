@@ -4,7 +4,8 @@ import AUserCirc from "../components/admin-user-account-view-comp/AUserCirc"
 import RecentReports from "../components/admin-user-support-report-view-comp/RecentReports"
 import RecentSupport from "../components/admin-user-support-report-view-comp/RecentSupport"
 import UserInformations from "../components/admin-user-account-view-comp/UserInformations"
-
+import AUserReport from "../components/admin-user-account-view-comp/AUserReport"
+import AUserSupport from "../components/admin-user-account-view-comp/AUserSupport"
 const AUAccView = () => {
   const location = useLocation()
   const user = location.state?.user || {}
@@ -48,6 +49,8 @@ const AUAccView = () => {
           <div className="space-y-2">
             <UserInformations user={user} source={source} />
             <AUserCirc user={user} source={source} />
+            <AUserReport user={user} source={source} />
+            <AUserSupport user={user} source={source} />
           </div>
         </div>
 

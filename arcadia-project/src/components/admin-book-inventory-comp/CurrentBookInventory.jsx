@@ -282,7 +282,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           <input
             type="text"
             id="search"
-            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[370px]"
             placeholder="Title, author, category, keywords, or call no."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

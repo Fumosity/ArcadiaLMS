@@ -147,9 +147,9 @@ const SupportView = () => {
   ]
 
   const buttons = [
-    { label: "Mark as Resolved", status: "Resolved" },
-    { label: "Mark as Ongoing", status: "Ongoing" },
-    { label: "Mark as Intended", status: "Intended" },
+    { label: "Mark as Approved", status: "Approved" },
+    { label: "Mark as Pending", status: "Pending" },
+    { label: "Mark as Rejected", status: "Rejected" },
   ]
 
   if (!support) {
@@ -226,7 +226,7 @@ const SupportView = () => {
               onClick={submitReplyAndStatus}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Submitting..." : "Submit Update"}
+              {isSubmitting ? "Submitting..." : "Update"}
             </button>
           </div>
         </div>
