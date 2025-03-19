@@ -6,6 +6,7 @@ import Title from "../../components/main-comp/Title"
 import SupportTixStatus from "../../components/UserComponents/user-support-tix-comp/SupportTixStatus"
 import FileATix from "../../components/UserComponents/user-support-tix-comp/FileATix"
 import TicketDetails from "../../components/UserComponents/user-supportTix-view-comp/TicketDetails"
+import ReturnSupportButton from "../../components/UserComponents/user-support-tix-comp/ReturnSupportButton"
 
 const USupportTix = () => {
   const [selectedSupportID, setSelectedSupportID] = useState(null)
@@ -34,17 +35,14 @@ const USupportTix = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="fuserContent-container items-center justify-center mt-2.5 mb-2.5">
           <div className="w-full max-w-full">
-            <div className="space-y-8">
-              <div className="flex justify-center">
+            <div className="space-y-4">
+              <ReturnSupportButton />
                 <SupportTixStatus onSupportSelect={handleSupportSelect} />
-              </div>
-              <div className="flex justify-center">
                 {selectedSupportID ? (
                   <TicketDetails supportID={selectedSupportID} onBack={handleBackToMakeSupport} />
                 ) : (
                   <FileATix />
                 )}
-              </div>
             </div>
           </div>
         </div>

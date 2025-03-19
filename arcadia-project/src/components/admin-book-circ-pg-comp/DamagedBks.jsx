@@ -275,7 +275,7 @@ const DamagedBks = () => {
                   <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
                     <span
                       className="inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
-                        bg-dark-blue text-white"
+                        bg-intended text-white"
                     >
                       {book.status}
                     </span>

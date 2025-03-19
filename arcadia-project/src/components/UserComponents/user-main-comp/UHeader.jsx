@@ -63,10 +63,10 @@ const UHeader = () => {
 
               {/* Dropdown Menu */}
               {isDropdownVisible && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md border border-grey z-10">
                 {user.userAccountType === "Guest" ? (
-                  <ul className="py-1">
-                    <li>
+                  <ul className="py-2 px-2 divide-y divide-grey">
+                    <li className="hover:bg-grey cursor-pointer">
                       <Link
                         to="/user/login"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -74,7 +74,7 @@ const UHeader = () => {
                         Login
                       </Link>
                     </li>
-                    <li>
+                    <li className="hover:bg-grey cursor-pointer">
                       <Link
                         to="/user/register"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -84,8 +84,8 @@ const UHeader = () => {
                     </li>
                   </ul>
                 ) : (
-                  <ul className="py-1">
-                    <li>
+                  <ul className="py-2 px-2 divide-y divide-grey">
+                    <li className="hover:bg-grey cursor-pointer">
                       <Link
                         to="/user/accountview"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -96,7 +96,7 @@ const UHeader = () => {
                     
                     {/* Show "Back to Admin side" only if user is an Admin */}
                     {user.userAccountType === "Admin" && (
-                      <li>
+                      <li className="hover:bg-grey cursor-pointer">
                         <Link
                           to="/admin"
                           className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -106,7 +106,7 @@ const UHeader = () => {
                       </li>
                     )}
               
-                    <li>
+                    <li className="hover:bg-grey cursor-pointer">
                       <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"

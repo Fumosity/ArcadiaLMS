@@ -436,7 +436,7 @@ export default function Pathfinder({ book }) {
             <div className="w-full text-center font-semibold text-lg">
                 {callNo} is located at the {book.location}
             </div>
-            <div className="my-2 flex justify-center items-center w-full">
+            <div className="my-2 flex justify-center items-center w-full overflow-hidden">
                 <div className="w-fit" style={gridStyle}>
                     {gridData.flat().map((cell, index) => (
                         <div

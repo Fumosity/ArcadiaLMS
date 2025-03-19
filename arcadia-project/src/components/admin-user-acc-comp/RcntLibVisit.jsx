@@ -2,14 +2,32 @@ import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { supabase } from "../../supabaseClient";
 
-const COLORS = [
-  "hsl(215, 90%, 50%)",
-  "hsl(150, 60%, 50%)",
-  "hsl(0, 70%, 60%)",
-  "hsl(40, 80%, 50%)",
-  "hsl(280, 60%, 60%)",
-  "hsl(190, 70%, 50%)",
+const collegeColors = [
+  "#c27ba0",
+  "#8e7cc3",
+  "#6fa8dc",
+  "#6d9eeb",
+  "#76a5af",
+  "#93c47d",
+  "#ffd966",
+  "#f6b26b",
+  "#e06666",
+  "#cc4125"
 ];
+
+const deptColors= [
+  "#C96868",
+  "#FADFA1",
+  "#7EACB5",
+  "#7886C7",
+  "#4B4376",
+  "#D17D98",
+  "#47663B",
+  "#898121",
+  "#DA8359",
+  "#705C53"
+]
+
 
 export default function RcntLibVisit() {
   const [collegeData, setCollegeData] = useState([]);
@@ -142,7 +160,7 @@ export default function RcntLibVisit() {
                   dataKey="borrows"
                 >
                   {collegeData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={collegeColors[index % collegeColors.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -164,7 +182,7 @@ export default function RcntLibVisit() {
                   dataKey="borrows"
                 >
                   {departmentData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={deptColors[index % deptColors.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -178,7 +196,7 @@ export default function RcntLibVisit() {
       <div className="flex space-x-2 w-full">
         {/* By College Section */}
         <div className="bg-white border border-grey p-4 rounded-lg min-w-36 w-full">
-          <h2 className="text-2xl font-semibold mb-4 text-left">Circulation By College</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-left">Circulation By Program</h2>
           <div className="pb-4 overflow-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead>

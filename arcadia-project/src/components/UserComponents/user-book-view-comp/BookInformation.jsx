@@ -141,7 +141,7 @@ export default function BookInformation({ book }) {
     return (
         <div className="uMain-cont">
             {/* Main Book Info */}
-            <div className="flex w-full gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm">
+            <div className="flex w-full gap-4 p-4 border border-grey bg-silver rounded-lg shadow-sm overflow-hidden">
                 <div className="flex-shrink-0 w-[200px]">
                     <img
                         src={book.image_url || "https://via.placeholder.com/150x300"}

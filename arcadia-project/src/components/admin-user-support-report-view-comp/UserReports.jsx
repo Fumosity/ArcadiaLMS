@@ -9,7 +9,7 @@ const UserReports = () => {
   const [reports, setReports] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1);
-  const [entriesPerPage, setEntriesPerPage] = useState(5);
+  const [entriesPerPage, setEntriesPerPage] = useState(10)
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("Ascending");
   const [typeFilter, setTypeFilter] = useState("All");
@@ -143,6 +143,21 @@ const UserReports = () => {
               <option value="Ongoing">Ongoing</option>
               <option value="Intended">Intended</option>
               <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+
+          {/* Entries Per Page */}
+          <div className="flex items-center space-x-2">
+            <span className="font-medium text-sm">Entries:</span>
+            <select
+              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
+              value={entriesPerPage}
+              onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
             </select>
           </div>
         </div>

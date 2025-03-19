@@ -91,9 +91,11 @@ export default function RoomReservation() {
   }
 
   return (
-    <div className="flex border border-grey rounded-md p-2 space-x-4 max-w-4xl mx-auto">
-      <div className="w-1/2">
-        <h2 className="text-lg font-semibold text-center">Room Reservations</h2>
+    <div className="uMain-cont border border-grey rounded-md p-2 space-x-4 mx-auto">
+      <h2 className="text-2xl font-semibold mb-6">Room Reservations</h2>
+      <div className="flex space-x-4">
+      <div className="uMain-cont w-1/2">
+        
         <div className="flex justify-between items-center text-sm my-2">
           <button onClick={() => changeMonth(-1)} className="px-2 py-1 bg-red rounded">Prev</button>
           <h3>{new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>
@@ -143,6 +145,7 @@ export default function RoomReservation() {
             ))}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   );

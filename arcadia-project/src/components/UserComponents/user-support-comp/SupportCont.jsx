@@ -18,7 +18,7 @@ const SupportCont = () => {
     if (user?.userID) {
         libsupport = [
             {
-                title: "User Reports",
+                title: "User Reports",              
                 desc: "With your help, make the ARC better by reporting problems within the ARC or in our system, like erroneous information or the lack of stocks in our inventories. Together, we can make our library the best it could be!",
                 more: "Make a report",
                 link: "/user/support/reportticket",
@@ -56,6 +56,8 @@ const SupportCont = () => {
                                 <Link
                                     to={support.link}
                                     className="text-sm text-arcadia-red font-medium hover:underline"
+                                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+
                                 >
                                     {support.more}
                                 </Link>

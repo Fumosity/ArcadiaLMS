@@ -291,7 +291,7 @@ const OverdueBks = () => {
                   <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
                     <span
                       className={`inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
-                                        ${book.type === "Overdue" ? "bg-intended text-white" : "bg-grey"}`}
+                                        ${book.type === "Overdue" ? "bg-dark-blue text-white" : "bg-grey"}`}
                     >
                       {book.type}
                     </span>
