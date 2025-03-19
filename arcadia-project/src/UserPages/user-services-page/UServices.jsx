@@ -10,6 +10,7 @@ import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
 import UHero from "../../components/UserComponents/user-home-comp/UHero";
 import LibServ from "../../components/UserComponents/user-serv-comp/LibServ";
+import ServicesHero from "../../components/UserComponents/user-home-comp/ServicesHero";
 
 const UServices = () => {
     return (
@@ -29,7 +30,7 @@ const UServices = () => {
                     {/* Main Content */}
                     <div className="userMain-content lg:w-3/4 md:w-full">
                         {/* Hero Section */}
-                        <UHero />
+                        <ServicesHero />
                         <LibServ />
                     </div>
                 </div>
