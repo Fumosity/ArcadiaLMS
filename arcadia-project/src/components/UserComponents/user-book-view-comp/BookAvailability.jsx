@@ -59,7 +59,7 @@ export default function BookAvailability({ book }) {
 
                     <div className="item-center justify-center text-center text-black mb-2">
                         <p className="text-sm">Call Number:</p>
-                        <h4 className="text-lg font-semibold mb-2">{book.arcID}</h4>
+                        <h4 className="text-lg font-semibold mb-2">{book.titleCallNum}</h4>
                         <p className="text-sm">Location:</p>
                         <h4 className="text-md">{book.location}</h4>
                     </div>

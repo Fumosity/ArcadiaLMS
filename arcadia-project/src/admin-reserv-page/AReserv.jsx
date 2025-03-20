@@ -19,12 +19,12 @@ const AReserv = () => {
       } else {
         // Transform data into the format required by your calendar
         const formattedEvents = data.map((reservation) => {
-          const { reserve_data } = reservation;
+          const { reservationData } = reservation;
           return {
-            resourceId: reserve_data.room,
-            title: reserve_data.title,
-            start: `${reserve_data.date}T${reserve_data.startTime}`,
-            end: `${reserve_data.date}T${reserve_data.endTime}`,
+            resourceId: reservationData.room,
+            title: reservationData.title,
+            start: `${reservationData.date}T${reservationData.startTime}`,
+            end: `${reservationData.date}T${reservationData.endTime}`,
           };
         });
         setEvents(formattedEvents);

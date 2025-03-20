@@ -138,7 +138,6 @@ const ABAdding = ({ formData, setFormData }) => {
       procurementDate: '',
       location: '',
       bookID: '',
-      bookARCID: '',
       bookBarcode: '',
       isbn: '',
       cover: '',

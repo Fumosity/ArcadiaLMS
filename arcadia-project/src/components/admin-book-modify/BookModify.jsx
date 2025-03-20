@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation,useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
-import BookCopiesIndiv from "./BookCopiesIndiv";
-import { toast } from "react-toastify"
+import WrngDeleteTitle from "../../z_modals/warning-modals/WrmgDeleteTitle";
 
-const BookModify = ({ formData, setFormData, onSave }) => {
+
+const BookModify = ({ formData, onSave }) => {
   const fileInputRef = useRef(null);
   const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,6 +15,26 @@ const BookModify = ({ formData, setFormData, onSave }) => {
   const [selectedGenres, setSelectedGenres] = useState([])
   const [categoryFilter, setCategoryFilter] = useState(null);
   const [loading, setLoading] = useState(true)
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [formDataState, setFormData] = useState(formData);
+   const navigate = useNavigate();
+  
+
+  const handleDeleteBook = async () => {
+    const titleID = formDataState.titleID;
+    if (!titleID) {
+      alert("No book title selected for deletion.");
+      return;
+    }
+
+    const { error } = await supabase.from("book_titles").delete().eq("titleID", titleID);
+    if (error) {
+      alert("Failed to delete book: " + error.message);
+    } else {
+      alert("Book deleted successfully.");
+      navigate("/admin/bookmanagement");
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -33,7 +53,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       isbn: params.get("isbn") || "",
       price: params.get("price") || "",
       titleID: params.get("titleID") || null,
-      arcID: params.get("arcID") || null,
+      titleCallNum: params.get("titleCallNum") || null,
     };
 
     setFormData(initialFormData);
@@ -130,7 +150,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       isbn: params.get("isbn") || "",
       price: params.get("price") || "",
       titleID: params.get("titleID") || null,
-      arcID: params.get("arcID") || null,
+      titleCallNum: params.get("titleCallNum") || null,
     };
 
     console.log(initialFormData)
@@ -142,7 +162,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
 
   const handleSave = async () => {
     console.log(formData)
-    
+
     if (!formData || !formData.titleID) {
       console.error("Invalid form data or missing titleID");
       return;
@@ -459,11 +479,11 @@ const BookModify = ({ formData, setFormData, onSave }) => {
 
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Call No.:</label>
-                <input type="text" name="arcID" required
+                <input type="text" name="titleCallNum" required
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.arcID}
+                  value={formData.titleCallNum}
                   onChange={handleChange}
-                  style={validationErrors.arcID ? errorStyle : {}}
+                  style={validationErrors.titleCallNum ? errorStyle : {}}
                   placeholder="Book Title Call Number"
                 />
               </div>
@@ -510,6 +530,12 @@ const BookModify = ({ formData, setFormData, onSave }) => {
         </div>
         <div className="flex justify-center mt-8 gap-2">
           <button
+            className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg bg-arcadia-red text-white hover:bg-red transition"
+            onClick={() => setDeleteModalOpen(true)}
+          >
+            Delete Book
+          </button>
+          <button
             type="button"
             onClick={handleReset}
             className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
@@ -524,6 +550,12 @@ const BookModify = ({ formData, setFormData, onSave }) => {
             Save Changes
           </button>
         </div>
+        <WrngDeleteTitle
+          isOpen={isDeleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={handleDeleteBook}
+          itemName={formDataState.title}
+        />
       </div>
     </div>
   );

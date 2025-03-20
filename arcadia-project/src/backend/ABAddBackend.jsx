@@ -20,7 +20,7 @@ export const checkAndAddBookTitle = async (bookData) => {
             isbn: bookData.isbn,
             location: bookData.location,
             price: bookData.price,
-            arcID: bookData.titleARCID,
+            titleCallNum: bookData.titleCallNum,
         };
 
         const { data: newTitle, error: insertError } = await supabase.from('book_titles').insert([newTitleData]).select('titleID').single();
@@ -86,7 +86,6 @@ export const addBook = async (bookData) => {
         const specificBookData = {
             bookID: bookData.bookID,
             titleID: titleID,
-            bookARCID: bookData.bookARCID,
             bookStatus: "Available",
             bookAcqDate: bookData.procurementDate,
             bookBarcode: bookData.bookBarcode,

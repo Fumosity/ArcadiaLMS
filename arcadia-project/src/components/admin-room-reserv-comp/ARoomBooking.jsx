@@ -98,7 +98,7 @@ export default function ARoomBooking({ addReservation }) {
 
       if (data.length > 0) {
         toast.warn("This room is already reserved for the selected time!", {
-          position: "top-right",
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,

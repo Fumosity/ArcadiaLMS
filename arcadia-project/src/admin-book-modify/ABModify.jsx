@@ -4,7 +4,6 @@ import Title from "../components/main-comp/Title";
 import BookModify from "../components/admin-book-modify/BookModify";
 import ABAddPreview from "../components/admin-book-add-comp/ABAddPreview";
 import { supabase } from "../supabaseClient";
-import WrngDeleteTitle from "../z_modals/warning-modals/WrmgDeleteTitle";
 
 const ABModify = () => {
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ const ABModify = () => {
     originalPubDate: queryParams.get("orgdatePublished") || '',
     location: queryParams.get("location") || '',
     bookID: queryParams.get("databaseID") || '',
-    arcID: queryParams.get("arcID") || '',
+    titleCallNum: queryParams.get("titleCallNum") || '',
     isbn: queryParams.get("isbn") || '',
     price: queryParams.get("price") || '',
     cover: queryParams.get("cover") || '',
@@ -31,23 +30,6 @@ const ABModify = () => {
   };
 
   const [formDataState, setFormData] = useState(formData);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-
-  const handleDeleteBook = async () => {
-    const titleID = formDataState.titleID;
-    if (!titleID) {
-      alert("No book title selected for deletion.");
-      return;
-    }
-
-    const { error } = await supabase.from("book_titles").delete().eq("titleID", titleID);
-    if (error) {
-      alert("Failed to delete book: " + error.message);
-    } else {
-      alert("Book deleted successfully.");
-      navigate("/admin/bookmanagement");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -61,12 +43,6 @@ const ABModify = () => {
             >
               Return to Book Inventory
             </button>
-            <button
-              className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg bg-arcadia-red text-white hover:bg-red transition"
-              onClick={() => setDeleteModalOpen(true)}
-            >
-              Delete Book
-            </button>
           </div>
           <BookModify formData={formDataState} setFormData={setFormData} />
         </div>
@@ -74,12 +50,7 @@ const ABModify = () => {
           <ABAddPreview formData={formDataState} />
         </div>
       </div>
-      <WrngDeleteTitle
-        isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDeleteBook}
-        itemName={formDataState.title}
-      />
+
     </div>
   );
 };

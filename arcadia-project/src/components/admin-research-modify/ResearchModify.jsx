@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
+import WrngRmvRsrchInv from "../../z_modals/warning-modals/WrngRmvRsrchInv";
+import {useNavigate } from "react-router-dom";
 
 const ResearchModify = ({ formData, setFormData, onSave }) => {
   const coverInputRef = useRef(null);
@@ -9,6 +11,28 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pageCount, setPageCount] = useState(0);
+  const [formDataState] = useState(formData);
+  const navigate = useNavigate();
+
+  const handleResearchDelete = async () => {
+    const researchID = formDataState.researchID;
+    if (!researchID) {
+      alert("No research title selected for deletion.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("research")
+      .delete()
+      .eq("researchID", researchID);
+
+    if (error) {
+      alert("Failed to delete research: " + error.message);
+    } else {
+      alert("Research deleted successfully.");
+      navigate("/admin/researchmanagement");
+    }
+  };
 
   const collegeDepartmentMap = {
     "CAMS": [],
@@ -32,7 +56,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
       pubDate: queryParams.get("pubDate") || '',
       location: queryParams.get("location") || '',
       researchID: queryParams.get("researchID") || '',
-      researchARCID: queryParams.get("researchARCID") || '',
+      researchCallNum: queryParams.get("researchCallNum") || '',
       cover: queryParams.get("cover") || '',
     };
 
@@ -61,7 +85,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
       pubDate: queryParams.get("pubDate") || '',
       location: queryParams.get("location") || '',
       researchID: queryParams.get("researchID") || '',
-      researchARCID: queryParams.get("researchARCID") || '',
+      researchCallNum: queryParams.get("researchCallNum") || '',
       cover: queryParams.get("cover") || '',
     };
 
@@ -370,7 +394,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">ARC ID:</label>
-                <input type="text" name="researchARCID" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchARCID} onChange={handleChange} placeholder="ARC Issued ID, eg. LPUCAV012345" required />
+                <input type="text" name="researchCallNum" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchCallNum} onChange={handleChange} placeholder="ARC Issued ID, eg. LPUCAV012345" required />
               </div>
             </form>
 
@@ -404,6 +428,12 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
             Reset Changes
           </button>
           <button
+              className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg bg-arcadia-red hover:red text-white"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Delete Research
+            </button>
+          <button
             type="button"
             onClick={handleSave}
             className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
@@ -412,6 +442,11 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
           </button>
         </div>
       </div>
+      <WrngRmvRsrchInv
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onRemove={handleResearchDelete}
+      />
     </div>
   );
 };

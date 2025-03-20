@@ -24,6 +24,7 @@ const ABCopies = () => {
         titleCallNum: '',
         bookLocation: '',
         bookAcqDate: '',
+        bookID: '',
         titleID: null,
     })
 
@@ -37,6 +38,7 @@ const ABCopies = () => {
             titleCallNum: selectedCopy.book_titles.titleCallNum || '',
             bookLocation: selectedCopy.book_titles.location || '',
             bookAcqDate: selectedCopy.bookAcqDate || '',
+            bookID: selectedCopy.bookID,
             titleID: selectedCopy.titleID
         };
 
@@ -70,6 +72,7 @@ const ABCopies = () => {
                     titleCallNum: data.titleCallNum || '',
                     bookLocation: data.location || '',
                     bookAcqDate: '',
+                    bookID: '',
                     titleID: null,
                 });
             } else {
@@ -80,6 +83,7 @@ const ABCopies = () => {
                     titleCallNum: '',
                     bookLocation: '',
                     bookAcqDate: '',
+                    bookID: '',
                     titleID: null,
                 });
                 console.error("Book title not found");
@@ -91,6 +95,7 @@ const ABCopies = () => {
                 titleCallNum: '',
                 bookLocation: '',
                 bookAcqDate: '',
+                bookID: '',
                 titleID: null,
             });
             console.error("titleID is not set");

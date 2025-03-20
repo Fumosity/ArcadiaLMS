@@ -24,7 +24,7 @@ const ABAdd = () => {
     isbn: '',
     cover: '',
     price: '',
-    titleARCID: '',
+    titleCallNum: '',
   })
 
   return (

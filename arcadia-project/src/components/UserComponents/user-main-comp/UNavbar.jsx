@@ -42,7 +42,7 @@ function CustomLink({ to, children, className, restricted, ...props }) {
     if (user?.userAccountType === "Guest" && restricted) {
       e.preventDefault();
       toast.warning("You need to log in first to access this page! Redirecting to Login...", {
-        position: "top-right",
+        position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: true,
         closeOnClick: true,

@@ -12,7 +12,7 @@ const ARAddPreview = ({ formData }) => {
     pubDate = "N/A",
     location = "N/A",
     researchID = "N/A",
-    researchARCID = "N/A",
+    researchCallNum = "N/A",
     cover
   } = formData;
 
@@ -27,7 +27,7 @@ const ARAddPreview = ({ formData }) => {
     datePublished: pubDate,
     location,
     databaseID: researchID,
-    researchARCID,
+    researchCallNum,
   };
 
   return (
@@ -46,7 +46,7 @@ const ARAddPreview = ({ formData }) => {
             .map(([key, value], index) => (
               <tr key={index} className="border-b border-grey">
                 <td className="px-1 py-1 font-semibold capitalize w-1/3" >
-                  {key == "researchARCID" ? "ARC ID"
+                  {key == "researchCallNum" ? "Call No."
                   :
                   key == "datePublished" ? "Pub. Date"
                   :
