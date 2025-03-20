@@ -35,7 +35,7 @@ const ReportDetails = ({ reportID, onBack }) => {
   return (
     <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Report Details</h3>
+        <h3 className="text-2xl font-semibold">Report Details</h3>
         {/* <button
           onClick={onBack}
           className="px-4 py-2 bg-arcadia-red text-white rounded-full hover:bg-grey transition-colors hover:text-black"
