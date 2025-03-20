@@ -295,7 +295,7 @@ const UBkResults = ({ query }) => {
             <>
               {filteredBooks.length} results for "{query}"
               {activeFilters.length > 0 && (
-                <div className="text-sm font-normal mt-2">
+                <div className="text-md font-normal mt-2">
                   <span className="font-medium">Active Filters:</span> {activeFilters.join(" • ")}
                 </div>
               )}

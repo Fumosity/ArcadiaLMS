@@ -99,7 +99,7 @@ const ReservSupport = () => {
               onClick={() =>
                 setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")
               }
-              className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+              className="sort-by border-grey bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
             >
               {sortOrder}
             </button>
@@ -109,7 +109,7 @@ const ReservSupport = () => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">User Type:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
               value={userTypeFilter}
               onChange={(e) => setUserTypeFilter(e.target.value)}
             >
@@ -126,7 +126,7 @@ const ReservSupport = () => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Status:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
@@ -143,7 +143,7 @@ const ReservSupport = () => {
           <input
             type="text"
             id="search"
-            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+            className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
             placeholder="Subject or support ID"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

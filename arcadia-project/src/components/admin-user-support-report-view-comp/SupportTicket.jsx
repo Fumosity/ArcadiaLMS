@@ -4,7 +4,7 @@ import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 import { useNavigate } from "react-router-dom"
 
-const UserSupports = () => {
+const SupportTicket = () => {
   const [supports, setSupports] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
@@ -112,7 +112,7 @@ const UserSupports = () => {
             <span className="font-medium text-sm">Sort:</span>
             <button
               onClick={() => setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")}
-              className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+              className="sort-by bg-gray-200 py-1 px-3 border-grey rounded-lg text-sm w-28"
             >
               {sortOrder}
             </button>
@@ -122,7 +122,7 @@ const UserSupports = () => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Type:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
             >
@@ -136,7 +136,7 @@ const UserSupports = () => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Status:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
@@ -151,7 +151,7 @@ const UserSupports = () => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Entries:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
+              className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-20"
               value={entriesPerPage}
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
             >
@@ -170,7 +170,7 @@ const UserSupports = () => {
           <input
             type="text"
             id="search"
-            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+            className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
             placeholder="Subject or support ID"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -181,25 +181,25 @@ const UserSupports = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">
                 Type
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">
                 Status
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-3/12">
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-3/12">
                 Subject
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-3/12">
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-3/12">
                 User
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-2/12">
                 Date
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">
                 Time
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">
                 Ticket ID
               </th>
             </tr>
@@ -301,5 +301,5 @@ const UserSupports = () => {
   )
 }
 
-export default UserSupports
+export default SupportTicket
 

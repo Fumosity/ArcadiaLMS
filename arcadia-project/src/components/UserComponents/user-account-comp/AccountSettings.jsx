@@ -57,12 +57,13 @@ export const AccountSettings = ({ options = settingsOptions }) => {
       // Use React Router's navigate instead of window.location.href
       const queryParams = new URLSearchParams(option.params).toString()
       navigate(`${option.path}?${queryParams}`)
+      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
 
   return (
     <div className="uMain-cont">
-      <h2 className="text-xl font-medium text-arcadia-black mb-6">Account Settings</h2>
+      <h2 className="text-2xl font-medium text-arcadia-black mb-6">Account Settings</h2>
       <div className="space-y-4">
         {options.map((option) => (
           <SettingsOption

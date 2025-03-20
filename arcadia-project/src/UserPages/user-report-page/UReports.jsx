@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar"
 import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar"
 import Title from "../../components/main-comp/Title"
@@ -9,6 +10,7 @@ import ReturnSupportButton from "../../components/UserComponents/user-support-ti
 
 const UReports = () => {
   const [selectedReportID, setSelectedReportID] = useState(null)
+  const [searchParams] = useSearchParams()
 
   const handleReportSelect = (reportID) => {
     setSelectedReportID(reportID)
@@ -17,6 +19,12 @@ const UReports = () => {
   const handleBackToMakeReport = () => {
     setSelectedReportID(null)
   }
+
+  useEffect(() => {
+    if (searchParams.has("type") || searchParams.has("subject")) {
+      setSelectedReportID(null)
+    }
+  }, [searchParams])
 
   return (
     <div className="min-h-screen bg-light-white">
@@ -27,13 +35,23 @@ const UReports = () => {
         <div className="fuserContent-container items-center justify-center mt-2.5 mb-2.5">
           <div className="w-full max-w-full">
             <div className="space-y-4">
-              <ReturnSupportButton />
-                <ReportStatus onReportSelect={handleReportSelect} />
-                {selectedReportID ? (
-                  <ReportDetails reportID={selectedReportID} onBack={handleBackToMakeReport} />
-                ) : (
-                  <MakeReport />
+              <div className="flex items-center space-x-4">
+                <ReturnSupportButton />
+                {selectedReportID && (
+                  <button
+                    onClick={handleBackToMakeReport}
+                    className="w-[300px] h-[44px] border border-grey rounded-xl px-5 text-center items-center text-md text-black hover:bg-light-gray transition-colors"
+                  >
+                    Back to Make Support
+                  </button>
                 )}
+              </div>
+              <ReportStatus onReportSelect={handleReportSelect} />
+              {selectedReportID ? (
+                <ReportDetails reportID={selectedReportID} onBack={handleBackToMakeReport} />
+              ) : (
+                <MakeReport />
+              )}
             </div>
           </div>
         </div>

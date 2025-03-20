@@ -156,25 +156,25 @@ const UBookView = () => {
       <Title>Book View</Title>
 
       <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
-      <div className="lg:w-1/4 lg:block mb-4 space-y-4">
-      <BookAvailability book={bookDetails} />
-          </div>
-
-          <div className="userMain-content lg:w-3/4 md:w-full">
-          <ReturnToSearch />
-            <BookInformation
-              book={bookDetails}
-              publishedYear={bookDetails?.publishedYear || "Unknown"}
-              ratingInfo={{
-                avgRating: ratingInfo.avgRating,
-                totalRatings: ratingInfo.totalRatings,
-                formattedRatingCount: formatRatingCount(ratingInfo.totalRatings),
-              }}
-            />
-            <Pathfinder book={bookDetails}/>
-            <SimBooks titleID={titleId} userID={user.userID} category={bookDetails?.category} />
-          </div>
+        <div className="lg:w-1/4 lg:block mb-4 space-y-4 sticky top-5 self-start">
+          <BookAvailability book={bookDetails} />
         </div>
+
+        <div className="userMain-content lg:w-3/4 md:w-full">
+          <ReturnToSearch />
+          <BookInformation
+            book={bookDetails}
+            publishedYear={bookDetails?.publishedYear || "Unknown"}
+            ratingInfo={{
+              avgRating: ratingInfo.avgRating,
+              totalRatings: ratingInfo.totalRatings,
+              formattedRatingCount: formatRatingCount(ratingInfo.totalRatings),
+            }}
+          />
+          <Pathfinder book={bookDetails} />
+          <SimBooks titleID={titleId} userID={user.userID} category={bookDetails?.category} />
+        </div>
+      </div>
     </div>
   )
 }

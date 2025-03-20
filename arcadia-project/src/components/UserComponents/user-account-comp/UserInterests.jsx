@@ -93,7 +93,7 @@ export function UserInterests() {
 
     return (
         <div className="uMain-cont">
-            <h2 className="text-xl font-medium text-arcadia-black mb-6">User Interests</h2>
+            <h2 className="text-2xl font-medium text-arcadia-black mb-6">User Interests</h2>
             <div className="mb-4">
                 Below are your current interests, which will be used to recommend books.
                 Click on a genre to select or deselect, then press update to save changes.

@@ -86,7 +86,7 @@ const RecentReports = () => {
         
         <Link
           to="/admin/support#user-reports"
-          className="rounded-full py-1 px-3 text-sm border border-grey hover:bg-light-gray"
+          className="rounded-full py-0.5 px-3 text-sm border border-grey hover:bg-light-gray"
           onClick={() => {
             // Navigate to the page first
             setTimeout(() => {

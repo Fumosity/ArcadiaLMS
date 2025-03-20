@@ -225,7 +225,7 @@ function OutstandingFines({ onDataExport }) {
                 <div className="flex items-center space-x-2">
                     <span className="font-medium text-sm">Sort By:</span>
                     <button
-                        className="px-3 py-1 bg-gray-200 border border-gray-300 rounded-md text-sm w-32"
+                        className="px-3 py-1 bg-gray-200 border border-grey rounded-md text-sm w-32"
                         onClick={() =>
                             setOutstandingSortOrder(outstandingSortOrder === 'Descending' ? 'Ascending' : 'Descending')
                         }
@@ -234,7 +234,7 @@ function OutstandingFines({ onDataExport }) {
                     </button>
                     <span className="font-medium text-sm">Filter:</span>
                     <select
-                        className="text-sm px-3 py-1 bg-gray-200 border border-gray-300 rounded-md w-44 "
+                        className="text-sm px-3 py-1 bg-gray-200 border border-grey rounded-md w-44 "
                         value={outstandingSortBy}
                         onChange={(e) => setOutstandingSortBy(e.target.value)}
                     >
@@ -321,7 +321,7 @@ function OutstandingFines({ onDataExport }) {
                 <div className="flex items-center space-x-2">
                     <span className="font-medium text-sm">Sort By:</span>
                     <button
-                        className="px-3 py-1 bg-gray-200 border border-gray-300 rounded-md text-sm w-32"
+                        className="px-3 py-1 bg-gray-200 border border-grey rounded-md text-sm w-32"
                         onClick={() =>
                             setDamagedSortOrder(damagedSortOrder === 'Descending' ? 'Ascending' : 'Descending')
                         }
@@ -330,7 +330,7 @@ function OutstandingFines({ onDataExport }) {
                     </button>
                     <span className="font-medium text-sm">Filter:</span>
                     <select
-                        className="text-sm px-3 py-1 bg-gray-200 border border-gray-300 rounded-md w-44 "
+                        className="text-sm px-3 py-1 bg-gray-200 border border-grey rounded-md w-44 "
                         value={damagedSortBy}
                         onChange={(e) => setDamagedSortBy(e.target.value)}
                     >

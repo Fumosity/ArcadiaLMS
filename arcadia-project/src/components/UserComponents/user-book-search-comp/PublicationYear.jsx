@@ -85,7 +85,7 @@ export default function PublicationYear() {
           ))}
         </div>
         <div className="mt-4 w-full">
-          <div className="flex items-center w-full space-x-2">
+          <div className="flex items-center w-full space-x-4">
             <div>
               <b>
                 <label htmlFor="from" className="text-xs block mb-1">

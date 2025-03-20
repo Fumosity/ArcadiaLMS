@@ -6,8 +6,11 @@ const SeeMoreGenres = ({ onGenreClick, selectedComponent, onBackClick, fetchAllG
     <div className="min-h-screen bg-light-white">
       <button
         onClick={onBackClick}
-        className="w-[300px] h-[44px] mb-4 border border-grey rounded-xl px-5 text-center items-center gap-2 text-md text-black hover:bg-light-gray transition-colors"
-      >
+        className="w-[300px] h-[44px] border mb-4 border-grey rounded-xl px-5 text-md text-black hover:bg-light-gray transition-colors flex items-center justify-center gap-2"
+        >
+        <span className="w-5 h-5 border border-grey rounded-full bg-gray-100 flex items-center justify-center">
+        <ArrowLeft className="w-3 h-3 text-black" />
+      </span>
         Back to Home
       </button>
 

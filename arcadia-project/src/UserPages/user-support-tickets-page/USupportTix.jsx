@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar"
-import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar"
 import Title from "../../components/main-comp/Title"
 import SupportTixStatus from "../../components/UserComponents/user-support-tix-comp/SupportTixStatus"
 import FileATix from "../../components/UserComponents/user-support-tix-comp/FileATix"
@@ -36,13 +35,23 @@ const USupportTix = () => {
         <div className="fuserContent-container items-center justify-center mt-2.5 mb-2.5">
           <div className="w-full max-w-full">
             <div className="space-y-4">
-              <ReturnSupportButton />
-                <SupportTixStatus onSupportSelect={handleSupportSelect} />
-                {selectedSupportID ? (
-                  <TicketDetails supportID={selectedSupportID} onBack={handleBackToMakeSupport} />
-                ) : (
-                  <FileATix />
+              <div className="flex items-center space-x-4">
+                <ReturnSupportButton />
+                {selectedSupportID && (
+                  <button
+                    onClick={handleBackToMakeSupport}
+                    className="w-[300px] h-[44px] border border-grey rounded-xl px-5 text-center items-center text-md text-black hover:bg-light-gray transition-colors"
+                  >
+                    Back to Make Support
+                  </button>
                 )}
+              </div>
+              <SupportTixStatus onSupportSelect={handleSupportSelect} />
+              {selectedSupportID ? (
+                <TicketDetails supportID={selectedSupportID} onBack={handleBackToMakeSupport} showBackButton={false} />
+              ) : (
+                <FileATix />
+              )}
             </div>
           </div>
         </div>

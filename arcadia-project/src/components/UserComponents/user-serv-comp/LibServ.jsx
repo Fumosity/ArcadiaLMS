@@ -8,9 +8,9 @@ const LibServ = () => {
 
     const libserv = [
         { title: "ARC E-Library", desc: "Connect to the internet to do your own research, create your presentations, or simply learn how to code through our e-library!", img: "/image/arc7.JPG" },
-        { title: "Electronic Databases", desc: "Expand on your research on related literature through the electronic databases that the ARC is affiliated with!", img: "/image/e-db.png" },
         { title: "Printing Services", desc: "Need a document printed? Our library offers convenient and affordable printing services. Simply bring in your digital file (USB, email, or cloud storage) and we'll print it out for you. We have a variety of paper options and printing sizes to suit your needs.", img: "/image/print.png" },
         { title: "ARC Café", desc: "Take a break and enjoy a delicious treat. Our cafe offers a variety of snacks and beverages to enjoy while you relax and recharge. From coffee and tea to pastries and sandwiches, there's something for everyone.", img: "/image/cafe.png" },
+        { title: "Electronic Databases", desc: "Expand on your research on related literature through the electronic databases that the ARC is affiliated with!", img: "/image/e-db.png" },
     ];
 
     return (

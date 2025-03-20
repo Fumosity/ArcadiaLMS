@@ -57,6 +57,7 @@ const MakeReport = () => {
         >
           <option value="select-type" className="text-center text-grey">Select Type</option>
           <option value="System" className="text-center">System</option>
+          <option value="System" className="text-center">Feedback</option>
           <option value="Book" className="text-center">Book</option>
           <option value="Feedback" className="text-center">Research</option>
         </select>

@@ -66,11 +66,11 @@ const RsrchCards = ({ title, fetchResearch, onSeeMoreClick }) => {
     <div className="uMain-cont">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">{title}</h2>
-        {onSeeMoreClick != null && (
+        {/* {onSeeMoreClick != null && (
           <button className="uSee-more" onClick={onSeeMoreClick}>
             See more
           </button>
-        )}
+        )} */}
 
       </div>
       <div className="flex flex-col w-full space-y-2 my-4">

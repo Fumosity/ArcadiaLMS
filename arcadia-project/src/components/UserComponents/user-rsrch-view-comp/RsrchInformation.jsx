@@ -60,7 +60,7 @@ export default function RsrchInformation({ research }) {
                 <h3 className="text-2xl font-semibold mt-4 mb-2">Full Text Preview</h3>
                 <div className="h-100 p-2.5 flex justify-center items-center">
                     {research.pdf ? (
-                        <div className="p-2.5 pdf-viewer w-full max-w-4xl flex justify-center border border-grey rounded-lg" style={{ height: "725px" }}>
+                        <div className="p-2.5 pdf-viewer flex justify-center border border-grey rounded-lg" style={{ height: "725px" }}>
                             {isLoading && (
                                 <div className="absolute flex justify-center items-center w-full h-full bg-gray-100 opacity-75">
                                     <div className="loader"></div>

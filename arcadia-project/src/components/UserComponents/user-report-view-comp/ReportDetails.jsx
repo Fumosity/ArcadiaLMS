@@ -36,12 +36,12 @@ const ReportDetails = ({ reportID, onBack }) => {
     <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Report Details</h3>
-        <button
+        {/* <button
           onClick={onBack}
           className="px-4 py-2 bg-arcadia-red text-white rounded-full hover:bg-grey transition-colors hover:text-black"
         >
           Back to Make Report
-        </button>
+        </button> */}
       </div>
       <div className="flex items-center mb-4">
         <label className="text-sm mr-2 font-semibold">Type:</label>
@@ -50,18 +50,12 @@ const ReportDetails = ({ reportID, onBack }) => {
           value={reportData.type}
           disabled
         >
-          <option value="select-type" className="text-center text-grey">
-            Select Type
-          </option>
-          <option value="system" className="text-center">
-            System
-          </option>
-          <option value="book" className="text-center">
-            Book
-          </option>
-          <option value="research" className="text-center">
-            Research
-          </option>
+          <option value={reportData.type}>{reportData.type}</option>
+            <option value="Account">System</option>
+            <option value="Account">Feedback</option>
+            <option value="Book">Book</option>
+            <option value="Research">Research</option>
+
         </select>
 
         <span className="absolute inset-y-0 right-2 flex items-center pointer-events-none">

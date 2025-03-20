@@ -69,16 +69,16 @@ const URsrchView = () => {
       <Title>Research View</Title>
 
       <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
-      <div className="lg:w-1/4 lg:block mb-4 space-y-4">
-      <RsrchAvailability research={research}/>
-          </div>
-          <div className="userMain-content lg:w-3/4 md:w-full">
-          <ReturnToSearch research={research}/>
-            <RsrchInformation research={research} />
-            <Pathfinder book={research}/>
-            <SimRsrch research={research} />
-          </div>
+        <div className="lg:w-1/4 lg:block mb-4 space-y-4 sticky top-5 self-start">
+          <RsrchAvailability research={research} />
         </div>
+        <div className="userMain-content lg:w-3/4 md:w-full">
+          <ReturnToSearch research={research} />
+          <RsrchInformation research={research} />
+          <Pathfinder book={research} />
+          <SimRsrch research={research} />
+        </div>
+      </div>
     </div>
   );
 }

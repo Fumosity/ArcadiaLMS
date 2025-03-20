@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react"
 import { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
@@ -241,10 +243,11 @@ const URsrchCatalog = () => {
           </div>
         )}
 
-        <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
-          {/* Sidebar - match exact structure from UHomePage */}
+        {/* Added min-height-screen to ensure consistent behavior with UBkCatalog */}
+        <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start min-h-screen">
+          {/* Sidebar - Already working correctly, but added the same classes for consistency */}
           {query.trim() ? (
-            <div className="lg:w-1/4 lg:block md:hidden space-y-4 sticky top-5">
+            <div className="lg:w-1/4 lg:block md:hidden space-y-4 sticky top-5 self-start max-h-screen overflow-visible">
               <URFilterSidebar />
             </div>
           ) : (
@@ -277,7 +280,7 @@ const URsrchCatalog = () => {
             </>
           )}
 
-          {/* Main content area - match exact structure from UHomePage */}
+          {/* Main content area */}
           <div className="userMain-content lg:w-3/4 md:w-full">
             {seeMoreComponent ? (
               <SeeMoreResearch

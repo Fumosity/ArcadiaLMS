@@ -194,14 +194,14 @@ const ReportSupportPieChart = () => {
         <select
           value={timeFrame}
           onChange={(e) => handleTimeFrameChange(e.target.value)}
-          className="bg-white p-2 border border-gray rounded-md"
+          className="bg-white p-2 border border-grey rounded-md"
         >
           <option value="week">Week</option>
           <option value="month">Month</option>
           <option value="year">Year</option>
         </select>
 
-        <div className="flex justify-center  items-center gap-2 border border-gray rounded">
+        <div className="flex justify-center  items-center gap-2 border border-grey rounded">
           <button onClick={navigatePrevious} className="p-2 hover:bg-grey">
             &lt;
           </button>

@@ -45,7 +45,7 @@ const ARViewer = () => {
 
     return (
         <div className="min-h-screen bg-white">
-            <Title>User Account Viewer</Title>
+            <Title>Research Viewer</Title>
             <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
                 <div className="flex-shrink-0 w-3/4 space-y-2">
                     <div className="flex justify-between w-full gap-2">

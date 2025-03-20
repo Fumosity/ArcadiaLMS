@@ -123,7 +123,7 @@ const MostPopBk = ({ onSeeMoreClick }) => {
             <div className="flex justify-between items-center mb-2.5">
                 <h2 className="text-xl font-semibold">Most Popular Books</h2>
                 <button
-                    className="uSidebar-Seemore"
+                    className="rounded-full py-0.5 px-3 text-sm border border-grey hover:bg-light-gray"
                     onClick={() => onSeeMoreClick("Most Popular", async () => {
                         const books = await fetchMostPopularBooks();
                         return { books };

@@ -86,7 +86,7 @@ const RecentSupport = () => {
         
         <Link
           to="/admin/support#support-tickets"
-          className="rounded-full py-1 px-3 text-sm border border-grey hover:bg-light-gray whitespace-nowrap"
+          className="rounded-full py-0.5 px-3 text-sm border border-grey hover:bg-light-gray whitespace-nowrap"
           onClick={() => {
             // Navigate to the page first
             setTimeout(() => {

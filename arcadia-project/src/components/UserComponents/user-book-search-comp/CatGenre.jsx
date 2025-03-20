@@ -209,10 +209,10 @@ export default function CatGenre() {
           {searchGenre.map((genre) => (
             <div
               key={genre}
-              className="flex items-center border-grey rounded-2xl bg-grey text-arcadia-black px-2 py-0.5"
+              className="flex items-center border-arcadia-red rounded-2xl bg-arcadia-red text-white px-2 py-0.5"
             >
               <button
-                className="mr-2 text-arcadia-black text-left"
+                className="mr-2 text-white text-left"
                 onClick={() => handleRemoveGenre(genre, setSearchGenre, searchGenre)}
               >
                 ×
@@ -266,10 +266,10 @@ export default function CatGenre() {
           {excludeGenre.map((genre) => (
             <div
               key={genre}
-              className="flex items-center border-grey rounded-2xl bg-grey text-arcadia-black px-2 py-0.5"
+              className="flex items-center border-arcadia-red rounded-2xl bg-arcadia-red text-white px-2 py-0.5"
             >
               <button
-                className="mr-2 text-arcadia-black text-left"
+                className="mr-2 text-white text-left"
                 onClick={() => handleRemoveGenre(genre, setExcludeGenre, excludeGenre)}
               >
                 ×

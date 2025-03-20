@@ -127,8 +127,8 @@ export default function CollegeAndDept() {
         </div>
       </div>
 
-      {/* Department Dropdown (Only Visible if a College is Selected) */}
-      {selectedCollege && selectedCollege !== "All" && (
+      {/* Department Dropdown (Only Visible if the selected college is COECSA or IS) */}
+      {(selectedCollege === "COECSA" || selectedCollege === "IS") && (
         <div className="mb-2">
           <label className="text-sm font-semibold block mb-1">Department:</label>
           <div className="relative w-full">
@@ -172,4 +172,3 @@ export default function CollegeAndDept() {
     </div>
   )
 }
-

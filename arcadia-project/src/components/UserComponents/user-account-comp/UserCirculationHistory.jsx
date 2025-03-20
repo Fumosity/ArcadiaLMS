@@ -9,7 +9,7 @@ const UserCirculationHistory = () => {
   const [typeFilter, setTypeFilter] = useState("All")
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [entriesPerPage, setEntriesPerPage] = useState(10)
+  const [entriesPerPage, setEntriesPerPage] = useState(5)
   const [loading, setLoading] = useState(true)
 
   // Fetch current user from localStorage
@@ -79,29 +79,38 @@ const UserCirculationHistory = () => {
         const formattedData = data.map((item) => {
           const date = item.checkinDate || item.checkoutDate
           const time = item.checkinTime || item.checkoutTime
-
+        
+          // Format date to "Month Day, Year" format
+          let formattedDate = null
+          if (date) {
+            const [year, month, day] = date.split("-")
+            const dateObj = new Date(year, month - 1, day)
+            formattedDate = dateObj.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          }
+        
           let formattedTime = null
           if (time) {
+            // Ensure time is in the format HH:mm (24-hour format)
             const timeString = time.includes(":") ? time : `${time.slice(0, 2)}:${time.slice(2)}`
-
-            try {
-              formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString("en-PH", {
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-              })
-            } catch (e) {
-              console.error("Error formatting time:", e)
-              formattedTime = time
-            }
+        
+            // Convert time into 12-hour format with AM/PM, no 'Z' for local time
+            formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString("en-PH", {
+              hour: "numeric",
+              minute: "numeric",
+              hour12: true,
+            })
           }
-
+        
           const bookIndiv = item.book_indiv || {}
           const bookTitles = bookIndiv.book_titles || {}
-
+        
           return {
             type: item.transactionType || "Unknown",
-            date: date || "N/A",
+            date: formattedDate || "N/A", // Use formattedDate here
             time: formattedTime || "N/A",
             bookTitle: bookTitles.title || "Unknown Title",
             bookBarcode: bookIndiv.bookBarcode || item.bookBarcode || "N/A",
@@ -159,7 +168,7 @@ const UserCirculationHistory = () => {
 
   return (
     <div className="uMain-cont">
-      <h3 className="text-xl font-medium text-arcadia-black mb-6">My Circulation History</h3>
+      <h3 className="text-2xl font-medium text-arcadia-black mb-6">My Circulation History</h3>
 
       {/* Controls for sort, filter, and search */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -169,7 +178,7 @@ const UserCirculationHistory = () => {
             <span className="font-medium text-sm">Sort:</span>
             <button
               onClick={() => setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")}
-              className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+              className="border border-grey sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
             >
               {sortOrder}
             </button>
@@ -179,7 +188,7 @@ const UserCirculationHistory = () => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Type:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+              className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
             >
@@ -194,7 +203,7 @@ const UserCirculationHistory = () => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Entries:</span>
             <select
-              className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
+              className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-20"
               value={entriesPerPage}
               onChange={(e) => setEntriesPerPage(Number(e.target.value))}
             >
@@ -213,7 +222,7 @@ const UserCirculationHistory = () => {
           <input
             type="text"
             id="search"
-            className="border border-gray-300 rounded-md py-1 px-2 text-sm w-64"
+            className="border border-grey rounded-md py-1 px-2 text-sm w-64"
             placeholder="Title or barcode"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -252,11 +261,11 @@ const UserCirculationHistory = () => {
                       className={`inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
                                             ${
                                               book.type === "Returned"
-                                                ? "bg-[#8fd28f]"
+                                                ? "bg-resolved text-white"
                                                 : book.type === "Borrowed"
-                                                  ? "bg-[#e8d08d]"
+                                                  ? "bg-ongoing"
                                                   : book.type === "Overdue"
-                                                    ? "bg-[#f8a5a5]"
+                                                    ? "bg-dark-blue text-white"
                                                     : "bg-grey"
                                             }`}
                     >
@@ -268,8 +277,9 @@ const UserCirculationHistory = () => {
                   <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
                     {book.titleID ? (
                       <Link
-                        to={`/user/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
+                        to={`/user/bookview?titleID=${encodeURIComponent(book.titleID)}`}
                         className="text-blue-600 hover:underline"
+                        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                       >
                         {truncateTitle(book.bookTitle)}
                       </Link>

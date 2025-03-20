@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar"
@@ -165,10 +167,11 @@ const UBkCatalog = () => {
           </div>
         )}
 
-        <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
-          {/* Sidebar - match exact structure from UHomePage */}
+        {/* Added min-height-screen to ensure scrollable context */}
+        <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start min-h-screen">
+          {/* Sidebar - Fixed sticky behavior with self-start, max-h-screen, and overflow-visible */}
           {query.trim() ? (
-            <div className="lg:w-1/4 lg:block md:hidden space-y-4 sticky top-5">
+            <div className="lg:w-1/4 lg:block md:hidden space-y-4 sticky top-5 self-start max-h-screen overflow-visible">
               <FilterSidebar />
             </div>
           ) : (

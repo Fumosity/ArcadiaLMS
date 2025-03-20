@@ -135,7 +135,7 @@ const HighestRatedBk = ({ onSeeMoreClick }) => {
       <div className="flex justify-between items-center mb-2.5">
         <h2 className="text-xl font-semibold">Highest Rated Books</h2>
         <button
-          className="uSidebar-Seemore"
+          className="rounded-full py-0.5 px-3 text-sm border border-grey hover:bg-light-gray"
           onClick={() =>
             onSeeMoreClick("Highly Rated", async () => {
               const books = await fetchHighlyRatedBooks()
