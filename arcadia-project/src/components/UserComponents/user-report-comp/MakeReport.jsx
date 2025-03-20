@@ -47,7 +47,7 @@ const MakeReport = () => {
 
   return (
     <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
-      <h3 className="text-lg font-semibold mb-4">Make a Report</h3>
+      <h3 className="text-2xl font-semibold mb-4">Make a Report</h3>
       <div className="flex items-center mb-4">
         <label className="text-sm mr-2 font-semibold">Type:</label>
         <select
