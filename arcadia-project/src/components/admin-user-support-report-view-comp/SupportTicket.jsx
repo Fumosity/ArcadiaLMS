@@ -100,6 +100,13 @@ const SupportTicket = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  const handleUserClick = (support) => {
+    navigate("/admin/useraccounts/viewusers", {
+      state: { userId: support.user_accounts.userID },
+    })
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   return (
     <div className="bg-white p-4 rounded-lg border-grey border h-fit">
       <h3 className="text-2xl font-semibold mb-4">User Support Tickets</h3>
@@ -181,27 +188,13 @@ const SupportTicket = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">
-                Type
-              </th>
-              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">
-                Status
-              </th>
-              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-3/12">
-                Subject
-              </th>
-              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-3/12">
-                User
-              </th>
-              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-2/12">
-                Date
-              </th>
-              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">
-                Time
-              </th>
-              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">
-                Ticket ID
-              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">Type</th>
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">Status</th>
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-3/12">Subject</th>
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-3/12">User</th>
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-2/12">Date</th>
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">Time</th>
+              <th className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wider w-1/12">Ticket ID</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -246,7 +239,9 @@ const SupportTicket = () => {
                     </button>
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-900 text-center w-3/12">
-                    {support.user_accounts.userFName} {support.user_accounts.userLName}
+                    <button onClick={() => handleUserClick(support)} className="text-sm text-arcadia-red font-semibold hover:underline">
+                      {support.user_accounts.userFName} {support.user_accounts.userLName}
+                    </button>
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-900 text-center w-2/12">
                     {new Date(support.date).toLocaleDateString("en-US", {
