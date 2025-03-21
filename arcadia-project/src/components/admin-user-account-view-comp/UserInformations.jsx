@@ -73,7 +73,7 @@ const UserInformations = ({ user: propUser, source }) => {
             <label className="w-1/3 text-md ">School ID No.:</label>
             <input
               className="px-3 py-1 rounded-full border border-grey w-2/3"
-              value={formatSchoolNo(user.userLPUID) || ""}
+              value={user.userLPUID || ""}
               readOnly
             />
           </div>

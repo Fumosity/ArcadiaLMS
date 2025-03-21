@@ -125,6 +125,8 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
         'Available': '#118B50',
         'Unavailable': '#FFB200',
         'Damaged': '#A31D1D',
+        'Decommissioned': '#000000',
+
     };
 
     const errorStyle = {
@@ -159,7 +161,7 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
                         style={{
                             ...validationErrors.bookStatus ? errorStyle : {},
                             backgroundColor: statusColor,
-                            color: formData.bookStatus === 'Available' || formData.bookStatus === 'Damaged' ? 'white' : 'black',
+                            color: formData.bookStatus === 'Available' || formData.bookStatus === 'Damaged' || formData.bookStatus === 'Decommissioned' ? 'white' : 'black',
                         }}
                         placeholder="Book Status"
                     />
@@ -221,9 +223,9 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
                 </button>
                 <button
                     className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-                    onClick={() => handleStatusChange('Damaged')}
+                    onClick={() => handleStatusChange('Decommissioned')}
                 >
-                    Damaged
+                    Decommissioned
                 </button>
             </div>
             <div className="flex justify-end w-full gap-2">

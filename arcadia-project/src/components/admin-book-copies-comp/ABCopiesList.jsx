@@ -126,7 +126,7 @@ export default function ABCopiesList({ titleID, onRowSelect, refreshList }) {
                         <span className="font-medium text-sm">Sort:</span>
                         <button
                             onClick={() => setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")}
-                            className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+                            className="sort-by bg-gray-200 border border-grey py-1 px-3 rounded-lg text-sm w-28"
                         >
                             {sortOrder}
                         </button>
@@ -136,7 +136,7 @@ export default function ABCopiesList({ titleID, onRowSelect, refreshList }) {
                     <div className="flex items-center space-x-2">
                         <span className="font-medium text-sm">Status:</span>
                         <select
-                            className="bg-gray-200 py-1 px-1 border rounded-lg text-sm w-auto"
+                            className="bg-gray-200 py-1 px-1 border border-grey rounded-lg text-sm w-auto"
                             value={statusType}
                             onChange={(e) => setStatusType(e.target.value)}
                         >
@@ -153,7 +153,7 @@ export default function ABCopiesList({ titleID, onRowSelect, refreshList }) {
                         <span className="font-medium text-sm">Acq. Date:</span>
                         <input
                             type="text"
-                            className="bg-gray-200 py-1 px-2 border rounded-lg text-sm w-[90px]"
+                            className="bg-gray-200 py-1 px-2 border border-grey rounded-lg text-sm w-[90px]"
                             placeholder="YYYY-MM"
                             value={acqDateFilter}
                             onChange={(e) => setAcqDateFilter(e.target.value)}
@@ -164,7 +164,7 @@ export default function ABCopiesList({ titleID, onRowSelect, refreshList }) {
                     <div className="flex items-center space-x-2">
                         <span className="font-medium text-sm">Entries:</span>
                         <select
-                            className="bg-gray-200 py-1 px-1 border rounded-lg text-sm w-13"
+                            className="bg-gray-200 py-1 px-1 border border-grey rounded-lg text-sm w-13"
                             value={entriesPerPage}
                             onChange={(e) => setEntriesPerPage(Number(e.target.value))}
                         >
@@ -183,7 +183,7 @@ export default function ABCopiesList({ titleID, onRowSelect, refreshList }) {
                     <input
                         type="text"
                         id="search"
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+                        className=" border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
                         placeholder="Barcode or Status..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}

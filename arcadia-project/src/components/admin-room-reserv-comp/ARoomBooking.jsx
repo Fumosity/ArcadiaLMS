@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { supabase } from "../../supabaseClient";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useState, useEffect } from "react"
+import { supabase } from "../../supabaseClient"
+import { toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 export default function ARoomBooking({ addReservation }) {
   const [formData, setFormData] = useState({
@@ -15,18 +15,18 @@ export default function ARoomBooking({ addReservation }) {
     startTime: "09:00",
     endTime: "10:00",
     title: "New Reservation",
-  });
+  })
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0]
     setFormData((prev) => ({
       ...prev,
       date: today,
-    }));
-  }, []);
+    }))
+  }, [])
 
   const handleInputChange = async (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
 
     // If the school ID field is updated and cleared, reset the dependent fields
     if (name === "schoolId" && value.trim() === "") {
@@ -37,50 +37,49 @@ export default function ARoomBooking({ addReservation }) {
         name: "",
         college: "",
         department: "",
-      }));
-      return;
+      }))
+      return
     }
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }))
 
     if (name === "schoolId" && value.trim() !== "") {
       try {
-        let new_value = value.replace(/\D/g, "");  
         const { data, error } = await supabase
           .from("user_accounts")
           .select("userID, userFName, userLName, userCollege, userDepartment")
-          .eq("userLPUID", new_value); // Query using school ID instead of user ID
+          .eq("userLPUID", value) // Use the raw value directly
 
         if (error) {
-          console.error("Error fetching user details:", error.message);
-          return;
+          console.error("Error fetching user details:", error.message)
+          return
         }
 
         if (!data || data.length === 0) {
-          console.log("No user found with the provided School ID");
-          return;
+          console.log("No user found with the provided School ID")
+          return
         }
 
         if (data.length > 1) {
-          console.error("Multiple users found with the same School ID");
-          return;
+          console.error("Multiple users found with the same School ID")
+          return
         }
 
-        console.log("User found with the provided School ID");
+        console.log("User found with the provided School ID")
 
-        const user = data[0];
+        const user = data[0]
         setFormData((prev) => ({
           ...prev,
           userId: user.userID,
           name: `${user.userFName} ${user.userLName}`,
           college: user.userCollege,
           department: user.userDepartment,
-        }));
+        }))
       } catch (error) {
-        console.error("Error fetching user details:", error.message);
+        console.error("Error fetching user details:", error.message)
       }
     }
-  };
+  }
 
   const checkExistingReservation = async () => {
     try {
@@ -90,10 +89,10 @@ export default function ARoomBooking({ addReservation }) {
         .filter("reservationData->>room", "eq", formData.room)
         .filter("reservationData->>date", "eq", formData.date)
         .filter("reservationData->>startTime", "lt", formData.endTime)
-        .filter("reservationData->>endTime", "gt", formData.startTime);
+        .filter("reservationData->>endTime", "gt", formData.startTime)
 
       if (error) {
-        throw new Error(`Error checking existing reservations: ${error.message}`);
+        throw new Error(`Error checking existing reservations: ${error.message}`)
       }
 
       if (data.length > 0) {
@@ -107,13 +106,13 @@ export default function ARoomBooking({ addReservation }) {
           progress: undefined,
           theme: "colored",
           className: "bg-yellow-500 text-white",
-        });
-        return true;
+        })
+        return true
       }
 
-      return false;
+      return false
     } catch (error) {
-      console.error(error.message);
+      console.error(error.message)
       toast.error("Error checking existing reservations", {
         position: "top-right",
         autoClose: 5000,
@@ -124,10 +123,10 @@ export default function ARoomBooking({ addReservation }) {
         progress: undefined,
         theme: "colored",
         className: "bg-red-600 text-white",
-      });
-      return false;
+      })
+      return false
     }
-  };
+  }
 
   const handleFormSubmit = async () => {
     if (
@@ -151,13 +150,13 @@ export default function ARoomBooking({ addReservation }) {
         progress: undefined,
         theme: "colored",
         className: "bg-red-600 text-white",
-      });
-      return;
+      })
+      return
     }
 
-    const isReserved = await checkExistingReservation();
+    const isReserved = await checkExistingReservation()
     if (isReserved) {
-      return; // Prevent form submission if the room is already booked
+      return // Prevent form submission if the room is already booked
     }
 
     const newEvent = {
@@ -166,9 +165,9 @@ export default function ARoomBooking({ addReservation }) {
       title: formData.title,
       start: `${formData.date}T${formData.startTime}`,
       end: `${formData.date}T${formData.endTime}`,
-    };
+    }
 
-    addReservation(newEvent);
+    addReservation(newEvent)
 
     const reserveData = {
       room: formData.room,
@@ -176,18 +175,16 @@ export default function ARoomBooking({ addReservation }) {
       startTime: formData.startTime,
       endTime: formData.endTime,
       title: formData.title,
-    };
+    }
 
     try {
-      const { data, error } = await supabase
-        .from("reservation")
-        .insert({
-          userID: formData.userId,
-          reservationData: reserveData,
-        });
+      const { data, error } = await supabase.from("reservation").insert({
+        userID: formData.userId,
+        reservationData: reserveData,
+      })
 
       if (error) {
-        console.error("Error saving reservation:", error.message);
+        console.error("Error saving reservation:", error.message)
         toast.error("Error saving reservation", {
           position: "top-right",
           autoClose: 5000,
@@ -198,9 +195,9 @@ export default function ARoomBooking({ addReservation }) {
           progress: undefined,
           theme: "colored",
           className: "bg-red-600 text-white",
-        });
+        })
       } else {
-        console.log("Reservation successfully saved:", data);
+        console.log("Reservation successfully saved:", data)
         toast.success("Reservation successfully saved", {
           position: "top-right",
           autoClose: 5000,
@@ -211,10 +208,10 @@ export default function ARoomBooking({ addReservation }) {
           progress: undefined,
           theme: "colored",
           className: "bg-green-600 text-white",
-        });
+        })
       }
     } catch (error) {
-      console.error("Error while submitting reservation:", error.message);
+      console.error("Error while submitting reservation:", error.message)
       toast.error("Error while submitting reservation", {
         position: "top-right",
         autoClose: 5000,
@@ -225,23 +222,9 @@ export default function ARoomBooking({ addReservation }) {
         progress: undefined,
         theme: "colored",
         className: "bg-red-600 text-white",
-      });
+      })
     }
-  };
-
-  const formatSchoolNo = (value) => {
-    // Remove non-numeric characters
-    let numericValue = value.replace(/\D/g, "");
-
-    // Apply the XXXX-X-XXXXX format
-    if (numericValue.length > 4) {
-      numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`;
-    }
-    if (numericValue.length > 6) {
-      numericValue = `${numericValue.slice(0, 6)}-${numericValue.slice(6, 11)}`;
-    }
-    return numericValue;
-  };
+  }
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border overflow-x-auto">
@@ -254,8 +237,8 @@ export default function ARoomBooking({ addReservation }) {
               <input
                 type="text"
                 name="schoolId"
-                value={formData.schoolId ? formatSchoolNo(formData.schoolId) : ""}
-                onChange={handleInputChange} // Allow changes
+                value={formData.schoolId}
+                onChange={handleInputChange}
                 className="px-3 py-1 rounded-full border border-grey w-full"
                 required
               />
@@ -382,17 +365,17 @@ export default function ARoomBooking({ addReservation }) {
               />
             </div>
           </div>
-
         </div>
       </div>
       <div className="flex justify-center mt-8">
-        <button           
-        className="add-book w-1/4 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-        onClick={handleFormSubmit}
+        <button
+          className="add-book w-1/4 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+          onClick={handleFormSubmit}
         >
           Reserve a Room
         </button>
       </div>
     </div>
-  );
+  )
 }
+

@@ -170,7 +170,7 @@ const ReportView = () => {
                   {isLoading ? (
                     <Skeleton width="100%" height={15} />
                   ) : field.label === "School No.:" ? (
-                    formatSchoolNo(field.value)
+                    field.value
                   ) : (
                     field.value
                   )}

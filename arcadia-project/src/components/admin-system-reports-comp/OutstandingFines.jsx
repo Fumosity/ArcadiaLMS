@@ -280,7 +280,7 @@ function OutstandingFines({ onDataExport }) {
                                         {record.user_name}
                                     </button>
                                 </td>
-                                <td className="px-4 py-2 text-center">{formatSchoolNo(record.school_id)}</td>
+                                <td className="px-4 py-2 text-center">{record.school_id}</td>
                             </tr>
                         ))
                     ) : (
@@ -373,7 +373,7 @@ function OutstandingFines({ onDataExport }) {
                                         {record.user_name}
                                     </button>
                                 </td>
-                                <td className="px-4 py-2 text-center">{formatSchoolNo(record.school_id)}</td>
+                                <td className="px-4 py-2 text-center">{record.school_id}</td>
                             </tr>
                         ))
                     ) : (

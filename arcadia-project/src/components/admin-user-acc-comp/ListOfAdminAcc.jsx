@@ -187,7 +187,7 @@ const ListOfAdminAcc = () => {
                                     </button>
                                 </td>
                                 <td className="px-4 py-3 text-sm truncate text-center">
-                                    {formatSchoolNo(user.schoolId)}
+                                    {user.schoolId}
                                 </td>
                             </tr>
                         ))}

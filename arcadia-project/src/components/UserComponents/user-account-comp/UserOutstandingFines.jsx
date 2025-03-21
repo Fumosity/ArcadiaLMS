@@ -1,422 +1,541 @@
-import { useState, useEffect } from "react"
-import Skeleton from "react-loading-skeleton"
-import "react-loading-skeleton/dist/skeleton.css"
+import { useEffect, useState } from "react"
+import { supabase } from "../../../supabaseClient.js"
 import { Link } from "react-router-dom"
-import { UserFinesService } from "../../../backend/UserFinesService"
 
 const UserOutstandingFines = () => {
-  // Data states
-  const [overdueFines, setOverdueFines] = useState([])
-  const [damageFines, setDamageFines] = useState([])
-  const [finesSummary, setFinesSummary] = useState({
-    totalOverdueFines: 0,
-    totalDamageFines: 0,
-    totalFines: 0,
-    hasFines: false,
-  })
-  const [isLoading, setIsLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState(null)
+  const [overdueBooks, setOverdueBooks] = useState([])
+  const [damagedBooks, setDamagedBooks] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  // Overdue fines controls
+  // Sorting and pagination states for overdue books
   const [overdueSortOrder, setOverdueSortOrder] = useState("Descending")
   const [overdueSortBy, setOverdueSortBy] = useState("fine_amount")
-  const [overdueCurrentPage, setOverdueCurrentPage] = useState(1)
-  const [overdueEntriesPerPage, setOverdueEntriesPerPage] = useState(10)
+  const [overduePage, setOverduePage] = useState(1)
+  const [overdueEntriesPerPage, setOverdueEntriesPerPage] = useState(5)
 
-  // Damage fines controls
-  const [damageSortOrder, setDamageSortOrder] = useState("Descending")
-  const [damageSortBy, setDamageSortBy] = useState("fine")
-  const [damageCurrentPage, setDamageCurrentPage] = useState(1)
-  const [damageEntriesPerPage, setDamageEntriesPerPage] = useState(10)
+  // Sorting and pagination states for damaged books
+  const [damagedSortOrder, setDamagedSortOrder] = useState("Descending")
+  const [damagedSortBy, setDamagedSortBy] = useState("fine")
+  const [damagedPage, setDamagedPage] = useState(1)
+  const [damagedEntriesPerPage, setDamagedEntriesPerPage] = useState(5)
 
-  // Fetch user and fines data on component mount
+  // Fetch current user from localStorage
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true)
+    const storedUser = JSON.parse(localStorage.getItem("user"))
+    if (storedUser) {
+      console.log("Current user from localStorage:", storedUser)
+      setCurrentUser(storedUser)
+    }
+  }, [])
 
-      // Get current user
-      const user = UserFinesService.getCurrentUser()
-      setCurrentUser(user)
-
-      if (!user) {
-        console.log("No user logged in")
-        setIsLoading(false)
+  // Fetch user's outstanding fines from Supabase
+  useEffect(() => {
+    const fetchUserFines = async () => {
+      if (!currentUser || !currentUser.userID) {
+        console.log("No user ID available")
+        setLoading(false)
         return
       }
 
+      console.log("Fetching outstanding fines for user ID:", currentUser.userID)
+      setLoading(true)
+
       try {
-        // Fetch fines data
-        const [overdueData, damageData] = await Promise.all([
-          UserFinesService.fetchOverdueFines(),
-          UserFinesService.fetchDamageFines(),
-        ])
+        // Fetch overdue books
+        const today = new Date()
+        const { data: overdueData, error: overdueError } = await supabase
+          .from("book_transactions")
+          .select(`
+            transactionID, 
+            transactionType,
+            userID, 
+            bookBarcode, 
+            book_indiv (
+              bookBarcode,
+              bookStatus,
+              book_titles (
+                titleID,
+                title,
+                price
+              )
+            ),
+            checkoutDate, 
+            checkoutTime, 
+            deadline
+          `)
+          .eq("userID", currentUser.userID)
+          .not("deadline", "is.null")
+          .lt("deadline", today.toISOString().split("T")[0])
+          .neq("transactionType", "Returned")
 
-        setOverdueFines(overdueData)
-        setDamageFines(damageData)
+        if (overdueError) {
+          console.error("Error fetching overdue books:", overdueError)
+        } else {
+          const formattedOverdueData = overdueData.map((item) => {
+            const deadline = item.deadline
+            let overdue_days = 0
 
-        // Calculate totals
-        const summary = UserFinesService.calculateTotalFines(overdueData, damageData)
-        setFinesSummary(summary)
+            // Calculate overdue days excluding Sundays
+            for (let d = new Date(deadline); d < today; d.setDate(d.getDate() + 1)) {
+              if (d.getDay() !== 0) {
+                overdue_days++
+              }
+            }
+
+            const fine_amount = overdue_days * 10
+            const bookDetails = item.book_indiv || {}
+            const bookTitles = bookDetails.book_titles || {}
+
+            // Format date to "Month Day, Year" format
+            let formattedDeadline = null
+            if (deadline) {
+              const [year, month, day] = deadline.split("-")
+              const dateObj = new Date(year, month - 1, day)
+              formattedDeadline = dateObj.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+
+            // Format checkout date
+            let formattedCheckoutDate = null
+            if (item.checkoutDate) {
+              const [year, month, day] = item.checkoutDate.split("-")
+              const dateObj = new Date(year, month - 1, day)
+              formattedCheckoutDate = dateObj.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+
+            return {
+              transactionID: item.transactionID,
+              bookTitle: bookTitles.title || "Unknown Title",
+              bookBarcode: bookDetails.bookBarcode || item.bookBarcode || "N/A",
+              titleID: bookTitles.titleID,
+              checkoutDate: formattedCheckoutDate || "N/A",
+              deadline: formattedDeadline || "N/A",
+              overdue_days,
+              fine_amount,
+            }
+          })
+
+          console.log("Formatted overdue data:", formattedOverdueData)
+          setOverdueBooks(formattedOverdueData)
+        }
+
+        // Fetch damaged books
+        const { data: damageData, error: damageError } = await supabase
+          .from("book_transactions")
+          .select(`
+    transactionID,
+    userID,
+    bookBarcode,
+    book_indiv!inner (
+      bookBarcode,
+      bookStatus,
+      book_titles (
+        titleID,
+        title,
+        price
+      )
+    )
+  `)
+          .eq("userID", currentUser.userID)
+          .order("transactionID", { ascending: false })
+
+        if (damageError) {
+          console.error("Error fetching damaged books:", damageError)
+        } else {
+          // We'll store verified damaged books here
+          const verifiedDamageData = []
+
+          // Get all unique book barcodes from the user's transactions
+          const uniqueBookBarcodes = [...new Set(damageData.map((item) => item.bookBarcode))]
+
+          // For each unique book
+          for (const barcode of uniqueBookBarcodes) {
+            // 1. Check if the book is currently damaged
+            const { data: bookStatus, error: bookStatusError } = await supabase
+              .from("book_indiv")
+              .select("bookStatus")
+              .eq("bookBarcode", barcode)
+              .single()
+
+            if (bookStatusError) {
+              console.error(`Error checking status for book ${barcode}:`, bookStatusError)
+              continue
+            }
+
+            // Only proceed if the book is currently damaged
+            if (bookStatus.bookStatus === "Damaged") {
+              // 2. Check if this user was the last one to have the book
+              const { data: latestTransaction, error: latestError } = await supabase
+                .from("book_transactions")
+                .select("userID, transactionID, book_indiv!inner(bookBarcode, book_titles(titleID, title, price))")
+                .eq("bookBarcode", barcode)
+                .order("transactionID", { ascending: false })
+                .limit(1)
+
+              if (!latestError && latestTransaction.length > 0) {
+                // Only add to the user's fines if they were the last one to have the book
+                if (latestTransaction[0].userID === currentUser.userID) {
+                  verifiedDamageData.push(latestTransaction[0])
+                }
+              }
+            }
+          }
+
+          const formattedDamageData = verifiedDamageData.map((item) => {
+            const bookDetails = item.book_indiv?.book_titles || {}
+            return {
+              transactionID: item.transactionID,
+              bookBarcode: item.book_indiv.bookBarcode,
+              bookTitle: bookDetails.title || "Unknown Title",
+              titleID: bookDetails.titleID,
+              fine: bookDetails.price || 0,
+            }
+          })
+
+          console.log("Formatted damage data (verified current damages only):", formattedDamageData)
+          setDamagedBooks(formattedDamageData)
+        }
       } catch (error) {
-        console.error("Error fetching fines data:", error)
+        console.error("Unexpected error:", error)
       } finally {
-        setIsLoading(false)
+        setLoading(false)
       }
     }
 
-    fetchData()
-  }, [])
+    fetchUserFines()
+  }, [currentUser])
 
-  // Format date to a more readable format
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A"
-    const [year, month, day] = dateString.split("-")
-    const dateObj = new Date(year, month - 1, day)
-    return dateObj.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
-
-  // Truncate long text
-  const truncateText = (text, maxLength = 25) => {
-    if (!text) return "N/A"
-    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text
-  }
-
-  // Handle sorting and pagination for overdue fines
-  const sortedOverdueFines = [...overdueFines].sort((a, b) => {
-    const valueA = a[overdueSortBy]
-    const valueB = b[overdueSortBy]
-
-    if (overdueSortOrder === "Ascending") {
-      return valueA > valueB ? 1 : -1
+  // Sort and paginate overdue books
+  const sortedOverdueBooks = [...overdueBooks].sort((a, b) => {
+    if (overdueSortOrder === "Descending") {
+      return b[overdueSortBy] > a[overdueSortBy] ? 1 : -1
     } else {
-      return valueB > valueA ? 1 : -1
+      return a[overdueSortBy] > b[overdueSortBy] ? 1 : -1
     }
   })
 
-  const overdueStartIndex = (overdueCurrentPage - 1) * overdueEntriesPerPage
-  const displayedOverdueFines = sortedOverdueFines.slice(overdueStartIndex, overdueStartIndex + overdueEntriesPerPage)
-  const overdueTotalPages = Math.max(1, Math.ceil(overdueFines.length / overdueEntriesPerPage))
+  const overdueStartIndex = (overduePage - 1) * overdueEntriesPerPage
+  const displayedOverdueBooks = sortedOverdueBooks.slice(overdueStartIndex, overdueStartIndex + overdueEntriesPerPage)
 
-  // Handle sorting and pagination for damage fines
-  const sortedDamageFines = [...damageFines].sort((a, b) => {
-    const valueA = a[damageSortBy]
-    const valueB = b[damageSortBy]
-
-    if (damageSortOrder === "Ascending") {
-      return valueA > valueB ? 1 : -1
+  // Sort and paginate damaged books
+  const sortedDamagedBooks = [...damagedBooks].sort((a, b) => {
+    if (damagedSortOrder === "Descending") {
+      return b[damagedSortBy] > a[damagedSortBy] ? 1 : -1
     } else {
-      return valueB > valueA ? 1 : -1
+      return a[damagedSortBy] > b[damagedSortBy] ? 1 : -1
     }
   })
 
-  const damageStartIndex = (damageCurrentPage - 1) * damageEntriesPerPage
-  const displayedDamageFines = sortedDamageFines.slice(damageStartIndex, damageStartIndex + damageEntriesPerPage)
-  const damageTotalPages = Math.max(1, Math.ceil(damageFines.length / damageEntriesPerPage))
+  const damagedStartIndex = (damagedPage - 1) * damagedEntriesPerPage
+  const displayedDamagedBooks = sortedDamagedBooks.slice(damagedStartIndex, damagedStartIndex + damagedEntriesPerPage)
 
-  // Render loading state
-  if (isLoading) {
-    return (
-      <div className="uMain-cont">
-        <h3 className="text-2xl font-medium text-arcadia-black mb-2">My Outstanding Fines</h3>
-        <div className="p-4">
-          <Skeleton height={100} className="mb-4" />
-          <Skeleton height={200} />
-        </div>
-      </div>
-    )
+  const truncateTitle = (title, maxLength = 25) => {
+    if (!title) return "Unknown Title"
+    return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title
   }
 
-  // Render not logged in state
-  if (!currentUser) {
-    return (
-      <div className="uMain-cont">
-        <h3 className="text-2xl font-medium text-arcadia-black mb-2">My Outstanding Fines</h3>
-        <div className="p-8 text-center bg-gray-50 rounded-lg border border-grey">
-          <h4 className="text-lg font-medium mb-2 text-gray-700">Please Log In</h4>
-          <p className="text-gray-500">You need to be logged in to view your outstanding fines.</p>
-        </div>
-      </div>
-    )
-  }
+  // Calculate total fines
+  const totalOverdueFines = overdueBooks.reduce((total, book) => total + book.fine_amount, 0)
+  const totalDamageFines = damagedBooks.reduce((total, book) => total + book.fine, 0)
+  const totalFines = totalOverdueFines + totalDamageFines
 
-  // Render no fines state
-  if (!finesSummary.hasFines) {
-    return (
-      <div className="uMain-cont">
-        <h3 className="text-2xl font-medium text-arcadia-black mb-2">My Outstanding Fines</h3>
-        <div className="p-8 text-center bg-gray-50 rounded-lg border border-grey">
-          <h4 className="text-lg font-medium mb-2 text-gray-700">No Outstanding Fines</h4>
-          <p className="text-gray-500">You don't have any outstanding fines at this time.</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Render fines state
   return (
     <div className="uMain-cont">
-      <h3 className="text-2xl font-medium text-arcadia-black mb-2">My Outstanding Fines</h3>
-      <p className="text-sm text-gray-600 mb-6">
-        Note: Additional fines are added per school day. Fines are not added when the ARC is closed.
-      </p>
+      <h3 className="text-2xl font-medium text-arcadia-black mb-6">My Outstanding Fines</h3>
 
       {/* Total fines summary */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-grey">
+      <div className="mb-6 p-4 bg-gray-100 rounded-lg border border-grey">
         <h4 className="text-lg font-medium mb-2">Summary</h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-3 bg-light-gray rounded border border-grey">
-            <p className="text-sm text-gray-500">Overdue Fines</p>
-            <p className="text-xl font-semibold">₱{finesSummary.totalOverdueFines.toFixed(2)}</p>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <p className="text-sm text-gray-600">Overdue Fines:</p>
+            <p className="text-lg font-semibold">₱{totalOverdueFines}</p>
           </div>
-          <div className="p-3 bg-light-gray rounded border border-grey">
-            <p className="text-sm text-gray-500">Damage Fines</p>
-            <p className="text-xl font-semibold">₱{finesSummary.totalDamageFines.toFixed(2)}</p>
+          <div>
+            <p className="text-sm text-gray-600">Damage Fines:</p>
+            <p className="text-lg font-semibold">₱{totalDamageFines.toFixed(2)}</p>
           </div>
-          <div className="p-3 bg-light-gray rounded border border-grey">
-            <p className="text-sm text-gray-500">Total Outstanding</p>
-            <p className="text-xl font-semibold text-arcadia-red">₱{finesSummary.totalFines.toFixed(2)}</p>
+          <div>
+            <p className="text-sm text-gray-600">Total Due:</p>
+            <p className="text-xl font-bold text-arcadia-red">₱{totalFines.toFixed(2)}</p>
           </div>
         </div>
       </div>
 
-      {/* Overdue Fines Section - Only show if there are overdue fines */}
-      {overdueFines.length > 0 && (
-        <div className="mb-8">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-            <h3 className="text-xl font-semibold">Overdue Books</h3>
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center space-x-2">
-                <span className="font-medium text-sm">Sort:</span>
-                <button
-                  className="px-3 py-1 bg-gray-200 border border-grey rounded-md text-sm w-32"
-                  onClick={() => setOverdueSortOrder(overdueSortOrder === "Descending" ? "Ascending" : "Descending")}
-                >
-                  {overdueSortOrder}
-                </button>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="font-medium text-sm">Filter:</span>
-                <select
-                  className="text-sm px-3 py-1 bg-gray-200 border border-grey rounded-md w-44"
-                  value={overdueSortBy}
-                  onChange={(e) => setOverdueSortBy(e.target.value)}
-                >
-                  <option value="fine_amount">Total Fine</option>
-                  <option value="overdue_days">Days Overdue</option>
-                  <option value="book_title">Book Title</option>
-                </select>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="font-medium text-sm">Entries:</span>
-                <select
-                  className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-20"
-                  value={overdueEntriesPerPage}
-                  onChange={(e) => {
-                    setOverdueEntriesPerPage(Number(e.target.value))
-                    setOverdueCurrentPage(1) // Reset to first page when entries per page changes
-                  }}
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                </select>
-              </div>
+      {/* Overdue Books Section */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="text-xl font-medium">Overdue Books</h4>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-sm">Sort:</span>
+              <button
+                onClick={() => setOverdueSortOrder(overdueSortOrder === "Ascending" ? "Descending" : "Ascending")}
+                className="border border-grey sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+              >
+                {overdueSortOrder}
+              </button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-sm">Sort By:</span>
+              <select
+                className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
+                value={overdueSortBy}
+                onChange={(e) => setOverdueSortBy(e.target.value)}
+              >
+                <option value="fine_amount">Fine Amount</option>
+                <option value="overdue_days">Days Overdue</option>
+                <option value="deadline">Deadline</option>
+              </select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-sm">Entries:</span>
+              <select
+                className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-20"
+                value={overdueEntriesPerPage}
+                onChange={(e) => setOverdueEntriesPerPage(Number(e.target.value))}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+              </select>
             </div>
           </div>
+        </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y">
-              <thead>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y">
+            <thead>
+              <tr>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Fine
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Days Overdue
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Book Title
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Barcode
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Checkout Date
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Deadline
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {loading ? (
                 <tr>
-                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fine
-                  </th>
-                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Days Overdue
-                  </th>
-                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Book Title
-                  </th>
-                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Book Barcode
-                  </th>
-                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Due Date
-                  </th>
+                  <td colSpan="6" className="px-4 py-2 text-center">
+                    Loading data...
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y">
-                {displayedOverdueFines.map((fine) => (
-                  <tr key={fine.transaction_id} className="hover:bg-light-gray">
-                    <td className="px-4 py-3 text-sm text-gray-900 text-center font-semibold">
-                      ₱{fine.fine_amount.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900 text-center">{fine.overdue_days} days</td>
+              ) : displayedOverdueBooks.length > 0 ? (
+                displayedOverdueBooks.map((book, index) => (
+                  <tr key={index} className="hover:bg-light-gray">
+                    <td className="px-4 py-3 text-sm text-gray-900 text-center">₱{book.fine_amount}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.overdue_days} days</td>
                     <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
-                      {fine.book_title_id ? (
+                      {book.titleID ? (
                         <Link
-                          to={`/user/bookview?titleID=${encodeURIComponent(fine.book_title_id)}`}
+                          to={`/user/bookview?titleID=${encodeURIComponent(book.titleID)}`}
                           className="text-blue-600 hover:underline"
                           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                         >
-                          {truncateText(fine.book_title)}
+                          {truncateTitle(book.bookTitle)}
                         </Link>
                       ) : (
-                        truncateText(fine.book_title)
+                        truncateTitle(book.bookTitle)
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900 text-center">{fine.book_barcode}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900 text-center">{formatDate(fine.deadline)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.checkoutDate}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.deadline}</td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination Controls for Overdue Fines */}
-          {overdueFines.length > 0 && (
-            <div className="flex justify-center items-center mt-2 space-x-4">
-              <button
-                className={`uPage-btn ${overdueCurrentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-                onClick={() => setOverdueCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={overdueCurrentPage === 1}
-              >
-                Previous Page
-              </button>
-              <span className="text-xs text-arcadia-red">
-                Page {overdueCurrentPage} of {overdueTotalPages}
-              </span>
-              <button
-                className={`uPage-btn ${
-                  overdueCurrentPage === overdueTotalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"
-                }`}
-                onClick={() => setOverdueCurrentPage((prev) => Math.min(prev + 1, overdueTotalPages))}
-                disabled={overdueCurrentPage === overdueTotalPages}
-              >
-                Next Page
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Damage Fines Section - Only show if there are damage fines */}
-      {damageFines.length > 0 && (
-        <div>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-            <h3 className="text-xl font-semibold">Fines Due To Damages</h3>
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center space-x-2">
-                <span className="font-medium text-sm">Sort:</span>
-                <button
-                  className="px-3 py-1 bg-gray-200 border border-grey rounded-md text-sm w-32"
-                  onClick={() => setDamageSortOrder(damageSortOrder === "Descending" ? "Ascending" : "Descending")}
-                >
-                  {damageSortOrder}
-                </button>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="font-medium text-sm">Filter:</span>
-                <select
-                  className="text-sm px-3 py-1 bg-gray-200 border border-grey rounded-md w-44"
-                  value={damageSortBy}
-                  onChange={(e) => setDamageSortBy(e.target.value)}
-                >
-                  <option value="fine">Fine Amount</option>
-                  <option value="book_title">Book Title</option>
-                </select>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="font-medium text-sm">Entries:</span>
-                <select
-                  className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-20"
-                  value={damageEntriesPerPage}
-                  onChange={(e) => {
-                    setDamageEntriesPerPage(Number(e.target.value))
-                    setDamageCurrentPage(1) // Reset to first page when entries per page changes
-                  }}
-                >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y">
-              <thead>
+                ))
+              ) : (
                 <tr>
-                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fine
-                  </th>
-                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Book Title
-                  </th>
-                  <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Book Barcode
-                  </th>
+                  <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
+                    {currentUser ? "No overdue books found." : "Please log in to view your overdue books."}
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y">
-                {displayedDamageFines.map((fine) => (
-                  <tr key={fine.transaction_id} className="hover:bg-light-gray">
-                    <td className="px-4 py-3 text-sm text-gray-900 text-center font-semibold">
-                      ₱{fine.fine.toFixed(2)}
-                    </td>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center items-center mt-2 space-x-4">
+          <button
+            className={`uPage-btn ${overduePage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+            onClick={() => setOverduePage((prev) => Math.max(prev - 1, 1))}
+            disabled={overduePage === 1 || displayedOverdueBooks.length === 0}
+          >
+            Previous Page
+          </button>
+          <span className="text-xs text-arcadia-red">
+            Page {overduePage} of {Math.max(1, Math.ceil(overdueBooks.length / overdueEntriesPerPage))}
+          </span>
+          <button
+            className={`uPage-btn ${
+              overduePage === Math.ceil(overdueBooks.length / overdueEntriesPerPage) || overdueBooks.length === 0
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-grey"
+            }`}
+            onClick={() =>
+              setOverduePage((prev) => Math.min(prev + 1, Math.ceil(overdueBooks.length / overdueEntriesPerPage)))
+            }
+            disabled={
+              overduePage === Math.ceil(overdueBooks.length / overdueEntriesPerPage) ||
+              displayedOverdueBooks.length === 0
+            }
+          >
+            Next Page
+          </button>
+        </div>
+      </div>
+
+      {/* Damaged Books Section */}
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h4 className="text-xl font-medium">Damaged Books</h4>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-sm">Sort:</span>
+              <button
+                onClick={() => setDamagedSortOrder(damagedSortOrder === "Ascending" ? "Descending" : "Ascending")}
+                className="border border-grey sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+              >
+                {damagedSortOrder}
+              </button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-sm">Sort By:</span>
+              <select
+                className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
+                value={damagedSortBy}
+                onChange={(e) => setDamagedSortBy(e.target.value)}
+              >
+                <option value="fine">Fine Amount</option>
+                <option value="bookTitle">Book Title</option>
+              </select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-sm">Entries:</span>
+              <select
+                className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-20"
+                value={damagedEntriesPerPage}
+                onChange={(e) => setDamagedEntriesPerPage(Number(e.target.value))}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y">
+            <thead>
+              <tr>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Fine
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Book Title
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Barcode
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {loading ? (
+                <tr>
+                  <td colSpan="3" className="px-4 py-2 text-center">
+                    Loading data...
+                  </td>
+                </tr>
+              ) : displayedDamagedBooks.length > 0 ? (
+                displayedDamagedBooks.map((book, index) => (
+                  <tr key={index} className="hover:bg-light-gray">
+                    <td className="px-4 py-3 text-sm text-gray-900 text-center">₱{book.fine.toFixed(2)}</td>
                     <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
-                      {fine.book_title_id ? (
+                      {book.titleID ? (
                         <Link
-                          to={`/user/bookview?titleID=${encodeURIComponent(fine.book_title_id)}`}
+                          to={`/user/bookview?titleID=${encodeURIComponent(book.titleID)}`}
                           className="text-blue-600 hover:underline"
                           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                         >
-                          {truncateText(fine.book_title)}
+                          {truncateTitle(book.bookTitle)}
                         </Link>
                       ) : (
-                        truncateText(fine.book_title)
+                        truncateTitle(book.bookTitle)
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900 text-center">{fine.book_barcode}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination Controls for Damage Fines */}
-          {damageFines.length > 0 && (
-            <div className="flex justify-center items-center mt-2 space-x-4">
-              <button
-                className={`uPage-btn ${damageCurrentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-                onClick={() => setDamageCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={damageCurrentPage === 1}
-              >
-                Previous Page
-              </button>
-              <span className="text-xs text-arcadia-red">
-                Page {damageCurrentPage} of {damageTotalPages}
-              </span>
-              <button
-                className={`uPage-btn ${
-                  damageCurrentPage === damageTotalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"
-                }`}
-                onClick={() => setDamageCurrentPage((prev) => Math.min(prev + 1, damageTotalPages))}
-                disabled={damageCurrentPage === damageTotalPages}
-              >
-                Next Page
-              </button>
-            </div>
-          )}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="px-4 py-2 text-center text-zinc-600">
+                    {currentUser ? "No damaged books found." : "Please log in to view your damaged books."}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center items-center mt-2 space-x-4">
+          <button
+            className={`uPage-btn ${damagedPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+            onClick={() => setDamagedPage((prev) => Math.max(prev - 1, 1))}
+            disabled={damagedPage === 1 || displayedDamagedBooks.length === 0}
+          >
+            Previous Page
+          </button>
+          <span className="text-xs text-arcadia-red">
+            Page {damagedPage} of {Math.max(1, Math.ceil(damagedBooks.length / damagedEntriesPerPage))}
+          </span>
+          <button
+            className={`uPage-btn ${
+              damagedPage === Math.ceil(damagedBooks.length / damagedEntriesPerPage) || damagedBooks.length === 0
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-grey"
+            }`}
+            onClick={() =>
+              setDamagedPage((prev) => Math.min(prev + 1, Math.ceil(damagedBooks.length / damagedEntriesPerPage)))
+            }
+            disabled={
+              damagedPage === Math.ceil(damagedBooks.length / damagedEntriesPerPage) ||
+              displayedDamagedBooks.length === 0
+            }
+          >
+            Next Page
+          </button>
+        </div>
+      </div>
+
+      {/* Note about fines */}
+      <div className="mt-6 text-sm text-gray-600">
+        <p>Note: Additional fines are added per school day. Fines are not added when the ARC is closed.</p>
+        <p>Please visit the library to settle your outstanding fines.</p>
+      </div>
     </div>
   )
 }

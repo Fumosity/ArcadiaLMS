@@ -85,7 +85,7 @@ export function AdminCredentials({ user = defaultUser }) {
         <div className="space-y-2">
           <div>
             <span className="text-sm text-dark-gray">School ID No.:</span>
-            <input type="text" value={formatStudentId(currentUser.schoolId)} className="inputBox w-full" readOnly />
+            <input type="text" value={currentUser.schoolId} className="inputBox w-full" readOnly />
           </div>
           <div>
             <span className="text-sm text-dark-gray">Department:</span>

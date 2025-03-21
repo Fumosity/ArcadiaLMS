@@ -215,7 +215,7 @@ const ListOfUserAcc = () => {
                         {user.name}
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-sm truncate text-center">{formatSchoolNo(user.schoolId)}</td>
+                    <td className="px-4 py-3 text-sm truncate text-center">{user.schoolId || "N/A"}</td>
                     <td className="px-4 py-3 text-sm truncate text-center">{user.college || "N/A"}</td>
                     <td className="px-4 py-3 text-sm truncate text-center">{user.department || "N/A"}</td>
                   </tr>

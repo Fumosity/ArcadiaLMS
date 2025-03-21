@@ -146,7 +146,7 @@ const ABCopiesHistory = ({ titleID }) => {
                         <span className="font-medium text-sm">Sort:</span>
                         <button
                             onClick={() => setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")}
-                            className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+                            className="sort-by bg-gray-200 border border-grey py-1 px-3 rounded-lg text-sm w-28"
                         >
                             {sortOrder}
                         </button>
@@ -156,7 +156,7 @@ const ABCopiesHistory = ({ titleID }) => {
                     <div className="flex items-center space-x-2">
                         <span className="font-medium text-sm">Type:</span>
                         <select
-                            className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-32"
+                            className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
                             value={typeFilter}
                             onChange={(e) => setTypeFilter(e.target.value)}
                         >
@@ -170,7 +170,7 @@ const ABCopiesHistory = ({ titleID }) => {
                     <div className="flex items-center space-x-2">
                         <span className="font-medium text-sm">Entries:</span>
                         <select
-                            className="bg-gray-200 py-1 px-3 border rounded-lg text-sm w-20"
+                            className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-20"
                             value={entriesPerPage}
                             onChange={(e) => setEntriesPerPage(Number(e.target.value))}
                         >
@@ -190,7 +190,7 @@ const ABCopiesHistory = ({ titleID }) => {
                     <input
                         type="text"
                         id="search"
-                        className="border border-gray-300 rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+                        className=" border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
                         placeholder="Title, borrower, or barcode"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
