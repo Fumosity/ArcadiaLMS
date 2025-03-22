@@ -30,12 +30,12 @@ export default function URegister() {
 
       <main className="relative flex-1 flex justify-center items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
         <div className="userContent-container flex justify-center items-center">
-          {step === "agreement" && <Agreement onContinue={() => setStep("privacy")} />}
+          {step === "agreement" && <Agreement onContinue={() => setStep("register")} />}
           {step === "privacy" && (
             <DataPrivacy onContinue={() => setStep("register")} onBack={() => setStep("agreement")} />
           )}
           {step === "register" && (
-            <RegisterForm userData={userData} onBack={() => setStep("privacy")} onRegister={handleRegister} />
+            <RegisterForm userData={userData} onBack={() => setStep("agreement")} onRegister={handleRegister} />
           )}
           {step === "interests" && (
             <UserInterests userData={userData} onBack={() => setStep("register")} onContinue={handleContinue} />

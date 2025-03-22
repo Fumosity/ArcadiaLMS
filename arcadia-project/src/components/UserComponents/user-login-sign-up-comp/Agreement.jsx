@@ -17,16 +17,24 @@ export default function Agreement({ onContinue }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!termsAccepted || !privacyAccepted) {
+
+        if (!privacyAccepted) {
             alert(
-                "Please accept both Terms and Conditions and Data Privacy Agreement to continue."
+                "Please accept Data Privacy Agreement to continue."
             );
             return;
         }
+        // if (!termsAccepted || !privacyAccepted) {
+        //     alert(
+        //         "Please accept both Terms and Conditions and Data Privacy Agreement to continue."
+        //     );
+        //     return;
+        // }
         // Your logic here after successful submission
     };
 
-    const isContinueEnabled = termsAccepted && privacyAccepted;
+    const isContinueEnabled = privacyAccepted;
+    // const isContinueEnabled = termsAccepted && privacyAccepted;
 
     return (
         <div className="uMain-cont flex max-h-auto max-w-[950px] h-full w-full bg-white">
@@ -94,7 +102,7 @@ export default function Agreement({ onContinue }) {
                 </div>
 
                 {/* Terms and Conditions Checkbox (assuming you have something similar elsewhere) */}
-                <div className="flex items-center mb-4">
+                {/* <div className="flex items-center mb-4">
                     <input
                         type="checkbox"
                         id="terms"
@@ -105,7 +113,7 @@ export default function Agreement({ onContinue }) {
                     <label htmlFor="terms" className="text-black text-sm">
                         I agree to the Terms and Conditions
                     </label>
-                </div>
+                </div> */}
 
                 <div className="flex justify-center items-center gap-4">
                     <Link to="/user/login" className="registerBtn">
