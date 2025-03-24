@@ -1,26 +1,36 @@
-import React, { useState } from "react";
-import { supabase } from "/src/supabaseClient.js";
-import { useUser } from "../../../backend/UserContext"; // Adjust the path if necessary
+import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
+import { supabase } from "/src/supabaseClient.js"
+import { useUser } from "../../../backend/UserContext" // Adjust the path if necessary
 
 const MakeReport = () => {
-  const [type, setType] = useState("select-type");
-  const [subject, setSubject] = useState("");
-  const [content, setContent] = useState("");
-  const { user } = useUser(); // Access the logged-in user
+  const [searchParams] = useSearchParams()
+  const [type, setType] = useState("select-type")
+  const [subject, setSubject] = useState("")
+  const [content, setContent] = useState("")
+  const { user } = useUser() // Access the logged-in user
+
+  // Set default values from query parameters
+  useEffect(() => {
+    const defaultType = searchParams.get("type")
+    const defaultSubject = searchParams.get("subject")
+    if (defaultType) setType(defaultType)
+    if (defaultSubject) setSubject(defaultSubject)
+  }, [searchParams])
 
   const handleSubmit = async () => {
     if (type === "select-type" || !subject || !content) {
-      alert("Please fill out all fields.");
-      return;
+      alert("Please fill out all fields.")
+      return
     }
 
     if (!user) {
-      alert("You need to log in first.");
-      return;
+      alert("You need to log in first.")
+      return
     }
 
-    const date = new Date().toLocaleDateString();
-    const time = new Date().toLocaleTimeString();
+    const date = new Date().toLocaleDateString()
+    const time = new Date().toLocaleTimeString()
 
     const { error } = await supabase.from("report_ticket").insert([
       {
@@ -32,18 +42,18 @@ const MakeReport = () => {
         content,
         userID: user.userID, // Get the userID from the logged-in user object
       },
-    ]);
+    ])
 
     if (error) {
-      console.error("Error submitting report:", error);
-      alert("Failed to submit the report. Please try again.");
+      console.error("Error submitting report:", error)
+      alert("Failed to submit the report. Please try again.")
     } else {
-      alert("Report submitted successfully!");
-      setType("select-type");
-      setSubject("");
-      setContent("");
+      alert("Report submitted successfully!")
+      setType("select-type")
+      setSubject("")
+      setContent("")
     }
-  };
+  }
 
   return (
     <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
@@ -55,11 +65,21 @@ const MakeReport = () => {
           value={type}
           onChange={(e) => setType(e.target.value)}
         >
-          <option value="select-type" className="text-center text-grey">Select Type</option>
-          <option value="System" className="text-center">System</option>
-          <option value="System" className="text-center">Feedback</option>
-          <option value="Book" className="text-center">Book</option>
-          <option value="Feedback" className="text-center">Research</option>
+          <option value="select-type" className="text-center text-grey">
+            Select Type
+          </option>
+          <option value="System" className="text-center">
+            System
+          </option>
+          <option value="Feedback" className="text-center">
+            Feedback
+          </option>
+          <option value="Book" className="text-center">
+            Book
+          </option>
+          <option value="Research" className="text-center">
+            Research
+          </option>
         </select>
 
         <label className="text-sm ml-4 mr-2 font-semibold">Subject:</label>
@@ -87,7 +107,8 @@ const MakeReport = () => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MakeReport;
+export default MakeReport
+
