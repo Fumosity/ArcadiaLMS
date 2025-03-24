@@ -125,7 +125,7 @@ const ReportStatus = ({ onReportSelect }) => {
         <h2 className="text-2xl font-semibold">User Report Status</h2>
       </div>
       <p className="text-md mb-4">
-        These are all the user reports that you have made. Click on the report ID to view the contents of the report and
+        These are all the user reports that you have made. Click on the Report <b>Subject</b> or <b>ID</b> to view the contents of the report and
         the ARC's reply.
       </p>
 

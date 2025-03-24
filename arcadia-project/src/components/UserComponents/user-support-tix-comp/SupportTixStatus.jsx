@@ -125,7 +125,7 @@ const SupportTixStatus = ({ onSupportSelect }) => {
         <h2 className="text-2xl font-semibold">User Support Status</h2>
       </div>
       <p className="text-md mb-4">
-        These are all the user supports that you have made. Click on the subject to view the contents of the support and
+        These are all the user supports that you have made. Click on the Support <b>Subject</b> or <b>ID</b> to view the contents of the support and
         the ARC's reply.
       </p>
 

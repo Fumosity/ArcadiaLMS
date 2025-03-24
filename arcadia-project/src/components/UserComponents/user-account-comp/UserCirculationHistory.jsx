@@ -79,7 +79,7 @@ const UserCirculationHistory = () => {
         const formattedData = data.map((item) => {
           const date = item.checkinDate || item.checkoutDate
           const time = item.checkinTime || item.checkoutTime
-        
+
           // Format date to "Month Day, Year" format
           let formattedDate = null
           if (date) {
@@ -91,12 +91,12 @@ const UserCirculationHistory = () => {
               day: "numeric",
             })
           }
-        
+
           let formattedTime = null
           if (time) {
             // Ensure time is in the format HH:mm (24-hour format)
             const timeString = time.includes(":") ? time : `${time.slice(0, 2)}:${time.slice(2)}`
-        
+
             // Convert time into 12-hour format with AM/PM, no 'Z' for local time
             formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString("en-PH", {
               hour: "numeric",
@@ -104,14 +104,16 @@ const UserCirculationHistory = () => {
               hour12: true,
             })
           }
-        
+
           const bookIndiv = item.book_indiv || {}
           const bookTitles = bookIndiv.book_titles || {}
-        
+
           return {
             type: item.transactionType || "Unknown",
             date: formattedDate || "N/A", // Use formattedDate here
             time: formattedTime || "N/A",
+            rawDate: date || "", // Store the original date for sorting
+            rawTime: time || "", // Store the original time for sorting
             bookTitle: bookTitles.title || "Unknown Title",
             bookBarcode: bookIndiv.bookBarcode || item.bookBarcode || "N/A",
             titleID: bookTitles.titleID,
@@ -132,15 +134,21 @@ const UserCirculationHistory = () => {
 
   // Handle sorting
   const sortedData = [...circulationHistory].sort((a, b) => {
-    // Get the book titles, defaulting to empty strings if undefined
-    const titleA = (a.bookTitle || "").toLowerCase()
-    const titleB = (b.bookTitle || "").toLowerCase()
+    // Get the dates and times for comparison
+    const dateA = a.rawDate || ""
+    const dateB = b.rawDate || ""
+    const timeA = a.rawTime || ""
+    const timeB = b.rawTime || ""
+
+    // Combine date and time for more accurate sorting
+    const dateTimeA = `${dateA} ${timeA}`
+    const dateTimeB = `${dateB} ${timeB}`
 
     // Sort based on the current sort order
     if (sortOrder === "Ascending") {
-      return titleA.localeCompare(titleB)
+      return dateTimeA.localeCompare(dateTimeB)
     } else {
-      return titleB.localeCompare(titleA)
+      return dateTimeB.localeCompare(dateTimeA)
     }
   })
 

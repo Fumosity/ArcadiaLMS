@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useCallback } from "react"
 import { supabase } from "/src/supabaseClient.js"
 import Skeleton from "react-loading-skeleton"
@@ -64,15 +62,15 @@ const AccountRequests = () => {
 
   // Handle sorting
   const sortedData = [...reservations].sort((a, b) => {
-    // Get the book titles, defaulting to empty strings if undefined
-    const titleA = (a.book_titles?.title || "").toLowerCase()
-    const titleB = (b.book_titles?.title || "").toLowerCase()
+    // Get the dates, defaulting to empty strings if undefined
+    const dateA = a.date || ""
+    const dateB = b.date || ""
 
     // Sort based on the current sort order
     if (sortOrder === "Ascending") {
-      return titleA.localeCompare(titleB)
+      return dateA.localeCompare(dateB)
     } else {
-      return titleB.localeCompare(titleA)
+      return dateB.localeCompare(dateA)
     }
   })
 
