@@ -11,7 +11,7 @@ const ReportStatus = ({ onReportSelect }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [entriesPerPage, setEntriesPerPage] = useState(5)
   const [searchTerm, setSearchTerm] = useState("")
-  const [sortOrder, setSortOrder] = useState("Ascending")
+  const [sortOrder, setSortOrder] = useState("Descending")
   const [typeFilter, setTypeFilter] = useState("All")
   const [statusFilter, setStatusFilter] = useState("All")
 

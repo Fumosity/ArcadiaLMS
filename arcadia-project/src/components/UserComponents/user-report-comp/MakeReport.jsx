@@ -52,6 +52,7 @@ const MakeReport = () => {
       setType("select-type")
       setSubject("")
       setContent("")
+      window.location.href = "/user/support/reportticket"
     }
   }
 

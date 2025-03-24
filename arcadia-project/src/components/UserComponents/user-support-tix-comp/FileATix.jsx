@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom"
 import { supabase } from "/src/supabaseClient.js";
 
 const FileATix = () => {
@@ -59,6 +59,7 @@ const FileATix = () => {
             setType("select-type");
             setSubject("");
             setContent("");
+            window.location.href = "/user/support/supportticket"
         }
     };
 
