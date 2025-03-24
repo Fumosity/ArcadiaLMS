@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { supabase } from "../../../supabaseClient"
+import { supabase } from "../supabaseClient"
 
 const periods = [
   "07:00 - 08:00",
@@ -13,10 +13,10 @@ const periods = [
   "03:00 - 04:00",
   "04:00 - 05:00",
 ]
-const rooms = ["A701-A", "A701-B", "A701-C","A701-D"]
+const rooms = ["A701-A", "A701-B", "A701-C", "A701-D"]
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
-export default function CurrentReservations() {
+export default function ACurrentReserv() {
   // Create a date object for the current date in the user's local timezone
   const today = new Date()
   // Ensure we're working with the current date by setting to midnight in local timezone
@@ -114,7 +114,7 @@ export default function CurrentReservations() {
   })
 
   return (
-    <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
+    <div className="uHero-cont max-w-[1500px] w-full p-6 bg-white rounded-lg border border-grey">
       <h2 className="text-2xl font-semibold mb-6">Room Reservations</h2>
 
       <div className="flex flex-col md:flex-row gap-8">
@@ -187,7 +187,7 @@ export default function CurrentReservations() {
               const month = String(date.getMonth() + 1).padStart(2, "0")
               const day = String(date.getDate()).padStart(2, "0")
               const dateString = `${year}-${month}-${day}`
-
+            
               const isPast = date < today
               const isSunday = date.getDay() === 0
               const isToday = date.getTime() === today.getTime()
@@ -206,7 +206,7 @@ export default function CurrentReservations() {
               }
 
               if (isPast || isSunday) {
-                dayClasses += " text-gray-400 cursor-not-allowed" // Disable past dates and Sundays
+                dayClasses += " text-grey cursor-not-allowed" // Disable past dates and Sundays
               } else {
                 dayClasses += " cursor-pointer" // Enable clickable dates
               }

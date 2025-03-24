@@ -54,17 +54,31 @@ const BookRequests = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
-        return "bg-yellow text-yellow-800";
+        return "bg-yellow text-black";
       case "Approved":
-        return "bg-green text-green-800";
+        return "bg-green text-black";
       case "Rejected":
-        return "bg-red text-red-800";
+        return "bg-red text-black";
       default:
         return "bg-gray-200 text-gray-800";
     }
   };
 
-  
+  const handleUserClick = (user) => {
+    console.log("userid", book.userId, "user", book.borrower, book)
+    navigate("/admin/useraccounts/viewusers", {
+      state: { userId: user.userID, user: user },
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBookClick = (book) => {
+    navigate("/admin/bookinventory/viewbook", {
+      state: { titleID: book.titleID, book: book },
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg border-grey border h-fit">
       <h3 className="text-2xl font-semibold mb-4">User Book Requests</h3>
@@ -118,12 +132,20 @@ const BookRequests = () => {
               displayedReservations.map((reservation, index) => (
                 <tr key={index} className="hover:bg-light-gray cursor-pointer">
                   <td className="px-4 py-2 text-sm text-black text-center">{reservation.bookResID}</td>
-                  <td className="px-4 py-2 text-sm text-black text-center">
+                  <td
+                    className="px-4 py-2 text-sm text-black text-center cursor-pointer text-blue-600 hover:underline"
+                    onClick={() => handleUserClick(reservation.user_accounts)}
+                  >
                     {reservation.user_accounts.userFName} {reservation.user_accounts.userLName}
                   </td>
-                  <td className="px-4 py-2 text-sm text-black text-center">{reservation.book.title}</td>
+                  <td
+                    className="px-4 py-2 text-sm text-black text-center cursor-pointer text-blue-600 hover:underline"
+                    onClick={() => handleBookClick(reservation.book)}
+                  >
+                    {reservation.book.title}
+                  </td>
                   <td className="px-4 py-2 text-sm text-black text-center">{reservation.date}</td>
-                  <td className={`px-4 py-2 text-sm text-center rounded-full ${getStatusColor(reservation.status)}`}>
+                  <td className={`flex items-center justify-center mt-2 mb-2 text-sm font-medium rounded-full px-1 py-2 ${getStatusColor(reservation.status)}`}>
                     {reservation.status}
                   </td>
                 </tr>

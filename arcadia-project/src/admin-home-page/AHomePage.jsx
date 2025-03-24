@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import AccessTable from '../components/admin-home-page-comp/AccessTable';
+import AccessTable from '../components/admin-home-page-comp/HomeShortcutButtons';
 import TodayReserv from '../components/admin-reserv-comp/TodayReserv';
 import BCHistory from '../components/admin-book-circ-pg-comp/BCHistory';
 import RoomReserv from '../components/admin-lib-analytics-comp/RoomReserv';

@@ -105,7 +105,7 @@ export default function ARoomBooking({ addReservation }) {
           draggable: true,
           progress: undefined,
           theme: "colored",
-          className: "bg-yellow-500 text-white",
+          className: "bg-yellow text-white",
         })
         return true
       }
@@ -114,7 +114,7 @@ export default function ARoomBooking({ addReservation }) {
     } catch (error) {
       console.error(error.message)
       toast.error("Error checking existing reservations", {
-        position: "top-right",
+        position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -122,13 +122,90 @@ export default function ARoomBooking({ addReservation }) {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        className: "bg-red-600 text-white",
+        className: "bg-red text-white",
       })
       return false
     }
   }
 
+  const isSunday = (date) => {
+    const selectedDay = new Date(date).getDay(); // 0 = Sunday
+    return selectedDay === 0;
+  };
+
   const handleFormSubmit = async () => {
+
+    const now = new Date();
+    const selectedDateTime = new Date(`${formData.date}T${formData.startTime}`);
+    const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
+
+
+    if (selectedDateTime < now) {
+      toast.warn("You cannot book a past date or time!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        className: "bg-yellow text-white",
+      });
+      return;
+    }
+
+    const startHour = parseInt(formData.startTime.split(":")[0], 10);
+    const endHour = parseInt(formData.endTime.split(":")[0], 10);
+
+    if (endDateTime <= selectedDateTime) {
+      toast.error("End time must be after the start time!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        className: "bg-red text-white",
+      });
+      return;
+    }
+
+    if (isSunday(formData.date)) {
+      toast.error("Bookings are not allowed on Sundays!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        className: "bg-red text-white",
+      });
+      return;
+    }
+
+    // Validate booking hours (07:00 - 17:00)
+    if (startHour < 7 || endHour > 17) {
+      toast.error("Bookings are only allowed from 7:00 AM to 5:00 PM!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        className: "bg-red text-white",
+      });
+      return;
+    }
+
+
+
     if (
       !formData.userId ||
       !formData.schoolId ||
@@ -141,7 +218,7 @@ export default function ARoomBooking({ addReservation }) {
       !formData.title
     ) {
       toast.error("Please fill in all required fields.", {
-        position: "top-right",
+        position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -149,7 +226,7 @@ export default function ARoomBooking({ addReservation }) {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        className: "bg-red-600 text-white",
+        className: "bg-red text-white",
       })
       return
     }
@@ -169,13 +246,24 @@ export default function ARoomBooking({ addReservation }) {
 
     addReservation(newEvent)
 
+    const formatTimeTo12Hour = (time24) => {
+      const [hour, minute] = time24.split(":");
+      const date = new Date();
+      date.setHours(hour, minute);
+      return date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    };
+    
     const reserveData = {
       room: formData.room,
       date: formData.date,
-      startTime: formData.startTime,
-      endTime: formData.endTime,
+      startTime: formatTimeTo12Hour(formData.startTime), 
+      endTime: formatTimeTo12Hour(formData.endTime),     
       title: formData.title,
-    }
+    };
 
     try {
       const { data, error } = await supabase.from("reservation").insert({
@@ -186,7 +274,7 @@ export default function ARoomBooking({ addReservation }) {
       if (error) {
         console.error("Error saving reservation:", error.message)
         toast.error("Error saving reservation", {
-          position: "top-right",
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -194,12 +282,12 @@ export default function ARoomBooking({ addReservation }) {
           draggable: true,
           progress: undefined,
           theme: "colored",
-          className: "bg-red-600 text-white",
+          className: "bg-red text-white",
         })
       } else {
         console.log("Reservation successfully saved:", data)
         toast.success("Reservation successfully saved", {
-          position: "top-right",
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -207,13 +295,16 @@ export default function ARoomBooking({ addReservation }) {
           draggable: true,
           progress: undefined,
           theme: "colored",
-          className: "bg-green-600 text-white",
+          className: "bg-green text-white",
         })
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       }
     } catch (error) {
       console.error("Error while submitting reservation:", error.message)
       toast.error("Error while submitting reservation", {
-        position: "top-right",
+        position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -221,7 +312,7 @@ export default function ARoomBooking({ addReservation }) {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        className: "bg-red-600 text-white",
+        className: "bg-red text-white",
       })
     }
   }
@@ -301,7 +392,7 @@ export default function ARoomBooking({ addReservation }) {
         {/* Right Section */}
         <div className="space-y-2 flex-1">
           <div className="flex items-center">
-            <span className="w-1/3 text-md capitalize">Department:</span>
+            <span className="w-1/3 text-md capitalize">Room: </span>
             <div className="w-2/3 flex items-center">
               <select
                 name="room"

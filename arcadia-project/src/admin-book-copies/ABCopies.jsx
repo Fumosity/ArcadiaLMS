@@ -44,12 +44,12 @@ const ABCopies = () => {
 
         setFormData(newFormData);
         setOriginalFormData(newFormData);
-        setIsAddMode(false); // Set to edit mode
+        setIsAddMode(false); 
 
     };
 
     const handleAddCopy = async () => {
-        setIsAddMode(true); // Set to add mode
+        setIsAddMode(true); 
         setOriginalFormData(null);
 
 

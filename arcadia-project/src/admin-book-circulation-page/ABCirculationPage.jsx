@@ -1,13 +1,13 @@
 import React from "react"
-import BorrowedBks from "../components/admin-book-circ-pg-comp/BorrowedBks"
-import AccessTable from "../components/admin-home-page-comp/AccessTable"
+import AccessTable from "../components/admin-home-page-comp/HomeShortcutButtons"
 import BCHistory from "../components/admin-book-circ-pg-comp/BCHistory"
-import ReturnedBks from "../components/admin-book-circ-pg-comp/ReturnedBks"
 import OverdueBks from "../components/admin-book-circ-pg-comp/OverdueBks"
 import BksDueTdy from "../components/admin-book-circ-pg-comp/BksDueTdy"
 import Title from "../components/main-comp/Title"
 import SBOverdue from "../components/admin-system-reports-comp/SBOverdue"
 import DamagedBks from "../components/admin-book-circ-pg-comp/DamagedBks"
+import HomeShortcutButtons from "../components/admin-home-page-comp/HomeShortcutButtons"
+import BCSideButtons from "../components/admin-book-circ-pg-comp/BCSideButtons"
 
 export default function ABCirculationPage() {
   // Check if there's a hash in the URL and scroll to it after render
@@ -31,10 +31,6 @@ export default function ABCirculationPage() {
           <div id="history">
             <BCHistory />
           </div>
-          <div id="borrowed-books">
-          </div>
-          <div id="returned-books">
-          </div>
           <div id="overdue-books">
             <OverdueBks />
           </div>
@@ -44,7 +40,7 @@ export default function ABCirculationPage() {
         </div>
 
         <div className="flex flex-col items-start flex-shrink-0 w-1/4 space-y-2">
-          <AccessTable />
+          <BCSideButtons />
           <BksDueTdy />
           <SBOverdue />
         </div>

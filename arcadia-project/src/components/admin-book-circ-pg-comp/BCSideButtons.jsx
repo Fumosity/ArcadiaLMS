@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const AccessTable = () => {
+const BCSideButtons = () => {
   const navigate = useNavigate();
 
   const actions = [
@@ -26,4 +26,4 @@ const AccessTable = () => {
   );
 };
 
-export default AccessTable;
+export default BCSideButtons;

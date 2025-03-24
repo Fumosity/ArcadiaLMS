@@ -1,6 +1,6 @@
 import React from "react";
 import RcntLibVisit from "../components/admin-user-acc-comp/RcntLibVisit";
-import AccessTable from "../components/admin-home-page-comp/AccessTable";
+import AccessTable from "../components/admin-home-page-comp/HomeShortcutButtons";
 import Title from "../components/main-comp/Title";
 import ListOfAdminAcc from "../components/admin-user-acc-comp/ListOfAdminAcc";
 import ListOfUserAcc from "../components/admin-user-acc-comp/ListOfUserAcc";

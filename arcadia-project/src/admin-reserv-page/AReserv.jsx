@@ -6,6 +6,8 @@ import Title from "../components/main-comp/Title";
 import ARoomBooking from "../components/admin-room-reserv-comp/ARoomBooking";
 import ARoomReservations from "../components/admin-room-reserv-comp/ARoomReservations";
 import { ToastContainer } from "react-toastify";
+import RoomReserv from "../components/admin-lib-analytics-comp/RoomReserv";
+import ACurrentReserv from "./ACurrentReserv";
 
 const AReserv = () => {
   const [events, setEvents] = useState([]);
@@ -50,16 +52,15 @@ const AReserv = () => {
     <div className="min-h-screen bg-white">
       <Title>Reservations</Title>
       <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
-
-        <div className="flex-shrink-0 w-3/4 space-y-2">
-          <div id="room-reserv">
-            <ReservSupport />
-          </div>
+        <div className="flex-shrink-0 w-3/4 space-y-3">
           <div id="room-booking">
             <ARoomBooking addReservation={addReservation} />
           </div>
           <div id="reserved-rooms">
-            <ARoomReservations events={events} />
+            <ACurrentReserv/>
+          </div>
+          <div id="reserved-rooms">
+            <RoomReserv />
           </div>
             <ToastContainer />
         </div>

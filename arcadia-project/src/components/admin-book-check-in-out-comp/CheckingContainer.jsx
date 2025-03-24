@@ -38,8 +38,8 @@ const CheckingContainer = () => {
     name: "",
     college: "",
     department: "",
-    bookBarcode: "",
     bookTitle: "",
+    bookBarcode: "",
     date: new Date().toISOString().split("T")[0], // Store date in YYYY-MM-DD format
     time: getLocalTime(), // Set the initial value to the PC's local time
     deadline: "", // Initialize deadline as empty
@@ -378,6 +378,7 @@ const CheckingContainer = () => {
               Checking In
             </label>
           </div>
+          
           <div className="grid grid-cols-1 gap-2 mb-4">
             {Object.entries(formData).map(([key, value]) => {
               let label = key.replace(/([A-Z])/g, " $1")

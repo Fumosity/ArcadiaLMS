@@ -336,7 +336,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                   <tr
                     key={index}
                     className={`hover:bg-light-gray cursor-pointer ${
-                      selectedBook?.titleID === item.titleID ? "bg-gray-200" : ""
+                      selectedBook?.titleID === item.titleID ? "bg-grey" : ""
                     }`}
                     onClick={() => handleRowClick(item)}
                   >
