@@ -21,13 +21,16 @@ const ARAdding = ({ formData, setFormData }) => {
   const [pageCount, setPageCount] = useState(0);
 
   const collegeDepartmentMap = {
-    "CAMS": [""],
-    "CLAE": [""],
-    "CBA": [""],
     "COECSA": ["DOA", "DCS", "DOE"],
-    "CFAD": [""],
+    "CLAE": [""],
     "CITHM": [""],
-    "CON": [""]
+    "CAMS": [""],
+    "CON": [""],
+    "CBA": [""],
+    "LAW": [""],
+    "CFAD": [""],
+    "IS": ["JHS", "SHS"],
+    "Graduate School": [""],
   };
 
   //Aggregates form inputs
@@ -358,6 +361,27 @@ const ARAdding = ({ formData, setFormData }) => {
                       onChange={handleChange}
                     >
                       <option value="">Select a department</option>
+                      {departmentOptions.map((department) => (
+                        <option key={department} value={department}>
+                          {department}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {formData.college === "IS" && (
+                <div className="flex justify-between items-center">
+                  <label className="w-1/4">High School Level:</label>
+                  <div className="select-dropdown-wrapper w-2/3">
+                    <select
+                      name="department"
+                      className="w-full px-3 py-1 rounded-full border border-grey"
+                      value={formData.department}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select level</option>
                       {departmentOptions.map((department) => (
                         <option key={department} value={department}>
                           {department}

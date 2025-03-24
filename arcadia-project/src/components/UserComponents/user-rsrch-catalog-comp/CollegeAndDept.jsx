@@ -48,6 +48,7 @@ export default function CollegeAndDept() {
   // Fetch departments based on selected college
   const fetchDepartments = async (college) => {
     try {
+
       let query = supabase.from("research").select("department").not("department", "is", null)
 
       // If a college is selected (and not "All"), filter by that college
@@ -88,7 +89,7 @@ export default function CollegeAndDept() {
 
       {/* College Dropdown */}
       <div className="mb-2">
-        <label className="text-sm font-semibold block mb-1">College:</label>
+        <label className="text-sm font-semibold block mb-1">Programs:</label>
         <div className="relative w-full">
           <select
             className="text-sm rounded-xl border border-grey bg-white focus:outline-none focus:ring-0 appearance-none px-4 py-2 w-full"
@@ -128,7 +129,7 @@ export default function CollegeAndDept() {
       </div>
 
       {/* Department Dropdown (Only Visible if the selected college is COECSA or IS) */}
-      {(selectedCollege === "COECSA" || selectedCollege === "IS") && (
+      {(selectedCollege === "COECSA") && (
         <div className="mb-2">
           <label className="text-sm font-semibold block mb-1">Department:</label>
           <div className="relative w-full">
@@ -168,7 +169,51 @@ export default function CollegeAndDept() {
             </span>
           </div>
         </div>
-      )}
+      )
+    }
+      {(selectedCollege === "IS") && (
+        <div className="mb-2">
+          <label className="text-sm font-semibold block mb-1">High School Level:</label>
+          <div className="relative w-full">
+            <select
+              className="text-sm rounded-xl border border-grey bg-white focus:outline-none focus:ring-0 appearance-none px-4 py-2 w-full"
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+            >
+              <option value="">All</option>
+              {loading ? (
+                <option value="" disabled>
+                  Loading high school levels...
+                </option>
+              ) : (
+                departments.map((department) => (
+                  <option key={department} value={department}>
+                    {department}
+                  </option>
+                ))
+              )}
+            </select>
+
+            {/* Custom dropdown arrow */}
+            <span className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+              <svg
+                className="w-4 h-4 text-black"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      )
+
+      }
     </div>
   )
 }

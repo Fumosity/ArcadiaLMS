@@ -31,7 +31,7 @@ export function useRegisterForm(onBack, onRegister, userData) {
   const [isChecking, setIsChecking] = useState(false)
   const [isPasswordHashed, setIsPasswordHashed] = useState(false)
 
-  const colleges = ["COECSA", "CITHM", "CAMS", "CON", "CBA", "Law", "IS", "ASP", "Graduate School"]
+  const colleges = ["CLAE", "CFAD", "COECSA", "CITHM", "CAMS", "CON", "CBA", "LAW", "IS", "ASP", "Graduate School"]
 
   const departments = {
     COECSA: ["DCS", "DOA", "DOE"],
@@ -40,7 +40,8 @@ export function useRegisterForm(onBack, onRegister, userData) {
     CAMS: [],
     CON: [],
     CBA: [],
-    Law: [],
+    LAW: [],
+    CFAD: [],
     IS: ["JHS", "SHS"],
     ASP: [],
     "Graduate School": [],

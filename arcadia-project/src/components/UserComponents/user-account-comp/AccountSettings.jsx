@@ -54,7 +54,6 @@ export const AccountSettings = ({ options = settingsOptions }) => {
     } else if (option.action === "openChangePassModal") {
       setIsChangePassModalOpen(true)
     } else if (option.path) {
-      // Use React Router's navigate instead of window.location.href
       const queryParams = new URLSearchParams(option.params).toString()
       navigate(`${option.path}?${queryParams}`)
       window.scrollTo({ top: 0, behavior: "smooth" })
