@@ -4,7 +4,9 @@ import CurrentBookInventory from "../components/admin-book-inventory-comp/Curren
 import BookPreviewInv from "../components/admin-book-inventory-comp/BookPreviewInventory";
 import Title from "../components/main-comp/Title";
 import ExcellentExport from "excellentexport";
-import {supabase} from "../supabaseClient";
+import { supabase } from "../supabaseClient";
+import SelectFormat from "../z_modals/confirmation-modals/SelectFormat";
+
 
 const ABInventory = () => {
   const navigate = useNavigate(); // Initialize useNavigate
@@ -15,47 +17,104 @@ const ABInventory = () => {
     setSelectedBook(book); // Update selected book
   };
 
+  const [showModal, setShowModal] = useState(false);
+
+  const handleExportClick = () => {
+    setShowModal(true);
+  };
+
+  const handleExport = (format) => {
+    if (format === "xlsx") {
+      exportAsXLSX();
+    } else {
+      exportAsCSV();
+    }
+    setShowModal(false);
+  };
+
   const exportAsXLSX = async () => {
     const table = document.createElement("table");
+    const currentDate = new Date().toISOString().split('T')[0];
 
     const headerRow = table.insertRow();
-    const headers = ["Title Call No.", "Title", "Author", "Publisher", "ISBN", "Current Pub Date", "Original Pub Date", "Procurement Date", "Price"];
+    const headers = ["Research Call No.", "Title", "Author", "College", "Department", "PubDate"];
     headers.forEach(header => {
-        const cell = headerRow.insertCell();
-        cell.textContent = header;
+      const cell = headerRow.insertCell();
+      cell.textContent = header;
     });
 
     const { data, error } = await supabase
-        .from('book_titles')
-        .select("titleCallNum, title, author, publisher, isbn, currentPubDate, originalPubDate, procurementDate, price");
+      .from('research')
+      .select("researchCallNum, title, author, college, department, pubDate");
 
     if (error) {
-        console.error("Error fetching book inventory:", error);
-        return;
+      console.error("Error fetching book inventory:", error);
+      return;
     }
 
-    data.forEach(book => {
-        const row = table.insertRow();
-        row.insertCell().textContent = book.titleCallNum;
-        row.insertCell().textContent = book.title;
-        row.insertCell().textContent = book.author;
-        row.insertCell().textContent = book.publisher;
-        row.insertCell().textContent = book.isbn;
-        row.insertCell().textContent = book.currentPubDate;
-        row.insertCell().textContent = book.originalPubDate;
-        row.insertCell().textContent = book.procurementDate;
-        row.insertCell().textContent = book.price;
+    data.forEach(research => {
+      const row = table.insertRow();
+      row.insertCell().textContent = research.researchCallNum;
+      row.insertCell().textContent = research.title; research
+      row.insertCell().textContent = research.author;
+      row.insertCell().textContent = research.college;
+      row.insertCell().textContent = research.department;
+      row.insertCell().textContent = research.pubDate;
     });
 
     const link = document.createElement("a");
     document.body.appendChild(link);
     ExcellentExport.convert(
-      { anchor: link, filename: `BookInventory_${currentDate}`, format: "xlsx" },
-        [{ name: "Book Inventory", from: { table } }]
+      { anchor: link, filename: `Research_Inventory${currentDate}`, format: "xlsx" },
+      [{ name: "Research Inventory", from: { table } }]
     );
     link.click();
     document.body.removeChild(link);
-};
+  };
+
+  const exportAsCSV = async () => {
+    const { data, error } = await supabase
+      .from("book_titles")
+      .select("titleCallNum, title, author, publisher, isbn, currentPubDate, originalPubDate, procurementDate");
+
+    if (error) {
+      console.error("Error fetching book inventory:", error);
+      return;
+    }
+
+    const currentDate = new Date().toISOString().split("T")[0];
+
+    // Define CSV headers
+    const headers = [
+      "Title Call No.", "Title", "Author", "Publisher",
+      "ISBN", "Current Pub Date", "Original Pub Date", "Procurement Date"
+    ];
+
+    // Initialize CSV content with headers
+    const csvRows = [headers.join(",")];
+
+    data.forEach(book => {
+      csvRows.push([
+        `"${book.titleCallNum}"`,
+        `"${book.title}"`,
+        `"${book.author}"`,
+        `"${book.publisher}"`,
+        `"${book.isbn}"`,
+        `"${book.currentPubDate}"`,
+        `"${book.originalPubDate}"`,
+        `"${book.procurementDate}"`
+      ].join(","));
+    });
+
+    // Create CSV blob and trigger download
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `BookInventory_${currentDate}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   React.useEffect(() => {
     if (window.location.hash) {
@@ -90,7 +149,7 @@ const ABInventory = () => {
             </button>
             <button
               className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-              onClick={exportAsXLSX}
+              onClick={handleExportClick}
             >
               Export Book Inventory
             </button>
@@ -105,6 +164,7 @@ const ABInventory = () => {
           </div>
         </div>
       </div>
+      <SelectFormat isOpen={showModal} onClose={() => setShowModal(false)} onExport={handleExport} />
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from "../../supabaseClient.js";
 import WrmgDeleteBookCopy from "../../z_modals/warning-modals/WrmgDeleteBookCopy.jsx";
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 export default function ABCopiesMgmt({ formData, setFormData, originalFormData, setOriginalFormData, onRefresh, titleID, isAddMode }) {
     const [validationErrors, setValidationErrors] = useState({});
@@ -38,7 +40,7 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
             setFormData({
                 bookStatus: '',
                 bookBarcode: '',
-                bookCallNo: '',
+                titleCallNum: '',
                 bookLocation: '',
                 bookAcqDate: '',
                 bookID: null,
@@ -57,7 +59,7 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
                 .from('book_indiv')
                 .delete()
                 .eq('bookID', formData.bookID);
-    
+
             if (error) {
                 console.error("Error deleting book copy:", error);
             } else {
@@ -70,8 +72,25 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
             console.error("An unexpected error occurred:", error);
         }
     };
-    
+
     const handleSubmit = async () => {
+
+        const requiredFields = ["bookStatus", "bookBarcode", "bookAcqDate", "titleCallNum", "bookLocation"];
+        let errors = {};
+
+        requiredFields.forEach(field => {
+            if (!formData[field]) {
+                errors[field] = true;
+            }
+        });
+
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            console.error("Validation failed:", errors);
+            toast.error("Please fill in all required fields before adding or saving.");
+            return;
+        }
+
         const { bookStatus, bookBarcode, bookAcqDate } = formData;
         console.log("Are we in Add Mode?", isAddMode)
         try {
@@ -86,6 +105,7 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
                     console.error("Error updating book_indiv:", error);
                 } else {
                     console.log("book_indiv updated successfully");
+                    toast.success("Book updated successfully");
                     onRefresh();
                 }
             } else {
@@ -106,8 +126,10 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
 
                 if (error) {
                     console.error("Error adding new book_indiv:", error);
+                    toast.error("Error adding new book copy. Check for duplicates or refresh the page");
                 } else {
                     console.log("New book_indiv added successfully");
+                    toast.success("Book added successfully");
                     onRefresh();
                 }
             }
@@ -144,8 +166,17 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
 
     return (
         <div className="bg-white p-4 rounded-lg border-grey border h-fit w-1/2">
-            <h3 className="text-2xl font-semibold mb-4">{isAddMode ? 'Add Copy' : 'Modify Copy'}</h3>
+            <ToastContainer //this is for incomplete fields
+                position="bottom-right"  
+                autoClose={3000}
+                hideProgressBar
+                newestOnTop
+                closeOnClick
+                pauseOnHover
+                draggable
+            />
 
+            <h3 className="text-2xl font-semibold mb-4">{isAddMode ? 'Add Copy' : 'Modify Copy'}</h3>
             <h3 className="text-xl font-semibold my-2">Copy Details</h3>
             <form className="space-y-2">
                 <div className="flex justify-between items-center" key="bookStatus">
@@ -180,9 +211,9 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
                     <label className="w-1/4">Call Number*:</label>
                     <input type="text" name="bookCallNo" required readOnly
                         className="w-2/3 px-3 py-1 rounded-full border border-grey bg-light-gray text-dark-gray"
-                        value={formData.bookCallNo}
+                        value={formData.titleCallNum}
                         onChange={handleChange}
-                        style={validationErrors.bookCallNo ? errorStyle : {}}
+                        style={validationErrors.titleCallNum ? errorStyle : {}}
                         placeholder="Book Call Number"
                     />
                 </div>

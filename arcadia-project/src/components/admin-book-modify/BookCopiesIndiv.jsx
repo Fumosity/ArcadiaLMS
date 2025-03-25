@@ -19,7 +19,7 @@ const BookCopiesIndiv = ({ titleID }) => {
 
         const { data: copies, error: copiesError } = await supabase
           .from("book_indiv")
-          .select("titleID, bookARCID, bookStatus") //no bookARCID in the column names. status should now be bookStatus
+          .select("titleID, titleCallNum, bookStatus") //no bookARCID in the column names. status should now be bookStatus
           .eq("titleID", titleID);
 
         if (copiesError) throw copiesError;
@@ -80,7 +80,7 @@ const BookCopiesIndiv = ({ titleID }) => {
             <React.Fragment key={index}>
               <div className="flex justify-between items-center text-base text-zinc-900 mt-3">
                 <span className="flex-1 text-center">{book.titleID}</span>
-                <span className="flex-1 text-center">{book.bookARCID}</span>
+                <span className="flex-1 text-center">{book.titleCallNum}</span>
                 <span
                   className={`px-5 py-1 rounded-3xl text-sm font-semibold capitalize text-center ${getStatusStyle(
                     book.bookStatus

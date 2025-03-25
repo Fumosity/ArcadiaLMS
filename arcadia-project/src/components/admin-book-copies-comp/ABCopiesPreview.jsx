@@ -1,7 +1,6 @@
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const ABCopiesPreview = ({ book }) => {
 
@@ -61,7 +60,7 @@ const ABCopiesPreview = ({ book }) => {
                         ? "Original Pub. Date:"
                         : key === "isbn"
                           ? "ISBN:"
-                          : key === "arcID"
+                          : key === "titleCallNum"
                             ? "ARC ID:"
                             : key.replace(/([A-Z])/g, " $1") + ":"}
                   </td>

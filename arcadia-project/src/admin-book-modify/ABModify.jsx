@@ -21,7 +21,6 @@ const ABModify = () => {
     currentPubDate: queryParams.get("currdatePublished") || '',
     originalPubDate: queryParams.get("orgdatePublished") || '',
     location: queryParams.get("location") || '',
-    bookID: queryParams.get("databaseID") || '',
     titleCallNum: queryParams.get("titleCallNum") || '',
     isbn: queryParams.get("isbn") || '',
     price: queryParams.get("price") || '',

@@ -30,12 +30,13 @@ const RoomReserv = () => {
   }
 
   const formatTime = (timeString) => {
+    if (!timeString) return "Invalid Time";
     return new Date(`2000-01-01T${timeString}`).toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
-    })
-  }
+    });
+  };
 
   // Filter, Sort, and Search Logic
   const filteredReservations = useMemo(() => {
@@ -83,13 +84,15 @@ const RoomReserv = () => {
           console.error("Error fetching reservations:", error.message)
         } else {
           const formattedData = data.map((item) => ({
-            date: item.reservationData.date,
-            room: item.reservationData.room,
-            purpose: item.reservationData.title,
-            period: `${formatTime(item.reservationData.startTime)} - ${formatTime(item.reservationData.endTime)}`,
+            date: item.reservationData.date ? new Date(item.reservationData.date).toISOString().split("T")[0] : "Invalid Date",
+            room: item.reservationData.room || "Unknown Room",
+            purpose: item.reservationData.title || "No Purpose",
+            period: item.reservationData.startTime && item.reservationData.endTime
+              ? `${(item.reservationData.startTime)} - ${(item.reservationData.endTime)}`
+              : "Invalid Time",
             name: item.user_accounts ? `${item.user_accounts.userFName} ${item.user_accounts.userLName}` : "N/A",
             user_accounts: item.user_accounts,
-          }))
+          }));
 
           setReservations(formattedData)
         }

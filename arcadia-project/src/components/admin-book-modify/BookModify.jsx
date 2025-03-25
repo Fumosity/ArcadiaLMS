@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation,useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
 import WrngDeleteTitle from "../../z_modals/warning-modals/WrmgDeleteTitle";
+import { toast } from "react-toastify";
 
 
-const BookModify = ({ formData, onSave }) => {
+const BookModify = ({ formData, setFormData, onSave }) => {
   const fileInputRef = useRef(null);
   const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,9 +17,14 @@ const BookModify = ({ formData, onSave }) => {
   const [categoryFilter, setCategoryFilter] = useState(null);
   const [loading, setLoading] = useState(true)
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [formDataState, setFormData] = useState(formData);
-   const navigate = useNavigate();
-  
+  const [formDataState] = useState(formData);
+  const errorStyle = {
+    border: "2px solid red",
+    backgroundColor: "#ffe6e6",
+  };
+
+  const navigate = useNavigate();
+
 
   const handleDeleteBook = async () => {
     const titleID = formDataState.titleID;
@@ -61,7 +67,10 @@ const BookModify = ({ formData, onSave }) => {
   }, [location.search, setFormData]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const uploadCover = async (e) => {
@@ -110,10 +119,24 @@ const BookModify = ({ formData, onSave }) => {
     fetchGenres();
   }, [formData.genres]); // Depend on formData.genres so it updates correctly  
 
+  const [selectedGenresByCategory, setSelectedGenresByCategory] = useState({});
+
   const handleCategoryChange = (category) => {
+    // Save the current selection before switching categories
+    setSelectedGenresByCategory((prev) => ({
+      ...prev,
+      [categoryFilter]: selectedGenres, // Store the selected genres for the previous category
+    }));
+
+    // Restore the genres for the newly selected category (if any were previously selected)
+    const restoredGenres = selectedGenresByCategory[category] || [];
+    const restoredGenreNames = genres
+      .filter((g) => restoredGenres.includes(g.genreID))
+      .map((g) => g.genreName);
+
     setCategoryFilter(category);
-    setSelectedGenres([]); // Reset genres when category changes
-    setFormData((prev) => ({ ...prev, category, genres: [] }));
+    setSelectedGenres(restoredGenres);
+    setFormData((prev) => ({ ...prev, category, genres: restoredGenreNames }));
   };
 
   const toggleGenre = (genreID) => {
@@ -161,6 +184,34 @@ const BookModify = ({ formData, onSave }) => {
   }
 
   const handleSave = async () => {
+
+    const requiredFields = [
+      "title", "author", "publisher", "synopsis", "keywords",
+      "currentPubDate", "originalPubDate", "location", "isbn",
+      "price", "titleID", "titleCallNum", "category", "genres"
+    ];
+
+    const errors = {};
+    requiredFields.forEach((field) => {
+      if (!formData[field] || formData[field].length === 0) {
+        errors[field] = true;
+      }
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      toast.error("Please fill in all required fields before saving.", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+      return;
+    }
+
     console.log(formData)
 
     if (!formData || !formData.titleID) {
@@ -304,11 +355,26 @@ const BookModify = ({ formData, onSave }) => {
     }
 
     console.log("Book updated successfully:", updateBook);
+    toast.success("Book updated successfully", {
+      position: "bottom-right",
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      className: "bg-green text-white",
+    })
+
 
     //  Step 7: Trigger onSave callback if provided
     if (onSave) {
       await onSave(formData);
     }
+    setTimeout(() => {
+      navigate(-1);
+    }, 1500);
   };
 
 
