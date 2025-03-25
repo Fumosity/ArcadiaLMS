@@ -95,9 +95,9 @@ const TodayReserv = () => {
           ) : roomRes.length > 0 ? (
             roomRes.map((room, index) => (
               <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                <td className="w-2/3 px-4 py-2 text-left text-sm text-arcadia-red font-semibold">{room.room}</td>
-                <td className="w-2/3 px-4 py-2 text-left text-sm text-arcadia-red font-semibold">{room.time}</td>
-                <td className="w-2/3 px-4 py-2 text-left text-sm text-arcadia-red font-semibold">{room.booker}</td>
+                <td className="px-3 py-2 text-left text-sm text-black">{room.room}</td>
+                <td className="px-3 py-2 text-left text-sm text-black">{room.time}</td>
+                <td className="px-3 py-2 text-left text-sm text-black">{room.booker}</td>
               </tr>
             ))
           ) : (

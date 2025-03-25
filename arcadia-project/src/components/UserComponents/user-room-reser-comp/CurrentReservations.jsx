@@ -13,7 +13,7 @@ const periods = [
   "03:00 - 04:00",
   "04:00 - 05:00",
 ]
-const rooms = ["A701-A", "A701-B", "A701-C","A701-D"]
+const rooms = ["Discussion Room", "Law Discussion Room"]
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 export default function CurrentReservations() {
@@ -58,13 +58,68 @@ export default function CurrentReservations() {
         const formattedDate = reservationDate.toISOString().split("T")[0]
 
         if (formattedDate === selectedDate) {
-          periods.forEach((period) => {
-            const [startHour] = period.split(":")
-            const periodStartTime = Number.parseInt(startHour, 10)
-            const startHourInt = Number.parseInt(startTime.split(":")[0], 10)
-            const endHourInt = Number.parseInt(endTime.split(":")[0], 10)
+          // Properly parse 12-hour time format to 24-hour
+          const parse12HourTime = (time12) => {
+            if (!time12) return { hours: 0, minutes: 0 }
 
-            if (periodStartTime >= startHourInt && periodStartTime < endHourInt) {
+            // Check if time is already in 24-hour format
+            if (time12.match(/^\d{1,2}:\d{2}$/)) {
+              const [hours, minutes] = time12.split(":").map((num) => Number.parseInt(num, 10))
+              return { hours, minutes }
+            }
+
+            // Parse 12-hour format (HH:MM AM/PM)
+            const match = time12.match(/(\d+):(\d+)\s*(AM|PM|am|pm)/i)
+            if (!match) return { hours: 0, minutes: 0 }
+
+            let [_, hours, minutes, period] = match
+            hours = Number.parseInt(hours, 10)
+
+            if (period.toLowerCase() === "pm" && hours < 12) {
+              hours += 12
+            } else if (period.toLowerCase() === "am" && hours === 12) {
+              hours = 0
+            }
+
+            return { hours, minutes: Number.parseInt(minutes, 10) }
+          }
+
+          // Parse reservation times
+          const reservationStart = parse12HourTime(startTime)
+          const reservationEnd = parse12HourTime(endTime)
+
+          // Convert to decimal for easier comparison
+          const reservationStartDecimal = reservationStart.hours + reservationStart.minutes / 60
+          const reservationEndDecimal = reservationEnd.hours + reservationEnd.minutes / 60
+
+          periods.forEach((period) => {
+            // Parse period times (format: "HH:00 - HH:00")
+            const [periodStart, periodEnd] = period.split(" - ")
+
+            // Handle the special case for afternoon hours (12:00 - 01:00, etc.)
+            const parsePeriodTime = (timeStr) => {
+              const [hourStr] = timeStr.split(":")
+              let hour = Number.parseInt(hourStr, 10)
+
+              // Convert 12-hour format to 24-hour
+              // For periods after 12:00, we need to add 12 to get PM hours
+              if (hour < 7 && periods.indexOf(period) >= 6) {
+                // If hour is 1-6 and it's in the afternoon periods
+                hour += 12
+              }
+
+              return hour
+            }
+
+            const periodStartHour = parsePeriodTime(periodStart)
+            const periodEndHour = parsePeriodTime(periodEnd)
+
+            // Check if this period overlaps with the reservation
+            if (
+              (periodStartHour >= reservationStartDecimal && periodStartHour < reservationEndDecimal) ||
+              (periodEndHour > reservationStartDecimal && periodEndHour <= reservationEndDecimal) ||
+              (periodStartHour <= reservationStartDecimal && periodEndHour >= reservationEndDecimal)
+            ) {
               availability[period][room] = "Reserved"
             }
           })
@@ -117,7 +172,7 @@ export default function CurrentReservations() {
     <div className="uHero-cont max-w-[1200px] w-full p-6 bg-white rounded-lg border border-grey">
       <h2 className="text-2xl font-semibold mb-6">Room Reservations</h2>
 
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col md:flex-row gap-3">
         {/* Calendar Section */}
         <div className="w-full md:w-1/2 bg-white rounded-lg p-4 border border-grey">
           <div className="flex justify-between items-center mb-4">
@@ -281,4 +336,3 @@ export default function CurrentReservations() {
     </div>
   )
 }
-

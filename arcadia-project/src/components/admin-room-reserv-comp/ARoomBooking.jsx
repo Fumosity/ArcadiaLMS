@@ -10,11 +10,11 @@ export default function ARoomBooking({ addReservation }) {
     name: "",
     college: "",
     department: "",
-    room: "A701-A",
+    room: "Discussion Room",
     date: "",
-    startTime: "09:00",
-    endTime: "10:00",
-    title: "New Reservation",
+    startTime: "07:00",
+    endTime: "05:00",
+    title: "",
   })
 
   useEffect(() => {
@@ -139,7 +139,6 @@ export default function ARoomBooking({ addReservation }) {
     const selectedDateTime = new Date(`${formData.date}T${formData.startTime}`);
     const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
 
-
     if (selectedDateTime < now) {
       toast.warn("You cannot book a past date or time!", {
         position: "bottom-right",
@@ -204,8 +203,6 @@ export default function ARoomBooking({ addReservation }) {
       return;
     }
 
-
-
     if (
       !formData.userId ||
       !formData.schoolId ||
@@ -260,8 +257,8 @@ export default function ARoomBooking({ addReservation }) {
     const reserveData = {
       room: formData.room,
       date: formData.date,
-      startTime: formatTimeTo12Hour(formData.startTime), 
-      endTime: formatTimeTo12Hour(formData.endTime),     
+      startTime: formData.startTime, // Keep as 24-hour format
+      endTime: formData.endTime,
       title: formData.title,
     };
 
@@ -400,10 +397,8 @@ export default function ARoomBooking({ addReservation }) {
                 onChange={handleInputChange}
                 className="px-3 py-1 rounded-full border border-grey w-full"
               >
-                <option value="A701-A">Discussion Room 1 (A701-A)</option>
-                <option value="A701-B">Discussion Room 2 (A701-B)</option>
-                <option value="A701-C">Discussion Room 3 (A701-C)</option>
-                <option value="A701-D">Discussion Room 4 (A701-D)</option>
+                <option value="Discussion Room">Discussion Room </option>
+                <option value="Law Discussion Room">Law Discussion Room </option>
               </select>
             </div>
           </div>
