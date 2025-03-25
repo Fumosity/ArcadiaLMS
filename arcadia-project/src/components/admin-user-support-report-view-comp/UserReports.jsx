@@ -68,7 +68,8 @@ const UserReports = () => {
     const matchesStatus = statusFilter === "All" || reports.status === statusFilter
 
     const matchesSearch =
-      reports.subject.toLowerCase().includes(searchTerm.toLowerCase()) || reports.reportID.includes(searchTerm)
+      reports.subject.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      reports.reportID.toString().includes(searchTerm)
 
     return matchesType && matchesStatus && matchesSearch
   })
@@ -109,7 +110,7 @@ const UserReports = () => {
             <span className="font-medium text-sm">Sort:</span>
             <button
               onClick={() => setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")}
-              className="sort-by bg-gray-200 py-1 px-3 rounded-lg text-sm w-28"
+              className="sort-by border-grey py-1 px-3 rounded-lg text-sm w-28"
             >
               {sortOrder}
             </button>

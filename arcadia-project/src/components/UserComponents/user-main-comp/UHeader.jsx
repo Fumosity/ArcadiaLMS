@@ -66,10 +66,10 @@ const UHeader = () => {
                   <FiUser className="h-6 w-6 text-gray-300" />
                 )}
               </div>
-                <div className="text-white">
-                  <HamburgerIcon isOpen={isDropdownVisible} toggle={toggleDropdown} />
-                </div>
-              
+              <div className="text-white">
+                <HamburgerIcon isOpen={isDropdownVisible} toggle={toggleDropdown} />
+              </div>
+
 
               {/* Dropdown Menu */}
               <div
@@ -96,8 +96,8 @@ const UHeader = () => {
                       </Link>
                     </li>
 
-                    {/* Show "Back to Admin side" only if user is an Admin */}
-                    {user.userAccountType === "Admin" && (
+                    {/* Show "Back to Admin side" only if user is an Admin or Superadmin */}
+                    {(user.userAccountType === "Admin" || user.userAccountType === "Superadmin") && (
                       <li className="hover:bg-grey cursor-pointer">
                         <Link to="/admin" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                           Back to Admin side

@@ -32,7 +32,7 @@ const ListOfUserAcc = () => {
       const { data, error } = await supabase
         .from("user_accounts")
         .select("userAccountType, userEmail, userFName, userLName, userID, userLPUID, userCollege, userDepartment")
-        .in("userAccountType", ["User", "Faculty", "Student", "Intern"]) // Use .in() to filter multiple types
+        .in("userAccountType", ["User", "Faculty", "Student", ]) // Use .in() to filter multiple types
 
       if (error) {
         console.error("Error fetching data from Supabase:", error)
@@ -133,7 +133,6 @@ const ListOfUserAcc = () => {
                 <option value="All">All</option>
                 <option value="Student">Student</option>
                 <option value="Faculty">Faculty</option>
-                <option value="Intern">Intern</option>
               </select>
             </div>
 

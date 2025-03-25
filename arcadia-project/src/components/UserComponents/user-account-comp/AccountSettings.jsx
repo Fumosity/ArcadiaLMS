@@ -2,7 +2,6 @@ import { useState } from "react"
 import { ChevronRight } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import UpdateProfilePic from "../../../z_modals/UpdateProfilePic"
-import UserChangePass from "../../../z_modals/UserChangePass"
 
 const settingsOptions = [
   {
@@ -12,8 +11,9 @@ const settingsOptions = [
   },
   {
     title: "Change Password",
-    description: "Change your password through your registered email account.",
-    action: "openChangePassModal",
+    description: "Contact ARC through outlook using your lpu email to change your password.",
+    email: "cav-arc@lpu.edu.ph", // Add the email address here
+    subject: "Request to Change Password" // Optional: set a default subject
   },
   {
     title: "Update User Data",
@@ -46,13 +46,13 @@ const SettingsOption = ({ title, description, onClick }) => (
 export const AccountSettings = ({ options = settingsOptions }) => {
   const navigate = useNavigate()
   const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false)
-  const [isChangePassModalOpen, setIsChangePassModalOpen] = useState(false)
 
   const handleOptionClick = (option) => {
     if (option.action === "openProfilePicModal") {
       setIsProfilePicModalOpen(true)
-    } else if (option.action === "openChangePassModal") {
-      setIsChangePassModalOpen(true)
+    } else if (option.email) {
+      // Redirect to Outlook with the email
+      window.location.href = `mailto:${option.email}?subject=${encodeURIComponent(option.subject || '')}`
     } else if (option.path) {
       const queryParams = new URLSearchParams(option.params).toString()
       navigate(`${option.path}?${queryParams}`)
@@ -78,12 +78,6 @@ export const AccountSettings = ({ options = settingsOptions }) => {
       {isProfilePicModalOpen && (
         <UpdateProfilePic isOpen={isProfilePicModalOpen} onClose={() => setIsProfilePicModalOpen(false)} />
       )}
-
-      {/* Change Password Modal */}
-      {isChangePassModalOpen && (
-        <UserChangePass isOpen={isChangePassModalOpen} onClose={() => setIsChangePassModalOpen(false)} />
-      )}
     </div>
   )
 }
-

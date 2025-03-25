@@ -44,9 +44,13 @@ export default function LoginForm() {
     }
   };
 
+  const handleForgotPassword = () => {
+    window.location.href = "mailto:cav-arc@lpu.edu.ph?subject=Password Reset Request";
+  };
+
   return (
     <div className="uMain-cont flex max-h-auto max-w-[950px] h-full w-full bg-white">
-      <div className="max-w-md mx-auto p-8 ">
+      <div className="max-w-md mx-auto p-8">
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-1">
             <img src="/image/arcadia.png" alt="Arcadia logo" className="h-13 w-13" />
@@ -96,11 +100,24 @@ export default function LoginForm() {
             </button>
           </div>
 
-          <label className="block text-sm text-center text-gray-700">Or you may also browse as a guest!</label>
-          <div className="flex justify-center items-center">
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-sm text-arcadia-red hover:underline"
+            >
+              Forgot Password
+            </button>
+          </div>
+
+          <p className="text-sm text-center text-gray-700">
+            Or you may also browse as a guest!
+          </p>
+          
+          <div className="flex justify-center">
             <button
               onClick={loginAsGuest}
-              className="border py-1 border-arcadia-red text-arcadia-red p-2 rounded-full w-full hover:bg-red hover:border-red hover:text-white"
+              className="border py-0.5 px-8 border-arcadia-red text-arcadia-red rounded-full w-auto hover:bg-red hover:border-red hover:text-white"
             >
               Continue as Guest
             </button>
@@ -108,24 +125,19 @@ export default function LoginForm() {
         </form>
       </div>
 
-      <div
-        className="w-1/2 relative rounded-2xl bg-cover bg-center hidden md:block max-h-[600px]"
-      >
-          <img
-                        src="/image/hero2.jpeg"
-                        alt="Hero Background"
-                        className="w-full h-full object-cover rounded-lg" // Add rounded-lg here
-                    />
-
+      <div className="w-1/2 relative rounded-2xl bg-cover bg-center hidden md:block max-h-[600px]">
+        <img
+          src="/image/hero2.jpeg"
+          alt="Hero Background"
+          className="w-full h-full object-cover rounded-lg"
+        />
         <div className="absolute inset-0 bg-black opacity-70 rounded-lg" />
-
         <div className="absolute inset-0 flex items-end p-12 z-10">
           <h2 className="text-white text-4xl text-right font-semibold">
             Knowledge that empowers.
           </h2>
         </div>
       </div>
-
     </div>
   );
 }

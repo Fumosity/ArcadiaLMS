@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useRef, useEffect } from "react"
 import { FiUser } from "react-icons/fi"
 import { Link, useNavigate } from "react-router-dom"
@@ -11,7 +13,9 @@ const Header = () => {
   const dropdownRef = useRef(null)
 
   useEffect(() => {
-    if (!user || user.userAccountType !== "Admin") {
+    // This condition was incorrect - it was using OR (||) instead of AND (&&)
+    // The original condition would redirect ALL users, not just non-admin users
+    if (!user || (user.userAccountType !== "Admin" && user.userAccountType !== "Superadmin")) {
       navigate("/") // Redirect to home or another page
     }
   }, [user, navigate])

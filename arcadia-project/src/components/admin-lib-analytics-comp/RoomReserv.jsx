@@ -242,7 +242,7 @@ const RoomReserv = () => {
                 displayedReservations.map((res, index) => (
                   <tr key={index} className="hover:bg-light-gray cursor-pointer">
                     <td className="px-4 py-2 text-sm text-gray-900 text-center w-1/12">
-                      <div className="py-1 px-3 rounded-full bg-grey font-semibold">{res.room}</div>
+                      <div className="py-1 px-3 rounded-full bg-grey font-semibold truncate">{res.room}</div>
                     </td>
                     <td className="px-4 py-3 text-sm text-center">
                       {new Date(res.date).toLocaleDateString("en-US", {

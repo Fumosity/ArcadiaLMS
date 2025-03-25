@@ -1,4 +1,3 @@
-// WarningModal.js
 import React from 'react';
 
 const DeleteAdminAcc = ({ isOpen, onClose, onDelete }) => {
@@ -7,13 +6,7 @@ const DeleteAdminAcc = ({ isOpen, onClose, onDelete }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl w-full max-w-md p-6 shadow-xl relative">
-        <button 
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-          aria-label="Close"
-        >
-          ×
-        </button>
+
         <div className="flex items-center mb-4">
           <div className="text-red-500 text-2xl mr-2">⚠️</div>
           <h2 className="text-xl font-semibold">Attention!</h2>
@@ -38,7 +31,7 @@ const DeleteAdminAcc = ({ isOpen, onClose, onDelete }) => {
             onClick={onDelete}
             className="px-8 py-1 border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
-            Delete
+            I am Sure
           </button>
         </div>
       </div>

@@ -33,7 +33,7 @@ const ListOfAdminAcc = () => {
             const { data, error } = await supabase
                 .from("user_accounts")
                 .select("*")
-                .in("userAccountType", ["Admin", "Superadmin", "Intern"]); // Adjusted to fetch only Admins for now
+                .in("userAccountType", ["Admin", "Superadmin"]); // Adjusted to fetch only Admins for now
 
             if (error) {
                 console.error("Error fetching data from Supabase:", error);
@@ -138,7 +138,20 @@ const ListOfAdminAcc = () => {
                                 <option value="All">All</option>
                                 <option value="Admin">Admin</option>
                                 <option value="Superadmin">Superadmin</option>
-                                <option value="Intern">Intern</option>
+                            </select>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <span className="font-medium text-sm">Entries:</span>
+                            <select
+                                className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-20"
+                                value={entriesPerPage}
+                                onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+                            >
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
                             </select>
                         </div>
                     </div>
@@ -158,41 +171,41 @@ const ListOfAdminAcc = () => {
 
                 {/* Table */}
                 <div className="overflow-x-auto">
-                <table className="min-w-full divide-y ">
-                    <thead>
-                        <tr>
-                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">School ID</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y ">
-                        {displayedUsers.map((user, index) => (
-                            <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                                <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
-                                    <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1">
-                                        {user.type}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-3 text-sm truncate text-left">
-                                    {user.email}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-left">
-                                    <button
-                                        onClick={() => handleUserClick(user)}
-                                        className="text-blue-500 hover:underline"
-                                    >
-                                        {user.name}
-                                    </button>
-                                </td>
-                                <td className="px-4 py-3 text-sm truncate text-center">
-                                    {user.schoolId}
-                                </td>
+                    <table className="min-w-full divide-y ">
+                        <thead>
+                            <tr>
+                                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">School ID</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="bg-white divide-y ">
+                            {displayedUsers.map((user, index) => (
+                                <tr key={index} className="hover:bg-light-gray cursor-pointer">
+                                    <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
+                                        <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1">
+                                            {user.type}
+                                        </span>
+                                    </td>
+                                    <td className="px-4 py-3 text-sm truncate text-left">
+                                        {user.email}
+                                    </td>
+                                    <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-left">
+                                        <button
+                                            onClick={() => handleUserClick(user)}
+                                            className="text-blue-500 hover:underline"
+                                        >
+                                            {user.name}
+                                        </button>
+                                    </td>
+                                    <td className="px-4 py-3 text-sm truncate text-center">
+                                        {user.schoolId}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
 
                 {/* Pagination Controls */}

@@ -24,7 +24,7 @@ const AUAccView = () => {
   const getTitle = () => {
     const userType = user.type || user.userAccountType
 
-    if (["Student", "Teacher", "Intern", "User"].includes(userType)) {
+    if (["Student", "Faculty", "Intern", "User"].includes(userType)) {
       return "User Account Viewer"
     } else if (["Admin", "Superadmin"].includes(userType)) {
       return "Admin Account Viewer"

@@ -4,6 +4,7 @@ import DeleteUserAcc from "../../z_modals/attention-modals/DeleteUserAcc"
 import DeleteSupadminAcc from "../../z_modals/attention-modals/DeleteSupadminAcc"
 import DeleteAdminAcc from "../../z_modals/attention-modals/DeleteAdminAcc"
 import { useUserInformations } from "../../backend/UInfoBackend"
+import { useUser } from "../../backend/UserContext"
 
 const UserInformations = ({ user: propUser, source }) => {
   const location = useLocation()
@@ -21,20 +22,36 @@ const UserInformations = ({ user: propUser, source }) => {
     handleDelete,
     handleUserUpdate,
     formatSchoolNo,
+    canDeleteAccount,
   } = useUserInformations(propUser, userId, source)
+
+  const { user: currentUser } = useUser() // Get current logged in user
 
   if (loading) return <p>Loading user data...</p>
   if (!user) return <p>No user data available</p>
 
   const accountTitle =
     user.userAccountType === "Student" ||
-    user.userAccountType === "Teacher" ||
+    user.userAccountType === "Faculty" ||
     user.userAccountType === "Intern" ||
     user.userAccountType === "User"
       ? "User Account Information"
       : user.userAccountType === "Admin" || user.userAccountType === "Superadmin"
         ? "Admin Account Information"
         : "Account Information"
+
+  // Determine if delete button should be disabled
+  const isDeleteDisabled = !canDeleteAccount()
+
+  // Get tooltip message for delete button
+  const getDeleteTooltip = () => {
+    if (user.userAccountType === "Superadmin") {
+      return "Superadmin accounts cannot be deleted"
+    } else if (user.userAccountType === "Admin" && currentUser?.userAccountType !== "Superadmin") {
+      return "Only Superadmin users can delete Admin accounts"
+    }
+    return ""
+  }
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
@@ -71,11 +88,7 @@ const UserInformations = ({ user: propUser, source }) => {
           </div>
           <div className="flex items-center">
             <label className="w-1/3 text-md ">School ID No.:</label>
-            <input
-              className="px-3 py-1 rounded-full border border-grey w-2/3"
-              value={user.userLPUID || ""}
-              readOnly
-            />
+            <input className="px-3 py-1 rounded-full border border-grey w-2/3" value={user.userLPUID || ""} readOnly />
           </div>
           <div className="flex items-center">
             <label className="w-1/3 text-md ">Is Verified:</label>
@@ -128,8 +141,15 @@ const UserInformations = ({ user: propUser, source }) => {
           Modify
         </button>
         <button
-          className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-arcadia-red hover:text-white transition"
-          onClick={() => setIsDeleteModalOpen(true)}
+          className={`add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey ${
+            isDeleteDisabled
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "hover:bg-arcadia-red hover:text-white transition"
+          }`}
+          onClick={() => (isDeleteDisabled ? null : setIsDeleteModalOpen(true))}
+          // disabled={isDeleteDisabled}
+          //onClick={() => setIsSuperadminModalOpen(true)}
+          title={getDeleteTooltip()}
         >
           Delete
         </button>
