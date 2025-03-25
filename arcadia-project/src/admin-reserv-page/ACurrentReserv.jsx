@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { supabase } from "../supabaseClient"
+import { useNavigate } from "react-router-dom"
+import BookingReservation from "../z_modals/BookingReservation"
+import WrmgDeleteReserve from "../z_modals/warning-modals/WrmgDeleteReserve"
 
 const periods = [
   "07:00 - 08:00",
@@ -13,7 +16,7 @@ const periods = [
   "03:00 - 04:00",
   "04:00 - 05:00",
 ]
-const rooms = ["A701-A", "A701-B", "A701-C", "A701-D"]
+const rooms = ["Discussion Room", "Law Discussion Room"]
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 export default function ACurrentReserv() {
@@ -32,13 +35,34 @@ export default function ACurrentReserv() {
     return `${year}-${month}-${day}`
   })
   const [reservations, setReservations] = useState({})
+  const [activeReservations, setActiveReservations] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Table controls
+  const [sortOrder, setSortOrder] = useState("Ascending")
+  const [roomFilter, setRoomFilter] = useState("All")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [entriesPerPage, setEntriesPerPage] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedReservation, setSelectedReservation] = useState(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [reservationToDelete, setReservationToDelete] = useState(null)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function fetchReservations() {
-      const { data, error } = await supabase.from("reservation").select("reservationData")
+      setLoading(true)
+
+      // Fetch room availability data
+      const { data, error } = await supabase.from("reservation").select("userID, reservationData")
 
       if (error) {
         console.error("Error fetching reservations:", error)
+        setLoading(false)
         return
       }
 
@@ -58,13 +82,58 @@ export default function ACurrentReserv() {
         const formattedDate = reservationDate.toISOString().split("T")[0]
 
         if (formattedDate === selectedDate) {
-          periods.forEach((period) => {
-            const [startHour] = period.split(":")
-            const periodStartTime = Number.parseInt(startHour, 10)
-            const startHourInt = Number.parseInt(startTime.split(":")[0], 10)
-            const endHourInt = Number.parseInt(endTime.split(":")[0], 10)
+          // Properly parse 12-hour time format to 24-hour
+          const parse12HourTime = (time12) => {
+            if (!time12) return { hours: 0, minutes: 0 }
 
-            if (periodStartTime >= startHourInt && periodStartTime < endHourInt) {
+            const [timePart, modifier] = time12.split(" ")
+            let [hours, minutes] = timePart.split(":").map((num) => Number.parseInt(num, 10))
+
+            if (modifier === "PM" && hours < 12) {
+              hours += 12
+            } else if (modifier === "AM" && hours === 12) {
+              hours = 0
+            }
+
+            return { hours, minutes }
+          }
+
+          // Parse reservation times
+          const reservationStart = parse12HourTime(startTime)
+          const reservationEnd = parse12HourTime(endTime)
+
+          // Convert to decimal for easier comparison
+          const reservationStartDecimal = reservationStart.hours + reservationStart.minutes / 60
+          const reservationEndDecimal = reservationEnd.hours + reservationEnd.minutes / 60
+
+          periods.forEach((period) => {
+            // Parse period times (format: "HH:00 - HH:00")
+            const [periodStart, periodEnd] = period.split(" - ")
+
+            // Handle the special case for afternoon hours (12:00 - 01:00, etc.)
+            const parsePeriodTime = (timeStr) => {
+              const [hourStr] = timeStr.split(":")
+              let hour = Number.parseInt(hourStr, 10)
+
+              // Convert 12-hour format to 24-hour
+              // For periods after 12:00, we need to add 12 to get PM hours
+              if (hour < 7 && periods.indexOf(period) >= 6) {
+                // If hour is 1-6 and it's in the afternoon periods
+                hour += 12
+              }
+
+              return hour
+            }
+
+            const periodStartHour = parsePeriodTime(periodStart)
+            const periodEndHour = parsePeriodTime(periodEnd)
+
+            // Check if this period overlaps with the reservation
+            if (
+              (periodStartHour >= reservationStartDecimal && periodStartHour < reservationEndDecimal) ||
+              (periodEndHour > reservationStartDecimal && periodEndHour <= reservationEndDecimal) ||
+              (periodStartHour <= reservationStartDecimal && periodEndHour >= reservationEndDecimal)
+            ) {
               availability[period][room] = "Reserved"
             }
           })
@@ -72,10 +141,73 @@ export default function ACurrentReserv() {
       })
 
       setReservations(availability)
+
+      // Fetch active reservations with user data
+      const { data: activeData, error: activeError } = await supabase
+        .from("reservation")
+        .select("*, user_accounts(userFName, userLName, userID)")
+
+      if (activeError) {
+        console.error("Error fetching active reservations:", activeError.message)
+      } else {
+        const formattedData = activeData.map((item) => ({
+          reservationID: item.reservationID,
+          date: item.reservationData.date
+            ? new Date(item.reservationData.date).toISOString().split("T")[0]
+            : "Invalid Date",
+          room: item.reservationData.room || "Unknown Room",
+          purpose: item.reservationData.title || "No Purpose",
+          period:
+            item.reservationData.startTime && item.reservationData.endTime
+              ? `${item.reservationData.startTime} - ${item.reservationData.endTime}`
+              : "Invalid Time",
+          name: item.user_accounts ? `${item.user_accounts.userFName} ${item.user_accounts.userLName}` : "N/A",
+          user_accounts: item.user_accounts,
+          rawData: item.reservationData, // Store raw data for debugging
+        }))
+
+        setActiveReservations(formattedData)
+      }
+
+      setLoading(false)
     }
 
     fetchReservations()
   }, [selectedDate])
+
+  // Filter, Sort, and Search Logic for active reservations
+  const filteredReservations = useMemo(() => {
+    let filtered = [...activeReservations]
+
+    // Filtering by Room
+    if (roomFilter !== "All") {
+      filtered = filtered.filter((res) => res.room === roomFilter)
+    }
+
+    // Searching (Matches Room, Borrower, or Purpose)
+    if (searchTerm.trim() !== "") {
+      filtered = filtered.filter(
+        (res) =>
+          res.room.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          res.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          res.purpose.toLowerCase().includes(searchTerm.toLowerCase()),
+      )
+    }
+
+    // Sorting by Date
+    filtered.sort((a, b) => {
+      return sortOrder === "Ascending" ? new Date(a.date) - new Date(b.date) : new Date(b.date) - new Date(a.date)
+    })
+
+    return filtered
+  }, [activeReservations, sortOrder, roomFilter, searchTerm])
+
+  // Calculate total pages
+  const totalPages = Math.ceil(filteredReservations.length / entriesPerPage)
+
+  // Pagination logic
+  const startIndex = (currentPage - 1) * entriesPerPage
+  const displayedReservations = filteredReservations.slice(startIndex, startIndex + entriesPerPage)
 
   const changeMonth = (direction) => {
     let newMonth = currentMonth + direction
@@ -113,11 +245,113 @@ export default function ACurrentReserv() {
     day: "numeric",
   })
 
+  const handleUserClick = (reservation) => {
+    navigate("/admin/useraccounts/viewusers", {
+      state: { userId: reservation.user_accounts.userID },
+    })
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const formatTo12Hour = (timeString) => {
+    // Check if the time is already in 12-hour format
+    if (timeString.includes("AM") || timeString.includes("PM")) {
+      return timeString
+    }
+
+    // Handle 24-hour format (HH:MM)
+    if (timeString.match(/^\d{1,2}:\d{2}$/)) {
+      const [hours, minutes] = timeString.split(":").map((num) => Number.parseInt(num, 10))
+      const period = hours >= 12 ? "PM" : "AM"
+      const displayHours = hours % 12 || 12 // Convert 0 to 12 for 12 AM
+      return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`
+    }
+
+    return timeString // Return original if format is unknown
+  }
+
+  const formatPeriod = (period) => {
+    if (!period) return ""
+
+    const [start, end] = period.split(" - ")
+    if (!start || !end) return period
+
+    return `${formatTo12Hour(start.trim())} - ${formatTo12Hour(end.trim())}`
+  }
+
+  const handleModifyReservation = (reservation) => {
+    setSelectedReservation({
+      ...reservation,
+      startTime: reservation.rawData.startTime, // Ensure separate fields are passed
+      endTime: reservation.rawData.endTime,
+    })
+    setIsModalOpen(true)
+  }
+
+  const handleDeleteReservation = (reservation) => {
+    if (!reservation || !reservation.reservationID) {
+      console.error("Error: Reservation ID is undefined")
+      alert("Cannot delete reservation: ID is missing")
+      return
+    }
+
+    setReservationToDelete(reservation)
+    setIsDeleteModalOpen(true)
+  }
+
+  const confirmDeleteReservation = async () => {
+    if (!reservationToDelete || !reservationToDelete.reservationID) {
+      console.error("Error: Reservation ID is undefined")
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from("reservation")
+        .delete()
+        .eq("reservationID", reservationToDelete.reservationID)
+
+      if (error) {
+        console.error("Error deleting reservation:", error.message)
+        alert("Failed to delete reservation. Please try again.")
+      } else {
+        // Update the local state to remove the deleted reservation
+        setActiveReservations(
+          activeReservations.filter((res) => res.reservationID !== reservationToDelete.reservationID),
+        )
+
+        // Refresh the calendar view
+        const fetchReservations = async () => {
+          const { data, error } = await supabase.from("reservation").select("userID, reservationData")
+          if (!error && data) {
+            // Update reservations state with new data
+            // (simplified - the full logic is in the useEffect)
+            const availability = {}
+            periods.forEach((period) => {
+              availability[period] = {}
+              rooms.forEach((room) => {
+                availability[period][room] = "Available"
+              })
+            })
+            // Process data and update state
+            setReservations(availability)
+          }
+        }
+        fetchReservations()
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      alert("An unexpected error occurred.")
+    } finally {
+      setIsDeleteModalOpen(false)
+      setReservationToDelete(null)
+    }
+  }
+
   return (
     <div className="uHero-cont max-w-[1500px] w-full p-6 bg-white rounded-lg border border-grey">
       <h2 className="text-2xl font-semibold mb-6">Room Reservations</h2>
 
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col md:flex-row gap-3 mb-2">
         {/* Calendar Section */}
         <div className="w-full md:w-1/2 bg-white rounded-lg p-4 border border-grey">
           <div className="flex justify-between items-center mb-4">
@@ -187,7 +421,7 @@ export default function ACurrentReserv() {
               const month = String(date.getMonth() + 1).padStart(2, "0")
               const day = String(date.getDate()).padStart(2, "0")
               const dateString = `${year}-${month}-${day}`
-            
+
               const isPast = date < today
               const isSunday = date.getDay() === 0
               const isToday = date.getTime() === today.getTime()
@@ -278,7 +512,316 @@ export default function ACurrentReserv() {
           </div>
         </div>
       </div>
+
+      {/* Active Reservations Table */}
+      <div className="bg-white p-4 rounded-lg border-grey border mt-3">
+        <h3 className="text-xl font-semibold mb-4">Active Reservations</h3>
+
+        {/* Controls for sort, filter, and search */}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-sm">Sort:</span>
+              <button
+                onClick={() => setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")}
+                className="sort-by bg-gray-200 border-grey py-1 px-3 rounded-lg text-sm w-28"
+              >
+                {sortOrder}
+              </button>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-sm">Room:</span>
+              <select
+                className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
+                value={roomFilter}
+                onChange={(e) => setRoomFilter(e.target.value)}
+              >
+                <option value="All">All</option>
+                {[...new Set(activeReservations.map((res) => res.room))].map((room, idx) => (
+                  <option key={idx} value={room}>
+                    {room}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="font-medium text-sm">Entries:</span>
+              <select
+                className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-20"
+                value={entriesPerPage}
+                onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2 min-w-[0]">
+            <label htmlFor="search" className="font-medium text-sm">
+              Search:
+            </label>
+            <input
+              type="text"
+              id="search"
+              className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+              placeholder="Room, borrower, or purpose"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Room
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Period
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Borrower
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Purpose
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="px-4 py-2 text-center">
+                    Loading data...
+                  </td>
+                </tr>
+              ) : displayedReservations.length > 0 ? (
+                displayedReservations.map((res, index) => (
+                  <tr key={index} className="hover:bg-light-gray">
+                    <td className="px-4 py-2 text-sm text-gray-900 text-center">
+                      <div className="py-1 px-3 rounded-full bg-grey font-semibold">{res.room}</div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-center">
+                      {new Date(res.date).toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-center">{formatPeriod(res.period)}</td>
+                    <td className="px-4 py-3 text-sm text-center">
+                      <button
+                        onClick={() => handleUserClick(res)}
+                        className="text-sm text-arcadia-red font-semibold hover:underline"
+                      >
+                        {res.name}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-center">{res.purpose}</td>
+                    <td className="px-4 py-3 text-sm text-center">
+                      <div className="flex justify-center space-x-2">
+                        <button
+                          onClick={() => handleModifyReservation(res)}
+                          className="bg-dark-blue hover:bg-light-blue text-black py-1 px-2 rounded text-xs"
+                        >
+                          Modify
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReservation(res)}
+                          className="bg-arcadia-red hover:bg-red text-white py-1 px-2 rounded text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
+                    No data available.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center items-center mt-2 space-x-4">
+          <button
+            className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous Page
+          </button>
+          <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+          <button
+            className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next Page
+          </button>
+        </div>
+      </div>
+
+      {/* Booking Reservation Modal */}
+      <BookingReservation
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        reservation={selectedReservation}
+        onSave={(updatedReservation) => {
+          setActiveReservations((prev) =>
+            prev.map((res) => (res.reservationID === updatedReservation.reservationID ? updatedReservation : res)),
+          )
+          setIsModalOpen(false)
+        }}
+        onUpdate={() => {
+          // This will trigger a refresh of the reservation data
+          async function fetchReservations() {
+            setLoading(true)
+
+            // Fetch room availability data
+            const { data, error } = await supabase.from("reservation").select("userID, reservationData")
+
+            if (error) {
+              console.error("Error fetching reservations:", error)
+              setLoading(false)
+              return
+            }
+
+            const availability = {}
+            periods.forEach((period) => {
+              availability[period] = {}
+              rooms.forEach((room) => {
+                availability[period][room] = "Available"
+              })
+            })
+
+            data.forEach(({ reservationData }) => {
+              const { date, room, startTime, endTime } = reservationData
+
+              // Fix timezone handling to ensure correct date comparison
+              const reservationDate = new Date(date)
+              const formattedDate = reservationDate.toISOString().split("T")[0]
+
+              if (formattedDate === selectedDate) {
+                // Properly parse 12-hour time format to 24-hour
+                const parse12HourTime = (time12) => {
+                  if (!time12) return { hours: 0, minutes: 0 }
+
+                  const [timePart, modifier] = time12.split(" ")
+                  let [hours, minutes] = timePart.split(":").map((num) => Number.parseInt(num, 10))
+
+                  if (modifier === "PM" && hours < 12) {
+                    hours += 12
+                  } else if (modifier === "AM" && hours === 12) {
+                    hours = 0
+                  }
+
+                  return { hours, minutes }
+                }
+
+                // Parse reservation times
+                const reservationStart = parse12HourTime(startTime)
+                const reservationEnd = parse12HourTime(endTime)
+
+                // Convert to decimal for easier comparison
+                const reservationStartDecimal = reservationStart.hours + reservationStart.minutes / 60
+                const reservationEndDecimal = reservationEnd.hours + reservationEnd.minutes / 60
+
+                periods.forEach((period) => {
+                  // Parse period times (format: "HH:00 - HH:00")
+                  const [periodStart, periodEnd] = period.split(" - ")
+
+                  // Handle the special case for afternoon hours (12:00 - 01:00, etc.)
+                  const parsePeriodTime = (timeStr) => {
+                    const [hourStr] = timeStr.split(":")
+                    let hour = Number.parseInt(hourStr, 10)
+
+                    // Convert 12-hour format to 24-hour
+                    // For periods after 12:00, we need to add 12 to get PM hours
+                    if (hour < 7 && periods.indexOf(period) >= 6) {
+                      // If hour is 1-6 and it's in the afternoon periods
+                      hour += 12
+                    }
+
+                    return hour
+                  }
+
+                  const periodStartHour = parsePeriodTime(periodStart)
+                  const periodEndHour = parsePeriodTime(periodEnd)
+
+                  // Check if this period overlaps with the reservation
+                  if (
+                    (periodStartHour >= reservationStartDecimal && periodStartHour < reservationEndDecimal) ||
+                    (periodEndHour > reservationStartDecimal && periodEndHour <= reservationEndDecimal) ||
+                    (periodStartHour <= reservationStartDecimal && periodEndHour >= reservationEndDecimal)
+                  ) {
+                    availability[period][room] = "Reserved"
+                  }
+                })
+              }
+            })
+
+            setReservations(availability)
+
+            // Fetch active reservations with user data
+            const { data: activeData, error: activeError } = await supabase
+              .from("reservation")
+              .select("*, user_accounts(userFName, userLName, userID)")
+
+            if (activeError) {
+              console.error("Error fetching active reservations:", activeError.message)
+            } else {
+              const formattedData = activeData.map((item) => ({
+                reservationID: item.reservationID,
+                date: item.reservationData.date
+                  ? new Date(item.reservationData.date).toISOString().split("T")[0]
+                  : "Invalid Date",
+                room: item.reservationData.room || "Unknown Room",
+                purpose: item.reservationData.title || "No Purpose",
+                period:
+                  item.reservationData.startTime && item.reservationData.endTime
+                    ? `${item.reservationData.startTime} - ${item.reservationData.endTime}`
+                    : "Invalid Time",
+                name: item.user_accounts ? `${item.user_accounts.userFName} ${item.user_accounts.userLName}` : "N/A",
+                user_accounts: item.user_accounts,
+                rawData: item.reservationData, // Store raw data for debugging
+              }))
+
+              setActiveReservations(formattedData)
+            }
+
+            setLoading(false)
+          }
+
+          fetchReservations()
+        }}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <WrmgDeleteReserve
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDeleteReservation}
+        itemName={
+          reservationToDelete
+            ? `${reservationToDelete.room} on ${new Date(reservationToDelete.date).toLocaleDateString()}`
+            : ""
+        }
+      />
     </div>
   )
 }
-

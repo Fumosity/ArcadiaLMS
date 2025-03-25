@@ -20,6 +20,22 @@ const SeeMore = ({ selectedComponent, onBackClick, fetchBooks }) => {
       description: "Just the best, all in one place!",
       img: "/image/highlyrated.jpg",
     },
+    "Newly Added": {
+      description: "Fresh Picks, Latest Arrivals!",
+      img: "/image/default.jpg",
+    },
+    "Released This Year": {
+      description: "Hot off the shelf",
+      img: "/image/default.jpg",
+    },
+    "Fiction": {
+      description: "Escape into new worlds",
+      img: "/image/default.jpg",
+    },
+    "Non-fiction": {
+      description: "Knowledge at your fingertips",
+      img: "/image/default.jpg",
+    },
     default: {
       description: "A flourish of titles!",
       img: "/image/default.jpg",

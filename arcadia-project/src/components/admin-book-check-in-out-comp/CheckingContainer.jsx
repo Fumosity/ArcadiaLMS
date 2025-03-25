@@ -9,10 +9,8 @@ const CheckingContainer = () => {
   const [isDamaged, setIsDamaged] = useState(false) // Track if the book is marked as damaged
   const [isScannerOpen, setIsScannerOpen] = useState(false)
   const [scannedCode, setScannedCode] = useState("")
-
   const [bookSuggestions, setBookSuggestions] = useState([]) // Store search results
   const [isSearching, setIsSearching] = useState(false) // Loading state for search
-
   const [showSuggestions, setShowSuggestions] = useState(false)
 
   // Function to get the PC's current local time
@@ -169,6 +167,146 @@ const CheckingContainer = () => {
 
       return updatedFormData
     })
+  }
+
+  // Function to fetch available book copies by titleID
+  const fetchAvailableBookCopies = async (titleID) => {
+    try {
+      const { data, error } = await supabase
+        .from("book_indiv")
+        .select("bookBarcode, bookStatus")
+        .eq("titleID", titleID)
+        .eq("bookStatus", "Available")
+
+      if (error) {
+        console.error("Error fetching available book copies:", error)
+        return null
+      }
+
+      return data.length > 0 ? data : null
+    } catch (error) {
+      console.error("Error in fetchAvailableBookCopies:", error)
+      return null
+    }
+  }
+
+  // Function to fill form data from a reservation
+  const fillFormFromReservation = async (reservation) => {
+    if (!reservation) return
+
+    try {
+      // Set check mode to "Check Out" for reservations
+      setCheckMode("Check Out")
+
+      // Fill user information
+      const userInfo = reservation.user_accounts
+      if (userInfo) {
+        // Fetch the user's school ID (LPUID) from user_accounts
+        const { data: userData, error: userError } = await supabase
+          .from("user_accounts")
+          .select("userLPUID")
+          .eq("userID", userInfo.userID)
+          .single()
+
+        if (userError) {
+          console.error("Error fetching user LPUID:", userError)
+        } else if (userData) {
+          // Set the school number which will trigger the useEffect to fill other user fields
+          setFormData((prev) => ({
+            ...prev,
+            schoolNo: userData.userLPUID,
+            // The useEffect will fill name, college, department, and userID
+          }))
+        }
+      }
+
+      // Get book information
+      const bookInfo = reservation.book
+      if (bookInfo) {
+        // Find available copies of the book
+        const availableCopies = await fetchAvailableBookCopies(bookInfo.titleID)
+
+        if (availableCopies && availableCopies.length > 0) {
+          // If multiple copies are available, show a selection dialog or use the first one
+          if (availableCopies.length > 1) {
+            // Create a custom dialog to select from available copies
+            const copySelection = window.confirm(
+              `${availableCopies.length} copies of this book are available. Click OK to use barcode: ${availableCopies[0].bookBarcode} or Cancel to select manually.`,
+            )
+
+            if (copySelection) {
+              // Use the first available copy
+              setFormData((prev) => ({
+                ...prev,
+                bookBarcode: availableCopies[0].bookBarcode,
+                // The useEffect will fill bookTitle and set the book cover
+              }))
+            } else {
+              // Set just the title and let the user select a barcode manually
+              // First, fetch the book title
+              const { data: titleData, error: titleError } = await supabase
+                .from("book_titles")
+                .select("title")
+                .eq("titleID", bookInfo.titleID)
+                .single()
+
+              if (!titleError && titleData) {
+                setFormData((prev) => ({
+                  ...prev,
+                  bookTitle: titleData.title,
+                  bookBarcode: "", // Clear barcode so user can select
+                }))
+
+                // Show available barcodes
+                const barcodeList = availableCopies.map((copy) => copy.bookBarcode).join(", ")
+                alert(`Available barcodes: ${barcodeList}`)
+              }
+            }
+          } else {
+            // Only one copy available, use it directly
+            setFormData((prev) => ({
+              ...prev,
+              bookBarcode: availableCopies[0].bookBarcode,
+              // The useEffect will fill bookTitle and set the book cover
+            }))
+          }
+        } else {
+          // If no available copy, just set the title without a barcode
+          // First, fetch the book title
+          const { data: titleData, error: titleError } = await supabase
+            .from("book_titles")
+            .select("title")
+            .eq("titleID", bookInfo.titleID)
+            .single()
+
+          if (!titleError && titleData) {
+            setFormData((prev) => ({
+              ...prev,
+              bookTitle: titleData.title,
+              bookBarcode: "", // No available copy
+            }))
+            alert("No available copies of this book found.")
+          }
+        }
+      }
+
+      // Set current date and time
+      const currentDate = new Date().toISOString().split("T")[0]
+      setFormData((prev) => ({
+        ...prev,
+        date: currentDate,
+        time: getLocalTime(),
+        deadline: calculateDeadline(currentDate),
+      }))
+    } catch (error) {
+      console.error("Error filling form from reservation:", error)
+    }
+  }
+
+  // Export the fillFormFromReservation function to be used by parent components
+  // This is needed to expose the function to the parent component
+  if (typeof window !== "undefined") {
+    window.fillFormFromReservation = fillFormFromReservation
   }
 
   const handleSubmit = async () => {
@@ -378,7 +516,7 @@ const CheckingContainer = () => {
               Checking In
             </label>
           </div>
-          
+
           <div className="grid grid-cols-1 gap-2 mb-4">
             {Object.entries(formData).map(([key, value]) => {
               let label = key.replace(/([A-Z])/g, " $1")
@@ -543,4 +681,3 @@ const CheckingContainer = () => {
 }
 
 export default CheckingContainer
-
