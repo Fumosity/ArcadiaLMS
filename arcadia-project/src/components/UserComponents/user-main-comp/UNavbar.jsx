@@ -1,8 +1,9 @@
-import React from "react";
-import { Link, useMatch, useResolvedPath } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useUser } from "../../../backend/UserContext"; 
-import { useNavigate } from "react-router-dom";
+import { useState, useRef } from "react"
+import { Link, useMatch, useResolvedPath } from "react-router-dom"
+import { toast } from "react-toastify"
+import { useUser } from "../../../backend/UserContext"
+import { useNavigate } from "react-router-dom"
+
 export default function UNavbar() {
   return (
     <div className="userNavbar-cont bg-white shadow-md">
@@ -29,46 +30,53 @@ export default function UNavbar() {
         </div>
       </nav>
     </div>
-  );
+  )
 }
 
 function CustomLink({ to, children, className, restricted, ...props }) {
-  const resolvePath = useResolvedPath(to);
-  const isActive = useMatch({ path: resolvePath.pathname, end: true });
-  const { user } = useUser();
-  const navigate = useNavigate(); 
+  const resolvePath = useResolvedPath(to)
+  const isActive = useMatch({ path: resolvePath.pathname, end: true })
+  const { user } = useUser()
+  const navigate = useNavigate()
+  const [toastClosed, setToastClosed] = useState(false)
+  const toastIdRef = useRef(null)
 
   const handleClick = (e) => {
     if (user?.userAccountType === "Guest" && restricted) {
-      e.preventDefault();
-      toast.warning("You need to log in first to access this page! Redirecting to Login...", {
+      e.preventDefault()
+
+      // Create toast with custom close button that sets toastClosed to true
+      toastIdRef.current = toast.warning("You need to log in first to access this page! Redirecting to Login...", {
         position: "bottom-right",
         autoClose: 3000,
-        hideProgressBar: true,
+        hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: false,
         theme: "colored",
-      });
-
-      setTimeout(() => {
-        navigate("/user/login"); 
-      }, 3000);
+        onClose: (closedByUser) => {
+          // If toast was closed manually by user (not by timeout)
+          if (closedByUser) {
+            setToastClosed(true)
+          } else {
+            // If toast closed automatically (timeout), navigate to login
+            navigate("/user/login")
+          }
+        },
+      })
     }
-  };
-  
+  }
+
   return (
     <Link
       to={to}
       {...props}
       onClick={handleClick}
       className={`userNav-link px-2 py-3 text-white transition duration-200 ${
-        isActive
-          ? "bg-red font-semibold !text-white"
-          : "hover:bg-grey hover:text-black"
+        isActive ? "bg-red font-semibold !text-white" : "hover:bg-grey hover:text-black"
       } ${className}`}
     >
       {children}
     </Link>
-  );
+  )
 }

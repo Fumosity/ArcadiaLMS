@@ -36,6 +36,7 @@ const UBkCatalog = () => {
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [resultsLoading, setResultsLoading] = useState(false)
+  const isGuest = user?.userAccountType === "Guest"
 
   useEffect(() => {
     if (viewParam === "highlyRated") {
@@ -176,7 +177,7 @@ const UBkCatalog = () => {
             <div className="lg:w-1/4 lg:block md:hidden space-y-4">
               <ArcOpHr />
               <UpEvents />
-              <Services />
+              {!isGuest && <Services />}
               <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
               <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
             </div>
@@ -223,7 +224,7 @@ const UBkCatalog = () => {
                     )}
                   </>
                 )}
-                {!query.trim() && (
+                {!query.trim() && !isGuest && (
                   <Recommended
                     titleID={titleId}
                     userID={user.userID}

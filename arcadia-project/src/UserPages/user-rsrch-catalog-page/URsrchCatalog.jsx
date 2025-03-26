@@ -30,6 +30,7 @@ const URsrchCatalog = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [resultsLoading, setResultsLoading] = useState(false)
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
+  const isGuest = user?.userAccountType === "Guest"
 
   React.useEffect(() => {
     if (window.location.hash) {
@@ -252,7 +253,7 @@ const URsrchCatalog = () => {
             <div className="lg:w-1/4 lg:block md:hidden space-y-4">
               <ArcOpHr />
               <UpEvents />
-              <Services />
+              {!isGuest &&<Services />}
             </div>
           )}
 
@@ -299,11 +300,15 @@ const URsrchCatalog = () => {
                     )}
                   </>
                 )}
-                {!query.trim() && (
+                {!query.trim() && !isGuest && (
                   <>
                     <div id="research">
                       <ResearchRecommend onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
                     </div>
+                  </>
+                )}
+                {!query.trim() && (
+                  <>
                     <div id="new-research">
                       <NewAddResearch onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
                     </div>

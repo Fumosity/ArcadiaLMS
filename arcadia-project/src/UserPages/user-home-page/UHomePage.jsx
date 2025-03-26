@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
+import { useUser } from "../../backend/UserContext"
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar"
 import Recommended from "../../components/UserComponents/user-home-comp/Recommended"
 import InterestedGenre from "../../components/UserComponents/user-home-comp/InterestedGenre"
@@ -20,6 +21,7 @@ const UHomePage = () => {
   const [selectedGenre, setSelectedGenre] = useState(null)
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
   const [seeMoreGenresComponent, setSeeMoreGenresComponent] = useState(null)
+  const { user } = useUser() // Get user from context
 
   // Get location to check for query parameters
   const location = useLocation()
@@ -86,6 +88,9 @@ const UHomePage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  // Check if user is a guest
+  const isGuest = user?.userAccountType === "Guest"
+
   return (
     <div className="min-h-screen bg-light-white">
       <UNavbar />
@@ -94,7 +99,8 @@ const UHomePage = () => {
         <div className="lg:w-1/4 lg:block md:hidden space-y-4">
           <ArcOpHr />
           <UpEvents />
-          <Services />
+          {/* Hide Services component for guest users */}
+          {!isGuest && <Services />}
           <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
           <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
         </div>
@@ -122,8 +128,8 @@ const UHomePage = () => {
                 onGenreClick={handleGenreClick}
                 onSeeMoreGenresClick={(title, fetchData) => handleSeeMoreGenresClick(title, fetchData)}
               />
-              <Recommended onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-              <InterestedGenre onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+              {!isGuest &&<Recommended onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />}
+              {!isGuest &&<InterestedGenre onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />}
               <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
               <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
             </>
@@ -135,4 +141,3 @@ const UHomePage = () => {
 }
 
 export default UHomePage
-

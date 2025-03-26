@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
+import { toast } from "react-toastify";
 
 const UpdateProfilePic = ({ isOpen, onClose }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -64,7 +65,10 @@ const UpdateProfilePic = ({ isOpen, onClose }) => {
         if (updateError) throw updateError;
 
         console.log('Update successful:', data);
-        window.location.reload("/accountview");
+       
+        setTimeout(() => {
+          window.location.reload();
+      }, 2000); 
       } catch (updateError) {
         console.error('Error updating user_accounts:', updateError);
         setErrorMessage(`Error updating profile: ${updateError.message}`);
@@ -77,7 +81,9 @@ const UpdateProfilePic = ({ isOpen, onClose }) => {
 
       // Successfully updated
       onClose();
-      alert("Profile picture updated successfully!");
+      toast.success("Profile picture updated successfully!", {
+        autoClose: 2000, // 3 seconds
+    });
     } catch (err) {
       setErrorMessage(err.message);
       console.error("Error details:", err); // Added for debugging

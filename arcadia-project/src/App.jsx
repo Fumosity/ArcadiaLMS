@@ -117,7 +117,7 @@ function App() {
             <Header />
             <Navbar />
             <Routes>
-              <Route path="/" element={<AHomePage />} />
+              <Route path="/" element={<ProtectedRoute><AHomePage /></ProtectedRoute>} />
               <Route path="analytics" element={<ALibAnal />} />
               <Route path="circulationhistory" element={<ABCirculationPage />} />
               <Route path="bookmanagement" element={<ABInventory />} />
