@@ -203,7 +203,7 @@ const RoomReserv = () => {
               type="text"
               id="search"
               className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
-              placeholder="Room, borrower, or purpose"
+              placeholder="Room, booker, or purpose"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -224,7 +224,7 @@ const RoomReserv = () => {
                   Period
                 </th>
                 <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Borrower
+                  Booker
                 </th>
                 <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Purpose

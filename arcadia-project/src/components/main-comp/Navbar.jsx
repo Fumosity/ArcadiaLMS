@@ -13,7 +13,7 @@ export default function Navbar(){
         <CustomLink to="/admin/researchmanagement" className="nav-link">Research Management</CustomLink>
         <CustomLink to="/admin/useraccounts" className="nav-link">User Accounts</CustomLink>
         <CustomLink to="/admin/support" className="nav-link">Support</CustomLink>
-        <CustomLink to="/admin/reservations" className="nav-link">Reservations</CustomLink>
+        <CustomLink to="/admin/reservations" className="nav-link">Room Reservations</CustomLink>
         <CustomLink to="/admin/systemreports" className="nav-link">System Reports</CustomLink>
         <CustomLink to="/admin/schedule" className="nav-link">Schedule</CustomLink>
       </div>

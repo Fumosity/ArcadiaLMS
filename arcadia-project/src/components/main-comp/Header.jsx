@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useRef, useEffect } from "react"
 import { FiUser } from "react-icons/fi"
 import { Link, useNavigate } from "react-router-dom"

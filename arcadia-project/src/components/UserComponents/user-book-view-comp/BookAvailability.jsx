@@ -52,7 +52,7 @@ export default function BookAvailability({ book }) {
                             </div>
                         )}
                     </div>
-
+                    
                     <p className="w-full text-center text-md mb-4">
                         Number available: {availableCount}
                     </p>
@@ -65,7 +65,7 @@ export default function BookAvailability({ book }) {
                     </div>
 
                     <div className="relative group">
-                        <button
+                        {/* <button
                             className={`mt-2 w-full py-1 px-4 rounded-xl text-sm ${isAvailable
                                     ? "bg-arcadia-red hover:bg-red hover:text-white text-white"
                                     : "bg-grey text-black cursor-not-allowed"
@@ -74,7 +74,8 @@ export default function BookAvailability({ book }) {
                             disabled={!isAvailable}
                         >
                             Make A Reservation
-                        </button>
+                        </button> */}
+                        <p className="w-full text-center text-sm mb-4"><b>Approach Desk to Reserve a book</b></p>
                         {!isAvailable && (
                             <span className="absolute left-1/2 transform -translate-x-1/2 -top-8 bg-gray-700 text-white text-xs rounded-md px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 Book is unavailable

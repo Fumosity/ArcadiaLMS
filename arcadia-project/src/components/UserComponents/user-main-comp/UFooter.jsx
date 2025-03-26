@@ -1,282 +1,191 @@
-
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom";
+import { FaArrowUp, FaEnvelope, FaFacebookSquare } from "react-icons/fa";
 
 const UFooter = () => {
-  const navigate = useNavigate()
+    const navigate = useNavigate();
+    const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+    const handleLinkClick = () => setTimeout(scrollToTop, 100);
 
-  const handleRecommendedResearch = () => {
-    navigate("/user/researchmanagement/?view=recommended")
+    // Navigation handlers
+    const navigateWithQuery = (path, query) => {
+        navigate(`${path}?view=${query}`);
+        scrollToTop();
+    };
 
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+    return (
+        <footer className="bg-arcadia-black text-white w-full px-6 py-12">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-8">
+                {/* Logo and About Column (Left) */}
+                <div className="md:w-1/3">
+                    <div className="flex items-center mb-6">
+                        <img
+                            src="/image/logo_user.png"
+                            alt="Library Logo"
+                            className="h-12"
+                        />
+                    </div>
 
-  const handleRecentlyPubliched = () => {
-    navigate("/user/researchmanagement/?view=recentlyPublished")
+                    <p className="text-md leading-relaxed mb-2">
+                        A Library Management System for the Academic Resource Center owned by: <br />
+                        <b>Lyceum of the Philippines University of Cavite</b>
+                    </p>
 
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+                    <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                            <FaEnvelope size={20} className="text-gray-300" />
+                            <span className="text-sm">cav-arc@lpu.edu.ph</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <FaFacebookSquare size={20} className="text-blue-500" />
+                            <a
+                                href="https://www.facebook.com/LPUCaviteARC"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm hover:text-gray-300 transition"
+                            >
+                                facebook.com/LPUCaviteARC
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
+                {/* Content Columns (Right) */}
+                <div className="flex-1 flex justify-end border-l border-gray-700 pl-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+                        {/* Resources Column */}
+                        <div className="min-w-[160px]">
+                            <h3 className="font-bold text-lg mb-4">Resources</h3>
+                            <ul className="space-y-3 text-sm text-gray-400">
+                                <li>
+                                    <button 
+                                        onClick={() => navigateWithQuery("/user/bookmanagement", "mostPopular")}
+                                        className="hover:text-white transition text-left w-full"
+                                    >
+                                        Most Popular Books
+                                    </button>
+                                </li>
+                                <li>
+                                    <button 
+                                        onClick={() => navigateWithQuery("/user/bookmanagement", "highlyRated")}
+                                        className="hover:text-white transition text-left w-full"
+                                    >
+                                        Highest Rated Books
+                                    </button>
+                                </li>
+                                <li>
+                                    <button 
+                                        onClick={() => navigateWithQuery("/user/researchmanagement", "recommended")}
+                                        className="hover:text-white transition text-left w-full"
+                                    >
+                                        Recommended Research
+                                    </button>
+                                </li>
+                                <li>
+                                    <Link 
+                                        to="/user/faqs" 
+                                        className="hover:text-white transition block"
+                                        onClick={handleLinkClick}
+                                    >
+                                        FAQs
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
 
-  const handleHighlyRatedClick = () => {
-    // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
-    navigate("/user/bookmanagement/?view=highlyRated")
+                        {/* Services Column */}
+                        <div className="min-w-[160px]">
+                            <h3 className="font-bold text-lg mb-4">Services</h3>
+                            <ul className="space-y-3 text-sm text-gray-400">
+                                {/* <li>
+                                    <Link 
+                                        to="/user/reservations#reserv-a-room" 
+                                        className="hover:text-white transition block"
+                                        onClick={() => {
+                                            setTimeout(() => {
+                                                const element = document.getElementById("reserv-a-room");
+                                                element?.scrollIntoView({ behavior: "smooth" });
+                                            }, 100);
+                                        }}
+                                    >
+                                        Reserve A Room
+                                    </Link>
+                                </li> */}
+                                <li>
+                                    <Link 
+                                        to="/user/reservations#room-reservs" 
+                                        className="hover:text-white transition block"
+                                        onClick={() => {
+                                            setTimeout(() => {
+                                                const element = document.getElementById("room-reservs");
+                                                element?.scrollIntoView({ behavior: "smooth" });
+                                            }, 100);
+                                        }}
+                                    >
+                                        View Reservation Schedule
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link 
+                                        to="/user/services" 
+                                        className="hover:text-white transition block"
+                                        onClick={handleLinkClick}
+                                    >
+                                        All Services
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
 
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+                        {/* Account Column */}
+                        <div className="min-w-[160px]">
+                            <h3 className="font-bold text-lg mb-4">Account</h3>
+                            <ul className="space-y-3 text-sm text-gray-400">
+                                <li>
+                                    <Link 
+                                        to="/user/accountview" 
+                                        className="hover:text-white transition block"
+                                        onClick={handleLinkClick}
+                                    >
+                                        View Account
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link 
+                                        to="/user/accountview" 
+                                        className="hover:text-white transition block"
+                                        onClick={() => {
+                                            const middle = Math.floor(document.documentElement.scrollHeight / 2);
+                                            window.scrollTo({ top: middle, behavior: "smooth" });
+                                        }}
+                                    >
+                                        Circulation History
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link 
+                                        to="/user/support" 
+                                        className="hover:text-white transition block"
+                                        onClick={handleLinkClick}
+                                    >
+                                        Support Center
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  const handleMostPopularClick = () => {
-    // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
-    navigate("/user/bookmanagement/?view=mostPopular")
+            {/* Back to Top Button */}
+            <button
+                onClick={scrollToTop}
+                className="fixed bottom-16 right-6 bg-arcadia-red hover:bg-red-700 text-white p-3 rounded-full shadow-lg transition-all"
+                aria-label="Back to top"
+            >
+                <FaArrowUp size={20} />
+            </button>
+        </footer>
+    );
+};
 
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
-
-  const handleFictionBooks = () => {
-    // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
-    navigate("/user/bookmanagement/?view=fictionBooks")
-
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
-
-  const handleNonfictionBooks = () => {
-    // Navigate to home page with a query parameter to indicate showing the expanded HighlyRated component
-    navigate("/user/bookmanagement/?view=nonFictionBooks")
-
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
-
-
-  return (
-    <footer className="bg-arcadia-black w-full px-4 py-10">
-      <div className="container mx-auto max-w-6xl">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-items-center text-center">
-          <div>
-            <h4 className="text-lg font-semibold text-left mb-4 text-white">
-              <Link
-                to="/user/bookmanagement"
-                className="hover:underline"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                Book Catalog
-              </Link>
-            </h4>
-            <ul className="text-sm text-grey text-left space-y-2">
-              <li><button
-                onClick={handleMostPopularClick}
-                className="text-grey hover:text-white hover:underline cursor-pointer text-left"
-              >
-                Most Popular Books
-              </button></li>
-              <li>
-                <button
-                  onClick={handleHighlyRatedClick}
-                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
-                >
-                  Highest Rated Books
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={handleFictionBooks}
-                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
-                >
-                  Fiction
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={handleNonfictionBooks}
-                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
-                >
-                  Non-fiction
-                </button>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold text-left mb-4 text-white">
-              <Link
-                to="/user/researchmanagement"
-                className="hover:underline"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                Research Catalog
-              </Link>
-            </h4>
-            <ul className="text-sm text-grey text-left space-y-2">
-              <li>
-              <button
-                  onClick={handleRecommendedResearch}
-                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
-                >
-                  Recommended Research
-                </button>
-              </li>
-              <li>
-              <button
-                  onClick={handleRecentlyPubliched}
-                  className="text-grey hover:text-white hover:underline cursor-pointer text-left"
-                >
-                  Newly Added Research
-                </button>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold text-left mb-4 text-white">
-              <Link
-                to="/user/reservations"
-                className="hover:underline"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                Reservations
-              </Link>
-            </h4>
-            <ul className="text-sm text-grey text-left space-y-2">
-              <li>
-                <Link
-                  to="/user/reservations#reserv-a-room"
-                  className="hover:underline"
-                  onClick={() => {
-                    // Navigate to the page first
-                    setTimeout(() => {
-                      // After navigation, find and scroll to the element
-                      const element = document.getElementById("reserv-a-room")
-                      if (element) {
-                        element.scrollIntoView({ behavior: "smooth" })
-                      }
-                    }, 100)
-                  }}
-                >
-                  Reserve A Room
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/user/reservations#room-reservs"
-                  className="hover:underline"
-                  onClick={() => {
-                    // Navigate to the page first
-                    setTimeout(() => {
-                      // After navigation, find and scroll to the element
-                      const element = document.getElementById("room-reservs")
-                      if (element) {
-                        element.scrollIntoView({ behavior: "smooth" })
-                      }
-                    }, 100)
-                  }}
-                >
-                  Reservation Schedule
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold text-left mb-4 text-white">
-              <Link
-                to="/user/services"
-                className="hover:underline"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                Services
-              </Link>
-            </h4>
-            <ul className="text-sm text-grey text-left space-y-2">
-              <li>
-                <Link
-                  to="/user/faqs"
-                  className="hover:underline"
-                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                >
-                  FAQs
-                </Link>
-              </li>
-
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold text-left mb-4 text-white">
-              <Link
-                to="/user/support"
-                className="hover:underline"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                Support
-              </Link>
-            </h4>
-            <ul className="text-sm text-grey text-left space-y-2">
-              <li>
-                <Link
-                  to="/user/support/reportticket"
-                  className="hover:underline"
-                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                >
-                  User Reports
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/user/support/supportticket"
-                  className="hover:underline"
-                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                >
-                  Support Tickets
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/user/support"
-                  className="hover:underline"
-                  onClick={() => window.scrollTo({ bottom: 0, behavior: "smooth" })}
-                >
-                  Contacts
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold text-left mb-4 text-white">
-              <Link
-                to="/user/accountview"
-                className="hover:underline"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              >
-                User Account
-              </Link>
-            </h4>
-            <ul className="text-sm text-grey text-left space-y-2">
-              <li>
-                <Link
-                  to="/user/accountview"
-                  className="hover:underline"
-                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                >
-                  View Account
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/user/accountview"
-                  className="hover:underline"
-                  onClick={() => {
-                    const middleOfPage = Math.floor(document.documentElement.scrollHeight / 2);
-                    window.scrollTo({ top: middleOfPage, behavior: "smooth" });
-                  }}
-                >
-                  Circulation History
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </footer>
-  )
-}
-
-export default UFooter
-
+export default UFooter;

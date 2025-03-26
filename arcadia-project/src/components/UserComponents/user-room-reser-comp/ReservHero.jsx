@@ -53,12 +53,7 @@ const ReservHero = () => {
             Reserve discussion rooms <br />
             for group presentations, <br /> consultations, and meetings.
           </h1>
-          <button
-            onClick={handleReserveClick}
-            className="px-6 py-2 border border-white ml-4 rounded-full text-white hover:bg-arcadia-red hover:border-arcadia-red transition duration-300"
-          >
-            Click here to reserve a room
-          </button>
+
         </div>
       </section>
     </div>

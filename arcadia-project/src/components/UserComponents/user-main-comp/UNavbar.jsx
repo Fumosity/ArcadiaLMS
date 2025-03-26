@@ -18,7 +18,7 @@ export default function UNavbar() {
             Research Catalog
           </CustomLink>
           <CustomLink to="/user/reservations" className="userNav-link w-[150px] text-center" restricted>
-            Reservations
+            Room Reservations
           </CustomLink>
           <CustomLink to="/user/services" className="userNav-link w-[150px] text-center" restricted>
             Services
