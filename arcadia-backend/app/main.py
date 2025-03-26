@@ -2,17 +2,19 @@ from fastapi import FastAPI, File, UploadFile, Query
 from fastapi.responses import JSONResponse
 from PIL import Image
 import pytesseract
+import cv2
 import io
 import fitz 
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import re
-from joblib import load
+import joblib
 from datetime import datetime
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 import math
+
 from app.book_reco import get_recommendations
 from app.research_reco import get_rsrch_recommendations
 
@@ -27,11 +29,6 @@ app.add_middleware(
 )
 import os
 print("Current Working Directory:", os.getcwd())
-
-
-df = pd.read_csv('app/research_corpus.csv')
-
-print(df.head())
 
 excluded_sections = ["Approval Sheet", "Certificate of Originality", "Acknowledgement", "Table of Contents", "Access Leaf", "Acceptance Sheet", "Author Permission Statement", "List of Tables", "List of Figures", "List of Appendices", "List of Abbreviations"]
 resume_sections = ["Abstract", "Keywords"]
@@ -175,7 +172,7 @@ def preprocess_text(text):
     cleaned_lines = []
     for line in lines:
         # remove extra whitespace and lowercase the line
-        cleaned_line = re.sub(r"\s+‘~", " ", line).strip().lower()
+        cleaned_line = re.sub(r"[^\w\s.,'\"()-—:;/]", "", line).strip().lower()
         
         if cleaned_line:
             cleaned_lines.append(cleaned_line)
@@ -210,10 +207,14 @@ def replace_college_names(college_name):
   return college_name
 
 def convert_date(date_str):
-    month_year = datetime.strptime(date_str, "%b %Y")
-    
-    # format it to "YYYY-MM"
-    return month_year.strftime("%Y-%m")
+    formats = ["%B %Y", "%b %Y", "%m/%Y", "%Y-%m"]  # Full month, abbreviated month, numeric month, ISO format
+    for fmt in formats:
+        try:
+            month_year = datetime.strptime(date_str, fmt)
+            return month_year.strftime("%Y-%m")  # Standardized output
+        except ValueError:
+            continue
+    raise ValueError(f"Date format not recognized: {date_str}")
 
 def proper_case(name):
     lower_case_words = {
@@ -292,7 +293,9 @@ def classify_text_chunks(preprocessed_text, original_text, pipeline):
 
     return title, authors, college, abstract, keywords, pubdate    
 
-# Text extraction endpoint
+# Load the trained model
+pipeline = joblib.load("app/text_classifier_svm.pkl")
+
 @app.post("/extract-text/")
 async def extract_text(files: List[UploadFile] = File(...)):
     try:
@@ -300,10 +303,8 @@ async def extract_text(files: List[UploadFile] = File(...)):
         total_pages = 0
 
         for file in files:
-            # Initialize text for each file
             file_text = ""
 
-            # Handle PDF files
             if file.content_type == "application/pdf":
                 pdf_data = await file.read()
                 pdf_doc = fitz.open(stream=pdf_data, filetype="pdf")
@@ -311,143 +312,44 @@ async def extract_text(files: List[UploadFile] = File(...)):
 
                 total_pages += pdf_doc.page_count
 
-                # Convert each page to an image and apply OCR
                 for page_num in range(min(15, pdf_doc.page_count)):
                     page = pdf_doc[page_num]
                     pix = page.get_pixmap(dpi=300)
                     img = Image.open(io.BytesIO(pix.tobytes("png")))
-
-                    # Apply OCR to the page image
                     page_text = pytesseract.image_to_string(img, lang='eng')
 
                     file_text += page_text + "\n\n"
 
-            # Handle image files directly
             else:
                 image = Image.open(io.BytesIO(await file.read()))
                 text = pytesseract.image_to_string(image)
                 file_text += text + "\n\n"
                 total_pages += 1
 
-            # Append processed text for the current file
             total_text += file_text + "\n\n"
 
         # Preprocess and classify text
         presectioned_text, original_text, department = remove_sections(total_text)
         cleaned_text = preprocess_text(presectioned_text)
 
-        print("\n====TOTALTEXT====\n\n",total_text)
-        print("\n====PRESECTIONEDTEXT====\n\n",presectioned_text)
-        print("\n====CLEANEDTEXT====\n\n",cleaned_text)
+        print("\n====TOTAL TEXT====\n", total_text)
+        print("\n====PRESECTIONED TEXT====\n", presectioned_text)
+        print("\n====CLEANED TEXT====\n", cleaned_text)
 
-        """
-        ===LABELING AND FEATURE EXTRACTION===
-        """
-
-        from sklearn.feature_extraction.text import TfidfVectorizer
-
-        vectorizer = TfidfVectorizer(stop_words='english')
-
-        # Assume you have a list of clean text documents
-        documents = [cleaned_text] 
-        X = vectorizer.fit_transform(documents)
-
-        # Convert the TF-IDF matrix to a more readable form
-        feature_names = vectorizer.get_feature_names_out()
-        dense = X.todense()
-        df_tfidf  = pd.DataFrame(dense, columns=feature_names)
-
-        print("feature extraction:\n\n", df_tfidf)
-
-        """
-        ===TRAINING===
-        """
-
-        from sklearn.model_selection import train_test_split
-        from sklearn.svm import SVC
-        from sklearn.metrics import accuracy_score
-        from sklearn.metrics import classification_report, confusion_matrix
-        from sklearn.pipeline import Pipeline
-        from sklearn.compose import ColumnTransformer
-        from sklearn.preprocessing import FunctionTransformer
-        import numpy as np
-
-        # Reshape the dataset
-        # Assuming `df` has columns 'text' (chunks) and 'label' (category)
-        data = {
-            "text": [],
-            "label": []
-        }
-
-        for column in ['title', 'authors', 'college', 'abstract', 'keywords', 'pubdate']:
-            for text in df[column]:
-                data["text"].append(text)
-                data["label"].append(column)
-
-        # Create a new DataFrame
-        classification_df = pd.DataFrame(data)
-        # Clean the data to remove NaN values
-        classification_df = classification_df.dropna(subset=["text", "label"])
-        classification_df["text"] = classification_df["text"].fillna("")
-
-        # Normalize text data
-        classification_df["text"] = classification_df["text"].str.lower()
-        classification_df["text"] = classification_df["text"].str.replace(r"\s+", " ", regex=True)  # Replace extra spaces
-        classification_df["text"] = classification_df["text"].str.replace(r'[^\w\s.,\'"()-—:;/]', '', regex=True)  # Remove punctuation
-        classification_df['text_length'] = classification_df['text'].apply(len)
-
-        # Text length
-        def add_text_length(X):
-            return np.array([[len(text)] for text in X])
-
-        X = classification_df[['text', 'text_length']]
-        y = classification_df['label']
-
-        # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
-
-        # Create a transformer for text length
-        text_length_transformer = FunctionTransformer(add_text_length, validate=False)
-
-        # Create a column transformer that combines TF-IDF and text length
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ('tfidf', TfidfVectorizer(stop_words='english', ngram_range=(1, 2), max_features=10000), 'text'),
-                ('text_length', text_length_transformer, 'text')
-            ])
-
-        # Create a pipeline that first applies the preprocessor and then fits the model
-        pipeline = Pipeline(steps=[
-            ('preprocessor', preprocessor),
-            ('classifier', SVC(class_weight="balanced", C=10, kernel="linear"))
-        ])
-
-        # Train the model
-        pipeline.fit(X_train, y_train)
-
-        # Evaluate the model
-        y_pred = pipeline.predict(X_test)
-
-        # Print evaluation results
-        from sklearn.metrics import accuracy_score, classification_report
-        print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
-        print(classification_report(y_test, y_pred))
-
+        # Use the trained pipeline to classify the text
         title, authors, college, abstract, keywords, pubdate = classify_text_chunks(cleaned_text, original_text, pipeline)
 
+        # Post-processing
         keywords_pattern = re.compile(r'\b(keywords?|key words?)\b', re.IGNORECASE)
-
         if keywords_pattern.search(title):
             title, keywords = keywords, title
 
         keywords = re.sub(r'\b(keywords?|key words?)\b.*?(?:—|:)?\s*', '', keywords, flags=re.IGNORECASE).strip()
-
-        # Format output
         authors = format_authors(authors)
         college = replace_college_names(college)
+        print("pre-error", pubdate)
         pubdate = convert_date(pubdate)
+        print("post-error", pubdate)
         title = proper_case(title)
 
         print("=====Final Classification=====")
@@ -459,7 +361,6 @@ async def extract_text(files: List[UploadFile] = File(...)):
         print(f"Keywords: {keywords}\n")
         print(f"Publication Date: {pubdate}\n")
 
-        # Return JSON response
         return JSONResponse(content={
             "text": cleaned_text,
             "total_pages": total_pages,
@@ -471,7 +372,7 @@ async def extract_text(files: List[UploadFile] = File(...)):
             "pubDate": pubdate,
             "keywords": keywords
         })
-    
+
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 

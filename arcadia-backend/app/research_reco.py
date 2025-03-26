@@ -9,7 +9,7 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Fetch book data
-data = supabase.table("research").select("researchID", "title", "author", "college", "department", "keywords", "abstract", "pubDate", "researchARCID").execute()
+data = supabase.table("research").select("researchID", "title", "author", "college", "department", "keywords", "abstract", "pubDate", "researchCallNum").execute()
 df = pd.DataFrame(data.data)
 
 # Preprocess data
@@ -32,4 +32,4 @@ def get_rsrch_recommendations(researchID, cosine_sim=cosine_sim, df=df):
     print(f"Chosen Book (ID: {researchID}):")
     print(df[['title', 'college', 'department', 'keywords']].iloc[idx])
     print("\nRecommendations:")
-    return df[['researchID', 'title', 'college', 'department', 'keywords', 'abstract', 'pubDate', 'author', 'researchARCID']].iloc[book_indices]
+    return df[['researchID', 'title', 'college', 'department', 'keywords', 'abstract', 'pubDate', 'author', 'researchCallNum']].iloc[book_indices]
