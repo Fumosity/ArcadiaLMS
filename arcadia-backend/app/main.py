@@ -212,9 +212,8 @@ def convert_date(date_str):
         try:
             month_year = datetime.strptime(date_str, fmt)
             return month_year.strftime("%Y-%m")  # Standardized output
-        except ValueError:
-            continue
-    raise ValueError(f"Date format not recognized: {date_str}")
+        except:
+            return None
 
 def proper_case(name):
     lower_case_words = {
@@ -316,13 +315,25 @@ async def extract_text(files: List[UploadFile] = File(...)):
                     page = pdf_doc[page_num]
                     pix = page.get_pixmap(dpi=300)
                     img = Image.open(io.BytesIO(pix.tobytes("png")))
-                    page_text = pytesseract.image_to_string(img, lang='eng')
+                    img_cv = np.array(img)  # Convert PIL to NumPy
+                    img_cv = cv2.cvtColor(img_cv, cv2.COLOR_RGB2GRAY)  # Convert to grayscale
+                    img_cv = cv2.GaussianBlur(img_cv, (3, 3), 0)  # Reduce noise
+                    _, img_cv = cv2.threshold(img_cv, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)  # Binarization
+
+                    page_text = pytesseract.image_to_string(img_cv, lang='eng')
+
 
                     file_text += page_text + "\n\n"
 
             else:
                 image = Image.open(io.BytesIO(await file.read()))
-                text = pytesseract.image_to_string(image)
+                img_cv = np.array(image)  # Convert PIL image to NumPy array
+                img_cv = cv2.cvtColor(img_cv, cv2.COLOR_RGB2GRAY)  # Convert to grayscale
+                img_cv = cv2.GaussianBlur(img_cv, (3, 3), 0)  # Apply Gaussian Blur
+                _, img_cv = cv2.threshold(img_cv, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)  # Binarization
+
+                text = pytesseract.image_to_string(img_cv, lang='eng')
+
                 file_text += text + "\n\n"
                 total_pages += 1
 
@@ -364,13 +375,13 @@ async def extract_text(files: List[UploadFile] = File(...)):
         return JSONResponse(content={
             "text": cleaned_text,
             "total_pages": total_pages,
-            "title": title,
-            "abstract": abstract,
-            "author": authors,
-            "college": college,
-            "department": department,
-            "pubDate": pubdate,
-            "keywords": keywords
+            "title": title if title else "",
+            "abstract": abstract if abstract else "",
+            "author": authors if authors else "",
+            "college": college if college else "",
+            "department": department if department else "",
+            "pubDate": pubdate if pubdate else "",
+            "keywords": keywords if keywords else ""
         })
 
     except Exception as e:

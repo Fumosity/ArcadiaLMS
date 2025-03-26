@@ -49,19 +49,22 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
         }
       });
 
+      console.log("Backend response:", response.data);
+
+
       console.log("Extracted text from backend:", response.data.text);
 
       let reformatPubDate = response.data.pubDate + "-01"
 
       const extractedData = {
-        title: response.data.title,
-        abstract: response.data.abstract,
-        author: response.data.author,
-        keyword: response.data.keywords,
-        pubDate: reformatPubDate,
-        department: response.data.department,
-        college: response.data.college,
-      };
+        title: response.data.title || "",
+        abstract: response.data.abstract || "",
+        author: response.data.author || "",
+        keyword: response.data.keywords || "",
+        pubDate: reformatPubDate || "",
+        department: response.data.department || "",
+        college: response.data.college || "",
+      };      
 
       setExtractedData(extractedData);
       onFileSelect(uploadedFiles); // Add extractedData here
