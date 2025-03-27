@@ -30,13 +30,32 @@ const RoomReserv = () => {
   }
 
   const formatTime = (timeString) => {
-    if (!timeString) return "Invalid Time";
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
+    if (!timeString) return "Invalid Time"
+    try {
+      return new Date(`2000-01-01T${timeString}`).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
+    } catch (error) {
+      return "Invalid Time"
+    }
+  }
+
+  const formatPeriod = (periodString) => {
+    if (!periodString) return "Invalid Period"
+
+    const [startTime, endTime] = periodString.split(" - ")
+    if (!startTime || !endTime) return periodString
+
+    try {
+      const formattedStart = formatTime(startTime)
+      const formattedEnd = formatTime(endTime)
+      return `${formattedStart} - ${formattedEnd}`
+    } catch (error) {
+      return periodString
+    }
+  }
 
   // Filter, Sort, and Search Logic
   const filteredReservations = useMemo(() => {
@@ -84,15 +103,18 @@ const RoomReserv = () => {
           console.error("Error fetching reservations:", error.message)
         } else {
           const formattedData = data.map((item) => ({
-            date: item.reservationData.date ? new Date(item.reservationData.date).toISOString().split("T")[0] : "Invalid Date",
+            date: item.reservationData.date
+              ? new Date(item.reservationData.date).toISOString().split("T")[0]
+              : "Invalid Date",
             room: item.reservationData.room || "Unknown Room",
             purpose: item.reservationData.title || "No Purpose",
-            period: item.reservationData.startTime && item.reservationData.endTime
-              ? `${(item.reservationData.startTime)} - ${(item.reservationData.endTime)}`
-              : "Invalid Time",
+            period:
+              item.reservationData.startTime && item.reservationData.endTime
+                ? `${item.reservationData.startTime} - ${item.reservationData.endTime}`
+                : "Invalid Time",
             name: item.user_accounts ? `${item.user_accounts.userFName} ${item.user_accounts.userLName}` : "N/A",
             user_accounts: item.user_accounts,
-          }));
+          }))
 
           setReservations(formattedData)
         }
@@ -106,16 +128,60 @@ const RoomReserv = () => {
     fetchReservations()
   }, [])
 
-  // Process data for the chart
-  const chartData = reservations.reduce((acc, res) => {
-    const existingEntry = acc.find((entry) => entry.date === res.date)
-    if (existingEntry) {
-      existingEntry.count += 1
+  const filterDataByTimeFrame = () => {
+    const today = new Date()
+    const filtered = [...reservations]
+
+    if (timeFrame === "day") {
+      return filtered.filter((res) => {
+        const resDate = new Date(res.date)
+        return resDate.toDateString() === today.toDateString()
+      })
+    } else if (timeFrame === "week") {
+      const weekStart = new Date(today)
+      weekStart.setDate(today.getDate() - today.getDay())
+      return filtered.filter((res) => {
+        const resDate = new Date(res.date)
+        return resDate >= weekStart
+      })
     } else {
-      acc.push({ date: res.date, count: 1 })
+      // month
+      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+      return filtered.filter((res) => {
+        const resDate = new Date(res.date)
+        return resDate >= monthStart
+      })
     }
-    return acc
-  }, [])
+  }
+
+  // Process data for the chart
+  const chartData = useMemo(() => {
+    const filteredByTime = filterDataByTimeFrame()
+
+    // Group reservations by date and room
+    const dataByDate = filteredByTime.reduce((acc, res) => {
+      const date = res.date
+      if (!acc[date]) {
+        acc[date] = {
+          date,
+          "Discussion Room": 0,
+          "Law Discussion Room": 0,
+        }
+      }
+
+      // Increment the count for the specific room
+      if (res.room === "Discussion Room") {
+        acc[date]["Discussion Room"] += 1
+      } else if (res.room === "Law Discussion Room") {
+        acc[date]["Law Discussion Room"] += 1
+      }
+
+      return acc
+    }, {})
+
+    // Convert to array for the chart
+    return Object.values(dataByDate)
+  }, [reservations, timeFrame])
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
@@ -128,7 +194,10 @@ const RoomReserv = () => {
         </label>
         <select
           id="time-frame"
-          onChange={(e) => setTimeFrame(e.target.value)}
+          onChange={(e) => {
+            setTimeFrame(e.target.value)
+            // The chartData will automatically update due to the dependency in useMemo
+          }}
           value={timeFrame}
           className="border border-grey rounded-md py-1 px-2"
         >
@@ -138,7 +207,7 @@ const RoomReserv = () => {
         </select>
       </div>
 
-      {/* Bar Chart for Room Reservations */}
+      {/* Stacked Bar Chart for Room Reservations */}
       <div className="w-full mb-6">
         <ResponsiveContainer width="100%" aspect={3}>
           <BarChart data={chartData}>
@@ -147,7 +216,8 @@ const RoomReserv = () => {
             <YAxis allowDecimals={false} />
             <Tooltip />
             <Legend />
-            <Bar dataKey="count" fill="#FFB200" name="Reservations" />
+            <Bar dataKey="Discussion Room" stackId="a" fill="#FFB200" name="Discussion Room" />
+            <Bar dataKey="Law Discussion Room" stackId="a" fill="#36A2EB" name="Law Discussion Room" />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -251,9 +321,12 @@ const RoomReserv = () => {
                         year: "numeric",
                       })}
                     </td>
-                    <td className="px-4 py-3 text-sm text-center">{res.period}</td>
+                    <td className="px-4 py-3 text-sm text-center">{formatPeriod(res.period)}</td>
                     <td className="px-4 py-3 text-sm text-center">
-                      <button onClick={() => handleUserClick(res)} className="text-sm text-arcadia-red font-semibold hover:underline">
+                      <button
+                        onClick={() => handleUserClick(res)}
+                        className="text-sm text-arcadia-red font-semibold hover:underline"
+                      >
                         {res.name}
                       </button>
                     </td>
@@ -295,4 +368,3 @@ const RoomReserv = () => {
 }
 
 export default RoomReserv
-

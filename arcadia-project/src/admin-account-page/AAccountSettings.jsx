@@ -17,9 +17,6 @@ const AAccountSettings = () => {
                         {/* Hero Section */}
                         <AdminCredentials />
                         <AdminSettings />
-
-
-
                     </div>
                 </div>
             </main>

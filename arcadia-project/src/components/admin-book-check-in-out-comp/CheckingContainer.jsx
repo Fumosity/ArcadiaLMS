@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../../supabaseClient"
 import BarcodeScanner from "./BarcodeScanner"
+import { toast, ToastContainer } from "react-toastify" // Import ToastContainer
+import "react-toastify/dist/ReactToastify.css"
 
 const CheckingContainer = () => {
   const [checkMode, setCheckMode] = useState("Check Out")
@@ -57,6 +59,32 @@ const CheckingContainer = () => {
         time: getLocalTime(),
         deadline: "", // Clear deadline when "Check In" is selected
       }))
+
+      // Clear book suggestions when switching to Check In mode
+      setBookSuggestions([])
+
+      // Also clear book title and barcode when switching modes
+      if (formData.bookTitle || formData.bookBarcode) {
+        setFormData((prev) => ({
+          ...prev,
+          bookTitle: "",
+          bookBarcode: "",
+        }))
+        setBookCover("")
+      }
+    } else {
+      // Clear book suggestions when switching to Check Out mode
+      setBookSuggestions([])
+
+      // Also clear book title and barcode when switching modes
+      if (formData.bookTitle || formData.bookBarcode) {
+        setFormData((prev) => ({
+          ...prev,
+          bookTitle: "",
+          bookBarcode: "",
+        }))
+        setBookCover("")
+      }
     }
   }, [checkMode])
 
@@ -259,7 +287,7 @@ const CheckingContainer = () => {
 
                 // Show available barcodes
                 const barcodeList = availableCopies.map((copy) => copy.bookBarcode).join(", ")
-                alert(`Available barcodes: ${barcodeList}`)
+                toast.info(`Available barcodes: ${barcodeList}`)
               }
             }
           } else {
@@ -285,7 +313,7 @@ const CheckingContainer = () => {
               bookTitle: titleData.title,
               bookBarcode: "", // No available copy
             }))
-            alert("No available copies of this book found.")
+            toast.error("No available copies of this book found.")
           }
         }
       }
@@ -309,6 +337,29 @@ const CheckingContainer = () => {
     window.fillFormFromReservation = fillFormFromReservation
   }
 
+  // Function to check if user has reached borrowing limit
+  const checkBorrowingLimit = async (userID) => {
+    try {
+      const { data, error, count } = await supabase
+        .from("book_transactions")
+        .select("*", { count: "exact" })
+        .eq("userID", userID)
+        .eq("transactionType", "Borrowed")
+        .is("checkinDate", null)
+
+      if (error) {
+        console.error("Error checking borrowing limit:", error)
+        return false
+      }
+
+      console.log("Current borrowed books count:", count)
+      return count >= 5 // Return true if limit reached
+    } catch (error) {
+      console.error("Error in checkBorrowingLimit:", error)
+      return false
+    }
+  }
+
   const handleSubmit = async () => {
     // Check if all required fields are filled
     const requiredFields = ["userID", "bookBarcode", "date", "time", "schoolNo", "name", "college", "bookTitle"]
@@ -328,7 +379,7 @@ const CheckingContainer = () => {
     if (Object.keys(emptyFields).length > 0) {
       setEmptyFields(emptyFields) // Set empty fields state
       console.log(emptyFields)
-      alert("Please fill in all required fields.")
+      toast.error("Please fill in all required fields.")
       return // Prevent form submission if any required field is empty
     }
 
@@ -342,6 +393,15 @@ const CheckingContainer = () => {
 
       // If the mode is 'Check Out', perform the checkout logic
       if (checkMode === "Check Out") {
+        // Check if user has reached borrowing limit
+        const limitReached = await checkBorrowingLimit(userID)
+
+        if (limitReached) {
+          toast.error("You have reached the maximum limit of 5 borrowed books.")
+          setIsSubmitting(false)
+          return // Exit the function if limit reached
+        }
+
         const { data: existingTransaction, error: fetchError } = await supabase
           .from("book_transactions")
           .select("transactionType")
@@ -357,7 +417,8 @@ const CheckingContainer = () => {
 
         // Prevent checkout if a "Borrowed" transaction exists
         if (existingTransaction) {
-          alert("This book is already borrowed. You cannot check it out again.")
+          toast.error("This book is already borrowed. You cannot check it out again.")
+          setIsSubmitting(false)
           return // Exit the function if the book is already borrowed
         }
 
@@ -369,6 +430,8 @@ const CheckingContainer = () => {
 
         if (updateError) {
           console.error("Error updating book status to Unavailable:", updateError)
+          toast.error("Error updating book status. Please try again.")
+          setIsSubmitting(false)
           return // Exit if there's an error updating the status
         }
 
@@ -386,10 +449,12 @@ const CheckingContainer = () => {
 
         if (error) {
           console.error("Error inserting transaction:", error)
-          alert("Error submitting the form. Please try again.")
+          toast.error("Error submitting the form. Please try again.")
         } else {
           console.log("Transaction successful:", data)
-          alert("Transaction completed successfully!")
+          toast.success("Book checked out successfully!")
+          // Reset form for a new transaction
+          resetForm()
         }
       }
 
@@ -411,7 +476,7 @@ const CheckingContainer = () => {
 
         // Prevent check-in if the book is not currently borrowed
         if (!existingTransaction) {
-          alert("This book is not marked as borrowed or has already been checked in.")
+          toast.error("This book is not marked as borrowed or has already been checked in.")
           return // Exit the function if the book is not currently borrowed
         }
 
@@ -444,14 +509,42 @@ const CheckingContainer = () => {
           return // Exit if there's an error updating the status
         }
 
-        alert("Book checked in successfully and transaction updated!")
+        toast.success("Book checked in successfully and transaction updated!")
+        // Reset form for a new transaction
+        resetForm()
       }
     } catch (error) {
       console.error("Error processing transaction:", error)
-      alert("An error occurred. Please try again.")
+      toast.error("An error occurred. Please try again.")
     } finally {
       setIsSubmitting(false) // Set submitting state back to false when done
     }
+  }
+
+  // Add this function after handleSubmit
+  const resetForm = () => {
+    // Reset form data to initial state
+    setFormData({
+      schoolNo: "",
+      name: "",
+      college: "",
+      department: "",
+      bookTitle: "",
+      bookBarcode: "",
+      date: new Date().toISOString().split("T")[0], // Current date
+      time: getLocalTime(), // Current time
+      deadline: "", // Initialize deadline as empty
+      userID: "",
+    })
+
+    // Reset other states
+    setEmptyFields({})
+    setIsDamaged(false)
+    setBookCover("")
+    setBookSuggestions([])
+
+    // Optionally, you can reset the check mode to "Check Out" if needed
+    // setCheckMode("Check Out");
   }
 
   useEffect(() => {
@@ -464,27 +557,73 @@ const CheckingContainer = () => {
 
       setIsSearching(true)
       try {
-        const { data, error } = await supabase
-          .from("book_indiv")
-          .select("bookBarcode, book_titles!inner(title)") // Ensure the join is enforced
-          .ilike("book_titles.title", `%${formData.bookTitle}%`)
-          .limit(5)
+        // Different query based on check mode
+        if (checkMode === "Check In") {
+          // For Check In, we want to search for books that are currently borrowed
+          // First, get the user's borrowed books from transactions
+          if (!formData.userID) {
+            setBookSuggestions([])
+            setIsSearching(false)
+            return
+          }
 
-        if (error) {
-          console.error("Error fetching book titles:", error)
-          setBookSuggestions([])
+          const { data: borrowedBooks, error: borrowedError } = await supabase
+            .from("book_transactions")
+            .select("bookBarcode")
+            .eq("userID", formData.userID)
+            .eq("transactionType", "Borrowed")
+            .is("checkinDate", null)
+
+          if (borrowedError || !borrowedBooks || borrowedBooks.length === 0) {
+            console.error("Error fetching borrowed books or no books found:", borrowedError)
+            setBookSuggestions([])
+            setIsSearching(false)
+            return
+          }
+
+          // Get the barcodes of borrowed books
+          const borrowedBarcodes = borrowedBooks.map((book) => book.bookBarcode)
+
+          // Now fetch book details for these barcodes that match the search term
+          const { data: bookDetails, error: detailsError } = await supabase
+            .from("book_indiv")
+            .select("bookBarcode, book_titles!inner(title)")
+            .in("bookBarcode", borrowedBarcodes)
+            .ilike("book_titles.title", `%${formData.bookTitle}%`)
+
+          if (detailsError) {
+            console.error("Error fetching book details:", detailsError)
+            setBookSuggestions([])
+          } else {
+            console.log("Fetched borrowed books:", bookDetails)
+            setBookSuggestions(bookDetails || [])
+          }
         } else {
-          console.log("Fetched books:", data) // Debugging log
-          setBookSuggestions(data)
+          // For Check Out, we want available books
+          const { data, error } = await supabase
+            .from("book_indiv")
+            .select("bookBarcode, book_titles!inner(title)")
+            .eq("bookStatus", "Available") // Only show available books for checkout
+            .ilike("book_titles.title", `%${formData.bookTitle}%`)
+            .limit(5)
+
+          if (error) {
+            console.error("Error fetching book titles:", error)
+            setBookSuggestions([])
+          } else {
+            console.log("Fetched available books:", data)
+            setBookSuggestions(data || [])
+          }
         }
       } catch (error) {
         console.error("Error fetching books:", error)
+        setBookSuggestions([])
       }
       setIsSearching(false)
     }
 
     fetchBookTitles()
-  }, [formData.bookTitle])
+  }, [formData.bookTitle, checkMode, formData.userID])
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
@@ -566,7 +705,9 @@ const CheckingContainer = () => {
                         name="bookTitle"
                         value={formData.bookTitle}
                         onChange={handleInputChange}
-                        placeholder="Search book title..."
+                        placeholder={
+                          checkMode === "Check In" ? "Search your borrowed books..." : "Search available books..."
+                        }
                         className="px-3 py-1 w-full rounded-full border border-grey"
                         onFocus={() => {
                           if (bookSuggestions.length > 0) setShowSuggestions(true)
@@ -676,6 +817,19 @@ const CheckingContainer = () => {
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
+
+      {/* Add ToastContainer here */}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   )
 }
