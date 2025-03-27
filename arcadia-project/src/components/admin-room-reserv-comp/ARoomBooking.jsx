@@ -13,7 +13,7 @@ export default function ARoomBooking({ addReservation }) {
     room: "Discussion Room",
     date: "",
     startTime: "07:00",
-    endTime: "05:00",
+    endTime: "08:00",
     title: "",
   })
 
@@ -285,7 +285,7 @@ export default function ARoomBooking({ addReservation }) {
         console.log("Reservation successfully saved:", data)
         toast.success("Reservation successfully saved", {
           position: "bottom-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -296,7 +296,7 @@ export default function ARoomBooking({ addReservation }) {
         })
         setTimeout(() => {
           window.location.reload();
-        }, 3000);
+        }, 1500);
       }
     } catch (error) {
       console.error("Error while submitting reservation:", error.message)

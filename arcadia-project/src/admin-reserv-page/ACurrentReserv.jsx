@@ -145,7 +145,7 @@ export default function ACurrentReserv() {
       // Fetch active reservations with user data
       const { data: activeData, error: activeError } = await supabase
         .from("reservation")
-        .select("*, user_accounts(userFName, userLName, userID)")
+        .select("*, user_accounts(userFName, userLName, userID, userAccountType)")
 
       if (activeError) {
         console.error("Error fetching active reservations:", activeError.message)
@@ -587,7 +587,10 @@ export default function ACurrentReserv() {
                   Period
                 </th>
                 <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Borrower
+                  Booker
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Type
                 </th>
                 <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Purpose
@@ -600,7 +603,7 @@ export default function ACurrentReserv() {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="px-4 py-2 text-center">
+                  <td colSpan="7" className="px-4 py-2 text-center">
                     Loading data...
                   </td>
                 </tr>
@@ -626,6 +629,7 @@ export default function ACurrentReserv() {
                         {res.name}
                       </button>
                     </td>
+                    <td className="px-4 py-3 text-sm text-center">{res.user_accounts?.userAccountType || "N/A"}</td>
                     <td className="px-4 py-3 text-sm text-center">{res.purpose}</td>
                     <td className="px-4 py-3 text-sm text-center">
                       <div className="flex justify-center space-x-2">
@@ -647,7 +651,7 @@ export default function ACurrentReserv() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
+                  <td colSpan="7" className="px-4 py-2 text-center text-zinc-600">
                     No data available.
                   </td>
                 </tr>
@@ -780,7 +784,7 @@ export default function ACurrentReserv() {
             // Fetch active reservations with user data
             const { data: activeData, error: activeError } = await supabase
               .from("reservation")
-              .select("*, user_accounts(userFName, userLName, userID)")
+              .select("*, user_accounts(userFName, userLName, userID, userAccountType)")
 
             if (activeError) {
               console.error("Error fetching active reservations:", activeError.message)

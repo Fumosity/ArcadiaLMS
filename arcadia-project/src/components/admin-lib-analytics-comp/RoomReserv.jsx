@@ -72,7 +72,8 @@ const RoomReserv = () => {
         (res) =>
           res.room.toLowerCase().includes(searchTerm.toLowerCase()) ||
           res.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          res.purpose.toLowerCase().includes(searchTerm.toLowerCase()),
+          res.purpose.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (res.user_accounts?.userAccountType || "").toLowerCase().includes(searchTerm.toLowerCase()),
       )
     }
 
@@ -97,7 +98,7 @@ const RoomReserv = () => {
         setLoading(true)
         const { data, error } = await supabase
           .from("reservation")
-          .select("reservationData, user_accounts(userFName, userLName, userID)")
+          .select("reservationData, user_accounts(userFName, userLName, userID, userAccountType)")
 
         if (error) {
           console.error("Error fetching reservations:", error.message)
@@ -180,7 +181,12 @@ const RoomReserv = () => {
     }, {})
 
     // Convert to array for the chart
-    return Object.values(dataByDate)
+    const chartArray = Object.values(dataByDate)
+
+    // Sort by date in ascending order
+    chartArray.sort((a, b) => new Date(a.date) - new Date(b.date))
+
+    return chartArray
   }, [reservations, timeFrame])
 
   return (
@@ -273,7 +279,7 @@ const RoomReserv = () => {
               type="text"
               id="search"
               className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
-              placeholder="Room, booker, or purpose"
+              placeholder="Room, booker, type, or purpose"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -297,6 +303,9 @@ const RoomReserv = () => {
                   Booker
                 </th>
                 <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Type
+                </th>
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Purpose
                 </th>
               </tr>
@@ -304,7 +313,7 @@ const RoomReserv = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="px-4 py-2 text-center">
+                  <td colSpan="6" className="px-4 py-2 text-center">
                     Loading data...
                   </td>
                 </tr>
@@ -330,12 +339,13 @@ const RoomReserv = () => {
                         {res.name}
                       </button>
                     </td>
+                    <td className="px-4 py-3 text-sm text-center">{res.user_accounts?.userAccountType || "N/A"}</td>
                     <td className="px-4 py-3 text-sm text-center">{res.purpose}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="px-4 py-2 text-center text-zinc-600">
+                  <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
                     No data available.
                   </td>
                 </tr>
