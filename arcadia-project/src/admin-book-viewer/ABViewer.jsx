@@ -29,7 +29,7 @@ export default function ABViewer() {
 
         // Fetch book details
         const { data, error } = await supabase
-          .from("book_indiv")
+          .from("book_titles")
           .select("*")
           .eq("titleID", fetchedTitleID) // Fetch the book with the matching titleID
           .single() // Ensure we get a single result
