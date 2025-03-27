@@ -43,12 +43,6 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
         <h3 className="text-xl font-semibold mb-3">
           <Skeleton width={150} />
         </h3>
-        <div className="relative bg-white p-2 mb-4 rounded-lg">
-          <Skeleton height={200} width={150} className="mx-auto mb-2 rounded" />
-          <p className="text-xs text-gray-500 mb-2 text-center">
-            <Skeleton width={120} />
-          </p>
-        </div>
         <table className="min-w-full border-collapse">
           <tbody>
             {[...Array(10)].map((_, index) => (
@@ -136,19 +130,11 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
       
       <div className="bg-white p-4 rounded-lg border-grey border w-full">
         <h3 className="text-2xl font-semibold mb-2">Research Preview</h3>
-        <div className="w-full h-fit flex justify-center">
-          <div className="relative bg-white p-4 w-fit rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md border border-grey">
-            <img
-              src={research.cover && research.cover !== ""
-                ? research.cover
-                : "../image/book_research_placeholder.png"}
-              alt="Research cover"
-              className="h-[475px] w-[300px] rounded-lg border border-grey object-cover" />
-          </div>
-        </div>
         <table className="min-w-full border-collapse">
           <tbody>
-            {Object.entries(researchDetails).map(([key, value], index) => (
+            {Object.entries(researchDetails)
+            .filter(([key]) => !["researchID"].includes(key))
+            .map(([key, value], index) => (
               <tr key={index} className="border-b border-grey">
                 <td className="px-1 py-1 font-semibold capitalize w-1/3">
                   {key === "pubDate"

@@ -22,7 +22,6 @@ const ARAdd = () => {
     location: '',
     researchCallNum: '',
     pubDate: '',
-    cover: '',
     pdf: ''
   })
 

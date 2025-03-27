@@ -13,7 +13,6 @@ const ARAddPreview = ({ formData }) => {
     location = "N/A",
     researchID = "N/A",
     researchCallNum = "N/A",
-    cover
   } = formData;
 
   const thesisDetails = {
@@ -34,15 +33,10 @@ const ARAddPreview = ({ formData }) => {
     <div className="w-full">
       <div className="bg-white p-4 rounded-lg border-grey border w-full mt-12">
         <h3 className="text-2xl font-semibold mb-2">Research Preview</h3>
-        <div className="w-full h-fit flex justify-center ">
-          <div className="relative bg-white p-4 w-fit rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md border border-grey">
-            <img src={thesisDetails.cover || "/image/book_research_placeholder.png"} alt="Book cover" className="h-[475px] w-[300px] rounded-lg border border-grey object-cover" />
-          </div>
-        </div>
         <table className="min-w-full border-collapse">
           <tbody>
             {Object.entries(thesisDetails)
-            .filter(([key]) => !["cover", "databaseID"].includes(key))
+            .filter(([key]) => !["databaseID"].includes(key))
             .map(([key, value], index) => (
               <tr key={index} className="border-b border-grey">
                 <td className="px-1 py-1 font-semibold capitalize w-1/3" >

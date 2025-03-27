@@ -22,7 +22,6 @@ const ARModify = () => {
     location: queryParams.get("location") || '',
     researchID: queryParams.get("researchID") || '',
     researchCallNum: queryParams.get("researchCallNum") || '',
-    cover: queryParams.get("cover") || '',
   };
 
   const [formDataState, setFormData] = useState(formData);

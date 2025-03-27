@@ -17,7 +17,7 @@ const ARAbout = ({ researchData }) => {
             </div>
         );
 
-    // Destructure fields from researchData, including cover
+    // Destructure fields from researchData
     const researchDetails = {
         title: researchData.title,
         author: Array.isArray(researchData.author) ? researchData.author.join(', ') : (researchData.author ?? '').split(';').join(',') || '',
@@ -29,7 +29,6 @@ const ARAbout = ({ researchData }) => {
         pubDate: researchData.pubDate,
         location: researchData.location,
         researchARCID: researchData.researchARCID,
-        cover: researchData.cover,
         researchID: researchData.researchID
     }
 
@@ -54,20 +53,9 @@ const ARAbout = ({ researchData }) => {
             </div>
             <div className="bg-white p-4 rounded-lg border-grey border w-full">
                 <h3 className="text-2xl font-semibold mb-2">About</h3>
-                <div className="w-full h-fit flex justify-center">
-                    <div className="relative bg-white p-4 w-fit rounded-lg hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md border border-grey">
-                        <img
-                            src={researchDetails.cover && researchDetails.cover !== ""
-                                ? researchDetails.cover
-                                : "../image/book_research_placeholder.png"}
-                            alt="Research cover"
-                            className="h-[475px] w-[300px] rounded-lg border border-grey object-cover" />
-                    </div>
-                </div>
                 <table className="w-full border-collapse">
                     <tbody>
                         {Object.entries(researchDetails)
-                            .filter(([key]) => !["cover"].includes(key))
                             .map(([key, value], index) => (
                                 <tr key={index} className="border-b border-grey">
                                     <td className="px-1 py-1 font-semibold capitalize w-1/3">

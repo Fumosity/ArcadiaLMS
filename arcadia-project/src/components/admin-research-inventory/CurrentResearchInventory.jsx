@@ -24,7 +24,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
         const { data, error } = await supabase
           .from("research")
           .select(
-            "researchID, title, college, department, abstract, location, researchCallNum, pubDate, cover, author, keywords, pages",
+            "researchID, title, college, department, abstract, location, researchCallNum, pubDate, author, keywords, pages",
           )
 
         if (error) {

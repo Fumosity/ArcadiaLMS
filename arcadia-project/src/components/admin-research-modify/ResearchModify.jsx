@@ -5,7 +5,6 @@ import WrngRmvRsrchInv from "../../z_modals/warning-modals/WrngRmvRsrchInv";
 import {useNavigate } from "react-router-dom";
 
 const ResearchModify = ({ formData, setFormData, onSave }) => {
-  const coverInputRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
@@ -57,7 +56,6 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
       location: queryParams.get("location") || '',
       researchID: queryParams.get("researchID") || '',
       researchCallNum: queryParams.get("researchCallNum") || '',
-      cover: queryParams.get("cover") || '',
     };
 
     setFormData(initialFormData);
@@ -86,7 +84,6 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
       location: queryParams.get("location") || '',
       researchID: queryParams.get("researchID") || '',
       researchCallNum: queryParams.get("researchCallNum") || '',
-      cover: queryParams.get("cover") || '',
     };
 
     console.log(initialFormData)
@@ -152,33 +149,6 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
     }));
   };
 
-  const uploadCover = async (e) => {
-    let coverFile = e.target.files[0];
-    const filePath = `${uuidv4()}_${coverFile.name}`;
-
-    const { data, error } = await supabase.storage.from("research-covers").upload(filePath, coverFile, {
-      cacheControl: "3600",
-      upsert: false,
-    });
-
-    if (error) {
-      console.error("Error uploading image: ", error);
-    } else {
-      const { data: publicData, error: urlError } = supabase.storage.from("research-covers").getPublicUrl(filePath);
-
-      if (urlError) {
-        console.error("Error getting public URL: ", urlError.message);
-      } else {
-        setFormData({ ...formData, cover: publicData.publicUrl });
-      }
-    }
-  };
-
-  //Checks if the cover image input field was clicked
-  const handleCoverClick = () => {
-    coverInputRef.current.click();
-  };
-
   // Separate function to handle file uploads
   const handleFileSelect = async (files) => {
     console.log("Files received in handleFileSelect:", files);
@@ -191,88 +161,6 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
 
     setUploadedFiles(files);
     setPageCount(files.length);
-
-    // Check for the first file and set it as the cover
-    const firstFile = files[0];
-    if (!firstFile) return;
-
-    try {
-      // If the first file is an image
-      if (firstFile.type.startsWith("image/")) {
-        const filePath = `${uuidv4()}_${firstFile.name}`;
-        const { error } = await supabase.storage.from("research-covers").upload(filePath, firstFile, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-        if (error) {
-          console.error("Error uploading image cover: ", error);
-        } else {
-          const { data: publicData, error: urlError } = supabase.storage.from("research-covers").getPublicUrl(filePath);
-          if (urlError) {
-            console.error("Error getting public URL for cover image: ", urlError.message);
-          } else {
-            setFormData((prevData) => ({
-              ...prevData,
-              cover: publicData.publicUrl, // Set the public URL as the cover
-              pages: files.length,
-            }));
-          }
-        }
-      }
-      // If the first file is a PDF
-      else if (firstFile.type === "application/pdf") {
-        // Extract the first page of the PDF as an image (requires a library like `pdfjs-dist`)
-        const fileReader = new FileReader();
-        fileReader.onload = async () => {
-          const pdfData = new Uint8Array(fileReader.result);
-
-          // Use pdfjs-dist to load the PDF and render the first page as an image
-          const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-
-          const totalPages = pdf.numPages;
-
-          const page = await pdf.getPage(1);
-          const viewport = page.getViewport({ scale: 1.5 });
-
-          // Render the page to a canvas
-          const canvas = document.createElement("canvas");
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-
-          const context = canvas.getContext("2d");
-          await page.render({ canvasContext: context, viewport }).promise;
-
-          // Convert canvas to a Blob (image)
-          canvas.toBlob(async (blob) => {
-            const filePath = `${uuidv4()}_cover.jpg`;
-            const { error } = await supabase.storage.from("research-covers").upload(filePath, blob, {
-              cacheControl: "3600",
-              upsert: false,
-            });
-
-            if (error) {
-              console.error("Error uploading cover from PDF: ", error);
-            } else {
-              const { data: publicData, error: urlError } = supabase.storage.from("research-covers").getPublicUrl(filePath);
-              if (urlError) {
-                console.error("Error getting public URL for cover image: ", urlError.message);
-              } else {
-                setFormData((prevData) => ({
-                  ...prevData,
-                  cover: publicData.publicUrl, // Set the public URL as the cover
-                  pages: totalPages,
-                }));
-              }
-            }
-          }, "image/jpeg");
-        };
-
-        fileReader.readAsArrayBuffer(firstFile);
-      }
-    } catch (error) {
-      console.error("Error processing cover file:", error);
-    }
   };
 
 
@@ -397,25 +285,6 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
                 <input type="text" name="researchCallNum" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchCallNum} onChange={handleChange} placeholder="ARC Issued ID, eg. LPUCAV012345" required />
               </div>
             </form>
-
-
-          </div>
-
-          {/* Right Side: Research Cover Placeholder */}
-          <div className="flex flex-col items-center px-2 w-1/3 justify-end">
-            <label className="text-md mb-2">Research Cover:</label>
-            <div className="w-full h-fit flex justify-center">
-              <div className="border border-grey p-4 w-fit rounded-lg  hover:bg-light-gray transition" onClick={handleCoverClick}>
-                <img
-                  src={formData.cover || '/image/book_research_placeholder.png'}
-                  alt="Research cover placeholder"
-                  className="h-[375px] w-[225px] object-cover rounded-lg border border-grey"
-                />
-              </div>
-            </div>
-            <p className="text-sm text-gray-500 text-center m-2">Click to change research cover</p>
-
-            <input type="file" ref={coverInputRef} required className="hidden" onChange={uploadCover} accept="image/png, image/jpeg, image/jpg" />
           </div>
         </div>
 
