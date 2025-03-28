@@ -147,6 +147,7 @@ export function useRegisterForm(onBack, onRegister, userData) {
 
   const handleRegister = async (e, userType = "student") => {
     e.preventDefault()
+    setFormError("");
   
     // Check if any required fields are empty
     const requiredFields = [
@@ -197,11 +198,25 @@ export function useRegisterForm(onBack, onRegister, userData) {
       return
     }
   
-    // Check if student number already exists
-    const studentNumberExists = await checkStudentNumberExists(new_data.studentNumber)
-    if (studentNumberExists) {
-      setFormError("This account is taken")
-      return
+    //Get account details from form
+    const userEmail = `${new_data.email}${new_data.emailSuffix}`;
+    const studentNumber = new_data.studentNumber;
+
+    // Check if email or student number already exists
+    const { data: existingUser, error: fetchError } = await supabase
+      .from("user_accounts")
+      .select("userLPUID")
+      .or(`userEmail.eq.${userEmail},userLPUID.eq.${studentNumber}`);
+
+    if (fetchError) {
+      console.error("Error checking user existence:", fetchError);
+      setFormError("An error occurred while checking user details.");
+      return;
+    }
+
+    if (existingUser.length > 0) {
+      setFormError("This email or student number is already registered.");
+      return;
     }
   
     // Create a copy of the data for submission
