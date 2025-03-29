@@ -3,6 +3,7 @@ import { supabase } from "../../supabaseClient"
 import BarcodeScanner from "./BarcodeScanner"
 import { toast, ToastContainer } from "react-toastify" // Import ToastContainer
 import "react-toastify/dist/ReactToastify.css"
+import ScanBardodeModal from "../../z_modals/ScanBarcodeModal"
 
 const CheckingContainer = () => {
   const [checkMode, setCheckMode] = useState("Check Out")
@@ -14,6 +15,7 @@ const CheckingContainer = () => {
   const [bookSuggestions, setBookSuggestions] = useState([]) // Store search results
   const [isSearching, setIsSearching] = useState(false) // Loading state for search
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isViewOpen, setViewOpen] = useState("")
 
   // Function to get the PC's current local time
   const getLocalTime = () => {
@@ -668,19 +670,29 @@ const CheckingContainer = () => {
               }
 
               if (key === "bookBarcode") {
-                label = "Book Barcode"
-                afterInput = (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (isScannerOpen) return
-                      setIsScannerOpen(true)
-                    }}
-                    className="px-3 py-1 ml-2 rounded-full border border-grey w-[calc(2/5*100%)] hover:bg-light-gray transition"
-                  >
-                    Scan Barcode
-                  </button>
-                )
+                if (key === "bookBarcode") {
+                  label = "Book Barcode"
+                  afterInput = (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isScannerOpen) return
+                          setIsScannerOpen(true)
+                        }}
+                        className="px-3 py-1 ml-2 rounded-full border border-grey w-[calc(2/5*100%)] hover:bg-light-gray transition"
+                      >
+                        Scan Barcode
+                      </button>
+                      <button
+                        className="border border-grey px-2 py-0.5 rounded-xl hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md ml-2"
+                        onClick={() => setViewOpen(true)}
+                      >
+                        Scan Barcode Modal
+                      </button>
+                    </>
+                  )
+                }
               }
               if (key === "bookTitle") {
                 const handleBookSelection = (book) => {
@@ -830,6 +842,7 @@ const CheckingContainer = () => {
         draggable
         pauseOnHover
       />
+      <ScanBardodeModal isOpen={isViewOpen} onClose={() => setViewOpen(false)} />
     </div>
   )
 }
