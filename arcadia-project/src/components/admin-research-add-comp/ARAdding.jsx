@@ -174,7 +174,7 @@ const ARAdding = ({ formData, setFormData }) => {
           {/* Left Side: Form Section */}
           <div className="w-full">
             <p className="text-gray-600 mb-8">
-              Data points marked with an asterisk (*) are autofilled. Use a semicolon (;) or comma (,) to add multiple authors and keywords.
+              Use a semicolon (;) or comma (,) to add multiple authors and keywords.
             </p>
 
             <div className="flex-col justify-between items-center mb-6 space-y-2">

@@ -127,7 +127,11 @@ def remove_sections(text):
             department = ""  # Initialize department to prevent uninitialized access
             department = find_department(line_lower) # find department 
 
-        if line_lower.startswith("lyceum"): # skip header
+        # Pattern to match headers (allows variations)
+        header_pattern = re.compile(r"(LYCEUM\s+OF\s+THE\s+PHILIPPINES\s+UNIVERSITY|CARLO\s+M\.\s+RECTO\s+ACADEMY\s+OF\s+ADVANCED\s+STUDIES)", re.IGNORECASE)
+
+        # Skip if line matches pattern AND is uppercase
+        if header_pattern.search(line) and line.isupper():
             continue
 
         if line_lower.startswith("in partial fulfillment") or line_lower.startswith("an undergraduate"): # title page
@@ -322,16 +326,20 @@ def proper_case(name):
     return ' '.join(words)
 
 def format_authors(authors_text):
-    authors_text = re.sub(r'\s+', ' ', authors_text.strip())  # Normalize spaces
+    # Remove unwanted symbols but keep letters, spaces, periods, and hyphens
+    authors_text = re.sub(r"[^\w\s\.\-]", " ", authors_text)  # Convert unwanted chars to spaces
+    authors_text = re.sub(r"\s+", " ", authors_text).strip()  # Normalize spaces
+    
+    # Split potential author names
     words = authors_text.split(" ")
-
     formatted_authors = []
     current_author = []
 
+    # Process names properly
     for i, word in enumerate(words):
         current_author.append(word)
 
-        # Detect end of an author's name (e.g., "V.", "Jr.", "III")
+        # Detect name endings (e.g., "V.", "Jr.", "III")
         if i > 0 and (re.match(r'^[A-Z]\.$', words[i - 1]) or re.match(r'^(Jr|Sr|II|III|IV|V)\.?$', word, re.IGNORECASE)):
             formatted_authors.append(" ".join(current_author).strip())
             current_author = []
@@ -349,8 +357,6 @@ def format_authors(authors_text):
 
     return "; ".join(proper_case(author) for author in formatted_authors)
 
-import re
-
 def is_trash_text(text):
     """Checks if a text line is considered 'trash' and should be removed."""
     text = text.strip()
@@ -366,7 +372,6 @@ def is_trash_text(text):
         r"^\s*[a-zA-Z]{1,2}\s*$",  # Lines with only 1-2 letters
         r"^\s*By\s*$",  # Lines with just "By"
         r"^[^a-zA-Z0-9]+$",  # Lines with only special characters
-        r"^\s*(\w{1,3}\s*){3,}$",  # 3+ short words (e.g., "oe ee en")
         r"^\s*[a-z]+\s*$",  # Single lowercase word (possible OCR noise)
     ]
 
@@ -376,87 +381,74 @@ def is_trash_text(text):
 
     # Heuristic check for gibberish: mostly lowercase and contains many short words
     words = text.split()
-    if len(words) >= 3 and all(len(word) <= 3 for word in words):
-        return True  # Likely gibberish (e.g., "wee en ee eee")
+    
+    if len(words) >= 3:
+        short_words = [word for word in words if len(word) <= 3 and word.lower() not in {"of", "in", "and"}]
+        short_word_ratio = len(short_words) / len(words)
+
+        if short_word_ratio > 0.8:  # Flag only if at least 80% of words are short
+            return True  
 
     return False
-
 
 def classify_text_chunks(preprocessed_text, original_text, pipeline):
     preprocessed_chunks = preprocessed_text.split("\n\n")
     original_chunks = original_text.split("\n\n")
 
-    print(f"Preprocessed Chunks: {len(preprocessed_chunks)}, Original Chunks: {len(original_chunks)}")
-
-    assert len(preprocessed_chunks) == len(original_chunks), "Mismatch between preprocessed and original text chunks"
-
-    if len(preprocessed_chunks) != len(original_chunks):
-        print("\n===== CHUNK MISMATCH DETECTED =====")
-        for i, (pre, orig) in enumerate(zip(preprocessed_chunks, original_chunks)):
-            print(f"\n==== CHUNK {i} ====")
-            print(f"Preprocessed: {repr(pre)}")
-            print(f"Original: {repr(orig)}")
-
-        raise ValueError("Mismatch between preprocessed and original text chunks")
-
-    classified_sections = {label: "" for label in ['title', 'authors', 'college', 'abstract', 'keywords', 'pubdate']}
-
-    print("\n===== DEBUG: CHUNK CLASSIFICATION =====\n")
+    classified_sections = {label: "" for label in ['title', 'authors', 'college', 'abstract', 'keywords', 'pubDate']}
+    classified_chunks = []
 
     for i, chunk in enumerate(preprocessed_chunks):
         original_chunk = original_chunks[i].strip()
 
-        # Ignore very short chunks (junk text)
         if is_trash_text(chunk):
-            print(f"Skipping chunk {i} (trash text): {repr(chunk)}")
             continue
 
-        # Force date-like patterns into `pubdate`
         if re.match(r"^(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}$", chunk, re.IGNORECASE):
-            predicted_section = "pubdate"
+            predicted_section = "pubDate"
         else:
-            # Reshape chunk to 2D array (1 sample, 1 feature)
             chunk_reshaped = np.array([chunk]).reshape(-1, 1)
-
-            # Calculate the length of the chunk
             text_length = np.array([[len(chunk)]])
-
-            # Combine chunk and chunk length as an array of features
             combined_features = np.hstack([chunk_reshaped, text_length])
 
-            # Convert to DataFrame
             df_features = pd.DataFrame(combined_features, columns=['text', 'text_length'])
-            df_features['text_length'] = df_features['text_length'].astype(float)  # Ensure numerical format
+            df_features['text_length'] = df_features['text_length'].astype(float)
 
-            # Predict label
             predicted_section = pipeline.predict(df_features)[0]
 
-            # Improve college recognition
             if "academy" in chunk.lower() or "college" in chunk.lower() or "school" in chunk.lower():
                 predicted_section = "college"
 
-        # Print debug information
-        print(f"Chunk {i}:")
-        print(f"  Preprocessed Text: {repr(chunk)}")
-        print(f"  Original Text: {repr(original_chunk)}")
-        print(f"  Predicted Section: {predicted_section}\n")
+        # Store classified chunk
+        classified_chunks.append({
+            "Preprocessed_Text": chunk,
+            "Original_Text": original_chunk,
+            "Classification": predicted_section
+        })
 
-        # Append the chunk to the classified section
+        # Append text to section
         classified_sections[predicted_section] += original_chunk + " "
 
-    print("\n===== Initial Classification Result =====\n")
-    for section, content in classified_sections.items():
-        print(f"{section.capitalize()}: {content.strip()}\n")
-
-    # Assign classified sections to respective variables
+    # Post-processing
     title = classified_sections.get('title', "").strip()
     authors = classified_sections.get('authors', "").strip()
     college = classified_sections.get('college', "").strip()
     abstract = classified_sections.get('abstract', "").strip()
     keywords = classified_sections.get('keywords', "").strip()
-    pubdate = classified_sections.get('pubdate', "").strip()
+    pubdate = classified_sections.get('pubDate', "").strip()
 
-    return title, authors, college, abstract, keywords, pubdate 
+    # Additional Post-processing Steps
+    keywords_pattern = re.compile(r'\b(keywords?|key words?)\b', re.IGNORECASE)
+    if keywords_pattern.search(title):
+        title, keywords = keywords, title
+
+    keywords = re.sub(r'\b(keywords?|key words?)\b.*?(?:—|:)?\s*', '', keywords, flags=re.IGNORECASE).strip()
+    authors = format_authors(authors)
+    college = replace_college_names(college)
+    pubdate = convert_date(pubdate)
+    title = proper_case(title)
+
+    return title, authors, college, abstract, keywords, pubdate, classified_chunks
 
 # Load the trained model
 pipeline = joblib.load("app/text_classifier_svm.pkl")
@@ -545,39 +537,20 @@ async def extract_text(files: List[UploadFile] = File(...)):
         print("\n====TOTAL TEXT====\n", total_text)
         print("\n====CLEANED TEXT====\n", cleaned_text)
 
-        # Use the trained pipeline to classify the text
-        title, authors, college, abstract, keywords, pubdate = classify_text_chunks(cleaned_text, original_text, pipeline)
-
-        # Post-processing
-        keywords_pattern = re.compile(r'\b(keywords?|key words?)\b', re.IGNORECASE)
-        if keywords_pattern.search(title):
-            title, keywords = keywords, title
-
-        keywords = re.sub(r'\b(keywords?|key words?)\b.*?(?:—|:)?\s*', '', keywords, flags=re.IGNORECASE).strip()
-        authors = format_authors(authors)
-        college = replace_college_names(college)
-        pubdate = convert_date(pubdate)
-        title = proper_case(title)
-
-        print("=====Final Classification=====")
-        print(f"Title: {title}\n")
-        print(f"Authors: {authors}\n")
-        print(f"College: {college}\n")
-        print(f"Department: {department}\n")
-        print(f"Abstract: {abstract}\n")
-        print(f"Keywords: {keywords}\n")
-        print(f"Publication Date: {pubdate}\n")
+        # Get classified fields and chunks
+        title, authors, college, abstract, keywords, pubdate, classified_chunks = classify_text_chunks(cleaned_text, original_text, pipeline)
 
         return JSONResponse(content={
             "text": cleaned_text,
-            "total_pages": total_pages,
+            "total_pages": len(classified_chunks),
             "title": title if title else "",
             "abstract": abstract if abstract else "",
             "author": authors if authors else "",
             "college": college if college else "",
             "department": department if department else "",
             "pubDate": pubdate if pubdate else "",
-            "keywords": keywords if keywords else ""
+            "keywords": keywords if keywords else "",
+            "chunks": classified_chunks  # Now includes classification for each chunk
         })
 
     except Exception as e:
