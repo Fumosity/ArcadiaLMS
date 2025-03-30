@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect, onExtractedData }) {
+function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData }) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
   const [extractedData, setExtractedData] = useState({
@@ -36,7 +36,6 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
 
     try {
       const formData = new FormData();
-      let totalPages = 0;  // Initialize total pages count
 
       // Append each selected file to the form data
       for (const file of uploadedFiles) {
@@ -51,10 +50,15 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
 
       console.log("Backend response:", response.data);
 
-
       console.log("Extracted text from backend:", response.data.text);
 
-      let reformatPubDate = response.data.pubDate + "-01"
+      let reformatPubDate
+
+      if (response.data.pubDate){
+        reformatPubDate = response.data.pubDate + "-01"
+      } else {
+        reformatPubDate = ""
+      }
 
       const extractedData = {
         title: response.data.title || "",
@@ -67,15 +71,8 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
       };      
 
       setExtractedData(extractedData);
-      onFileSelect(uploadedFiles); // Add extractedData here
-      onExtractedData(extractedData); // <-- Add this line
-
-      totalPages = response.data.total_pages || uploadedFiles.length;
-      onPageCountChange(totalPages);
-
-      console.log(response.data)
-      // Set the total page count
-      onPageCountChange(totalPages);
+      onFileSelect(uploadedFiles);
+      onExtractedData(extractedData);
 
       setUploadComplete(true);
 

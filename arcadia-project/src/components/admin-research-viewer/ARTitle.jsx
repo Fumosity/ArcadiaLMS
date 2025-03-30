@@ -27,6 +27,30 @@ const ARTitle = ({ researchData }) => {
         }
     };
 
+    const formatKeywords = (authors) => {
+        if (!authors || authors.length === 0) return "N/A";
+
+        if (!Array.isArray(authors)) {
+            authors = [authors]; // Ensure authors is an array
+        }
+
+        const formattedKeywords = authors.map(author => {
+            author = author.trim();
+            const names = author.split(" ");
+            const firstName = names.slice(0, -1).join(" "); // First name(s)
+            const lastName = names.slice(-1)[0]; // Last name
+            return `${firstName} ${lastName}`;
+        });
+
+        if (formattedKeywords.length === 1) {
+            return formattedKeywords[0];
+        } else if (formattedKeywords.length === 2) {
+            return `${formattedKeywords[0]} and ${formattedKeywords[1]}`;
+        } else {
+            return `${formattedKeywords.slice(0, -1).join(", ")}, and ${formattedKeywords.slice(-1)}`;
+        }
+    };
+
     if (!researchData) {
         return (
             <div className="bg-white p-4 rounded-lg border-grey border">
@@ -52,7 +76,7 @@ const ARTitle = ({ researchData }) => {
             <div className="w-full">
                 <h4 className="font-semibold mb-2 text-lg">Keywords:</h4>
                 <p className="text-md text-justify pb-2">
-                    {keywords}
+                    {formatKeywords(keywords)}
                 </p>
             </div>
         </div>

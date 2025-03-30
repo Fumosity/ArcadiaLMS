@@ -17,7 +17,6 @@ const ARAdding = ({ formData, setFormData }) => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [pageCount, setPageCount] = useState(0);
 
   const collegeDepartmentMap = {
     "COECSA": ["DOA", "DCS", "DOE"],
@@ -58,12 +57,10 @@ const ARAdding = ({ formData, setFormData }) => {
 
     if (!Array.isArray(files)) {
       setUploadedFiles([]);
-      setPageCount(0);
       return;
     }
 
     setUploadedFiles(files);
-    setPageCount(files.length);
   };
 
 
@@ -175,135 +172,125 @@ const ARAdding = ({ formData, setFormData }) => {
         <h2 className="text-2xl font-semibold mb-4">Research Adding</h2>
         <div className='flex'>
           {/* Left Side: Form Section */}
-          <div className="w-2/3">
+          <div className="w-full">
             <p className="text-gray-600 mb-8">
               Data points marked with an asterisk (*) are autofilled. Use a semicolon (;) or comma (,) to add multiple authors and keywords.
             </p>
 
-            <h3 className="text-xl font-semibold my-2">Research Paper Upload</h3>
-
             <div className="flex-col justify-between items-center mb-6 space-y-2">
-              <div className="">
-                <p>Upload research pages to autofill. Include the Title Page, Abstract, and Keywords for best results.</p>
-                <p className="text-gray-500">Accepted formats: (*.pdf, *.png, *.jpeg)</p>
-              </div>
-              <div className="flex justify-end w-full">
+              <div className="flex justify-start w-full">
                 <button
-                  className="add-book w-1/3 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+                  className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
                   onClick={() => setIsModalOpen(true)}
                 >
-                  Upload Pages
+                  Upload Pages to Autofill
                 </button>
               </div>
             </div>
 
-            {uploadedFiles.length > 0 && (
-              <p className="text-grey mb-4">
-                Uploaded Files: {uploadedFiles.map(file => file.name).join(', ')}
-              </p>
-            )}
-
             <h3 className="text-xl font-semibold my-2">Research Paper Information</h3>
 
             <form className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Title:</label>
-                <input type="text" name="title" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.title} onChange={handleChange} placeholder="Full Research Title" required />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Authors:</label>
-                <input type="text" name="author" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.author} onChange={handleChange} placeholder="Author 1; Author 2; Author 3;..." required />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">College:</label>
-                <div className="select-dropdown-wrapper w-2/3">
-                  <select
-                    name="college"
-                    className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
-                    value={formData.college}
-                    onChange={(e) => {
-                      handleChange(e);
-                      updateDepartmentOptions(e.target.value);
-                    }}
-                  >
-                    <option value="">Select a college</option>
-                    {Object.keys(collegeDepartmentMap).map((college) => (
-                      <option key={college} value={college}>
-                        {college}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              {formData.college === "COECSA" && (
-                <div className="flex justify-between items-center">
-                  <label className="w-1/4">Department:</label>
-                  <div className="select-dropdown-wrapper w-2/3">
-                    <select
-                      name="department"
-                      className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
-                      value={formData.department}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select a department</option>
-                      {departmentOptions.map((department) => (
-                        <option key={department} value={department}>
-                          {department}
-                        </option>
-                      ))}
-                    </select>
+              <div className="flex justify-between items-start space-x-2">
+                <div className="flex-col justify-between items-center w-1/2 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <label className="w-1/4">Title:</label>
+                    <input type="text" name="title" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.title} onChange={handleChange} placeholder="Full Research Title" required />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <label className="w-1/4">Authors:</label>
+                    <input type="text" name="author" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.author} onChange={handleChange} placeholder="Author 1; Author 2; Author 3;..." required />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <label className="w-1/4">College:</label>
+                    <div className="select-dropdown-wrapper w-2/3">
+                      <select
+                        name="college"
+                        className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
+                        value={formData.college}
+                        onChange={(e) => {
+                          handleChange(e);
+                          updateDepartmentOptions(e.target.value);
+                        }}
+                      >
+                        <option value="">Select a college</option>
+                        {Object.keys(collegeDepartmentMap).map((college) => (
+                          <option key={college} value={college}>
+                            {college}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  {formData.college === "COECSA" && (
+                    <div className="flex justify-between items-center">
+                      <label className="w-1/4">Department:</label>
+                      <div className="select-dropdown-wrapper w-2/3">
+                        <select
+                          name="department"
+                          className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
+                          value={formData.department}
+                          onChange={handleChange}
+                        >
+                          <option value="">Select a department</option>
+                          {departmentOptions.map((department) => (
+                            <option key={department} value={department}>
+                              {department}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                  {formData.college === "IS" && (
+                    <div className="flex justify-between items-center">
+                      <label className="w-1/4">Grade Level:</label>
+                      <div className="select-dropdown-wrapper w-2/3">
+                        <select
+                          name="department"
+                          className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
+                          value={formData.department}
+                          onChange={handleChange}
+                        >
+                          <option value="">Select level</option>
+                          {departmentOptions.map((department) => (
+                            <option key={department} value={department}>
+                              {department}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <label className="w-1/4">Pages:</label>
+                    <input type="number" name="pages" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.pages} onChange={handleChange} min="0" placeholder="No. of pages" required />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <label className="w-1/4">Keywords:</label>
+                    <input type="text" name="keyword" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.keyword} onChange={handleChange} placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <label className="w-1/4">Date Published:</label>
+                    <input type="date" name="pubDate" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.pubDate} onChange={handleChange} required />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <label className="w-1/4">Location:</label>
+                    <input type="text" name="location" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.location} onChange={handleChange} placeholder="Shelf Location" required />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <label className="w-1/4">Call Number:</label>
+                    <input type="text" name="researchCallNum" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchCallNum} onChange={handleChange} placeholder="ARC Issued ID, eg. CITHM-123" required />
+                  </div>
+                  <div className="justify-between items-center hidden">
+                    <label className="w-1/4">Database ID*:</label>
+                    <input type="number" name="researchID" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchID} onChange={handleChange} required />
                   </div>
                 </div>
-              )}
-
-              {formData.college === "IS" && (
-                <div className="flex justify-between items-center">
-                  <label className="w-1/4">High School Level:</label>
-                  <div className="select-dropdown-wrapper w-2/3">
-                    <select
-                      name="department"
-                      className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
-                      value={formData.department}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select level</option>
-                      {departmentOptions.map((department) => (
-                        <option key={department} value={department}>
-                          {department}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <div className="flex flex-col justify-between items-start w-1/2 space-y-2">
+                  <label className="w-1/4 h-8">Abstract:</label>
+                  <textarea type="text" name="abstract" className="w-full px-3 py-1 rounded-2xl border border-grey min-h-72" value={formData.abstract} onChange={handleChange} placeholder="Full Abstract Text" required />
                 </div>
-              )}
-
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Abstract:</label>
-                <input type="text" name="abstract" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.abstract} onChange={handleChange} placeholder="Full Abstract Text" required />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Pages:</label>
-                <input type="number" name="pages" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={pageCount} placeholder="No. of pages" required />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Keywords:</label>
-                <input type="text" name="keyword" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.keyword} onChange={handleChange} placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Date Published:</label>
-                <input type="date" name="pubDate" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.pubDate} onChange={handleChange} required />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Location:</label>
-                <input type="text" name="location" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.location} onChange={handleChange} placeholder="Shelf Location" required />
-              </div>
-              <div className="justify-between items-center hidden">
-                <label className="w-1/4">Database ID*:</label>
-                <input type="number" name="researchID" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchID} onChange={handleChange} required />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Call Number:</label>
-                <input type="text" name="researchCallNum" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchCallNum} onChange={handleChange} placeholder="ARC Issued ID, eg. LPUCAV012345" required />
               </div>
             </form>
           </div>
@@ -320,7 +307,6 @@ const ARAdding = ({ formData, setFormData }) => {
         onClose={() => setIsModalOpen(false)}
         onFileSelect={handleFileSelect}
         onExtractedData={handleExtractedData}    // For autofill data
-        onPageCountChange={setPageCount}
       />
     </div>
   );

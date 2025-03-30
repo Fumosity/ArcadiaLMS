@@ -98,8 +98,10 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
         research.author.some((author) => typeof author === "string" && author.toLowerCase().includes(searchTerm.toLowerCase())));
 
     // Filter by college type
-    const matchesCollege = collegeType === "All" || research.college === collegeType
-
+    const matchesCollege =
+    collegeType === "All" ||
+    (research.college &&
+      research.college.toLowerCase().startsWith(collegeType.toLowerCase()));
     // Filter by department type
     const matchesDepartment = departmentType === "All" || research.department === departmentType
 
@@ -240,17 +242,12 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
         </div>
       </div>
 
-
-
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                College
-              </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Department
+                College & Department
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Title
@@ -271,9 +268,6 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
               Array.from({ length: entriesPerPage }).map((_, index) => (
                 <tr key={index}>
                   <td className="px-4 py-4 text-sm text-gray-900">
-                    <Skeleton className="w-24" />
-                  </td>
-                  <td className="px-4 py-4 text-sm">
                     <Skeleton className="w-24" />
                   </td>
                   <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-xs">
@@ -301,12 +295,14 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                   <td className="px-4 py-4 text-sm text-gray-900 max-w-36">
                     <div className="flex justify-center">
                       <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1">
-                        {item.college}
+                        {item.department !== "N/A"
+                          ? `${item.college} - ${item.department}`
+                          : item.college}
                       </span>
                     </div>
                   </td>
 
-                  <td className="px-4 py-4 text-sm max-w-36">
+                  <td className="px-4 py-4 text-sm max-w-36 hidden">
                     <div className="flex justify-center">
                       <span className="bookinv-genre inline-flex items-center justify-center text-sm font-medium rounded-full border-gray px-2 py-1">
                         {item.department}

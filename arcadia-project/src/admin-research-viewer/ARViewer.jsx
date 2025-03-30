@@ -57,10 +57,6 @@ const ARViewer = () => {
                         </button>
                     </div>
                     <ARTitle researchData={researchData} /> {/* Pass research data to ARTitle */}
-                    <div className="flex w-full space-x-2">
-                    <PopularAmong />
-                    <SimilarTo />
-                    </div>
                     <ARFullText researchData={researchData} />
                 </div>
 

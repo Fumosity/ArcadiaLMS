@@ -33,6 +33,10 @@ export default {
         'Zen': ['"Zen Kaku Gothic Antique"', '"Zen Kaku Gothic New"', 'sans-serif'],
         'ZenSerif': ['"Zen Antique"', 'serif'],
       },
+      width: {
+        '1/8': '12.5%',
+        '7/8': '87.5%',
+      },
     }, 
   },
   plugins: [],
