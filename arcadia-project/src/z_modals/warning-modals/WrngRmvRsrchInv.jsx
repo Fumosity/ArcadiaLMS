@@ -16,7 +16,7 @@ const WrngRmvRsrchInv = ({ isOpen, onClose, onRemove }) => {
         </button>
         <div className="flex items-center mb-4">
           <div className="text-red-500 text-2xl mr-2">⚠️</div>
-          <h2 className="text-xl font-semibold">Attention!</h2>
+          <h2 className="text-2xl font-semibold">Attention!</h2>
         </div>
         <p className="text-gray-700 mb-6">
           You are about to remove a research from the Research Inventory. This action is irreversible once done. Are you sure you want to perform this action?
@@ -24,15 +24,15 @@ const WrngRmvRsrchInv = ({ isOpen, onClose, onRemove }) => {
         <div className="flex justify-center space-x-4">
           <button
             onClick={onClose}
-            className="px-4 py-1 border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            className="penBtn"
           >
-            Go back
+            Cancel
           </button>
           <button
             onClick={onRemove}
-            className="px-4 py-1 border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            className="cancelModify"
           >
-            Remove
+            Yes, I am sure
           </button>
         </div>
       </div>

@@ -54,7 +54,7 @@ export default function RemoveEvent({ isOpen, onClose }) {
 
         <div className="flex justify-center space-x-4 mt-8">
           <button
-            className="modifyButton"
+            className="penBtn"
             onClick={() => {
               // Palagay na lang ng remove logic boss
               onClose();
@@ -63,7 +63,7 @@ export default function RemoveEvent({ isOpen, onClose }) {
             Remove
           </button>
           <button
-            className="cancelButton"
+            className="cancelModify"
             onClick={onClose}
           >
             Cancel

@@ -220,13 +220,13 @@ const ModifySchedule = ({ isOpen, onClose, event, onModify, onDelete }) => {
         </div>
 
         <div className="flex justify-center space-x-4 mt-8">
-          <button className="modifyButton" onClick={handleSave}>
+          <button className="penBtn" onClick={handleSave}>
             Modify
           </button>
-          <button className="deleteButton" onClick={() => onDelete(event)}>
+          <button className="cancelModify" onClick={() => onDelete(event)}>
             Delete
           </button>
-          <button className="cancelButton" onClick={onClose}>
+          <button className="cancelModify" onClick={onClose}>
             Cancel
           </button>
         </div>

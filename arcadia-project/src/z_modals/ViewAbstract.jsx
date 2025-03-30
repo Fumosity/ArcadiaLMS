@@ -8,14 +8,7 @@ const ViewAbstract = ({ isOpen, onClose, abstractContent }) => {
       <div className="bg-white rounded-lg w-full max-w-2xl p-8 shadow-xl h-auto">
 
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">View Abstract</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 focus:outline-none"
-            aria-label="Close"
-          >
-            ×
-          </button>
+          <h2 className="text-2xl font-semibold mb-4">View Abstract</h2>
         </div>
         <div className="mb-4">
           <label htmlFor="abstract" className="block text-sm font-medium text-gray-700 mb-2">
@@ -25,13 +18,13 @@ const ViewAbstract = ({ isOpen, onClose, abstractContent }) => {
             id="abstract"
             value={abstractContent}
             readOnly
-            className="w-full h-64 p-2 border border-gray-300 rounded-md bg-gray-100 resize-none"
+            className="w-full h-64 p-2 border border-grey rounded-md bg-gray-100 resize-none"
           ></textarea>
 
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           <button
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="penBtn"
             onClick={onClose}
           >
             Close

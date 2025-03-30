@@ -274,8 +274,10 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-4xl p-8 sm:p-10">
-        <h3 className="text-2xl font-semibold mb-4">{accountTitle}</h3>
+      {/* <div className="bg-white rounded-2xl w-full max-w-4xl p-8 sm:p-10"> */}
+      <div className="bg-white p-6 rounded-xl max-w-4xl w-full mx-4 shadow-lg relative">
+
+        <h2 className="text-2xl font-semibold mb-4">{accountTitle}</h2>
 
         {!isEditable && (
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
@@ -401,10 +403,10 @@ const UserInformationModal = ({ isOpen, onClose, user, onUpdate }) => {
         </div>
 
         <div className="flex justify-center space-x-4 mt-10">
-          <button className="modifyButton" onClick={handleSubmit} disabled={isLoading}>
+          <button className="penBtn" onClick={handleSubmit} disabled={isLoading}>
             {isLoading ? "Saving..." : "Save"}
           </button>
-          <button className="cancelButton" onClick={onClose}>
+          <button className="cancelModify" onClick={onClose}>
             Cancel
           </button>
         </div>

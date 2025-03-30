@@ -237,7 +237,7 @@ const BookingReservation = ({ isOpen, onClose, reservation, onSave, onUpdate }) 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-96 p-8">
-        <h2 className="text-2xl font-semibold mb-6 text-center">Modify Booking Reservation</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-left">Modify Booking Reservation</h2>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="flex items-center">
@@ -285,10 +285,10 @@ const BookingReservation = ({ isOpen, onClose, reservation, onSave, onUpdate }) 
             </div>
           </div>
           <div className="flex justify-center space-x-4 mt-4">
-            <button type="submit" className="modifyButton" disabled={isLoading}>
+            <button type="submit" className="penBtn" disabled={isLoading}>
               {isLoading ? "Saving..." : "Save Changes"}
             </button>
-            <button type="button" className="cancelButton" onClick={onClose}>
+            <button type="button" className="cancelModify" onClick={onClose}>
               Cancel
             </button>
           </div>

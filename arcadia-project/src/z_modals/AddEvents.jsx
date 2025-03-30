@@ -96,18 +96,19 @@ export default function AddEvents({ isOpen, onClose }) {
         </div>
 
         <div className="flex justify-center space-x-4 mt-8">
-          <button
-            className="modifyButton"
-            onClick={onClose}
-          >
-            Add
-          </button>
-          <button
-            className="cancelButton"
+        <button
+            className="penBtn"
             onClick={onClose}
           >
             Cancel
           </button>
+          <button
+            className="cancelModify"
+            onClick={onClose}
+          >
+            Add
+          </button>
+          
         </div>
       </div>
     </div>

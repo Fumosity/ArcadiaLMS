@@ -18,7 +18,7 @@ const WrngDemoteFromIntern = ({ isOpen, onClose, onDemote, userFName, userLName 
         {/* Modal Header */}
         <div className="flex items-center mb-4">
           <div className="text-red-500 text-2xl mr-2">⚠️</div>
-          <h2 className="text-xl font-semibold">Attention!</h2>
+          <h2 className="text-2xl font-semibold">Attention!</h2>
         </div>
 
         {/* Modal Content */}
@@ -32,13 +32,13 @@ const WrngDemoteFromIntern = ({ isOpen, onClose, onDemote, userFName, userLName 
         <div className="flex justify-center space-x-4">
           <button
             onClick={onClose}
-            className="cancelButton"
+            className="penBtn"
           >
             Nevermind
           </button>
           <button
             onClick={onDemote}
-            className="cancelButton"
+            className="cancelModify"
           >
             Demote
           </button>

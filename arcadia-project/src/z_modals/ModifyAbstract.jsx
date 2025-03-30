@@ -52,14 +52,14 @@ const ModifyAbstract = ({ isOpen, onClose, onModify, initialAbstract, isUpdating
         </div>
         <div className="flex justify-end space-x-2">
           <button
-            className="px-4 py-2 bg-arcadia-red text-white rounded-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50"
+            className="penBtn"
             onClick={handleModify}
             disabled={isUpdating}
           >
             {isUpdating ? "Updating..." : "Modify"}
           </button>
           <button
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50"
+            className="cancelModify"
             onClick={onClose}
             disabled={isUpdating}
           >

@@ -131,7 +131,7 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-4xl p-8 sm:p-10">
-        <h2 className="text-2xl font-semibold mb-8 text-center">
+        <h2 className="text-2xl font-semibold mb-8 text-left">
           Modify Admin Account Information
         </h2>
 
@@ -255,14 +255,14 @@ const AccountModifier = ({ isOpen, onClose, user, onUpdate }) => {
 
         <div className="flex justify-center space-x-4 mt-10">
           <button
-            className="modifyButton"
+            className="penBtn"
             onClick={handleSubmit}
             disabled={isLoading}
           >
             {isLoading ? "Saving..." : "Modify"}
           </button>
           <button
-            className="cancelButton"
+            className="cancelModify"
             onClick={onClose}>
             Cancel
           </button>

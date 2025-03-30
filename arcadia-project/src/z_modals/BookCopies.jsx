@@ -69,11 +69,10 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-4 rounded-xl max-w-2xl w-full shadow-lg relative">
 
-        <header className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-medium text-zinc-900">
+
+          <h2 className="text-2xl font-semibold mb-4">
             Book Copies of {bookTitle || "Loading..."}
           </h2>
-        </header>
 
         <div>
           <table className="min-w-full divide-y divide-gray-200">
@@ -133,7 +132,7 @@ const BookCopies = ({ isOpen, onClose, titleID }) => {
           <div className="flex justify-center items-center gap-6 mt-2.5 min-h-[50px]">
             <button
               onClick={onClose}
-              className="px-2 py-1 border border-grey rounded-xl w-32 hover:bg-light-gray"
+              className="penBtn"
             >
               Close
             </button>

@@ -97,13 +97,13 @@ export default function ModifyEvents({ isOpen, onClose }) {
 
         <div className="flex justify-center space-x-4 mt-8">
           <button
-            className="modifyButton"
+            className="penBtn"
             onClick={onClose}
           >
             Modify
           </button>
           <button
-            className="cancelButton"
+            className="cancelModify"
             onClick={onClose}
           >
             Cancel

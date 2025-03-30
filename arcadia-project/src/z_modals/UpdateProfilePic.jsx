@@ -93,7 +93,7 @@ const UpdateProfilePic = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-3xl p-8">
-        <h2 className="text-2xl font-semibold mb-6 text-center">Update Profile Picture</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-left">Update Profile Picture</h2>
 
         <div className="flex flex-col items-center mb-8">
           <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
@@ -143,13 +143,13 @@ const UpdateProfilePic = ({ isOpen, onClose }) => {
 
         <div className="flex justify-center space-x-4 mt-8">
           <button
-            className="modifyButton"
+            className="penBtn"
             onClick={handleSave}
           >
             Save
           </button>
           <button
-            className="cancelButton"
+            className="cancelModify"
             onClick={onClose}
           >
             Cancel

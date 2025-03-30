@@ -72,7 +72,7 @@ const BookCopiesSection = ({ titleID }) => {
   }
 
   return (
-    <div className="bg-white p-4 rounded-xl w-full shadow-md">
+    <div className="bg-white p-4 rounded-lg border-grey border">
       <header className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-medium text-zinc-900">Book Copies</h2>
       </header>

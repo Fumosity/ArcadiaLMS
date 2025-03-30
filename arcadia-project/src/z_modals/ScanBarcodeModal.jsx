@@ -8,13 +8,13 @@ const ScanBardodeModal = ({ isOpen, onClose }) => {
       <div className="bg-white rounded-lg w-full max-w-2xl p-8 shadow-xl h-auto">
 
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Barcode Scanner</h2>
+          <h2 className="text-2xl font-semibold">Barcode Scanner</h2>
           
         </div>
         {/* Put content here for barcode scanner yusufman */}
         <div className="flex justify-end">
           <button
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="cancelModify"
             onClick={onClose}
           >
             Close

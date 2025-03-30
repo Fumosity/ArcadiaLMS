@@ -23,19 +23,20 @@ export default function WrmgDeleteReserve({ isOpen, onClose, onConfirm, itemName
             Are you sure you want to delete the reservation for {itemName}?
           </h3>
           <div className="flex justify-center gap-4">
-            <button
-              onClick={onConfirm}
-              type="button"
-              className="text-white bg-red hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
-            >
-              Yes, I'm sure
-            </button>
+            
             <button
               onClick={onClose}
               type="button"
-              className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10"
+              className="penBtn"
             >
-              No, cancel
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              type="button"
+              className="cancelModify"
+            >
+              Yes, I'm sure
             </button>
           </div>
         </div>

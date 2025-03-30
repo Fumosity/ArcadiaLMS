@@ -98,16 +98,10 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-xl max-w-lg w-full shadow-lg relative">
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-          aria-label="Close"
-        >
-          &times;
-        </button>
+
 
         <header className="mb-4">
-          <h1 className="text-2xl font-medium text-gray-900">Upload Research</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Upload Research</h1>
         </header>
 
         <section>
@@ -125,7 +119,7 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
                   <div className="flex justify-center mt-2">
                     <button
                       onClick={handleCancel}
-                      className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white"
+                      className="penBtn"
                       aria-label="Cancel upload"
                     >
                       Close
@@ -144,7 +138,7 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
                     </p>
                     <label
                       htmlFor="file-upload"
-                      className="inline-block mt-2 px-4 py-2 border border-gray-700 rounded-full text-gray-900 cursor-pointer"
+                      className="inline-block mt-2 px-4 py-0.5 border border-arcadia-red rounded-full text-arcadia-red cursor-pointer"
                       aria-label="Upload research pages in PDF or image formats"
                     >
                       Upload Pages
@@ -167,17 +161,17 @@ function ResearchUploadModal({ isOpen, onClose, onPageCountChange, onFileSelect,
                       readOnly
                       className="w-full mt-1 p-2 border rounded-md"
                     />
-                    <div className='flex items-center justify-center mt-2'>
+                    <div className='flex items-center justify-center space-x-4 mt-2'>
                       <button
                         onClick={handleUpload}
-                        className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white"
+                        className="penBtn"
                         aria-label="Upload files"
                       >
                         Upload
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="px-6 py-2 bg-gray-300 rounded-full hover:bg-arcadia-red hover:text-white ml-2"
+                        className="cancelModify"
                         aria-label="Cancel upload"
                       >
                         Cancel

@@ -151,7 +151,6 @@ const BCSideButtons = () => {
         ))}
       </div>
 
-      {/* Export format selection modal */}
       <SelectFormat isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onExport={handleExport} />
     </>
   );
