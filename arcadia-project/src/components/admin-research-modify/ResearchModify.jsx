@@ -214,7 +214,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
                 <div className="select-dropdown-wrapper w-2/3">
                   <select
                     name="college"
-                    className="w-full px-3 py-1 rounded-full border border-grey"
+                    className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
                     value={formData.college}
                     onChange={(e) => {
                       handleChange(e);
@@ -236,7 +236,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
                   <div className="select-dropdown-wrapper w-2/3">
                     <select
                       name="department"
-                      className="w-full px-3 py-1 rounded-full border border-grey"
+                      className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
                       value={formData.department}
                       onChange={handleChange}
                     >
