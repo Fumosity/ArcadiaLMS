@@ -79,22 +79,22 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
       acc[chunk.Classification].push(chunk.Preprocessed_Text);
       return acc;
     }, {});
-  
+
     console.log("Grouped Data Before Formatting:", groupedData);
-  
+
     // Convert publication date to YYYY-MM-DD format for date input
     let formattedPubDate = "";
     if (groupedData["pubDate"] && groupedData["pubDate"].length > 0) {
       const rawDate = groupedData["pubDate"].join("").trim();
       console.log("Raw pubDate:", rawDate);
-  
+
       // Handle month-name formats like "April 2019"
       const monthMap = {
         January: "01", February: "02", March: "03", April: "04",
         May: "05", June: "06", July: "07", August: "08",
         September: "09", October: "10", November: "11", December: "12"
       };
-  
+
       const dateParts = rawDate.split(" ");
       if (dateParts.length === 2 && monthMap[dateParts[0]]) {
         // Convert "April 2019" → "2019-04-01"
@@ -108,12 +108,12 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
       } else {
         console.warn("Invalid date format detected:", rawDate);
       }
-  
+
       console.log("Formatted pubDate:", formattedPubDate);
     } else {
       console.warn("No pubDate found in grouped data.");
     }
-  
+
     // Construct confirmed data
     const confirmedData = {
       title: groupedData["title"] ? groupedData["title"].join(" ") : "",
@@ -124,12 +124,12 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
       department: groupedData["department"] ? groupedData["department"].join(", ") : "",
       college: groupedData["college"] ? groupedData["college"].join(", ") : "",
     };
-  
+
     console.log("Confirmed Data:", confirmedData);
     onExtractedData(confirmedData);
     onClose();
   };
-  
+
 
   const handleReupload = () => {
     setUploadComplete(false)
@@ -213,33 +213,34 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
                       extractedChunks.map((chunk, index) => (
                         <tr key={index} className='hover:bg-light-gray p-2'>
                           <td>
-                            <textarea
-                              className="w-full px-3 py-1 rounded-md border border-grey resize-none"
-                              value={chunk.Preprocessed_Text}
-                              onChange={(e) => handleChunkEdit(index, e.target.value)}
-                              rows={1}
-                              ref={(el) => {
-                                if (el) {
-                                  el.style.height = "auto"; // Reset height
-                                  el.style.height = `${el.scrollHeight / 16}rem`; // Convert px to rem dynamically
-                                }
-                              }}
-                              style={{
-                                minHeight: "1.5rem",  // 1 line
-                                maxHeight: "4.5rem",  // 3 lines
-                                overflowY: "hidden", // No scrollbar unless necessary
-                              }}
-                              onInput={(e) => {
-                                e.target.style.height = "auto"; // Reset height
-                                const newHeight = Math.min(e.target.scrollHeight / 16, 4.5); // Convert to rem
-                                e.target.style.height = `${newHeight}rem`; // Expand up to 3 lines
-                                e.target.style.overflowY = newHeight >= 4.5 ? "auto" : "hidden"; // Show scrollbar only after 3 lines
-                              }}
-                            />
-
+                            <div className='flex items-center p-2'>
+                              <textarea
+                                className="w-full px-3 py-1 rounded-md border border-grey resize-none"
+                                value={chunk.Preprocessed_Text}
+                                onChange={(e) => handleChunkEdit(index, e.target.value)}
+                                rows={1}
+                                ref={(el) => {
+                                  if (el) {
+                                    el.style.height = "auto"; // Reset height
+                                    el.style.height = `${el.scrollHeight / 16}rem`; // Convert px to rem dynamically
+                                  }
+                                }}
+                                style={{
+                                  minHeight: "1.5rem",  // 1 line
+                                  maxHeight: "4.5rem",  // 3 lines
+                                  overflowY: "hidden", // No scrollbar unless necessary
+                                }}
+                                onInput={(e) => {
+                                  e.target.style.height = "auto"; // Reset height
+                                  const newHeight = Math.min(e.target.scrollHeight / 16, 4.5); // Convert to rem
+                                  e.target.style.height = `${newHeight}rem`; // Expand up to 3 lines
+                                  e.target.style.overflowY = newHeight >= 4.5 ? "auto" : "hidden"; // Show scrollbar only after 3 lines
+                                }}
+                              />
+                            </div>
                           </td>
                           <td className="p-2">
-                            <select className="w-full px-3 py-1 rounded-full border border-grey" value={chunk.Classification} onChange={(e) => handleClassificationChange(index, e.target.value)}>
+                            <select className="w-full px-3 py-1 rounded-lg border border-grey" value={chunk.Classification} onChange={(e) => handleClassificationChange(index, e.target.value)}>
                               <option value="title">Title</option>
                               <option value="author">Author</option>
                               <option value="college">College</option>

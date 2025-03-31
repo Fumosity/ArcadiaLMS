@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../../supabaseClient"
-import BarcodeScanner from "./BarcodeScanner"
 import { toast, ToastContainer } from "react-toastify" // Import ToastContainer
 import "react-toastify/dist/ReactToastify.css"
-import ScanBardodeModal from "../../z_modals/ScanBarcodeModal"
+import ScanBarcodeModal from "../../z_modals/ScanBarcodeModal"
 
 const CheckingContainer = () => {
   const [checkMode, setCheckMode] = useState("Check Out")
@@ -11,11 +10,15 @@ const CheckingContainer = () => {
   const [emptyFields, setEmptyFields] = useState({}) // Track empty fields
   const [isDamaged, setIsDamaged] = useState(false) // Track if the book is marked as damaged
   const [isScannerOpen, setIsScannerOpen] = useState(false)
-  const [scannedCode, setScannedCode] = useState("")
   const [bookSuggestions, setBookSuggestions] = useState([]) // Store search results
   const [isSearching, setIsSearching] = useState(false) // Loading state for search
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [isViewOpen, setViewOpen] = useState("")
+  const [scanResult, setScanResult] = useState(""); // Store scanned barcode
+
+  const handleBarcodeScan = (barcode) => {
+    setScanResult(barcode); // Update the scanned barcode
+  };
 
   // Function to get the PC's current local time
   const getLocalTime = () => {
@@ -47,12 +50,6 @@ const CheckingContainer = () => {
     deadline: "", // Initialize deadline as empty
     userID: "",
   })
-
-  const handleBarcodeScan = (barcode) => {
-    console.log(barcode)
-    setFormData((prev) => ({ ...prev, bookBarcode: barcode })) // Directly update bookBarcode
-    setIsScannerOpen(false) // Close scanner after a successful scan
-  }
 
   useEffect(() => {
     if (checkMode === "Check In") {
@@ -670,30 +667,24 @@ const CheckingContainer = () => {
               }
 
               if (key === "bookBarcode") {
-                if (key === "bookBarcode") {
-                  label = "Book Barcode"
-                  afterInput = (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (isScannerOpen) return
-                          setIsScannerOpen(true)
-                        }}
-                        className="px-3 py-1 ml-2 rounded-full border border-grey w-[calc(2/5*100%)] hover:bg-light-gray transition"
-                      >
-                        Scan Barcode
-                      </button>
-                      <button
-                        className="border border-grey px-2 py-0.5 rounded-xl hover:bg-grey transition-all duration-300 ease-in-out hover:shadow-md ml-2"
-                        onClick={() => setViewOpen(true)}
-                      >
-                        Scan Barcode Modal
-                      </button>
-                    </>
-                  )
-                }
+                label = "Book Barcode"
+                // Ensure the value updates when scanResult changes but is also editable
+                useEffect(() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    bookBarcode: scanResult || prev.bookBarcode, // Use scanResult if available, else keep existing value
+                  }));
+                }, [scanResult]);
+                afterInput = (
+                  <button
+                    className="px-3 py-1 ml-2 rounded-full border border-grey w-[calc(2/5*100%)] hover:bg-light-gray transition"
+                    onClick={() => setViewOpen(true)}
+                  >
+                    Scan Barcode
+                  </button>
+                )
               }
+
               if (key === "bookTitle") {
                 const handleBookSelection = (book) => {
                   setFormData((prev) => ({
@@ -788,7 +779,6 @@ const CheckingContainer = () => {
               )
             })}
           </div>
-          {isScannerOpen && <BarcodeScanner onScan={handleBarcodeScan} onClose={() => setIsScannerOpen(false)} />}
           <div className="w-full flex justify-end">
             {" "}
             {/* Add flex and justify-end */}
@@ -842,7 +832,7 @@ const CheckingContainer = () => {
         draggable
         pauseOnHover
       />
-      <ScanBardodeModal isOpen={isViewOpen} onClose={() => setViewOpen(false)} />
+      <ScanBarcodeModal isOpen={isViewOpen} onClose={() => setViewOpen(false)} onScan={handleBarcodeScan} />
     </div>
   )
 }

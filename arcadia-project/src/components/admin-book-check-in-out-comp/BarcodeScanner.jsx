@@ -1,90 +1,128 @@
-import { useEffect, useRef } from "react";
-import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from "@zxing/library";
+import { useEffect, useRef, useState } from "react";
+import { BrowserMultiFormatReader } from "@zxing/library";
 
 const BarcodeScanner = ({ onScan }) => {
   const videoRef = useRef(null);
-  const codeReader = useRef(null);
+  const canvasRef = useRef(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isSnapshotTaken, setIsSnapshotTaken] = useState(false);
+  const [snapshotURL, setSnapshotURL] = useState(""); // Stores the snapshot image
 
   useEffect(() => {
-    codeReader.current = new BrowserMultiFormatReader();
+    if (isCameraActive) {
+      startCamera();
+    } else {
+      stopCamera();
+    }
 
-    // Set scanning format to CODE_128
-    const hints = new Map();
-    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_128, BarcodeFormat.CODE_39, BarcodeFormat.CODE_93]);
-    codeReader.current.hints = hints;
+    return () => stopCamera();
+  }, [isCameraActive]);
 
-    const startScanner = async () => {
-      try {
-        const videoInputDevices = await codeReader.current.getVideoInputDevices();
-        console.log("Video devices:", videoInputDevices);
-
-        if (videoInputDevices.length === 0) {
-          console.warn("No video input devices found.");
-          return;
-        }
-
-        const firstDeviceId = videoInputDevices[0].deviceId;
-        console.log("Using device:", firstDeviceId);
-
-        const constraints = {
-          video: {
-            deviceId: firstDeviceId ? { exact: firstDeviceId } : undefined,
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        };
-
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-
-        codeReader.current.decodeFromVideoDevice(
-          firstDeviceId,
-          videoRef.current,
-          (result, err) => {
-            if (result) {
-              console.log("CODE_128 barcode detected:", result.text);
-              onScan(result.text); // Pass scanned data to parent component
-            }
-            if (err && err.name !== "NotFoundException") {
-              console.warn("Scan error:", err);
-            }
-          }
-        );
-      } catch (error) {
-        console.error("Error initializing scanner:", error);
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
       }
-    };
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+    }
+  };
 
-    startScanner();
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+    }
+  };
 
-    return () => {
-      if (codeReader.current) {
-        codeReader.current.reset();
-      }
-    };
-  }, [onScan]);
+  const takeSnapshot = async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+  
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+  
+    // Set fixed dimensions (same as video)
+    const WIDTH = 640;
+    const HEIGHT = 480;
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
+  
+    // Capture frame from video
+    context.drawImage(videoRef.current, 0, 0, WIDTH, HEIGHT);
+  
+    // Convert to Image URL
+    const imageDataURL = canvas.toDataURL("image/png");
+    setSnapshotURL(imageDataURL);
+    setIsSnapshotTaken(true);
+    setIsCameraActive(false);
+
+    decodeBarcode(imageDataURL);
+  };
+  
+
+  const decodeBarcode = async (imageSrc) => {
+    console.log("Decoding barcode...");
+
+    try {
+      const codeReader = new BrowserMultiFormatReader();
+      const result = await codeReader.decodeFromImage(undefined, imageSrc);
+
+      console.log("Barcode result:", result.text);
+      onScan(result.text);
+    } catch (err) {
+      console.warn("Barcode decoding failed:", err);
+    }
+  };
+
+  const retakePhoto = () => {
+    setIsSnapshotTaken(false);
+    setIsCameraActive(true);
+    setSnapshotURL("");
+  };
 
   return (
-    <div style={{ position: "relative", width: "100%", textAlign: "center" }}>
-      <h2>CODE_128 Barcode Scanner</h2>
-      <div style={{ position: "relative", display: "inline-block" }}>
-        <video ref={videoRef} autoPlay playsInline style={{ width: "100%", borderRadius: "10px" }}></video>
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            width: "250px",
-            height: "100px",
-            border: "4px solid red",
-            transform: "translate(-50%, -50%)",
-            boxShadow: "0px 0px 15px rgba(255, 0, 0, 0.5)",
-            zIndex: 2,
-          }}
-        ></div>
-      </div>
+    <div className="flex flex-col items-center space-y-2">
+      {/* Camera or Snapshot */}
+      {isSnapshotTaken && snapshotURL ? (
+        <img src={snapshotURL} className="w-[640px] h-[480px] rounded-lg object-cover" alt="Snapshot preview" />
+      ) : isCameraActive ? (
+        <video ref={videoRef} autoPlay playsInline className="w-[640px] h-[480px] rounded-lg object-cover"></video>
+      ) : (
+        <div className="w-[640px] h-[480px] bg-grey rounded-lg flex items-center justify-center">
+          <p className="text-black">Camera is off</p>
+        </div>
+      )}
+
+
+      {/* Action Buttons */}
+      {!isSnapshotTaken ? (
+        isCameraActive ? (
+          <button
+            onClick={takeSnapshot}
+            className="px-3 py-1 text-arcadia-red bg-white bg-opacity-50 rounded-lg border border-arcadia-red hover:bg-arcadia-red hover:text-white transition absolute top-3/4"
+          >
+            Take Snapshot
+          </button>
+        ) : (
+          <button
+            onClick={() => setIsCameraActive(true)}
+            className="px-3 py-1 text-black rounded-lg border hover:bg-dark-grey hover:border-dark-grey hover:text-white transition absolute top-3/4"
+          >
+            Open Camera
+          </button>
+        )
+      ) : (
+        <button
+          onClick={retakePhoto}
+          className="px-3 py-1 text-arcadia-red bg-white bg-opacity-50 rounded-lg border border-arcadia-red hover:bg-arcadia-red hover:text-white transition absolute top-3/4"
+          >
+          Retake Photo
+        </button>
+      )}
+
+      {/* Hidden Canvas for Processing */}
+      <canvas ref={canvasRef} className="hidden"></canvas>
+
     </div>
   );
 };
