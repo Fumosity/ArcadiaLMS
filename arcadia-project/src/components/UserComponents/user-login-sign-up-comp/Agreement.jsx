@@ -64,7 +64,7 @@ export default function Agreement({ onContinue }) {
                         <br />
                         This website is being managed by the Academic Resource Center. To contact the website owner, please send an email to: cav-arc@lpu.edu.ph.<br />
                         <br />
-                        We recognize your rights with respect to your personal data. Should you wish to exercise any of them or if you have any concerns regarding our processing activities, you may contact us cav-arc@lpu.edu.ph.
+                        We recognize your rights with respect to your personal data. Should you wish to exercise any of them or if you have any concerns regarding our processing activities, you may contact us privacy.cavite@lpu.edu.ph.
                         <br />
                         <br />
                         <br />
