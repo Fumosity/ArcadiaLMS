@@ -28,27 +28,30 @@ export default function ARoomBooking({ addReservation }) {
   const handleInputChange = async (e) => {
     const { name, value } = e.target
 
-    // If the school ID field is updated and cleared, reset the dependent fields
-    if (name === "schoolId" && value.trim() === "") {
-      setFormData((prev) => ({
-        ...prev,
-        schoolId: value,
-        userId: "",
-        name: "",
-        college: "",
-        department: "",
-      }))
-      return
-    }
-
+    // Update the form data with the new value
     setFormData((prev) => ({ ...prev, [name]: value }))
 
-    if (name === "schoolId" && value.trim() !== "") {
+    // If the school ID field is updated
+    if (name === "schoolId") {
+      // If the school ID is empty, clear the dependent fields
+      if (value.trim() === "") {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+          userId: "",
+          name: "",
+          college: "",
+          department: "",
+        }))
+        return
+      }
+
+      // If school ID has a value, fetch user data
       try {
         const { data, error } = await supabase
           .from("user_accounts")
           .select("userID, userFName, userLName, userCollege, userDepartment")
-          .eq("userLPUID", value) // Use the raw value directly
+          .eq("userLPUID", value)
 
         if (error) {
           console.error("Error fetching user details:", error.message)
@@ -56,6 +59,14 @@ export default function ARoomBooking({ addReservation }) {
         }
 
         if (!data || data.length === 0) {
+          // Clear the fields if no user is found
+          setFormData((prev) => ({
+            ...prev,
+            userId: "",
+            name: "",
+            college: "",
+            department: "",
+          }))
           console.log("No user found with the provided School ID")
           return
         }
@@ -129,15 +140,14 @@ export default function ARoomBooking({ addReservation }) {
   }
 
   const isSunday = (date) => {
-    const selectedDay = new Date(date).getDay(); // 0 = Sunday
-    return selectedDay === 0;
-  };
+    const selectedDay = new Date(date).getDay() // 0 = Sunday
+    return selectedDay === 0
+  }
 
   const handleFormSubmit = async () => {
-
-    const now = new Date();
-    const selectedDateTime = new Date(`${formData.date}T${formData.startTime}`);
-    const endDateTime = new Date(`${formData.date}T${formData.endTime}`);
+    const now = new Date()
+    const selectedDateTime = new Date(`${formData.date}T${formData.startTime}`)
+    const endDateTime = new Date(`${formData.date}T${formData.endTime}`)
 
     if (selectedDateTime < now) {
       toast.warn("You cannot book a past date or time!", {
@@ -150,12 +160,12 @@ export default function ARoomBooking({ addReservation }) {
         progress: undefined,
         theme: "colored",
         className: "bg-yellow text-white",
-      });
-      return;
+      })
+      return
     }
 
-    const startHour = parseInt(formData.startTime.split(":")[0], 10);
-    const endHour = parseInt(formData.endTime.split(":")[0], 10);
+    const startHour = Number.parseInt(formData.startTime.split(":")[0], 10)
+    const endHour = Number.parseInt(formData.endTime.split(":")[0], 10)
 
     if (endDateTime <= selectedDateTime) {
       toast.error("End time must be after the start time!", {
@@ -168,8 +178,8 @@ export default function ARoomBooking({ addReservation }) {
         progress: undefined,
         theme: "colored",
         className: "bg-red text-white",
-      });
-      return;
+      })
+      return
     }
 
     if (isSunday(formData.date)) {
@@ -183,8 +193,8 @@ export default function ARoomBooking({ addReservation }) {
         progress: undefined,
         theme: "colored",
         className: "bg-red text-white",
-      });
-      return;
+      })
+      return
     }
 
     // Validate booking hours (07:00 - 17:00)
@@ -199,8 +209,8 @@ export default function ARoomBooking({ addReservation }) {
         progress: undefined,
         theme: "colored",
         className: "bg-red text-white",
-      });
-      return;
+      })
+      return
     }
 
     if (
@@ -244,23 +254,23 @@ export default function ARoomBooking({ addReservation }) {
     addReservation(newEvent)
 
     const formatTimeTo12Hour = (time24) => {
-      const [hour, minute] = time24.split(":");
-      const date = new Date();
-      date.setHours(hour, minute);
+      const [hour, minute] = time24.split(":")
+      const date = new Date()
+      date.setHours(hour, minute)
       return date.toLocaleTimeString("en-US", {
         hour: "numeric",
         minute: "2-digit",
         hour12: true,
-      });
-    };
-    
+      })
+    }
+
     const reserveData = {
       room: formData.room,
       date: formData.date,
       startTime: formData.startTime, // Keep as 24-hour format
       endTime: formData.endTime,
       title: formData.title,
-    };
+    }
 
     try {
       const { data, error } = await supabase.from("reservation").insert({
@@ -295,8 +305,8 @@ export default function ARoomBooking({ addReservation }) {
           className: "bg-green text-white",
         })
         setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+          window.location.reload()
+        }, 1500)
       }
     } catch (error) {
       console.error("Error while submitting reservation:", error.message)
@@ -464,4 +474,3 @@ export default function ARoomBooking({ addReservation }) {
     </div>
   )
 }
-

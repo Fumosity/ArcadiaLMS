@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { supabase } from "../../supabaseClient"
 import { toast, ToastContainer } from "react-toastify" // Import ToastContainer
 import "react-toastify/dist/ReactToastify.css"
@@ -14,11 +14,11 @@ const CheckingContainer = () => {
   const [isSearching, setIsSearching] = useState(false) // Loading state for search
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [isViewOpen, setViewOpen] = useState("")
-  const [scanResult, setScanResult] = useState(""); // Store scanned barcode
+  const [scanResult, setScanResult] = useState("") // Store scanned barcode
 
   const handleBarcodeScan = (barcode) => {
-    setScanResult(barcode); // Update the scanned barcode
-  };
+    setScanResult(barcode) // Update the scanned barcode
+  }
 
   // Function to get the PC's current local time
   const getLocalTime = () => {
@@ -63,33 +63,39 @@ const CheckingContainer = () => {
       setBookSuggestions([])
 
       // Also clear book title and barcode when switching modes
-      if (formData.bookTitle || formData.bookBarcode) {
-        setFormData((prev) => ({
-          ...prev,
-          bookTitle: "",
-          bookBarcode: "",
-        }))
-        setBookCover("")
-      }
+      setFormData((prev) => ({
+        ...prev,
+        bookTitle: "",
+        bookBarcode: "",
+      }))
+      setBookCover("")
     } else {
       // Clear book suggestions when switching to Check Out mode
       setBookSuggestions([])
 
       // Also clear book title and barcode when switching modes
-      if (formData.bookTitle || formData.bookBarcode) {
-        setFormData((prev) => ({
-          ...prev,
-          bookTitle: "",
-          bookBarcode: "",
-        }))
-        setBookCover("")
-      }
+      setFormData((prev) => ({
+        ...prev,
+        bookTitle: "",
+        bookBarcode: "",
+      }))
+      setBookCover("")
     }
   }, [checkMode])
 
   useEffect(() => {
-    if (formData.schoolNo) {
-      const fetchUserData = async () => {
+    const fetchUserData = async () => {
+      // Clear fields immediately when schoolNo changes
+      setFormData((prev) => ({
+        ...prev,
+        name: "",
+        college: "",
+        department: "",
+        userID: "",
+      }))
+
+      // Only fetch data if schoolNo is not empty and matches a complete ID pattern
+      if (formData.schoolNo && formData.schoolNo.length >= 10) {
         try {
           const { data, error } = await supabase
             .from("user_accounts")
@@ -97,15 +103,7 @@ const CheckingContainer = () => {
             .eq("userLPUID", formData.schoolNo)
             .single()
 
-          if (error || !data) {
-            setFormData((prev) => ({
-              ...prev,
-              name: "",
-              college: "",
-              department: "",
-              userID: "",
-            }))
-          } else {
+          if (!error && data) {
             setFormData((prev) => ({
               ...prev,
               name: `${data.userFName} ${data.userLName}`,
@@ -118,23 +116,16 @@ const CheckingContainer = () => {
           console.error("Error fetching user data:", error)
         }
       }
-
-      fetchUserData()
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        name: "",
-        college: "",
-        department: "",
-      }))
     }
+
+    fetchUserData()
   }, [formData.schoolNo])
 
   const [bookCover, setBookCover] = useState("") // State for the book cover image URL
 
   useEffect(() => {
-    if (formData.bookBarcode) {
-      const fetchBookData = async () => {
+    const fetchBookData = async () => {
+      if (formData.bookBarcode) {
         try {
           // Fetch title and cover from the book_titles table using titleID from book_indiv
           const { data, error } = await supabase
@@ -159,16 +150,16 @@ const CheckingContainer = () => {
         } catch (error) {
           console.error("Error fetching book data:", error)
         }
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          bookTitle: "",
+        }))
+        setBookCover("") // Clear cover if no bookBarcode is provided
       }
-
-      fetchBookData()
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        bookTitle: "",
-      }))
-      setBookCover("") // Clear cover if no bookBarcode is provided
     }
+
+    fetchBookData()
   }, [formData.bookBarcode])
 
   const handleCheckChange = (e) => {
@@ -242,7 +233,6 @@ const CheckingContainer = () => {
           setFormData((prev) => ({
             ...prev,
             schoolNo: userData.userLPUID,
-            // The useEffect will fill name, college, department, and userID
           }))
         }
       }
@@ -406,6 +396,7 @@ const CheckingContainer = () => {
           .select("transactionType")
           .eq("bookBarcode", bookBarcode)
           .eq("transactionType", "Borrowed") // Check if the book is already borrowed
+          .is("checkinDate", null)
           .order("checkoutDate", { ascending: false })
           .limit(1)
           .single()
@@ -546,83 +537,94 @@ const CheckingContainer = () => {
     // setCheckMode("Check Out");
   }
 
-  useEffect(() => {
-    const fetchBookTitles = async () => {
-      if (formData.bookTitle.length < 2) {
-        // Prevent excessive API calls
-        setBookSuggestions([])
-        return
-      }
-
-      setIsSearching(true)
-      try {
-        // Different query based on check mode
-        if (checkMode === "Check In") {
-          // For Check In, we want to search for books that are currently borrowed
-          // First, get the user's borrowed books from transactions
-          if (!formData.userID) {
-            setBookSuggestions([])
-            setIsSearching(false)
-            return
-          }
-
-          const { data: borrowedBooks, error: borrowedError } = await supabase
-            .from("book_transactions")
-            .select("bookBarcode")
-            .eq("userID", formData.userID)
-            .eq("transactionType", "Borrowed")
-            .is("checkinDate", null)
-
-          if (borrowedError || !borrowedBooks || borrowedBooks.length === 0) {
-            console.error("Error fetching borrowed books or no books found:", borrowedError)
-            setBookSuggestions([])
-            setIsSearching(false)
-            return
-          }
-
-          // Get the barcodes of borrowed books
-          const borrowedBarcodes = borrowedBooks.map((book) => book.bookBarcode)
-
-          // Now fetch book details for these barcodes that match the search term
-          const { data: bookDetails, error: detailsError } = await supabase
-            .from("book_indiv")
-            .select("bookBarcode, book_titles!inner(title)")
-            .in("bookBarcode", borrowedBarcodes)
-            .ilike("book_titles.title", `%${formData.bookTitle}%`)
-
-          if (detailsError) {
-            console.error("Error fetching book details:", detailsError)
-            setBookSuggestions([])
-          } else {
-            console.log("Fetched borrowed books:", bookDetails)
-            setBookSuggestions(bookDetails || [])
-          }
-        } else {
-          // For Check Out, we want available books
-          const { data, error } = await supabase
-            .from("book_indiv")
-            .select("bookBarcode, book_titles!inner(title)")
-            .eq("bookStatus", "Available") // Only show available books for checkout
-            .ilike("book_titles.title", `%${formData.bookTitle}%`)
-            .limit(5)
-
-          if (error) {
-            console.error("Error fetching book titles:", error)
-            setBookSuggestions([])
-          } else {
-            console.log("Fetched available books:", data)
-            setBookSuggestions(data || [])
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching books:", error)
-        setBookSuggestions([])
-      }
-      setIsSearching(false)
+  const fetchBookTitles = useCallback(async () => {
+    if (formData.bookTitle.length < 2) {
+      // Prevent excessive API calls
+      setBookSuggestions([])
+      return
     }
 
-    fetchBookTitles()
+    setIsSearching(true)
+    try {
+      // Different query based on check mode
+      if (checkMode === "Check In") {
+        // For Check In, we want to search for books that are currently borrowed
+        // First, get the user's borrowed books from transactions
+        if (!formData.userID) {
+          setBookSuggestions([])
+          setIsSearching(false)
+          return
+        }
+
+        const { data: borrowedBooks, error: borrowedError } = await supabase
+          .from("book_transactions")
+          .select("bookBarcode")
+          .eq("userID", formData.userID)
+          .eq("transactionType", "Borrowed")
+          .is("checkinDate", null)
+
+        if (borrowedError || !borrowedBooks || borrowedBooks.length === 0) {
+          console.error("Error fetching borrowed books or no books found:", borrowedError)
+          setBookSuggestions([])
+          setIsSearching(false)
+          return
+        }
+
+        // Get the barcodes of borrowed books
+        const borrowedBarcodes = borrowedBooks.map((book) => book.bookBarcode)
+
+        // Now fetch book details for these barcodes that match the search term
+        const { data: bookDetails, error: detailsError } = await supabase
+          .from("book_indiv")
+          .select("bookBarcode, book_titles!inner(title)")
+          .in("bookBarcode", borrowedBarcodes)
+          .ilike("book_titles.title", `%${formData.bookTitle}%`)
+
+        if (detailsError) {
+          console.error("Error fetching book details:", detailsError)
+          setBookSuggestions([])
+        } else {
+          console.log("Fetched borrowed books:", bookDetails)
+          setBookSuggestions(bookDetails || [])
+        }
+      } else {
+        // For Check Out, we want available books
+        const { data, error } = await supabase
+          .from("book_indiv")
+          .select("bookBarcode, book_titles!inner(title)")
+          .eq("bookStatus", "Available") // Only show available books for checkout
+          .ilike("book_titles.title", `%${formData.bookTitle}%`)
+          .limit(5)
+
+        if (error) {
+          console.error("Error fetching book titles:", error)
+          setBookSuggestions([])
+        } else {
+          console.log("Fetched available books:", data)
+          setBookSuggestions(data || [])
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching books:", error)
+      setBookSuggestions([])
+    }
+    setIsSearching(false)
   }, [formData.bookTitle, checkMode, formData.userID])
+
+  useEffect(() => {
+    fetchBookTitles()
+  }, [fetchBookTitles])
+
+  const barcodeEffect = useCallback(() => {
+    setFormData((prev) => ({
+      ...prev,
+      bookBarcode: scanResult || prev.bookBarcode, // Use scanResult if available, else keep existing value
+    }))
+  }, [scanResult])
+
+  useEffect(() => {
+    barcodeEffect()
+  }, [barcodeEffect])
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
@@ -661,6 +663,10 @@ const CheckingContainer = () => {
               let inputType = "text"
               let afterInput = null
               let divClassName = "flex items-center" // Default class for the div
+              let isReadOnly = false
+              if (key === "name" || key === "college" || key === "department") {
+                isReadOnly = true
+              }
 
               if (key === "userID") {
                 divClassName = "flex items-center hidden" // Add 'hidden' class
@@ -669,12 +675,6 @@ const CheckingContainer = () => {
               if (key === "bookBarcode") {
                 label = "Book Barcode"
                 // Ensure the value updates when scanResult changes but is also editable
-                useEffect(() => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    bookBarcode: scanResult || prev.bookBarcode, // Use scanResult if available, else keep existing value
-                  }));
-                }, [scanResult]);
                 afterInput = (
                   <button
                     className="px-3 py-1 ml-2 rounded-full border border-grey w-[calc(2/5*100%)] hover:bg-light-gray transition"
@@ -772,6 +772,7 @@ const CheckingContainer = () => {
                       placeholder={key === "schoolNo" ? "XXXX-X-XXXXX" : ""}
                       className={`px-3 py-1 rounded-full border ${emptyFields[key] ? "border-arcadia-red" : "border-grey"} ${key === "bookBarcode" ? "w-[calc(3/5*100%)]" : "w-full"}`}
                       required
+                      readOnly={isReadOnly}
                     />
                     {afterInput}
                   </div>
