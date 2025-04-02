@@ -42,7 +42,7 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
     synopsis: book.synopsis,
     keywords: Array.isArray(book.keywords) ? book.keywords.join(', ') : (book.keywords ?? '').split(';').join(',') || '',
     currdatePublished: book.currentPubDate,
-    orgdatePublished: book.currentPubDate,
+    orgdatePublished: book.originalPubDate,
     location: book.location,
     isbn: book.isbn,
     cover: book.cover,

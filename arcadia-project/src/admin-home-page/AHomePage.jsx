@@ -34,9 +34,9 @@ const AHomePage = () => {
           <AccessTable />
           <TodayReserv />
           <MostPop />
-          <LeastPop />
+          {/* <LeastPop /> */}
           <HighRates />
-          <LowRates />
+          {/* <LowRates /> */}
           <RecentReports />
           <RecentSupport />
           <SBFines />

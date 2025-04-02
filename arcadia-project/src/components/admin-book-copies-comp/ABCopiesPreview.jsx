@@ -24,7 +24,7 @@ const ABCopiesPreview = ({ book }) => {
     synopsis: book.synopsis,
     keywords: Array.isArray(book.keywords) ? book.keywords.join(', ') : (book.keywords ?? '').split(';').join(',') || '',
     currdatePublished: book.currentPubDate,
-    orgdatePublished: book.currentPubDate,
+    orgdatePublished: book.originalPubDate,
     location: book.location,
     isbn: book.isbn,
     cover: book.cover,
@@ -65,7 +65,7 @@ const ABCopiesPreview = ({ book }) => {
                             : key.replace(/([A-Z])/g, " $1") + ":"}
                   </td>
                   <td
-                    className="px-1 py-1 text-sm break-words w-2/3"
+                    className="px-1 py-1 text-sm text-justify break-words w-2/3"
                   >
                     {value}
                   </td>
