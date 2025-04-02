@@ -79,6 +79,11 @@ const InterestedGenre = ({ userID, onSeeMoreClick }) => {
             setLoading(true);
             try {
                 const data = await fetchBooksByUserInterest(userID);
+                if (!data.books || data.books.length === 0) {
+                    // If there are no books to show, return early, meaning the component won't render
+                    setGenreData({ genreName: "", books: [] });
+                    return;
+                }
                 setGenreData(data);
             } catch (err) {
                 console.error("Error fetching genre:", err);
@@ -90,10 +95,11 @@ const InterestedGenre = ({ userID, onSeeMoreClick }) => {
         fetchData();
     }, [userID]);
 
+    // If there are no genres or books, don't render the component
+    if (!genreData.books || genreData.books.length === 0) {
+        return null;
+    }
 
-    if (!userID) {
-        return;
-    } else {
     return (
         <BookCards
             title={`Because you like ${genreData.genreName}`}
@@ -103,7 +109,6 @@ const InterestedGenre = ({ userID, onSeeMoreClick }) => {
             }
         />
     );
-    }
 };
 
 export default InterestedGenre;

@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 import math
+from typing import Optional
 
 from app.book_reco import get_recommendations
 from app.research_reco import get_rsrch_recommendations
@@ -557,11 +558,13 @@ async def extract_text(files: List[UploadFile] = File(...)):
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 class RecommendationRequest(BaseModel):
-    titleID: int = None
-    userID: int = None
+    titleID: Optional[int] = None
+    userID: Optional[int] = None
 
 @app.post("/book-recommend")
 async def recommend(request: RecommendationRequest):
+    print("Received Request:", request.dict())  # Debugging
+
     user_id = request.userID
     title_id = request.titleID
     

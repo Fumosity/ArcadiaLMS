@@ -59,12 +59,11 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
   }
 
   const renderStars = (rating) => {
-    const roundedRating = Math.round(rating * 10) / 10
-    const fullStars = Math.floor(roundedRating)
-    const halfStar = (roundedRating * 2) % 2 !== 0
-
-    let emptyStars = 5 - fullStars - (halfStar ? 1 : 0)
-    emptyStars = Math.max(0, emptyStars)
+    const roundedRating = Math.round(rating * 10) / 10;
+    const fullStars = Math.floor(roundedRating);
+    const halfStar = (roundedRating * 2) % 2 !== 0;
+    let emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+    emptyStars = Math.max(0, emptyStars);
 
     return (
       <span className="flex gap-1 items-center">
@@ -72,19 +71,15 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
           {[...Array(fullStars)].map((_, i) => (
             <FontAwesomeIcon key={i} icon={faStar} className="text-arcadia-yellow" />
           ))}
-          {halfStar && <FontAwesomeIcon icon={faStarHalfAlt} className="text-arcadia-yellow" />}
+          {halfStar && <FontAwesomeIcon icon={faStarHalfAlt} className="text-grey" />}
           {[...Array(emptyStars)].map((_, i) => (
             <FontAwesomeIcon key={i} icon={faRegularStar} className="text-grey" />
           ))}
         </span>
-        {formatRating(rating)}
+        {rating.toFixed(1)}
       </span>
-    )
-  }
-
-  const formatRating = (rating) => {
-    return rating.toFixed(1)
-  }
+    );
+  };
 
   return (
     <div className="uMain-cont">
@@ -124,7 +119,10 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
                 <img
                   src={book.cover || "/image/arcadia_gray.png"}
                   alt={book.title}
-                  className="w-full h-60 object-cover rounded-lg mb-2 bg-light-gray"
+                  className="w-full h-4/6 object-cover rounded-lg mb-2 bg-light-gray"
+                  style={{
+                    boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.5)", // Creates the vignette effect
+                  }}
                 />
                 <h3 className="text-lg h-[3rem] leading-tight font-semibold whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">
                   {book.title}
@@ -147,8 +145,13 @@ const BookCards = ({ title, fetchBooks, onSeeMoreClick }) => {
               </Link>
             ))}
             {generatePlaceholders().map((_, index) => (
-              <div key={`placeholder-${index}`} className="bg-white border border-grey rounded-xl p-4">
-                <div className="w-full h-60 rounded-lg mb-2 bg-light-gray"></div>
+              <div key={`placeholder-${index}`} className="bg-white border border-grey rounded-xl p-2">
+                <div
+                  className="w-full h-60 rounded-lg mb-2 bg-light-gray"
+                  style={{
+                    boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.05)", // Creates the vignette effect
+                  }}
+                ></div>
                 <div className="text-lg h-[3rem] font-semibold mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
                 <div className="text-sm text-gray-400 mb-1 truncate bg-light-gray">&nbsp;</div>

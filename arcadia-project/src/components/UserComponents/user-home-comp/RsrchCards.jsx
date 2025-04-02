@@ -102,7 +102,7 @@ const RsrchCards = ({ title, fetchResearch, onSeeMoreClick }) => {
                       {research.title}
                     </h3>
                     {research.pdf &&
-                      <div className="w-1/8 bg-arcadia-red rounded-full font-semibold text-white text-center text-xs px-2 py-1">
+                      <div className="w-1/6 bg-arcadia-red rounded-full font-semibold text-white text-center text-xs px-2 py-1">
                         Preview Available
                       </div>
                     }

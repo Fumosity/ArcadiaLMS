@@ -477,7 +477,10 @@
   background-color: white;
   border: 1px solid #d1d5db; /* Assuming 'grey' is close to this color */
   border-radius: 0.75rem; /* xl rounded corners */
-  padding: 1rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 1rem;
   transition: transform 0.3s, box-shadow 0.3s;
   will-change: transform;
 }

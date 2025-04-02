@@ -133,7 +133,7 @@ const HighestRatedBk = ({ onSeeMoreClick }) => {
   return (
     <div className="uSidebar-filter">
       <div className="flex justify-between items-center mb-2.5">
-        <h2 className="text-xl font-semibold">Highest Rated Books</h2>
+        <h2 className="text-xl font-semibold">Highest Rated</h2>
         <button
           className="rounded-full py-0.5 px-3 text-sm border border-grey hover:bg-light-gray"
           onClick={() =>

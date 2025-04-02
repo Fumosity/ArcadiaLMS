@@ -74,12 +74,21 @@ if 'features' in books_df.columns:
 else:
     print("Warning: 'features' column is missing for TF-IDF calculation.")
 
-
 def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df):
-    print("GETTING RECOMMENDATIONS TITLEID:", titleID, "USERID:", userID)
+    print("GETTING RECOMMENDATIONS - TITLEID:", titleID, "USERID:", userID)
+
+    if titleID is None and userID is None:
+        print("No titleID or userID provided. Returning top-rated books.")
+        return books_df.sort_values(by="average_rating", ascending=False).head(5)
+
+    book_indices = []  # Ensure book_indices is initialized
 
     if titleID is not None and userID is not None:
         print("Using Hybrid Recommendation (Content + Collaborative)")
+        if titleID not in books_df["titleID"].values:
+            print("Warning: titleID not found in books_df. Falling back to top-rated books.")
+            return books_df.sort_values(by="average_rating", ascending=False).head(5)
+
         idx = books_df[books_df["titleID"] == titleID].index[0]
         content_sim_scores = list(enumerate(cosine_sim[idx]))
         content_sim_scores = sorted(content_sim_scores, key=lambda x: x[1], reverse=True)[1:6]
@@ -97,27 +106,48 @@ def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_
         ]
         combined_scores = sorted(combined_scores, key=lambda x: x[1], reverse=True)
         book_indices = [i[0] for i in combined_scores]
-    
+
     elif titleID is not None:
         print("Using Content-Based Recommendation")
+        if titleID not in books_df["titleID"].values:
+            print("Warning: titleID not found in books_df. Falling back to top-rated books.")
+            return books_df.sort_values(by="average_rating", ascending=False).head(5)
+
         idx = books_df[books_df["titleID"] == titleID].index[0]
         content_sim_scores = list(enumerate(cosine_sim[idx]))
         content_sim_scores = sorted(content_sim_scores, key=lambda x: x[1], reverse=True)[1:6]
         book_indices = [i[0] for i in content_sim_scores]
-    
+
     elif userID is not None:
         print("Using Collaborative Filtering")
+        if userID not in users_df["userID"].values:
+            print("Warning: userID not found in users_df. Falling back to top-rated books.")
+            return books_df.sort_values(by="average_rating", ascending=False).head(5)
+
         user_college = users_df[users_df["userID"] == userID]["userCollege"].iloc[0]
         user_department = users_df[users_df["userID"] == userID]["userDepartment"].iloc[0]
-        
+
         college_ratings = ratings_df[(ratings_df["userCollege"] == user_college) & (ratings_df["userDepartment"] == user_department)]
         college_avg_ratings = college_ratings.groupby("titleID")["ratingValue"].mean()
         recommended_books = college_avg_ratings.sort_values(ascending=False).index.tolist()
+
+        # Get the valid book indices from the books_df
         valid_titleIDs = set(books_df["titleID"])
-        book_indices = [titleID for titleID in recommended_books if titleID in valid_titleIDs]
-    
+        book_indices = [books_df[books_df["titleID"] == titleID].index[0] for titleID in recommended_books if titleID in valid_titleIDs]
+
+        # If no valid books were found, fallback to top-rated books
+        if not book_indices:
+            print("No valid books found, returning top-rated books.")
+            return books_df.sort_values(by="average_rating", ascending=False).head(5)
+
+        print("Book indices:", book_indices)
+        return books_df[["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]].iloc[book_indices]
+
     else:
         print("Returning Top-Rated Books")
         book_indices = books_df.sort_values(by="average_rating", ascending=False).head(5).index.tolist()
-    
+
+    print("Book indices:", book_indices)
+    print("Books DataFrame shape:", books_df.shape)
+
     return books_df[["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]].iloc[book_indices]

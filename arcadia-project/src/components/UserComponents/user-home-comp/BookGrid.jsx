@@ -87,22 +87,34 @@ const BookGrid = ({ title, fetchBooks }) => {
                     <>
                         {books.map((book, index) => (
                             <a key={index} href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`} className="block genCard-cont" title={book.title}>
-                                <img src={book.cover} alt={book.title} className="w-full h-60 object-cover rounded-lg mb-2" />
+                                <img src={book.cover} alt={book.title} className="w-full h-4/6 object-cover rounded-lg mb-2" />
                                 <h3 className="text-lg h-[3rem] leading-tight font-semibold whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">{book.title}</h3>
                                 <p className="text-sm text-gray-500 mb-1 truncate">{formatAuthor(book.author)}</p>
                                 <p className="text-sm text-gray-400 mb-1 truncate">{book.category}</p>
                                 <p className="text-sm text-gray-500 mb-1 truncate">
-                                    {book.weightedAvg ? renderStars(book.weightedAvg) : "Rating not available"}
+                                    {book.weightedAvg && (
+                                        <span className="flex items-center justify-start gap-1">
+                                            {renderStars(book.weightedAvg)}
+                                            <span className="text-xs text-gray-500">
+                                                ({book.totalRatings >= 1000 ? "1000+" : book.totalRatings})
+                                            </span>
+                                        </span>
+                                    )}
+                                    {!book.weightedAvg && "Rating not available"}
                                 </p>
                             </a>
                         ))}
                         {generatePlaceholders().map((_, index) => (
-                            <div key={index} className="bg-white border border-grey rounded-xl p-4 "> {/* Placeholder div */}
-                                <div className="w-full h-60 rounded-lg mb-2 bg-light-gray"></div>
-                            <div className="text-lg font-semibold mb-1 truncate bg-light-gray">&nbsp;</div>
-                            <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
-                            <div className="text-sm text-gray-400 mb-1 truncate bg-light-gray">&nbsp;</div>
-                            <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
+                            <div key={index} className="bg-white border border-grey rounded-xl p-2 "> {/* Placeholder div */}
+                                <div
+                                    className="w-full h-60 rounded-lg mb-2 bg-light-gray"
+                                    style={{
+                                        boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.05)", // Creates the vignette effect
+                                    }}
+                                ></div>                            <div className="text-lg font-semibold mb-1 truncate bg-light-gray">&nbsp;</div>
+                                <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
+                                <div className="text-sm text-gray-400 mb-1 truncate bg-light-gray">&nbsp;</div>
+                                <div className="text-sm text-gray-500 mb-1 truncate bg-light-gray">&nbsp;</div>
                             </div>
                         ))}
                     </>

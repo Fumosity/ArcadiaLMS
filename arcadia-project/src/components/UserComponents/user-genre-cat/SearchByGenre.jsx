@@ -129,7 +129,7 @@ export default function SearchByGenre({ onGenreClick, onSeeMoreGenresClick }) {
               className="transform transition duration-300 hover:shadow-lg hover:scale-105 will-change-transform"
               onClick={() => onGenreClick(genre)}
             >
-              <div className="relative flex-none w-full h-[320px] rounded-xl overflow-hidden cursor-pointer group">
+              <div className="relative flex-none w-full h-[45vh] rounded-xl overflow-hidden cursor-pointer group">
                 <img
                   src={genre.img || "/placeholder.svg"}
                   alt={`${genre.category} ${genre.genreName} Cover`}
@@ -137,7 +137,7 @@ export default function SearchByGenre({ onGenreClick, onSeeMoreGenresClick }) {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-0 left-0 w-full p-3 text-white">
-                  <p className="text-sm opacity-90">{genre.category}</p>
+                  <p className="text-sm font-semibold opacity-90">{genre.category}</p>
                   <h3 className="text-xl font-semibold mt-1 text-left break-words">
                     {genre.genreName}
                   </h3>
