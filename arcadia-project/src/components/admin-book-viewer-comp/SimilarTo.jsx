@@ -6,7 +6,7 @@ const fetchSimilarBooks = async (titleID) => {
   try {
     console.log("Similar to: title, ", titleID)
     // Step 1: Fetch recommended books
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/book-recommend`, {
+    const response = await axios.post("http://localhost:8000/book-recommend", {
       titleID,
     });
     const recommendedBooks = response.data.recommendations || [];
