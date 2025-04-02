@@ -59,6 +59,7 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
 
   const handleManageCopies = () => {
     console.log("Title in BookPreviewInventory:", bookDetails.title)
+    
     navigate(`/admin/copymanagement?titleID=${bookDetails.titleID}`)
   }
   
