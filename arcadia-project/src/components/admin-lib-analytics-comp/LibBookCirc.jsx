@@ -32,7 +32,6 @@ const LibBookCirc = () => {
           value={timeFrame}
           className="border border-grey rounded-md py-1 px-2"
         >
-          <option value="day">Day</option>
           <option value="week">Week</option>
           <option value="month">Month</option>
         </select>
