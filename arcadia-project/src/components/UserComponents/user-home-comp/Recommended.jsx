@@ -6,10 +6,10 @@ import { supabase } from "../../../supabaseClient";
 
 const fetchRecommendedBooks = async (userID, titleID) => {
     try {
-        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/book-recommend`, {
+        const response = await axios.post("http://18.143.186.140:8000/book-recommend", {
             userID,
             titleID: titleID || null,
-        });        
+        });
 
         const recommendations = response.data.recommendations || [];
 
