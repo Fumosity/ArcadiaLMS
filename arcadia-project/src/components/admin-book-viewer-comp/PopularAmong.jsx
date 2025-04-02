@@ -10,72 +10,101 @@ const PopularAmong = ({ titleID }) => {
   const fetchTopColleges = async () => {
     console.log("Fetching top colleges for titleID:", titleID);
     try {
-      // Fetch all ratings for the book
+      // Fetch ratings for this specific titleID
       const { data: ratings, error: ratingsError } = await supabase
         .from("ratings")
-        .select("userID, ratingValue");
-
+        .select("userID, ratingValue")
+        .eq("titleID", titleID);
+  
       if (ratingsError) throw ratingsError;
-      console.log("Ratings:", ratings); // Log ratings
-
-      // Fetch the colleges associated with the users who rated the book
+      console.log("Ratings for titleID:", ratings);
+  
+      // Fetch all borrow transactions for this titleID
+      const { data: transactions, error: transactionError } = await supabase
+        .from("book_transactions") // Adjust to your borrow transactions table
+        .select("userID, bookBarcode");
+  
+      if (transactionError) throw transactionError;
+      console.log("Borrow Transactions:", transactions);
+  
+      // Fetch book metadata to get titleID for each bookBarcode
+      const { data: bookMetadata, error: bookError } = await supabase
+        .from("book_indiv") // Adjust to your book metadata table
+        .select("bookBarcode, titleID")
+        .eq("titleID", titleID); // Only for the specific book
+  
+      if (bookError) throw bookError;
+      console.log("Book Metadata:", bookMetadata);
+  
+      // Create a mapping of bookBarcode -> titleID
+      const bookBarcodeToTitle = bookMetadata.reduce((acc, { bookBarcode, titleID }) => {
+        acc[bookBarcode] = titleID;
+        return acc;
+      }, {});
+  
+      // Filter transactions to only include those linked to this titleID
+      const filteredTransactions = transactions.filter(({ bookBarcode }) => 
+        bookBarcodeToTitle[bookBarcode] === titleID
+      );
+  
+      console.log("Filtered Transactions for TitleID:", filteredTransactions);
+  
+      // Collect all userIDs involved in borrows or ratings
+      const userIDs = [
+        ...new Set([...ratings.map(r => r.userID), ...filteredTransactions.map(t => t.userID)])
+      ];
+  
+      // Fetch user colleges for involved users
       const { data: userColleges, error: userError } = await supabase
         .from("user_accounts")
-        .select("userID, userCollege");
-
+        .select("userID, userCollege")
+        .in("userID", userIDs);
+  
       if (userError) throw userError;
-      console.log("User Colleges:", userColleges); // Log user accounts
-
-      // Create a map of userID to their college for easy lookup
+      console.log("User Colleges:", userColleges);
+  
+      // Map userID -> College
       const userCollegeMap = userColleges.reduce((acc, { userID, userCollege }) => {
         acc[userID] = userCollege;
         return acc;
       }, {});
-      console.log("User College Map:", userCollegeMap); // Log user college map
-
-      // Create a map of userID to rating for easy lookup
-      const userRatingsMap = ratings.reduce((acc, { userID, ratingValue }) => {
-        acc[userID] = ratingValue;
-        return acc;
-      }, {});
-      console.log("User Ratings Map:", userRatingsMap); // Log user ratings map
-
-      // Now, we need to merge both maps (userCollegeMap and userRatingsMap) without depending on transactions
-      const mergedUserData = ratings.reduce((acc, { userID, ratingValue }) => {
-        const userCollege = userCollegeMap[userID];
-
-        console.log(`Processing userID: ${userID}, College: ${userCollege}, Rating: ${ratingValue}`);
-
-        // Proceed if the user has both a college and a rating
-        if (userCollege && ratingValue !== undefined) {
-          if (!acc[userCollege]) {
-            acc[userCollege] = { ratingCount: 0, totalRating: 0 };
-          }
-          acc[userCollege].ratingCount += 1;  // Increment rating count
-          acc[userCollege].totalRating += ratingValue;  // Aggregate ratings
+  
+      // Aggregate borrow and rating data per college
+      const collegeData = {};
+  
+      // Process ratings
+      ratings.forEach(({ userID, ratingValue }) => {
+        const college = userCollegeMap[userID];
+        if (!college) return;
+        if (!collegeData[college]) {
+          collegeData[college] = { borrowCount: 0, ratingCount: 0, totalRating: 0 };
         }
-        return acc;
-      }, {});
-
-      console.log("Merged User Data by College:", mergedUserData); // Log the merged data by college
-
-      // Calculate average rating per college and sort by rating count and average rating
-      const sortedColleges = Object.entries(mergedUserData)
-        .map(([college, { ratingCount, totalRating }]) => {
-          const averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(2) : 0;
-          return { college, ratingCount, averageRating };
-        })
-        .sort((a, b) => {
-          // Prioritize rating count first, then average rating if rating count is the same
-          if (b.ratingCount === a.ratingCount) {
-            return b.averageRating - a.averageRating; // Higher rating first
-          }
-          return b.ratingCount - a.ratingCount; // Higher rating count first
-        })
-        .slice(0, 5); // Top 5 colleges
-
-      console.log("Sorted Colleges:", sortedColleges); // Log sorted colleges
-
+        collegeData[college].ratingCount += 1;
+        collegeData[college].totalRating += ratingValue;
+      });
+  
+      // Process borrows
+      filteredTransactions.forEach(({ userID }) => {
+        const college = userCollegeMap[userID];
+        if (!college) return;
+        if (!collegeData[college]) {
+          collegeData[college] = { borrowCount: 0, ratingCount: 0, totalRating: 0 };
+        }
+        collegeData[college].borrowCount += 1;
+      });
+  
+      // Convert to array and sort
+      const sortedColleges = Object.entries(collegeData)
+        .map(([college, { borrowCount, ratingCount, totalRating }]) => ({
+          college,
+          borrowCount,
+          ratingCount,
+          totalRating,
+          averageRating: ratingCount > 0 ? (totalRating / ratingCount).toFixed(2) : 0,
+        }))
+        .sort((a, b) => (b.borrowCount === a.borrowCount ? b.averageRating - a.averageRating : b.borrowCount - a.borrowCount))
+        .slice(0, 5);
+  
       setColleges(sortedColleges);
       setIsLoading(false);
     } catch (error) {
@@ -98,6 +127,9 @@ const PopularAmong = ({ titleID }) => {
               College
             </th>
             <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Total Borrows
+            </th>
+            <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
               Total Ratings
             </th>
             <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -118,19 +150,23 @@ const PopularAmong = ({ titleID }) => {
                 <td className="px-4 py-2 text-center text-sm">
                   <Skeleton />
                 </td>
+                <td className="px-4 py-2 text-center text-sm">
+                  <Skeleton />
+                </td>
               </tr>
             ))
           ) : colleges.length > 0 ? (
             colleges.map((college, index) => (
               <tr key={index} className="hover:bg-light-gray cursor-pointer">
                 <td className="px-4 py-2 text-center text-sm">{college.college}</td>
+                <td className="px-4 py-2 text-center text-sm">{college.borrowCount}</td>
                 <td className="px-4 py-2 text-center text-sm">{college.ratingCount}</td>
                 <td className="px-4 py-2 text-center text-sm">{college.averageRating}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={3} className="py-4 text-center text-sm text-gray-500">
+              <td colSpan={4} className="py-4 text-center text-sm text-gray-500">
                 No colleges found
               </td>
             </tr>

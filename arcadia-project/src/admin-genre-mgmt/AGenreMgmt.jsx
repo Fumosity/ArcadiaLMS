@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Title from "../components/main-comp/Title";
 import FictionList from "../components/admin-genre-mgmt-comp/FictionList";
-import NonFictionList from "../components/admin-genre-mgmt-comp/Nonfictionlist";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import GenrePreview from "../components/admin-genre-mgmt-comp/GenrePreview";
+import NonFictionList from "../components/admin-genre-mgmt-comp/NonFictionList";
 
 export default function AGenreMgmt() {
     const navigate = useNavigate(); // Initialize useNavigate
