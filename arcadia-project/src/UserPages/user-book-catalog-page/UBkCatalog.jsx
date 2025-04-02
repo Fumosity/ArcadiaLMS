@@ -19,7 +19,7 @@ import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr"
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents"
 import Services from "../../components/UserComponents/user-main-comp/Services"
 import MostPopBk from "../../components/UserComponents/user-main-comp/MostPopBk"
-import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghestRatedBk"
+import HighestRatedBk from "../../components/UserComponents/user-main-comp/HighestRatedBk"
 import { FilterProvider } from "../../backend/filterContext"
 import { Filter } from "lucide-react"
 
