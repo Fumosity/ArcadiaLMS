@@ -38,7 +38,7 @@ export default function Agreement({ onContinue }) {
 
     return (
         <div className="uMain-cont flex max-h-auto max-w-[950px] h-full w-full bg-white">
-            <div className="max-w-md mx-auto p-8 flex flex-col items-center text-center">
+            <div className="w-1/2 max-w-md mx-auto p-8 flex flex-col items-center text-center">
                 <div className="mb-6">
                     <h3 className="text-5xl font-semibold">Before we start...</h3>
                 </div>
@@ -49,7 +49,7 @@ export default function Agreement({ onContinue }) {
                 </p>
 
                 {/* Privacy Agreement Scrollable Box */}
-                <div className="w-[425px] h-[250px] border border-gray-400 rounded-md p-4 overflow-y-scroll text-left text-black mb-4"
+                <div className="w-[425px] h-[250px] border border-grey rounded-md p-4 custom-scrollbar overflow-y-scroll text-left text-black mb-4"
                     ref={privacyTextRef}
                     onScroll={handleScroll}
                 >
