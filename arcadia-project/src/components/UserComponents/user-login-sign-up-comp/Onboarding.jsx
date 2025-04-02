@@ -114,7 +114,7 @@ export default function Onboarding({ userData, selectedGenres }) {
                     Once done, you may now log in!
                 </p>
 
-                <div className="flex justify-center">
+                <div className="flex justify-center mt-24">
                     {/* <button type="submit" className="genRedBtns" onClick={handleSubmit}>Continue</button> */}
                     <button type="submit" className="genRedBtns" onClick={async (e) => {await handleSubmit(e); navigate("/user/login");}}>
                         Continue
