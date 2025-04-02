@@ -4,7 +4,7 @@ import RsrchCards from "../user-home-comp/RsrchCards";
 
 const fetchSimilarResearch = async (researchID) => {
     try {
-        const response = await axios.post("http://localhost:8000/research-recommend", { researchID });
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/research-recommend`, { researchID });
         return { research: response.data.recommendations || [] };
     } catch (error) {
         console.error("Error fetching similar research:", error);

@@ -86,7 +86,7 @@ const BookGrid = ({ title, fetchBooks }) => {
                 ) : (
                     <>
                         {books.map((book, index) => (
-                            <a key={index} href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`} className="block genCard-cont" title={book.title}>
+                            <a key={index} href={`${import.meta.env.VITE_API_BASE_MAIN}/user/bookview?titleID=${book.titleID}`} className="block genCard-cont" title={book.title}>
                                 <img src={book.cover} alt={book.title} className="w-full h-60 object-cover rounded-lg mb-2" />
                                 <h3 className="text-lg h-[3rem] leading-tight font-semibold whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">{book.title}</h3>
                                 <p className="text-sm text-gray-500 mb-1 truncate">{formatAuthor(book.author)}</p>
