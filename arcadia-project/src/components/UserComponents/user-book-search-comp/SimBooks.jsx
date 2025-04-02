@@ -5,7 +5,7 @@ import BookCards from "../user-home-comp/BookCards";
 export const fetchSimilarBooks = async (titleID, userID) => {
     try {
         // Step 1: Fetch recommended books
-        const response = await axios.post(`http://18.143.186.140:8000/book-recommend`, {
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/book-recommend`, {
             userID,
             titleID
         });
