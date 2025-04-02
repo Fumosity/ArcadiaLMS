@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState, useCallback } from "react"
 import { supabase } from "../../supabaseClient"
 import { useNavigate } from "react-router-dom"
