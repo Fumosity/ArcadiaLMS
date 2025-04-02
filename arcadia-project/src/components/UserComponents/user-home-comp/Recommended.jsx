@@ -6,7 +6,7 @@ import { supabase } from "../../../supabaseClient";
 
 const fetchRecommendedBooks = async (userID, titleID) => {
     try {
-        const response = await axios.post("http://localhost:8000/book-recommend", {
+        const response = await axios.post("http://18.143.186.140:8000/book-recommend", {
             userID,
             titleID: titleID || null,
         });
@@ -86,7 +86,11 @@ const Recommended = ({ titleID, onSeeMoreClick }) => {
     if (!user || !user.userID) {
         console.log("Recommended: Guest Mode");
         return;
+    } else {
+        console.log("userID", user.userID)
     }
+
+    console.log("titleID", titleID)
 
     return (
         <BookCards
