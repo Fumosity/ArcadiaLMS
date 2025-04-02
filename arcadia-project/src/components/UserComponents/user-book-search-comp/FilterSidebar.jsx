@@ -1,6 +1,6 @@
 import CatGenre from "./CatGenre"
 import PublicationYear from "./PublicationYear"
-import { useFilters } from "../../../backend/filterContext"
+import { useFilters } from "../../../backend/FilterContext"
 import { X } from "lucide-react"
 
 export default function FilterSidebar({ onClose }) {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useFilters } from "../../../backend/filterContext"
+import { useFilters } from "../../../backend/FilterContext"
 import { supabase } from "../../../supabaseClient"
 
 export default function PublicationYear() {

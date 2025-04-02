@@ -4,7 +4,7 @@ import Trie from "../../backend/trie"
 import { useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faStar, faStarHalfAlt, faStar as faRegularStar } from "@fortawesome/free-solid-svg-icons"
-import { useFilters } from "../../backend/filterContext"
+import { useFilters } from "../../backend/FilterContext"
 
 const UBkResults = ({ query }) => {
   const [books, setBooks] = useState([])
