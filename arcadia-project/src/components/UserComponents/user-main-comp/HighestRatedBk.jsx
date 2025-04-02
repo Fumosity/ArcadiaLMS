@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { supabase } from "/src/supabaseClient"
-import { useUser } from "../../../backend/UserContext" // Adjust path if needed
-import { Link } from "react-router-dom" // Make sure this is imported
+import { useUser } from "../../../backend/UserContext"
+import { Link } from "react-router-dom"
 
 const HighestRatedBk = ({ onSeeMoreClick }) => {
   const { user } = useUser()
@@ -152,7 +152,11 @@ const HighestRatedBk = ({ onSeeMoreClick }) => {
           <li key={index} className="flex justify-between py-1 hover:bg-light-gray">
             {book ? (
               <>
-                <Link to={`/user/bookview?titleID=${book.titleID}`} className="text-arcadia-red font-bold w-60 p-1">
+                <Link
+                  to={`/user/bookview?titleID=${book.titleID}`}
+                  className="text-arcadia-red font-bold w-60 p-1 truncate"
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
                   {book.title}
                 </Link>
                 <span className="w-12 p-1 flex justify-center">

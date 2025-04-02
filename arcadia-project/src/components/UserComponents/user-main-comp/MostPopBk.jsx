@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { supabase } from "/src/supabaseClient"
 import { useUser } from "../../../backend/UserContext"
+import { Link } from "react-router-dom"
 
 const MostPopBk = ({ onSeeMoreClick }) => {
   const { user } = useUser()
@@ -152,9 +153,13 @@ const MostPopBk = ({ onSeeMoreClick }) => {
           // Show actual books
           filledBooks.map((book, index) => (
             <li key={index} className="flex justify-between py-1 hover:bg-light-gray">
-              <a href={`/user/bookview?titleID=${book.titleID}`} className="text-arcadia-red font-bold w-60 p-1">
+              <Link
+                to={`/user/bookview?titleID=${book.titleID}`}
+                className="text-arcadia-red font-bold w-60 p-1 truncate"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
                 {book.title}
-              </a>
+              </Link>
               <span className="w-12 p-1 flex justify-center">{book.weightedAvg.toFixed(1)}</span>
             </li>
           ))
