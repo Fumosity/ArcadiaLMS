@@ -102,7 +102,7 @@ export const fetchMostPopularBooks = async () => {
 const MostPopular = ({ onSeeMoreClick }) => {
     return(
     <BookCards 
-            title="Most Popular" 
+            title="Most Borrowed" 
             fetchBooks={fetchMostPopularBooks} 
             onSeeMoreClick={() => onSeeMoreClick("Most Popular", fetchMostPopularBooks)} 
         />
