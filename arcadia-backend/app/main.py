@@ -557,8 +557,8 @@ async def extract_text(files: List[UploadFile] = File(...)):
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 class RecommendationRequest(BaseModel):
-    userID: int
-    titleID: int | None
+    titleID: int = None
+    userID: int = None
 
 @app.post("/book-recommend")
 async def recommend(request: RecommendationRequest):

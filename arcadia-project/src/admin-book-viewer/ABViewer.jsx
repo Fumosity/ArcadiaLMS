@@ -99,8 +99,8 @@ export default function ABViewer() {
           </div>
           <BookInfo book={book} loading={loading} /> {/* Pass loading prop */}
           <div className="flex w-full space-x-2">
-            <PopularAmong />
-            <SimilarTo />
+            <PopularAmong titleID={book?.titleID || titleID}/>
+            <SimilarTo titleID={book?.titleID || titleID}/>
           </div>
           <BookCopiesSection titleID={book?.titleID || titleID} />
           <Analytics titleID={book?.titleID || titleID} />
