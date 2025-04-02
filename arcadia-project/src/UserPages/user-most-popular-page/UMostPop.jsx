@@ -6,7 +6,7 @@ import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
 import MostPopBk from "../../components/UserComponents/user-main-comp/MostPopBk";
-import HighestRatedBk from "../../components/UserComponents/user-main-comp/HIghestRatedBk";
+import HighestRatedBk from "../../components/UserComponents/user-main-comp/HighestRatedBk";
 import Title from "../../components/main-comp/Title";
 import ExpandedMostPop from "../../components/UserComponents/user-most-popular-comp/ExpandedMostPop";
 
