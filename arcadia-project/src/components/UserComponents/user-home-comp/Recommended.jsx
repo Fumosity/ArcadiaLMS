@@ -4,7 +4,7 @@ import BookCards from "./BookCards";
 import { useUser } from "../../../backend/UserContext";
 import { supabase } from "../../../supabaseClient";
 
-const API_BASE_URL = "http://54.179.128.36:8000";
+const API_BASE_URL = "http://54.179.128.36/api";
 
 const fetchRecommendedBooks = async (userID, titleID) => {
     try {
