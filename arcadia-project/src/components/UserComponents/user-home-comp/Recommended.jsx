@@ -6,7 +6,7 @@ import { supabase } from "../../../supabaseClient";
 
 const fetchRecommendedBooks = async (userID, titleID) => {
     try {
-        const response = await axios.post("http://localhost:8000/book-recommend", {
+        const response = await axios.post("http://54.179.128.36:8000/book-recommend", {
             userID: userID ? Number(userID) : null,
             titleID: titleID !== undefined ? Number(titleID) : null, 
         });
