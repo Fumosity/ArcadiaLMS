@@ -4,9 +4,13 @@ import BookCards from "./BookCards";
 import { useUser } from "../../../backend/UserContext";
 import { supabase } from "../../../supabaseClient";
 
+const API_BASE_URL = "http://54.179.128.36:8000";
+
 const fetchRecommendedBooks = async (userID, titleID) => {
     try {
-        const response = await axios.post("http://54.179.128.36:8000/book-recommend", {
+        console.log("Fetching recommendations from:", `${API_BASE_URL}/book-recommend`);
+        
+        const response = await axios.post(`${API_BASE_URL}/book-recommend`, {
             userID: userID ? Number(userID) : null,
             titleID: titleID !== undefined ? Number(titleID) : null, 
         });
