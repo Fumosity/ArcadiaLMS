@@ -2,10 +2,12 @@ import React from "react";
 import axios from "axios";
 import { supabase } from "../../../supabaseClient";
 import BookCards from "../user-home-comp/BookCards";
+import api from "../../../api";
+
 export const fetchSimilarBooks = async (titleID, userID) => {
     try {
         // Step 1: Fetch recommended books
-        const response = await axios.post("http://localhost:8000/book-recommend", {
+        const response = await api.post(`/book-recommend`, {
             userID,
             titleID
         });

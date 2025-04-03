@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import RsrchCards from "../user-home-comp/RsrchCards";
+import api from "../../../api";
 
 const fetchSimilarResearch = async (researchID) => {
     try {
-        const response = await axios.post("http://localhost:8000/research-recommend", { researchID });
+        const response = await api.post("/research-recommend", { researchID });
         return { research: response.data.recommendations || [] };
     } catch (error) {
         console.error("Error fetching similar research:", error);

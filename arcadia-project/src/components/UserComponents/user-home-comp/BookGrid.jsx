@@ -3,6 +3,7 @@ import { supabase } from "/src/supabaseClient.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalfAlt, faStar as faRegularStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faRegularStarOutline } from '@fortawesome/free-regular-svg-icons';
+import { Link } from "react-router-dom";
 
 const BookGrid = ({ title, fetchBooks }) => {
     const [books, setBooks] = useState([]);
@@ -86,7 +87,13 @@ const BookGrid = ({ title, fetchBooks }) => {
                 ) : (
                     <>
                         {books.map((book, index) => (
-                            <a key={index} href={`http://localhost:5173/user/bookview?titleID=${book.titleID}`} className="block genCard-cont" title={book.title}>
+                            <Link
+                                key={index}
+                                to={`/user/bookview?titleID=${book.titleID}`}
+                                className="block genCard-cont"
+                                title={book.title}
+                                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                            >
                                 <img src={book.cover} alt={book.title} className="w-full h-4/6 object-cover rounded-lg mb-2" />
                                 <h3 className="text-lg h-[3rem] leading-tight font-semibold whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">{book.title}</h3>
                                 <p className="text-sm text-gray-500 mb-1 truncate">{formatAuthor(book.author)}</p>
@@ -102,7 +109,7 @@ const BookGrid = ({ title, fetchBooks }) => {
                                     )}
                                     {!book.weightedAvg && "Rating not available"}
                                 </p>
-                            </a>
+                            </Link>
                         ))}
                         {generatePlaceholders().map((_, index) => (
                             <div key={index} className="bg-white border border-grey rounded-xl p-2 "> {/* Placeholder div */}

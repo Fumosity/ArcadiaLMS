@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { supabase } from "../../supabaseClient";
 import { Link } from "react-router-dom";
+import api from "../../api";
+
 const fetchSimilarBooks = async (titleID) => {
   try {
     console.log("Similar to: title, ", titleID)
     // Step 1: Fetch recommended books
-    const response = await axios.post("http://localhost:8000/book-recommend", {
+    const response = await api.post(`/book-recommend`, {
       titleID,
     });
     const recommendedBooks = response.data.recommendations || [];
