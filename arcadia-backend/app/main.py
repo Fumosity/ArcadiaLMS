@@ -19,7 +19,7 @@ from typing import Optional
 from app.book_reco import get_recommendations
 from app.research_reco import get_rsrch_recommendations
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 app.add_middleware(
     CORSMiddleware,
