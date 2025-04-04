@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import api from '../api';
 
 function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData }) {
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -27,7 +28,7 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
       const formData = new FormData();
       uploadedFiles.forEach(file => formData.append('files', file));
 
-      const response = await axios.post('http://127.0.0.1:8000/extract-text/', formData, {
+      const response = await api.post('/extract-text', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
