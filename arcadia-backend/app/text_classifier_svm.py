@@ -72,7 +72,8 @@ def train_model():
     accuracy = accuracy_score(y_test, y_pred)
     report = classification_report(y_test, y_pred)
     matrix = confusion_matrix(y_test, y_pred)
-    
+        
+    print("Classification Report for SVM")
     print("Accuracy:", accuracy)
     print("\nClassification Report:\n", report)
     print("\nConfusion Matrix:\n", matrix)

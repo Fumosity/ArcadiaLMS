@@ -64,7 +64,7 @@ def train_model():
     
     pipeline = Pipeline([
         ('preprocessor', preprocessor),
-        ('classifier', KNeighborsClassifier(n_neighbors=5, weights='uniform'))
+        ('classifier', KNeighborsClassifier(n_neighbors=3, weights='distance', metric='euclidean'))
     ])
     
     # Train model
@@ -75,6 +75,7 @@ def train_model():
     report = classification_report(y_test, y_pred)
     matrix = confusion_matrix(y_test, y_pred)
     
+    print("Classification Report for KNN")
     print("Accuracy:", accuracy)
     print("\nClassification Report:\n", report)
     print("\nConfusion Matrix:\n", matrix)
