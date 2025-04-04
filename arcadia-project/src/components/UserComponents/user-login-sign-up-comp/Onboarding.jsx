@@ -53,7 +53,7 @@ export default function Onboarding({ userData, selectedGenres }) {
 
         // Send authentication email
         try {
-            const response = await fetch("http://localhost:8000/send-email", {
+            const response = await fetch("http://13.229.180.191/auth/send-email", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
