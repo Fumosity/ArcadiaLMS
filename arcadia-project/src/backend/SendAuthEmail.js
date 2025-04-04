@@ -9,14 +9,14 @@ import { supabase } from "../supabaseClient.js";
 dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = 8000;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow only the frontend origin
+  origin: '*', // Allow only the frontend origin
   methods: ['POST'],              // Allow only specific methods
 }));
 app.use(bodyParser.json());
