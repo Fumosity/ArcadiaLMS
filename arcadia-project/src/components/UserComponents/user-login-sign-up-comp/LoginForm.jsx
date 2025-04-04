@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { supabase } from "../../../supabaseClient.js"
 import { useUser } from "../../../backend/UserContext"
 import bcrypt from "bcryptjs"
+import { toast } from "react-toastify"
 
 export default function LoginForm() {
   const [email, setEmail] = useState("")
@@ -33,6 +34,19 @@ export default function LoginForm() {
         return
       }
 
+      // Check if user email is verified
+      if (!loginData.userVerifyStatus) {
+        toast.error("Your email is not verified. Please check your inbox and verify your email to continue.", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        })
+        return
+      }
+
       if (!loginData.userAccountType) {
         alert("User role is missing. Please contact support.")
         return
@@ -56,6 +70,8 @@ export default function LoginForm() {
 
   return (
     <div className="uMain-cont flex max-h-auto max-w-[950px] h-full w-full bg-white">
+      {/* Add Toaster component for displaying notifications */}
+
       <div className="max-w-md mx-auto p-8">
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-1">
@@ -97,6 +113,8 @@ export default function LoginForm() {
             />
           </div>
 
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
           <div className="flex justify-center items-center gap-4">
             <Link to="/user/register" className="registerBtn">
               Sign up
@@ -136,3 +154,4 @@ export default function LoginForm() {
     </div>
   )
 }
+
