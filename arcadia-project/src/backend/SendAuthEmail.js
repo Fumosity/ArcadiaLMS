@@ -9,12 +9,12 @@ import { supabase } from "../supabaseClient.js";
 dotenv.config();
 
 const app = express();
-const PORT = 8000;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-app.get('/favicon.ico', (req, res) => res.status(204).end());
+app.get('/auth/favicon.ico', (req, res) => res.status(204).end());
 
 // Middleware
+
 app.use(cors({
   origin: '*', // Allow only the frontend origin
   methods: ['POST'],              // Allow only specific methods
@@ -45,7 +45,7 @@ function generateToken(payload) {
 }
 
 // Endpoint to send email
-app.post('/send-email', async (req, res) => {
+app.post('/auth/send-email', async (req, res) => {
   console.log('Received request body:', req.body);
   const { email, firstName, lpuID } = req.body;
 
@@ -56,7 +56,7 @@ app.post('/send-email', async (req, res) => {
 
   const token = generateToken({ lpuID, email });
 
-  const verificationLink = `http://13.229.180.191/auth-complete?token=${token}`;
+  const verificationLink = `http://13.229.180.191/auth/auth-complete?token=${token}`;
 
   const mailOptions = {
   from: "parseefan@gmail.com",
@@ -75,7 +75,7 @@ app.post('/send-email', async (req, res) => {
   }
 });
 
-app.get('/verify', async (req, res) => {
+app.get('/auth/verify', async (req, res) => {
   const token = req.query.token;
 
   if (!token) {
@@ -121,5 +121,3 @@ app.get('/verify', async (req, res) => {
     res.status(400).json({ error: 'Invalid or expired token.' });
   }
 });
-
-// app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
