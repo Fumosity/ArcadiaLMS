@@ -24,7 +24,14 @@ export default function LoginForm() {
         .single()
 
       if (loginError || !loginData) {
-        alert("Incorrect email or password. Please try again.")
+        toast.error("Email not registered. Please check your email or sign up for a new account.", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        })
         return
       }
 
@@ -37,7 +44,7 @@ export default function LoginForm() {
       // Check if user email is verified
       if (!loginData.userVerifyStatus) {
         toast.error("Your email is not verified. Please check your inbox and verify your email to continue.", {
-          position: "bottom-right",
+          position: "botom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
