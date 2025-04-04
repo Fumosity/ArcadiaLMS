@@ -56,7 +56,7 @@ app.post('/send-email', async (req, res) => {
 
   const token = generateToken({ lpuID, email });
 
-  const verificationLink = `http://localhost:5173/auth-complete?token=${token}`;
+  const verificationLink = `http://13.229.180.191/auth-complete?token=${token}`;
 
   const mailOptions = {
   from: "parseefan@gmail.com",
@@ -122,4 +122,4 @@ app.get('/verify', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+// app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
