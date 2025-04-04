@@ -10,7 +10,7 @@ const AuthComplete = () => {
     useEffect(() => {
         const verifyToken = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/verify?token=${token}`);
+                const response = await fetch(`http://localhost:8000/verify?token=${token}`);
                 if (response.ok) {
                     const data = await response.json();
                     setStatus("success");
