@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   build: {
     outDir: "dist",
-    assetsDir: "assets"
+    assetsDir: "assets",
+    cssCodeSplit: true,  
   },
   plugins: [react()],
   optimizeDeps: {
