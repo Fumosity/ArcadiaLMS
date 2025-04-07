@@ -33,6 +33,11 @@ app.add_middleware(
 import os
 print("Current Working Directory:", os.getcwd())
 
+# Include the email router with the correct prefix
+# This ensures the endpoint is available at /api/send-email
+app.include_router(email_router)
+
+# Rest of your code remains the same
 excluded_sections = ["Approval Sheet", "Certificate of Originality", "Acknowledgement", "Table of Contents", "Access Leaf", "Acceptance Sheet", "Author Permission Statement", "List of Tables", "List of Figures", "List of Appendices", "List of Abbreviations"]
 resume_sections = ["Abstract", "Keywords"]
 
@@ -300,7 +305,7 @@ def proper_case(name):
         word = words[i]
 
         # Preserve abbreviations (all uppercase or inside parentheses)
-        if re.fullmatch(r"[A-Z]+", word) or re.fullmatch(r"\([A-Z]+\)", word):
+        if re.fullmatch(r"[A-Z]+", word) or re.fullmatch(r"$$[A-Z]+$$", word):
             continue  # Keep as-is
 
         # Handle special cases: McDonald, O'Neil, MacArthur
@@ -603,4 +608,5 @@ async def recommend(request: RsrchRecommendationRequest):
     print("Recommendations Found:", recommendations)
     return {"recommendations": recommendations}
 
-app.include_router(email_router)
+app.include_router(email_router, prefix="")
+

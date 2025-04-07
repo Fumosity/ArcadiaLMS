@@ -11,7 +11,6 @@ from email.message import EmailMessage
 
 # Load environment variables
 load_dotenv()
-
 router = APIRouter()
 
 # ENV VARS
