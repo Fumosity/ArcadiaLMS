@@ -38,7 +38,7 @@ export default function Agreement({ onContinue }) {
 
     return (
         <div className="uMain-cont flex max-h-auto max-w-[950px] h-full w-full bg-white">
-            <div className="w-1/2 max-w-md mx-auto p-8 flex flex-col items-center text-center">
+            <div className="w-1/2 max-w-md mx-auto p-8 flex flex-col items-center justify-center text-center">
                 <div className="mb-6">
                     <h3 className="text-5xl font-semibold">Before we start...</h3>
                 </div>
@@ -72,7 +72,7 @@ export default function Agreement({ onContinue }) {
                         <br />
                         <br />
                         <br />
-                        By choosing "I Agree" and clicking the "Submit" button below, I hereby acknowledge and certify that I have carefully read and understood the Terms and Conditions of the Data Privacy Policy/Notice of the Lyceum of the Philippine University Cavite. By providing personal information to LPU, I am confirming that the data is true and correct. I understand that LPU reserves the right to revise any decision made on the basis of the information I provided should the information be found to be untrue or incorrect. I likewise agree that any issue that may arise in connection with the processing of my personal information will be settled amicably with LPU before resorting to appropriate arbitration or court proceedings within the Philippine jurisdiction. Finally, I am providing my voluntary consent and authorization to LPU and its authorized representatives to lawfully process my data/information.
+                        By choosing "I Agree" and clicking the "Continue" button below, I hereby acknowledge and certify that I have carefully read and understood the Terms and Conditions of the Data Privacy Policy/Notice of the Lyceum of the Philippine University Cavite. By providing personal information to LPU, I am confirming that the data is true and correct. I understand that LPU reserves the right to revise any decision made on the basis of the information I provided should the information be found to be untrue or incorrect. I likewise agree that any issue that may arise in connection with the processing of my personal information will be settled amicably with LPU before resorting to appropriate arbitration or court proceedings within the Philippine jurisdiction. Finally, I am providing my voluntary consent and authorization to LPU and its authorized representatives to lawfully process my data/information.
                     </p>
 
                     {/* Radio buttons inside the scrollable box */}
@@ -86,7 +86,7 @@ export default function Agreement({ onContinue }) {
                                     disabled={!scrolledToBottom}
                                     onChange={() => setPrivacyAccepted(true)}
                                 />
-                                Yes
+                                I Agree
                             </label>
                             <label className={`flex items-center gap-1 ${!scrolledToBottom ? "opacity-50 cursor-not-allowed" : ""}`}>
                                 <input
@@ -95,7 +95,7 @@ export default function Agreement({ onContinue }) {
                                     disabled={!scrolledToBottom}
                                     onChange={() => setPrivacyAccepted(false)}
                                 />
-                                No
+                                I Don't Agree
                             </label>
                         </div>
                     </div>

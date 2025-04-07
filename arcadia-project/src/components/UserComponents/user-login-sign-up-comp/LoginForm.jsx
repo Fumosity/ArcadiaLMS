@@ -79,7 +79,7 @@ export default function LoginForm() {
     <div className="uMain-cont flex max-h-auto max-w-[950px] h-full w-full bg-white">
       {/* Add Toaster component for displaying notifications */}
 
-      <div className="max-w-md mx-auto p-8">
+      <div className="w-1/2 max-w-md mx-auto p-8">
         <div className="flex justify-center mb-6">
           <div className="flex items-center gap-1">
             <img src="/image/arcadia.png" alt="Arcadia logo" className="h-13 w-13" />
