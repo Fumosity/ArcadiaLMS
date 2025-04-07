@@ -73,7 +73,7 @@ export default function Onboarding({ userData, selectedGenres }) {
       const result = await response.json()
       if (response.ok) {
         console.log("Verification email sent:", result)
-        alert("A verification email has been sent. Please check your inbox.")
+        alert("A verification email has been sent. Please check your outlook inbox, and verify before clicking the Okay button.")
       } else {
         console.error("Email sending failed:", result.detail || result.error)
         alert("Failed to send verification email.")
