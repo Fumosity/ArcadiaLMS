@@ -74,7 +74,7 @@ export default function Onboarding({ userData, selectedGenres }) {
             const result = await response.json()
             if (response.ok) {
                 console.log("Verification email sent:", result)
-                toast.success("📧 A verification email has been sent. Please check your outlook inbox, and verify before clicking the Okay button.", { autoClose: false })
+                toast.success("📧 A verification email has been sent. Please check your outlook inbox or junk mail.", { autoClose: false })
               } else {
                 console.error("Email sending failed:", result.detail || result.error)
                 toast.error("❌ Failed to send verification email.", { autoClose: false })

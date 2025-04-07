@@ -31,8 +31,10 @@ const ListOfUserAcc = () => {
       setLoading(true)
       const { data, error } = await supabase
         .from("user_accounts")
-        .select("userAccountType, userEmail, userFName, userLName, userID, userLPUID, userCollege, userDepartment")
-        .in("userAccountType", ["User", "Faculty", "Student", ]) // Use .in() to filter multiple types
+        .select(
+          "userAccountType, userEmail, userFName, userLName, userID, userLPUID, userCollege, userDepartment, userVerifyStatus",
+        )
+        .in("userAccountType", ["User", "Faculty", "Student"]) // Use .in() to filter multiple types
 
       if (error) {
         console.error("Error fetching data from Supabase:", error)
@@ -45,6 +47,7 @@ const ListOfUserAcc = () => {
           schoolId: user.userLPUID,
           college: user.userCollege,
           department: user.userDepartment,
+          verified: user.userVerifyStatus,
         }))
         setUserData(formattedData)
       }
@@ -176,12 +179,13 @@ const ListOfUserAcc = () => {
                 <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Type
                 </th>
+                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Verification Status
+                </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   School ID
                 </th>
@@ -196,18 +200,24 @@ const ListOfUserAcc = () => {
             <tbody className="bg-white divide-y  ">
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="px-4 py-2 text-center">
+                  <td colSpan="7" className="px-4 py-2 text-center">
                     Loading data...
                   </td>
                 </tr>
               ) : displayedUsers.length > 0 ? (
                 displayedUsers.map((user, index) => (
                   <tr key={index} className="hover:bg-light-gray cursor-pointer">
-                    <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
+                    <td className="px-4 py-2 text-sm text-gray-900 text-center">
                       <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1">
                         {user.type}
                       </span>
                     </td>
+                    <td className="px-4 py-2 text-sm text-gray-900 text-center">
+                      <span className={`inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 ${user.verified ? 'bg-resolved text-white' : 'bg-intended text-white'}`}>
+                        {user.verified ? "Verified" : "Unverified"}
+                      </span>
+                    </td>
+
                     <td className="px-4 py-3 text-sm truncate text-left">{user.email}</td>
                     <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-left">
                       <button onClick={() => handleUserClick(user)} className="text-blue-500 hover:underline">
@@ -218,10 +228,11 @@ const ListOfUserAcc = () => {
                     <td className="px-4 py-3 text-sm truncate text-center">{user.college || "N/A"}</td>
                     <td className="px-4 py-3 text-sm truncate text-center">{user.department || "N/A"}</td>
                   </tr>
+
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
+                  <td colSpan="7" className="px-4 py-2 text-center text-zinc-600">
                     No users found.
                   </td>
                 </tr>
