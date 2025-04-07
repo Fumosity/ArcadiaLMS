@@ -16,8 +16,10 @@ from pydantic import BaseModel
 import math
 from typing import Optional
 
-from app.book_reco import get_recommendations
-from app.research_reco import get_rsrch_recommendations
+from .book_reco import get_recommendations
+from .research_reco import get_rsrch_recommendations
+
+from .SendAuthEmail import router as email_router
 
 app = FastAPI(root_path="/api")
 
@@ -600,3 +602,5 @@ async def recommend(request: RsrchRecommendationRequest):
 
     print("Recommendations Found:", recommendations)
     return {"recommendations": recommendations}
+
+app.include_router(email_router)

@@ -232,8 +232,10 @@ export function useRegisterForm(onBack, onRegister, userData) {
     if (!isPasswordHashed) {
       submissionData.password = bcrypt.hashSync(submissionData.password, 10) // Salt rounds: 10
     }
-  
-    onRegister(submissionData) // Send submissionData on form submit
+
+    onRegister({
+      ...submissionData,
+    })
   }
 
   const formatStudentNumber = (value) => {
