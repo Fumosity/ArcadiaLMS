@@ -187,7 +187,7 @@ const ReportSupportPieChart = () => {
     <div className="bg-white p-4 rounded-lg border-grey border h-fit">
       <h3 className="text-2xl font-semibold mb-2">Status Overview</h3>
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-start gap-2 mb-6">
         
         <select
           value={timeFrame}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom"
 import { supabase } from "/src/supabaseClient.js";
+import { toast } from "react-toastify";
 
 const FileATix = () => {
     const [searchParams] = useSearchParams();
@@ -27,12 +28,27 @@ const FileATix = () => {
 
     const handleSubmit = async () => {
         if (type === "select-type" || !subject || !content) {
-            alert("Please fill out all fields.");
+            toast.warn("Please fill out all fields.", {
+                position: "bottom-right",
+                autoClose: true,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+              })
             return;
         }
 
         if (!userID) {
-            alert("Unable to identify the user. Please log in again.");
+            toast.warn("You need to log in first.",{
+                position: "bottom-right",
+                autoClose: true,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+        
+              })
             return;
         }
 
@@ -53,14 +69,36 @@ const FileATix = () => {
 
         if (error) {
             console.error("Error submitting ticket:", error);
-            alert("Failed to file the ticket. Please try again.");
+            toast.error("Failed to submit the ticket. Please try again.", {
+                position: "bottom-right",
+                autoClose: true,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+        
+              });
         } else {
-            alert("Ticket filed successfully!");
+            toast.success("Ticket filed successfully!", {
+              position: "bottom-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: false,
+
+            });
+          
+            // Reset form fields
             setType("select-type");
             setSubject("");
             setContent("");
-            window.location.href = "/user/support/supportticket"
-        }
+          
+            // Navigate after toast
+            setTimeout(() => {
+              window.location.reload()
+            }, 3000);
+          }
     };
 
     // Define the placeholder based on the selected type

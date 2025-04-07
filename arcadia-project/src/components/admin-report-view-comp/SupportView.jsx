@@ -3,11 +3,13 @@ import { useLocation } from "react-router-dom"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 import { supabase } from "/src/supabaseClient.js"
+import { toast } from "react-toastify"
+import { useNavigate } from "react-router-dom"
 
 const SupportView = () => {
   const location = useLocation()
   const support = location.state?.support
-
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
   const [reply, setReply] = useState("")
   const [selectedStatus, setSelectedStatus] = useState("")
@@ -108,10 +110,69 @@ const SupportView = () => {
         setUserData(data.user_accounts)
       }
       setReply("")
-      alert("Update submitted successfully!")
+      toast.success("Update submitted successfully!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
+
+      setTimeout(() => {
+        navigate("/admin/support")
+      }, 2000)
     } catch (error) {
       console.error("Error submitting update:", error)
-      alert("Failed to submit update. Please try again.")
+      toast.error("Failed to submit update. Please try again.", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleDeleteTicket = async () => {
+    if (!support || !support.supportID) return
+
+    if (!confirm("Are you sure you want to delete this ticket? This action cannot be undone.")) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const { error } = await supabase.from("support_ticket").delete().eq("supportID", support.supportID)
+
+      if (error) throw error
+
+      toast.success("Ticket deleted successfully!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
+
+      setTimeout(() => {
+        navigate("/admin/support")
+      }, 2000)
+    } catch (error) {
+      console.error("Error deleting ticket:", error)
+      toast.error("Failed to delete ticket. Please try again.", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -119,17 +180,17 @@ const SupportView = () => {
 
   const formatSchoolNo = (value) => {
     // Remove non-numeric characters
-    let numericValue = value.replace(/\D/g, "");
+    let numericValue = value.replace(/\D/g, "")
 
     // Apply the XXXX-X-XXXXX format
     if (numericValue.length > 4) {
-      numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`;
+      numericValue = `${numericValue.slice(0, 4)}-${numericValue.slice(4)}`
     }
     if (numericValue.length > 6) {
-      numericValue = `${numericValue.slice(0, 6)}-${numericValue.slice(6, 11)}`;
+      numericValue = `${numericValue.slice(0, 6)}-${numericValue.slice(6, 11)}`
     }
-    return numericValue;
-  };
+    return numericValue
+  }
 
   const supportFields = [
     { label: "School No.:", value: userData?.userLPUID || "Not Available" },
@@ -138,7 +199,6 @@ const SupportView = () => {
     { label: "Department:", value: userData?.userDepartment || "Not Available" },
     { label: "Date:", value: support?.date || "Not Available" },
     { label: "Time:", value: support?.time || "Not Available" },
-
   ]
 
   const responseFields = [
@@ -159,7 +219,16 @@ const SupportView = () => {
   return (
     <div className="space-y-2">
       <div className="bg-white border border-grey p-4 rounded-lg">
-        <h3 className="text-2xl font-semibold mb-2">Support Ticket Details</h3>
+        <div className="flex justify-between gap-6">
+          <h3 className="text-2xl font-semibold mb-2">Support Ticket Details</h3>
+          <button
+            className="add-book w-1/2 px-4 py-2 rounded-lg border transition border-arcadia-red bg-arcadia-red text-white hover:bg-intended"
+            onClick={handleDeleteTicket}
+            disabled={isSubmitting}
+          >
+            Delete Ticket
+          </button>
+        </div>
 
         <div className="grid grid-cols-2 gap-2 w-full">
           <div className="space-y-2">
@@ -214,7 +283,9 @@ const SupportView = () => {
             {buttons.map((button, index) => (
               <button
                 key={index}
-                className={`add-book w-1/2 px-4 py-2 rounded-lg border transition ${selectedStatus === button.status ? "bg-arcadia-red text-white" : "bg-light-gray text-black border-grey"
+                className={`add-book w-1/2 px-4 py-2 rounded-lg border transition ${selectedStatus === button.status
+                  ? "bg-arcadia-red text-white"
+                  : "bg-light-gray text-black border-grey"
                   }`}
                 onClick={() => handleStatusSelect(button.status)}
               >
@@ -229,10 +300,19 @@ const SupportView = () => {
               {isSubmitting ? "Submitting..." : "Update"}
             </button>
           </div>
+
         </div>
       </div>
-    </div>
+      <div className="flex justify-between mt-4">
+        <button
+          className="px-4 py-2 rounded-lg border border-grey hover:bg-light-gray transition"
+          onClick={() => navigate("/admin/support")}
+        >
+          Return to Supports
+        </button>
 
+      </div>
+    </div>
   )
 }
 
