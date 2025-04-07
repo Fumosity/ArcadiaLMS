@@ -19,6 +19,7 @@ const ARAbout = ({ researchData }) => {
 
     // Destructure fields from researchData
     const researchDetails = {
+        researchID: researchData.researchID,
         title: researchData.title,
         author: Array.isArray(researchData.author) ? researchData.author.join(', ') : (researchData.author ?? '').split(';').join(',') || '',
         college: researchData.college,

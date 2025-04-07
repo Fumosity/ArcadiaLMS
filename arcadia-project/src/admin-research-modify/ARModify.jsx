@@ -24,6 +24,8 @@ const ARModify = () => {
     researchCallNum: queryParams.get("researchCallNum") || '',
   };
 
+  const researchID = queryParams.get("researchID")
+
   const [formDataState, setFormData] = useState(formData);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -38,6 +40,12 @@ const ARModify = () => {
               onClick={() => navigate('/admin/researchmanagement')}
             >
               Return to Research Inventory
+            </button>
+            <button
+              className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+              onClick={() => navigate(`/admin/arviewer?researchID=${encodeURIComponent(researchID)}`)}
+            >
+              Return to Research Viewer
             </button>
           </div>
           <ResearchModify formData={formDataState} setFormData={setFormData} />
