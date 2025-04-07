@@ -151,7 +151,7 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
             <h1 className="text-xl font-semibold text-gray-900">Upload Research</h1>
             <div className="flex flex-col mt-4">
               {isUploading ? (
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-center justify-center space-x-2 pt-32">
                   <div className="loader"></div>
                   <span>Uploading...</span>
                 </div>
@@ -188,7 +188,13 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
                     <label className="text-gray-800">Files uploaded:</label>
                     <input type="text" value={uploadedFiles.length > 0 ? uploadedFiles.map(file => file.name).join(', ') : 'No files uploaded'} readOnly className="w-full p-2 border border-grey rounded-full" />
                     <div className='flex flex-col items-center justify-center space-y-2 mt-2'>
-                      <button onClick={handleUpload} className="penBtn">Upload</button>
+                      <button
+                        onClick={handleUpload}
+                        disabled={uploadedFiles.length === 0}
+                        className={`penBtn px-2.5 py-1 rounded-full ${uploadedFiles.length === 0 ? 'bg-grey cursor-not-allowed text-dark-gray border border-dark-gray' : 'bg-arcadia-red text-white hover:bg-red focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2'}`}
+                      >
+                        Upload
+                      </button>
                       <button onClick={handleCancel} className="cancelModify">Close Window</button>
                     </div>
                   </div>

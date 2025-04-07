@@ -23,13 +23,10 @@ const ARAbout = ({ researchData }) => {
         author: Array.isArray(researchData.author) ? researchData.author.join(', ') : (researchData.author ?? '').split(';').join(',') || '',
         college: researchData.college,
         department: researchData.department,
-        abstract: researchData.abstract,
-        pages: researchData.pages,
         keywords: Array.isArray(researchData.keywords) ? researchData.keywords.join(', ') : (researchData.keywords ?? '').split(';').join(',') || '',
         pubDate: researchData.pubDate,
         location: researchData.location,
         researchARCID: researchData.researchARCID,
-        researchID: researchData.researchID
     }
 
     console.log(researchData)
@@ -62,7 +59,7 @@ const ARAbout = ({ researchData }) => {
                                         {key === "pubDate"
                                             ? "Pub. Date:"
                                             : key === "researchARCID"
-                                                ? "ARC ID:"
+                                                ? "Call No.:"
                                                 : key.replace(/([A-Z])/g, " $1") + ":"}
                                     </td>
                                     <td className="px-1 py-1 text-sm break-words w-2/3">

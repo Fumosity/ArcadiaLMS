@@ -18,6 +18,7 @@ const AboutPage = ({ book }) => {
     );
 
   const bookDetails = {
+    titleID: book.titleID,
     title: book.title,
     author: Array.isArray(book.author) ? book.author.join(', ') : (book.author ?? '').split(';').join(',') || '',
     genres: Array.isArray(book.genres) ? book.genres.join(', ') : (book.genres ?? '').split(';').join(',') || '',

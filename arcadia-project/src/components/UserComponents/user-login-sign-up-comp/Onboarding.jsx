@@ -62,7 +62,7 @@ export default function Onboarding({ userData, selectedGenres }) {
             console.log("BASE_URL", BASE_URL)
 
             // Send verification email - use API_URL to ensure correct endpoint
-            const response = await fetch(`${BASE_URL}/send-email`, {
+            const response = await fetch(`${API_URL}/send-email`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

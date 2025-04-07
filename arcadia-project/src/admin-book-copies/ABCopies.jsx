@@ -175,8 +175,12 @@ const ABCopies = () => {
               Return to Book Inventory
             </button>
             <button
-              className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-              onClick={() => navigate(`/admin/abviewer?titleID=${encodeURIComponent(titleID)}`)}
+              className={`add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey transition ${!titleID ? 'bg-gray-300 cursor-not-allowed text-gray-500' : 'hover:bg-light-gray'
+                }`}
+              disabled={!titleID}
+              onClick={() =>
+                titleID && navigate(`/admin/abviewer?titleID=${encodeURIComponent(titleID)}`)
+              }
             >
               Return to Book Viewer
             </button>

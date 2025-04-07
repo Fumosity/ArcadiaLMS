@@ -98,17 +98,16 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
   }
 
   const researchDetails = {
-    title: research.title,
-    author: research.author,
-    college: research.college,
-    department: research.department,
-    abstract: abstractContent, // Use the state variable instead of research.abstract
-    researchCallNum: research.researchCallNum,
-    pages: research.pages,
-    keywords: research.keywords,
-    pubDate: research.pubDate,
-    location: research.location,
-    researchID: research.researchID
+    title: research.title || "N/A",
+    author: research.author || "N/A",
+    college: research.college || "N/A",
+    department: research.department || "N/A",
+    abstract: abstractContent || "N/A", // Use the state variable instead of research.abstract
+    researchCallNum: research.researchCallNum || "N/A",
+    keywords: research.keywords || "N/A",
+    pubDate: research.pubDate || "N/A",
+    location: research.location || "N/A",
+    researchID: research.researchID || "N/A"
   };
 
   // Navigate to modify research page with query parameters
