@@ -21,7 +21,7 @@ const AuthComplete = () => {
 
                     // Redirect to dashboard after 2 seconds
                     setTimeout(() => {
-                        navigate("/");
+                        navigate("/user/login");
                     }, 2000);
                 } else {
                     setStatus("failure");
@@ -56,7 +56,7 @@ const AuthComplete = () => {
                 <div className="space-y-4">
                     {status === "success" ? (
                         <h4 className="text-2xl font-semibold text-black">
-                            Your Account has been verified and logged in! <br /> Redirecting to your dashboard...
+                            Your Account has been verified and logged in! <br /> Redirecting to login...
                         </h4>
                     ) : (
                         <h4 className="text-2xl font-semibold text-black">
