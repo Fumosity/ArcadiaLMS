@@ -219,17 +219,7 @@ const SupportView = () => {
   return (
     <div className="space-y-2">
       <div className="bg-white border border-grey p-4 rounded-lg">
-        <div className="flex justify-between gap-6">
           <h3 className="text-2xl font-semibold mb-2">Support Ticket Details</h3>
-          <button
-            className="add-book w-1/2 px-4 py-2 rounded-lg border transition border-arcadia-red bg-arcadia-red text-white hover:bg-intended"
-            onClick={handleDeleteTicket}
-            disabled={isSubmitting}
-          >
-            Delete Ticket
-          </button>
-        </div>
-
         <div className="grid grid-cols-2 gap-2 w-full">
           <div className="space-y-2">
             {supportFields.map((field, index) => (
@@ -267,10 +257,19 @@ const SupportView = () => {
             </div>
           </div>
         </div>
+        <div className="flex justify-center mt-6">
+          <button
+            className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+            onClick={handleDeleteTicket}
+            disabled={isSubmitting}
+          >
+            Delete Ticket
+          </button>
+          </div>
       </div>
 
       <div className="bg-white border border-grey p-4 rounded-lg">
-        <h3 className="text-2xl font-semibold mb-2">Report Response</h3>
+        <h3 className="text-2xl font-semibold mb-2">Support Response</h3>
         <div className="flex flex-col gap-2 w-full">
           <label className="text-black text-md capitalize">Reply:</label>
           <textarea
