@@ -219,17 +219,7 @@ const ReportView = () => {
   return (
     <div className="space-y-2">
       <div className="bg-white border border-grey p-4 rounded-lg">
-        <div className="flex justify-between gap-6">
-          <h3 className="text-2xl font-semibold mb-2">Report Details</h3>
-          <button
-            className="add-book w-1/2 px-4 py-2 rounded-lg border transition border-arcadia-red bg-arcadia-red text-white hover:bg-intended"
-            onClick={handleDeleteTicket}
-            disabled={isSubmitting}
-          >
-            Delete Ticket
-          </button>
-        </div>
-
+        <h3 className="text-2xl font-semibold mb-2">Report Details</h3>
         <div className="grid grid-cols-2 gap-2 w-full">
           <div className="space-y-2">
             {reportFields.map((field, index) => (
@@ -266,6 +256,16 @@ const ReportView = () => {
               </div>
             </div>
           </div>
+
+        </div>
+        <div className="flex justify-center mt-6">
+          <button
+            className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+            onClick={handleDeleteTicket}
+            disabled={isSubmitting}
+          >
+            Delete Ticket
+          </button>
         </div>
       </div>
       <div className="bg-white border border-grey p-4 rounded-lg">
@@ -282,11 +282,10 @@ const ReportView = () => {
             {buttons.map((button, index) => (
               <button
                 key={index}
-                className={`add-book w-1/2 px-4 py-2 rounded-lg border transition ${
-                  selectedStatus === button.status
+                className={`add-book w-1/2 px-4 py-2 rounded-lg border transition ${selectedStatus === button.status
                     ? "bg-arcadia-red text-white"
                     : "bg-light-gray text-black border-grey"
-                }`}
+                  }`}
                 onClick={() => handleStatusSelect(button.status)}
               >
                 {button.label}
