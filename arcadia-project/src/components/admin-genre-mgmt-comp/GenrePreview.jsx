@@ -4,6 +4,8 @@ import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 import WrngDeleteGenre from "../../z_modals/warning-modals/WrngDeleteGenre"
 import { supabase } from "../../supabaseClient"
+import { toast } from "react-toastify"
+import { Link } from "react-router-dom"
 
 const GenrePreview = ({ genre, onGenreDeleted }) => {
   const navigate = useNavigate()
@@ -90,8 +92,20 @@ const GenrePreview = ({ genre, onGenreDeleted }) => {
       // Close the modal
       setIsDeleteModalOpen(false)
 
-      // Show success message
-      alert("Genre successfully deleted.")
+      toast.success("Genre successfully deleted.", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        theme: "colored",
+
+      })
+      // alert("Genre successfully deleted.")
+      setTimeout(() => {
+        window.location.reload()
+      }, 0)
 
       // Notify parent component that genre was deleted
       if (onGenreDeleted) {

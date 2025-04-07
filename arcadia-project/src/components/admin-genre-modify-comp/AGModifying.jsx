@@ -2,10 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { addGenre } from "../../backend/AGAddBackend.jsx";
 import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 //Main Function
 const AGModifying = ({ formData, setFormData }) => {
     const fileInputRef = useRef(null);
+    const navigate = useNavigate()
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [img, setImg] = useState('');
     const [validationErrors, setValidationErrors] = useState({});
@@ -138,15 +141,29 @@ const AGModifying = ({ formData, setFormData }) => {
                 return;
             }
 
+            toast.success("Genre updated successfully!", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                theme: "colored",
+                
+              })
+            
             console.log("Genre updated successfully!");
+            setTimeout(() => {
+                navigate("/admin/genremanagement")
+              }, 0)
 
             // Reset form after successful update
-            setFormData({
-                genreName: '',
-                category: '',
-                img: '',
-                description: '',
-            });
+            // setFormData({
+            //     genreName: '',
+            //     category: '',
+            //     img: '',
+            //     description: '',
+            // });
 
             setImg('');
             setFormData((prevData) => ({ ...prevData, img: '' }));

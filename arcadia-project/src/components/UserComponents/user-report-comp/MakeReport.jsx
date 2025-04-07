@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 import { supabase } from "/src/supabaseClient.js"
-import { useUser } from "../../../backend/UserContext" // Adjust the path if necessary
+import { useUser } from "../../../backend/UserContext"
+import { toast } from "react-toastify"
 
 const MakeReport = () => {
   const [searchParams] = useSearchParams()
@@ -20,12 +21,27 @@ const MakeReport = () => {
 
   const handleSubmit = async () => {
     if (type === "select-type" || !subject || !content) {
-      alert("Please fill out all fields.")
+      toast.warn("Please fill out all fields.", {
+        position: "bottom-right",
+        autoClose: true,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+      })
       return
     }
 
     if (!user) {
-      alert("You need to log in first.")
+      toast.warn("You need to log in first.",{
+        position: "bottom-right",
+        autoClose: true,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+
+      })
       return
     }
 
@@ -46,13 +62,35 @@ const MakeReport = () => {
 
     if (error) {
       console.error("Error submitting report:", error)
-      alert("Failed to submit the report. Please try again.")
+      toast.error("Failed to submit the report. Please try again.", {
+        position: "bottom-right",
+        autoClose: true,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+
+      });
     } else {
-      alert("Report submitted successfully!")
-      setType("select-type")
-      setSubject("")
-      setContent("")
-      window.location.href = "/user/support/reportticket"
+      toast.success("Report submitted successfully!", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+
+      });
+
+      // Reset form fields
+      setType("select-type");
+      setSubject("");
+      setContent("");
+
+      // Navigate after toast
+      setTimeout(() => {
+        window.location.reload()
+      }, 3000);
     }
   }
 

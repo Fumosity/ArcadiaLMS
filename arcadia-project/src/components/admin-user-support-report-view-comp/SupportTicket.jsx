@@ -34,7 +34,7 @@ const SupportTicket = () => {
         setIsLoading(true)
         const { data, error } = await supabase.from("support_ticket").select(`
             supportID, type, status, subject, date, time, content, 
-            user_accounts:userID (userFName, userLName)
+            user_accounts:userID (userFName, userLName, userID)
           `)
 
         if (error) throw error
