@@ -1,8 +1,11 @@
+"use client"
+
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../../../supabaseClient.js"
 import { useUser } from "../../../backend/UserContext.jsx"
 import { API_URL } from "../../../api.js"
+import { toast } from "react-toastify"
 
 export default function Onboarding({ userData, selectedGenres }) {
   const [error, setError] = useState("")
@@ -11,9 +14,9 @@ export default function Onboarding({ userData, selectedGenres }) {
 
   const { updateUser } = useUser()
 
-  console.log("Rendered Onboarding")
-  console.log("UserData:", userData)
-  console.log("SelectedGenres:", selectedGenres)
+  toast.info("Rendered Onboarding", { autoClose: false })
+  toast.info(`UserData: ${JSON.stringify(userData)}`, { autoClose: false })
+  toast.info(`SelectedGenres: ${JSON.stringify(selectedGenres)}`, { autoClose: false })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -50,14 +53,14 @@ export default function Onboarding({ userData, selectedGenres }) {
         .select("userID")
 
       if (userInsertError || !userInsertData) {
-        console.error("Error inserting user:", userInsertError)
+        toast.error(`Error inserting user: ${userInsertError?.message || "Unknown error"}`, { autoClose: false })
         alert("Failed to register. Please try again.")
         setIsSubmitting(false)
         return
       }
 
       const newUserID = userInsertData[0].userID
-      console.log("New userID:", newUserID)
+      toast.success(`New userID: ${newUserID}`, { autoClose: false })
 
       // Send verification email - use API_URL to ensure correct endpoint
       const response = await fetch(`${API_URL}/send-email`, {
@@ -72,10 +75,12 @@ export default function Onboarding({ userData, selectedGenres }) {
 
       const result = await response.json()
       if (response.ok) {
-        console.log("Verification email sent:", result)
-        alert("A verification email has been sent. Please check your outlook inbox, and verify before clicking the Okay button.")
+        toast.success(`Verification email sent: ${JSON.stringify(result)}`, { autoClose: false })
+        alert(
+          "A verification email has been sent. Please check your outlook inbox, and verify before clicking the Okay button.",
+        )
       } else {
-        console.error("Email sending failed:", result.detail || result.error)
+        toast.error(`Email sending failed: ${result.detail || result.error}`, { autoClose: false })
         alert("Failed to send verification email.")
       }
 
@@ -89,17 +94,17 @@ export default function Onboarding({ userData, selectedGenres }) {
         const { error: genreInsertError } = await supabase.from("user_genre_link").insert(genreLinks)
 
         if (genreInsertError) {
-          console.error("Error inserting interests:", genreInsertError)
+          toast.error(`Error inserting interests: ${genreInsertError.message}`, { autoClose: false })
           alert("Failed to save interests.")
         } else {
-          console.log("User interests added successfully.")
+          toast.success("User interests added successfully.", { autoClose: false })
         }
       }
 
       // Navigate to login after success
       navigate("/user/login")
     } catch (err) {
-      console.error("Submission error:", err)
+      toast.error(`Submission error: ${err.message || err}`, { autoClose: false })
       alert("Something went wrong. Please try again.")
     } finally {
       setIsSubmitting(false)
