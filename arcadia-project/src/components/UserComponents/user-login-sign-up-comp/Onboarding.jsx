@@ -60,7 +60,7 @@ export default function Onboarding({ userData, selectedGenres }) {
             console.log("New userID:", newUserID)
 
             // Send verification email
-            const response = await fetch("http://localhost:8000/send-email", {
+            const response = await fetch("http://13.212.24.184/send-email", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

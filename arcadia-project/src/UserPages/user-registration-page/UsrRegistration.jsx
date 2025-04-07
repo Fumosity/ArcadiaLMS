@@ -93,7 +93,7 @@ const UsrRegistration = () => {
       if (error) throw error;
       alert("Please check your LPU email to authenticate your account.");
 
-      const emailResponse = await fetch('http://localhost:5000/send-email', {
+      const emailResponse = await fetch('http://13.212.24.184/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
