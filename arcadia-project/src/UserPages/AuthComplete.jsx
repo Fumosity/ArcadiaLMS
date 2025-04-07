@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { API_URL } from "../../../api.js"
+import { API_URL } from "../api.js"
 
 const AuthComplete = () => {
     const [status, setStatus] = useState("verifying");
