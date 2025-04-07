@@ -44,7 +44,7 @@ export default function LoginForm() {
       // Check if user email is verified
       if (!loginData.userVerifyStatus) {
         toast.error("Your email is not verified. Please check your inbox and verify your email to continue.", {
-          position: "botom-right",
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
