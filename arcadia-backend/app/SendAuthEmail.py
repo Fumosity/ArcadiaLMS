@@ -17,7 +17,6 @@ router = APIRouter()
 JWT_SECRET = os.getenv("JWT_SECRET")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://13.212.24.184")
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -38,8 +37,8 @@ def verify_token(token: str) -> dict:
     return jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
 
 # Send email function
-def send_verification_email(to_email: str, first_name: str, token: str):
-    link = f"{FRONTEND_URL}/auth-complete?token={token}"
+def send_verification_email(to_email: str, first_name: str, token: str, ipAddress: str):
+    link = f"{ipAddress}/auth-complete?token={token}"
     msg = EmailMessage()
     msg.set_content(f"Hello, {first_name}. Verify your account here: {link}")
     msg["Subject"] = "Account Verification"
@@ -58,11 +57,12 @@ async def send_email(payload: EmailRequest):
 
     token = generate_token({
         "email": payload.email,
-        "lpuID": payload.lpuID
+        "lpuID": payload.lpuID,
+        "ipAddress": payload.ipAddress
     })
 
     try:
-        send_verification_email(payload.email, payload.firstName, token)
+        send_verification_email(payload.email, payload.firstName, token, payload.ipAddress)
         return {"message": "Email sent successfully."}
     except Exception as e:
         print("Email error:", e)
