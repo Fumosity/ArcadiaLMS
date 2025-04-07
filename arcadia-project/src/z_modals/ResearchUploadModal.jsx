@@ -28,7 +28,7 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
       const formData = new FormData();
       uploadedFiles.forEach(file => formData.append('files', file));
 
-      const response = await api.post('/extract-text', formData, {
+      const response = await api.post('api/extract-text', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
