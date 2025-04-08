@@ -8,7 +8,7 @@ import jwt
 import os
 import traceback
 from email.message import EmailMessage
-import json 
+import json
 
 # Load environment variables
 load_dotenv()
@@ -19,9 +19,11 @@ JWT_SECRET = os.getenv("JWT_SECRET")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
+# Load the shared configuration
 with open("config.json", "r") as f:
     config = json.load(f)
     
+# Use the BASE_URL from the config
 FRONTEND_URL = os.getenv("FRONTEND_URL", config["BASE_URL"])
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
