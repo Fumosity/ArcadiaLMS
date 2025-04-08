@@ -139,7 +139,7 @@ const GenrePage = ({ selectedGenre, onBackClick }) => {
             <h1 className="text-4xl md:text-5xl p-4 font-bold drop-shadow-lg">
               {selectedGenre.genreName}
               </h1>
-            <p className="text-sm md:text-lg drop-shadow-md">
+            <p className="text-sm md:text-lg drop-shadow-md px-8">
               {selectedGenre.description}
               </p>
           </div>
