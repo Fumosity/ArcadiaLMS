@@ -138,7 +138,7 @@ const GenrePreview = ({ genre, onGenreDeleted }) => {
         </button>
       </div>
 
-      <div className="bg-white p-4 rounded-lg border-grey border w-full">
+      <div className="bg-white p-4 rounded-lg border-grey border w-full min-w-min">
         <h3 className="text-2xl font-semibold mb-4">Genre Preview</h3>
         <div className="w-full h-fit flex justify-center">
           <div className="border border-grey p-4 w-full rounded-lg hover:bg-light-gray transition">
