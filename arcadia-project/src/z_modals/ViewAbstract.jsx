@@ -18,7 +18,7 @@ const ViewAbstract = ({ isOpen, onClose, abstractContent }) => {
             id="abstract"
             value={abstractContent}
             readOnly
-            className="w-full h-64 p-2 border border-grey rounded-md bg-gray-100 resize-none"
+            className="w-full h-64 p-2 border border-grey rounded-md bg-gray-100 resize-none custom-scrollbar"
           ></textarea>
 
         </div>

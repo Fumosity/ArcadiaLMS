@@ -33,42 +33,46 @@ const ABAddPreview = ({ formData }) => {
             {Object.entries(bookDetails)
               .filter(([key]) => !["cover", "procurementDate", "titleCallNum", "titleID"].includes(key)) // Exclude multiple keys
               .map(([key, value], index) => {
-              if (key === 'currentPubDate' || key === 'originalPubDate') {
-                return (
-                  <>
-                    {key === 'currentPubDate' && (
-                      <tr key="currentPubDate" className="border-b border-grey">
-                        <td className="px-1 py-1 font-semibold capitalize w-1/3">Current Pub. Date:</td>
-                        <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
-                      </tr>
-                    )}
-                    {key === 'originalPubDate' && (
-                      <tr key="originalPubDate" className="border-b border-grey">
-                        <td className="px-1 py-1 font-semibold capitalize w-1/3">Original Pub. Date:</td>
-                        <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
-                      </tr>
-                    )}
-                  </>
-                );
-              } else {
-                return (
-                  <tr key={index} className="border-b border-grey">
-                    <td className="px-1 py-1 font-semibold capitalize w-1/3">
-                      {key === 'databaseID' 
-                      ? 'Database ID' 
-                      :key === "isbn"
-                      ? "ISBN"
-                      : key === 'titleCallNum' 
-                      ? 'ARC ID' 
-                      : key.replace(/([A-Z])/g, ' $1')}:
-                    </td>
-                    <td className="px-1 py-1 text-sm break-words w-2/3">
-                      {value}
-                    </td>
-                  </tr>
-                );
-              }
-            })}
+                if (key === 'currentPubDate' || key === 'originalPubDate') {
+                  return (
+                    <>
+                      {key === 'currentPubDate' && (
+                        <tr key="currentPubDate" className="border-b border-grey">
+                          <td className="px-1 py-1 font-semibold capitalize w-1/3">Current Pub. Date:</td>
+                          <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
+                        </tr>
+                      )}
+                      {key === 'originalPubDate' && (
+                        <tr key="originalPubDate" className="border-b border-grey">
+                          <td className="px-1 py-1 font-semibold capitalize w-1/3">Original Pub. Date:</td>
+                          <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
+                        </tr>
+                      )}
+                    </>
+                  );
+                } else {
+                  return (
+                    <tr key={index} className="border-b border-grey">
+                      <td className="px-1 py-1 font-semibold capitalize w-1/3">
+                        {key === 'databaseID'
+                          ? 'Database ID'
+                          : key === "isbn"
+                            ? "ISBN"
+                            : key === 'titleCallNum'
+                              ? 'ARC ID'
+                              : key.replace(/([A-Z])/g, ' $1')}:
+                      </td>
+                      <td
+                        className={`px-1 py-1 text-sm break-words w-2/3 ${key === 'synopsis' ? 'text-justify' : ''
+                          }`}
+                      >
+                        {value}
+                      </td>
+                    </tr>
+
+                  );
+                }
+              })}
           </tbody>
         </table>
       </div>

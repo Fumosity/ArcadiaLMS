@@ -94,7 +94,7 @@ const AboutPage = ({ book }) => {
                             : key.replace(/([A-Z])/g, " $1") + ":"}
                   </td>
                   <td
-                    className="px-1 py-1 text-sm break-words w-2/3"
+                    className={`px-1 py-1 text-sm break-words w-2/3 ${key === 'synopsis' ? 'text-justify' : ''}`}
                   >
                     {value}
                   </td>
