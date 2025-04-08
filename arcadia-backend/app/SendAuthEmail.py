@@ -8,7 +8,7 @@ import jwt
 import os
 import traceback
 from email.message import EmailMessage
-import json
+import json 
 
 # Load environment variables
 load_dotenv()
@@ -20,11 +20,11 @@ EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
 # Load the shared configuration
-with open("changethisip.json", "r") as f:
-    changethisip = json.load(f)
+with open("config.json", "r") as f:
+    config = json.load(f)
     
 # Use the BASE_URL from the config
-FRONTEND_URL = os.getenv("FRONTEND_URL", changethisip["BASE_URL"])
+FRONTEND_URL = os.getenv("FRONTEND_URL", config["BASE_URL"])
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
