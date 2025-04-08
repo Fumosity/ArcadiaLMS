@@ -106,10 +106,17 @@ const ARAdding = ({ formData, setFormData }) => {
     const updatedFormData = { ...formData } // Capture current formData
 
     // Check for missing fields
-    const missingFields = requiredFields.filter(
-      (field) =>
-        !updatedFormData[field] || (typeof updatedFormData[field] === "string" && !updatedFormData[field].trim()),
-    )
+    const missingFields = requiredFields.filter((field) => {
+      const value = updatedFormData[field]
+
+      // Check if the value is an array
+      if (Array.isArray(value)) {
+        return value.length === 0 || (value.length === 1 && value[0] === "")
+      }
+
+      // Check if the value is a string or other type
+      return !value || (typeof value === "string" && !value.trim())
+    })
 
     if (missingFields.length > 0) {
       const newValidationErrors = {}
@@ -183,11 +190,11 @@ const ARAdding = ({ formData, setFormData }) => {
         setFormData({
           researchID: "",
           title: "",
-          author: [],
+          author: "", // Changed from [] to ""
           college: "",
           department: "",
           abstract: "",
-          keywords: [],
+          keywords: "", // Changed from [] to ""
           location: "",
           researchCallNum: "",
           pubDate: "",
