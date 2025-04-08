@@ -86,6 +86,7 @@ const ListOfAdminAcc = () => {
         navigate("/admin/useraccounts/viewusers", {
             state: { userId: user.userId, user: user }
         });
+        window.scrollTo({ top: 0, behavior: "smooth" })
     };
 
     if (loading) {
