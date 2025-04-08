@@ -584,6 +584,7 @@
 }
 
 .penBtn {
+  @apply px-2.5 py-1 bg-arcadia-red text-white rounded-full hover:bg-red focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2;
   width: 155px;
   font-size: 14px;
 }

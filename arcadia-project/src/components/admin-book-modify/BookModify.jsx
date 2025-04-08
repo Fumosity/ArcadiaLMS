@@ -37,7 +37,14 @@ const BookModify = ({ formData, setFormData, onSave }) => {
     if (error) {
       alert("Failed to delete book: " + error.message);
     } else {
-      alert("Book deleted successfully.");
+      toast.success("Book deleted successfully!", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: false,
+            })
       navigate("/admin/bookmanagement");
     }
   };
