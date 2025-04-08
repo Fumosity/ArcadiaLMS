@@ -52,7 +52,7 @@ export default function Onboarding({ userData, selectedGenres }) {
 
             if (userInsertError || !userInsertData) {
                 console.error("Error inserting user:", userInsertError)
-                toast.error("❌ Failed to register. Please try again.", { autoClose: false })
+                toast.error("Failed to register. Please try again.", { autoClose: false })
                 setIsSubmitting(false)
                 return
             }
@@ -77,7 +77,7 @@ export default function Onboarding({ userData, selectedGenres }) {
                 toast.success("📧 A verification email has been sent. Please check your outlook inbox or junk mail.", { autoClose: false })
               } else {
                 console.error("Email sending failed:", result.detail || result.error)
-                toast.error("❌ Failed to send verification email.", { autoClose: false })
+                toast.error("Failed to send verification email.", { autoClose: false })
               }
 
             // Insert selected genres
