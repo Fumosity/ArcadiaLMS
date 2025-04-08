@@ -9,6 +9,7 @@ import BookInformation from "../../components/UserComponents/user-book-view-comp
 import SimBooks from "../../components/UserComponents/user-book-search-comp/SimBooks"
 import { useUser } from "../../backend/UserContext"
 import Pathfinder from "../../components/UserComponents/pathfinder-comp/Pathfinder"
+import { useUser } from "../../backend/UserContext"
 
 const UBookView = () => {
   const location = useLocation()
@@ -20,6 +21,8 @@ const UBookView = () => {
   const [error, setError] = useState(null)
   const [ratingInfo, setRatingInfo] = useState({ avgRating: 0, totalRatings: 0 })
 
+  const isGuest = user?.userAccountType === "Guest"
+  
   useEffect(() => {
     const fetchBookDetails = async () => {
       if (!titleId) {
@@ -172,7 +175,7 @@ const UBookView = () => {
             }}
           />
           <Pathfinder book={bookDetails} />
-          <SimBooks titleID={titleId} userID={user.userID} category={bookDetails?.category} />
+          {!isGuest && <SimBooks titleID={titleId} userID={user.userID} category={bookDetails?.category} />}
         </div>
       </div>
     </div>

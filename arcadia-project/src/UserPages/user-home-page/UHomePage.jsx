@@ -21,7 +21,7 @@ const UHomePage = () => {
   const [selectedGenre, setSelectedGenre] = useState(null)
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
   const [seeMoreGenresComponent, setSeeMoreGenresComponent] = useState(null)
-  const { user } = useUser() // Get user from context
+  const { user } = useUser() 
 
   // Get location to check for query parameters
   const location = useLocation()

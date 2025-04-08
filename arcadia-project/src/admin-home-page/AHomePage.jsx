@@ -16,7 +16,7 @@ import RcntLibVisit from '../components/admin-user-acc-comp/RcntLibVisit';
 import LeastPop from '../components/admin-lib-analytics-comp/LeastPop';
 
 const AHomePage = () => {
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const navigate = useNavigate(); 
 
   return (
     <div className="min-h-screen bg-white">
