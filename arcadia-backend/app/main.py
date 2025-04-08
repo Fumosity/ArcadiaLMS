@@ -427,12 +427,14 @@ def classify_text_chunks(preprocessed_text, original_text, pipeline):
             if "academy" in chunk.lower() or "college" in chunk.lower() or "school" in chunk.lower():
                 predicted_section = "college"
 
+        print(f"\n=== CHUNK ===\n{original_chunk}\n=> Classified as: {predicted_section}\n")
+
         # Store classified chunk
         classified_chunks.append({
             "Preprocessed_Text": chunk,
             "Original_Text": original_chunk,
             "Classification": predicted_section
-        })
+        }) 
 
         # Append text to section
         classified_sections[predicted_section] += original_chunk + " "
@@ -539,6 +541,8 @@ async def extract_text(files: List[UploadFile] = File(...)):
 
         preprocessed_chunks = cleaned_text.split("\n\n")
         original_chunks = original_text.split("\n\n")
+
+        print("test")
 
         print(f"Preprocessed Chunks: {len(preprocessed_chunks)}, Original Chunks: {len(original_chunks)}")
 
