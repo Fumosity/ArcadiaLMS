@@ -20,7 +20,7 @@ export default function ReturnSupportButton() {
       <span className="w-5 h-5 border border-grey rounded-full bg-gray-100 flex items-center justify-center">
         <ArrowLeft className="w-3 h-3 text-black" />
       </span>
-      Return to Support Page
+      Return
     </button>
   );
 }

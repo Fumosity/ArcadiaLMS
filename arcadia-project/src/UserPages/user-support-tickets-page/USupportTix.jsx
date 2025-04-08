@@ -6,6 +6,7 @@ import SupportTixStatus from "../../components/UserComponents/user-support-tix-c
 import FileATix from "../../components/UserComponents/user-support-tix-comp/FileATix"
 import TicketDetails from "../../components/UserComponents/user-supportTix-view-comp/TicketDetails"
 import ReturnSupportButton from "../../components/UserComponents/user-support-tix-comp/ReturnSupportButton"
+import { ArrowLeft } from "lucide-react";
 
 const USupportTix = () => {
   const [selectedSupportID, setSelectedSupportID] = useState(null)
@@ -42,6 +43,9 @@ const USupportTix = () => {
                     onClick={handleBackToMakeSupport}
                     className="w-[300px] h-[44px] border border-grey rounded-xl px-5 text-center items-center text-md text-black hover:bg-light-gray transition-colors"
                   >
+                    <span className="w-5 h-5 flex items-center justify-center">
+                      <ArrowLeft className="w-3 h-3 text-white" />
+                    </span>
                     Back to Make Support
                   </button>
                 )}

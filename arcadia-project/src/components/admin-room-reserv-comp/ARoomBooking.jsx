@@ -94,31 +94,90 @@ export default function ARoomBooking({ addReservation }) {
 
   const checkExistingReservation = async () => {
     try {
+      // First, convert times to a consistent format for comparison
+      // The times in the database might be stored in 12-hour format (e.g., "8:00 AM")
+      // while the form data is in 24-hour format (e.g., "08:00")
+
+      // Format the start and end times to 12-hour format for comparison
+      const formatTo12Hour = (time24) => {
+        const [hour, minute] = time24.split(":")
+        const hourNum = Number.parseInt(hour, 10)
+        const period = hourNum >= 12 ? "PM" : "AM"
+        const hour12 = hourNum % 12 || 12 // Convert 0 to 12 for 12 AM
+        return `${hour12}:${minute} ${period}`
+      }
+
+      const startTime12 = formatTo12Hour(formData.startTime)
+      const endTime12 = formatTo12Hour(formData.endTime)
+
+      // Get all reservations for the same room and date
       const { data, error } = await supabase
         .from("reservation")
         .select("reservationData")
         .filter("reservationData->>room", "eq", formData.room)
         .filter("reservationData->>date", "eq", formData.date)
-        .filter("reservationData->>startTime", "lt", formData.endTime)
-        .filter("reservationData->>endTime", "gt", formData.startTime)
 
       if (error) {
         throw new Error(`Error checking existing reservations: ${error.message}`)
       }
 
-      if (data.length > 0) {
-        toast.warn("This room is already reserved for the selected time!", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          className: "bg-yellow text-white",
-        })
-        return true
+      // Check for overlaps manually to handle different time formats
+      if (data && data.length > 0) {
+        // Convert times to comparable values (minutes since midnight)
+        const convertTimeToMinutes = (timeStr) => {
+          // Handle 24-hour format (from form)
+          if (timeStr.match(/^\d{1,2}:\d{2}$/)) {
+            const [hours, minutes] = timeStr.split(":").map((num) => Number.parseInt(num, 10))
+            return hours * 60 + minutes
+          }
+
+          // Handle 12-hour format (from database)
+          const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM|am|pm)/i)
+          if (match) {
+            let [_, hours, minutes, period] = match
+            hours = Number.parseInt(hours, 10)
+            minutes = Number.parseInt(minutes, 10)
+
+            // Convert to 24-hour format
+            if (period.toLowerCase() === "pm" && hours < 12) {
+              hours += 12
+            } else if (period.toLowerCase() === "am" && hours === 12) {
+              hours = 0
+            }
+
+            return hours * 60 + minutes
+          }
+
+          return 0 // Default fallback
+        }
+
+        const newStartMinutes = convertTimeToMinutes(formData.startTime)
+        const newEndMinutes = convertTimeToMinutes(formData.endTime)
+
+        // Check each existing reservation for overlap
+        for (const item of data) {
+          const existingStartMinutes = convertTimeToMinutes(item.reservationData.startTime)
+          const existingEndMinutes = convertTimeToMinutes(item.reservationData.endTime)
+
+          // Check for overlap
+          if (
+            (newStartMinutes < existingEndMinutes && newEndMinutes > existingStartMinutes) ||
+            (existingStartMinutes < newEndMinutes && existingEndMinutes > newStartMinutes)
+          ) {
+            toast.error("This room is already reserved for the selected time!", {
+              position: "bottom-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "colored",
+              className: "bg-red text-white",
+            })
+            return true
+          }
+        }
       }
 
       return false
@@ -135,7 +194,7 @@ export default function ARoomBooking({ addReservation }) {
         theme: "colored",
         className: "bg-red text-white",
       })
-      return false
+      return true // Return true to prevent booking on error
     }
   }
 
@@ -238,6 +297,7 @@ export default function ARoomBooking({ addReservation }) {
       return
     }
 
+    // In the handleFormSubmit function, make sure the check is properly awaited
     const isReserved = await checkExistingReservation()
     if (isReserved) {
       return // Prevent form submission if the room is already booked

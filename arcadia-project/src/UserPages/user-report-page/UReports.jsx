@@ -7,6 +7,8 @@ import ReportStatus from "../../components/UserComponents/user-report-comp/Repor
 import MakeReport from "../../components/UserComponents/user-report-comp/MakeReport"
 import ReportDetails from "../../components/UserComponents/user-report-view-comp/ReportDetails"
 import ReturnSupportButton from "../../components/UserComponents/user-support-tix-comp/ReturnSupportButton"
+import { ArrowLeft } from "lucide-react";
+
 
 const UReports = () => {
   const [selectedReportID, setSelectedReportID] = useState(null)
@@ -42,6 +44,9 @@ const UReports = () => {
                     onClick={handleBackToMakeReport}
                     className="w-[300px] h-[44px] border border-grey rounded-xl px-5 text-center items-center text-md text-black hover:bg-light-gray transition-colors"
                   >
+                    <span className="w-5 h-5 flex items-center justify-center">
+                      <ArrowLeft className="w-3 h-3 text-white" />
+                    </span>
                     Back to Make Support
                   </button>
                 )}

@@ -3,7 +3,9 @@ import Title from "../components/main-comp/Title";
 import RecentReports from "../components/admin-user-support-report-view-comp/RecentReports";
 import ReportView from "../components/admin-report-view-comp/ReportView";
 import RecentSupport from "../components/admin-user-support-report-view-comp/RecentSupport";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
+import { ArrowLeft } from "lucide-react";
+
 
 
 const AReportViewPage = () => {
@@ -16,10 +18,13 @@ const AReportViewPage = () => {
                 <div className="flex-shrink-0 w-3/4">
                     <div className="flex justify-between w-full gap-2">
                         <button
-                            className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+                            className="add-book w-1/8 mb-2 px-4 py-2 rounded-lg border-grey text-white bg-arcadia-red hover:bg-red transition"
                             onClick={() => navigate('/admin/support')}
                         >
-                            Return to Support
+                            <span className="w-5 h-5 flex items-center justify-center">
+                                <ArrowLeft className="w-3 h-3 text-white" />
+                            </span>
+                            Return
                         </button>
                     </div>
                     <ReportView />

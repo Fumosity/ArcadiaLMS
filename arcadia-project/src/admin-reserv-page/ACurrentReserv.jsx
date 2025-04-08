@@ -3,6 +3,7 @@ import { supabase } from "../supabaseClient"
 import { useNavigate } from "react-router-dom"
 import BookingReservation from "../z_modals/BookingReservation"
 import WrmgDeleteReserve from "../z_modals/warning-modals/WrmgDeleteReserve"
+import "react-toastify/dist/ReactToastify.css"
 
 const periods = [
   "07:00 - 08:00",
@@ -347,6 +348,8 @@ export default function ACurrentReserv() {
     }
   }
 
+  // Add this function after the confirmDeleteReservation function
+
   return (
     <div className="uHero-cont max-w-[1500px] w-full p-6 bg-white rounded-lg border border-grey">
       <h2 className="text-2xl font-semibold mb-6">Room Reservations</h2>
@@ -635,7 +638,7 @@ export default function ACurrentReserv() {
                       <div className="flex justify-center space-x-2">
                         <button
                           onClick={() => handleModifyReservation(res)}
-                          className="bg-dark-blue hover:bg-light-blue text-black py-1 px-2 rounded text-xs"
+                          className="bg-dark-blue hover:bg-light-blue text-white py-1 px-2 rounded text-xs"
                         >
                           Modify
                         </button>

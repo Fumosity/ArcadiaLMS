@@ -3,90 +3,48 @@ import { supabase } from "../supabaseClient"
 import { toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
-const BookingReservation = ({ isOpen, onClose, reservation, onSave, onUpdate }) => {
-  const [room, setRoom] = useState("")
-  const [date, setDate] = useState("")
-  const [startTime, setStartTime] = useState("")
-  const [endTime, setEndTime] = useState("")
-  const [title, setTitle] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-
-  const convertTo24Hour = (time) => {
-    if (!time) return ""
-
-    // Check if the time is already in 24-hour format (HH:MM)
-    if (time.match(/^\d{1,2}:\d{2}$/)) {
-      return time
-    }
-
-    // Parse 12-hour format (HH:MM AM/PM)
-    const match = time.match(/(\d+):(\d+)\s*(AM|PM|am|pm)/i)
-    if (!match) return time
-
-    let [_, hours, minutes, period] = match
-    hours = Number.parseInt(hours, 10)
-
-    // Convert to 24-hour format
-    if (period.toLowerCase() === "pm" && hours < 12) {
-      hours += 12
-    } else if (period.toLowerCase() === "am" && hours === 12) {
-      hours = 0
-    }
-
-    return `${String(hours).padStart(2, "0")}:${minutes}`
-  }
+export default function BookingReservation({ isOpen, onClose, reservation, onSave, onUpdate, checkForConflicts }) {
+  const [formData, setFormData] = useState({
+    reservationID: "",
+    room: "Discussion Room",
+    date: "",
+    startTime: "07:00",
+    endTime: "08:00",
+    title: "",
+    userID: "",
+  })
 
   useEffect(() => {
-    if (reservation && isOpen) {
-      setRoom(reservation.room || "")
-      setDate(reservation.date || "")
-
-      if (reservation.rawData) {
-        setStartTime(convertTo24Hour(reservation.rawData.startTime || ""))
-        setEndTime(convertTo24Hour(reservation.rawData.endTime || ""))
-      } else if (reservation.period) {
-        const [start, end] = reservation.period.split(" - ")
-        setStartTime(convertTo24Hour(start.trim() || ""))
-        setEndTime(convertTo24Hour(end.trim() || ""))
-      }
-
-      setTitle(reservation.purpose || "")
+    if (reservation) {
+      setFormData({
+        reservationID: reservation.reservationID || "",
+        room: reservation.rawData?.room || "Discussion Room",
+        date: reservation.date || "",
+        startTime: reservation.rawData?.startTime || "07:00",
+        endTime: reservation.rawData?.endTime || "08:00",
+        title: reservation.rawData?.title || reservation.purpose || "",
+        userID: reservation.user_accounts?.userID || "",
+      })
     }
-  }, [reservation, isOpen])
+  }, [reservation])
 
-  const isSunday = (date) => new Date(date).getDay() === 0
-
-  const checkExistingReservation = async () => {
-    const { data } = await supabase
-      .from("reservation")
-      .select("reservationID, reservationData")
-      .filter("reservationData->>room", "eq", room)
-      .filter("reservationData->>date", "eq", date)
-      .filter("reservationData->>startTime", "lt", endTime)
-      .filter("reservationData->>endTime", "gt", startTime)
-
-    // Exclude the current reservation from the conflict check
-    return data?.some((res) => res.reservationID !== reservation.reservationID)
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const isTimeWithinAllowedHours = (time) => {
-    if (!time) return false
-
-    const hours = Number.parseInt(time.split(":")[0], 10)
-    return hours >= 7 && hours <= 17 // 7:00 AM to 5:00 PM (17:00)
+  const isSunday = (date) => {
+    const selectedDay = new Date(date).getDay() // 0 = Sunday
+    return selectedDay === 0
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+  const handleFormSubmit = async () => {
+    const now = new Date()
+    const selectedDateTime = new Date(`${formData.date}T${formData.startTime}`)
+    const endDateTime = new Date(`${formData.date}T${formData.endTime}`)
 
-    // Check if the time is within allowed hours (7:00 AM to 5:00 PM)
-    const startHour = Number.parseInt(startTime.split(":")[0], 10)
-    const endHour = Number.parseInt(endTime.split(":")[0], 10)
-    const endMinutes = Number.parseInt(endTime.split(":")[1], 10)
-
-    if (startHour < 7 || endHour > 17 || (endHour === 17 && endMinutes > 0)) {
-      toast.warn("Bookings are only allowed from 7:00 AM to 5:00 PM!", {
+    if (selectedDateTime < now) {
+      toast.error("You cannot book a past date or time!", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -95,13 +53,16 @@ const BookingReservation = ({ isOpen, onClose, reservation, onSave, onUpdate }) 
         draggable: true,
         progress: undefined,
         theme: "colored",
+        className: "bg-red text-white",
       })
-      setIsLoading(false)
       return
     }
 
-    if (new Date(`${date}T${startTime}`) < new Date()) {
-      toast.warn("You cannot book a past date or time!", {
+    const startHour = Number.parseInt(formData.startTime.split(":")[0], 10)
+    const endHour = Number.parseInt(formData.endTime.split(":")[0], 10)
+
+    if (endDateTime <= selectedDateTime) {
+      toast.error("End time must be after the start time!", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -110,13 +71,13 @@ const BookingReservation = ({ isOpen, onClose, reservation, onSave, onUpdate }) 
         draggable: true,
         progress: undefined,
         theme: "colored",
+        className: "bg-red text-white",
       })
-      setIsLoading(false)
       return
     }
 
-    if (isSunday(date)) {
-      toast.warn("Bookings are not allowed on Sundays!", {
+    if (isSunday(formData.date)) {
+      toast.error("Bookings are not allowed on Sundays!", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -125,13 +86,14 @@ const BookingReservation = ({ isOpen, onClose, reservation, onSave, onUpdate }) 
         draggable: true,
         progress: undefined,
         theme: "colored",
+        className: "bg-red text-white",
       })
-      setIsLoading(false)
       return
     }
 
-    if (new Date(`${date}T${endTime}`) <= new Date(`${date}T${startTime}`)) {
-      toast.warn("End time must be after the start time!", {
+    // Validate booking hours (07:00 - 17:00)
+    if (startHour < 7 || endHour > 17) {
+      toast.error("Bookings are only allowed from 7:00 AM to 5:00 PM!", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -140,13 +102,13 @@ const BookingReservation = ({ isOpen, onClose, reservation, onSave, onUpdate }) 
         draggable: true,
         progress: undefined,
         theme: "colored",
+        className: "bg-red text-white",
       })
-      setIsLoading(false)
       return
     }
 
-    if (await checkExistingReservation()) {
-      toast.warn("This room is already reserved for the selected time!", {
+    if (!formData.room || !formData.date || !formData.startTime || !formData.endTime || !formData.title) {
+      toast.error("Please fill in all required fields.", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -155,62 +117,79 @@ const BookingReservation = ({ isOpen, onClose, reservation, onSave, onUpdate }) 
         draggable: true,
         progress: undefined,
         theme: "colored",
+        className: "bg-red text-white",
       })
-      setIsLoading(false)
       return
     }
 
-    // Format times to 12-hour format for display
-    const formatTo12Hour = (time24) => {
-      const [hours, minutes] = time24.split(":")
-      const hour = Number.parseInt(hours, 10)
-      const period = hour >= 12 ? "PM" : "AM"
-      const hour12 = hour % 12 || 12 // Convert 0 to 12 for 12 AM
-      return `${hour12}:${minutes} ${period}`
+    // Check for conflicts with existing reservations
+    const hasConflict = await checkExistingReservation()
+    if (hasConflict) {
+      return // Prevent form submission if there's a conflict
     }
 
-    const startTime12 = formatTo12Hour(startTime)
-    const endTime12 = formatTo12Hour(endTime)
-
-    const updatedData = {
-      ...reservation.rawData,
-      room,
-      date,
-      startTime: startTime12,
-      endTime: endTime12,
-      title,
+    const reserveData = {
+      room: formData.room,
+      date: formData.date,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
+      title: formData.title,
     }
 
-    const { error } = await supabase
-      .from("reservation")
-      .update({ reservationData: updatedData })
-      .eq("reservationID", reservation.reservationID)
+    try {
+      if (formData.reservationID) {
+        // Update existing reservation
+        const { data, error } = await supabase
+          .from("reservation")
+          .update({
+            reservationData: reserveData,
+          })
+          .eq("reservationID", formData.reservationID)
 
-    if (error) {
-      toast.error("Failed to update reservation.", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      })
-    } else {
-      const updatedReservation = {
-        ...reservation,
-        room,
-        date,
-        period: `${startTime12} - ${endTime12}`,
-        purpose: title,
-        rawData: updatedData,
+        if (error) {
+          console.error("Error updating reservation:", error.message)
+          toast.error("Error updating reservation", {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            className: "bg-red text-white",
+          })
+        } else {
+          console.log("Reservation successfully updated:", data)
+          toast.success("Reservation successfully updated", {
+            position: "bottom-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            className: "bg-green text-white",
+          })
+
+          // Update the local state with the updated reservation
+          const updatedReservation = {
+            ...reservation,
+            date: formData.date,
+            room: formData.room,
+            purpose: formData.title,
+            period: `${formData.startTime} - ${formData.endTime}`,
+            rawData: reserveData,
+          }
+
+          onSave(updatedReservation)
+          onUpdate()
+        }
       }
-
-      onSave(updatedReservation)
-
-      // Show success toast
-      toast.success("Reservation updated successfully!", {
+    } catch (error) {
+      console.error("Error while submitting reservation:", error.message)
+      toast.error("Error while submitting reservation", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -219,83 +198,186 @@ const BookingReservation = ({ isOpen, onClose, reservation, onSave, onUpdate }) 
         draggable: true,
         progress: undefined,
         theme: "colored",
+        className: "bg-red text-white",
       })
-
-      // Trigger calendar refresh if onUpdate is provided
-      if (typeof onUpdate === "function") {
-        onUpdate()
-      }
-
-      onClose()
     }
-
-    setIsLoading(false)
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-96 p-8">
-        <h2 className="text-2xl font-semibold mb-6 text-left">Modify Booking Reservation</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <span className="w-24 text-sm font-medium">Room:</span>
-              <select value={room} onChange={(e) => setRoom(e.target.value)} className="inputBox" required>
-                <option value="">Select Room</option>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
+        <h2 className="text-2xl font-semibold mb-4">Modify Reservation</h2>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Room:</label>
+              <select
+                name="room"
+                value={formData.room}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
                 <option value="Discussion Room">Discussion Room</option>
                 <option value="Law Discussion Room">Law Discussion Room</option>
               </select>
             </div>
-            <div className="flex items-center">
-              <span className="w-24 text-sm font-medium">Date:</span>
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="inputBox" required />
-            </div>
-            <div className="flex items-center">
-              <span className="w-24 text-sm font-medium">Start Time:</span>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Date:</label>
               <input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="inputBox"
-                required
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
-            <div className="flex items-center">
-              <span className="w-24 text-sm font-medium">End Time:</span>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Start Time:</label>
               <input
                 type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="inputBox"
-                required
+                name="startTime"
+                value={formData.startTime}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
-            <div className="flex items-center">
-              <span className="w-24 text-sm font-medium">Title:</span>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">End Time:</label>
+              <input
+                type="time"
+                name="endTime"
+                value={formData.endTime}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="block text-sm font-medium">Purpose:</label>
               <input
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="inputBox"
-                placeholder="Purpose of reservation"
-                required
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
           </div>
-          <div className="flex justify-center space-x-4 mt-4">
-            <button type="submit" className="penBtn" disabled={isLoading}>
-              {isLoading ? "Saving..." : "Save Changes"}
-            </button>
-            <button type="button" className="cancelModify" onClick={onClose}>
-              Cancel
-            </button>
-          </div>
-        </form>
+        </div>
+        <div className="flex justify-end space-x-4 mt-6">
+          <button onClick={onClose} className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
+            Cancel
+          </button>
+          <button onClick={handleFormSubmit} className="px-4 py-2 bg-arcadia-red text-white rounded-md hover:bg-blue-700">
+            Save Changes
+          </button>
+        </div>
       </div>
     </div>
   )
-}
 
-export default BookingReservation
+  async function checkExistingReservation() {
+    const { room, date, startTime, endTime } = formData
+    try {
+      // Get all reservations for the same room and date
+      const { data, error } = await supabase
+        .from("reservation")
+        .select("reservationID, reservationData")
+        .filter("reservationData->>room", "eq", room)
+        .filter("reservationData->>date", "eq", date)
+    
+    if (error) {
+      console.error("Error checking existing reservations:", error.message)
+      toast.error("Error checking for reservation conflicts", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        className: "bg-red text-white",
+      })
+      return true // Return true to prevent booking on error
+    }
+    
+    // Convert times to comparable values (minutes since midnight)
+    const convertTimeToMinutes = (timeStr) => {
+      // Handle 24-hour format (from form)
+      if (timeStr.match(/^\d{1,2}:\d{2}$/)) {
+        const [hours, minutes] = timeStr.split(":").map(num => Number.parseInt(num, 10))
+        return hours * 60 + minutes
+      }
+      
+      // Handle 12-hour format (from database)
+      const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM|am|pm)/i)
+      if (match) {
+        let [_, hours, minutes, period] = match
+        hours = Number.parseInt(hours, 10)
+        minutes = Number.parseInt(minutes, 10)
+        
+        // Convert to 24-hour format
+        if (period.toLowerCase() === "pm" && hours < 12) {
+          hours += 12
+        } else if (period.toLowerCase() === "am" && hours === 12) {
+          hours = 0
+        }
+        
+        return hours * 60 + minutes
+      }
+      
+      return 0 // Default fallback
+    }
+    
+    const newStartMinutes = convertTimeToMinutes(startTime)
+    const newEndMinutes = convertTimeToMinutes(endTime)
+    
+    // Check each existing reservation for overlap, excluding the current one
+    for (const item of data) {
+      // Skip the current reservation being edited
+      if (item.reservationID === reservation?.reservationID) {
+        continue
+      }
+      
+      const existingStartMinutes = convertTimeToMinutes(item.reservationData.startTime)
+      const existingEndMinutes = convertTimeToMinutes(item.reservationData.endTime)
+      
+      // Check for overlap
+      if (
+        (newStartMinutes < existingEndMinutes && newEndMinutes > existingStartMinutes) ||
+        (existingStartMinutes < newEndMinutes && existingEndMinutes > newStartMinutes)
+      ) {
+        toast.error("This room is already reserved for the selected time!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          className: "bg-red text-white",
+        })
+        return true
+      }
+    }
+    
+    return false
+  } catch (error) {
+    console.error("Error checking for conflicts:", error.message)
+    toast.error("Error checking for reservation conflicts", {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      className: "bg-red text-white",
+    })
+    return true // Return true to prevent booking on error
+  }
+}}
