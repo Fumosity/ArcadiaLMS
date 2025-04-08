@@ -14,7 +14,7 @@ export default function Pathfinder({ book }) {
 
     const callNo = book.titleCallNum || book.researchCallNum;
     const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
-
+    
     const locations = {
         "2nd Floor, Circulation Section": { w: 28, h: 19 },
         "4th Floor, Circulation Section": { w: 27, h: 11 },
@@ -194,14 +194,29 @@ export default function Pathfinder({ book }) {
     useEffect(() => {
         console.log("Book info:", book);
         console.log("Call Number Prefix:", callNoPrefix);
-        console.log(book.location)
+        console.log(book.location);
+    
         if (!locations[book.location]) {
-            console.log("!locations[book.location]")
+            console.log(!locations[book.location])
             setPathfindingError("Pathfinding is not available.");
-        } else {
-            setPathfindingError(null)
+            return;
         }
-    }, [book.location]);
+    
+        const classificationType = getClassificationType(callNo);
+        const isHighschoolSection = book.location === "4th Floor, Highschool and Multimedia Section";
+    
+        if (isHighschoolSection && classificationType !== "DDC") {
+            setPathfindingError("This section only supports Dewey Decimal classified books. Please contact the help desk if you see this error.");
+            return;
+        }
+    
+        if (!isHighschoolSection && classificationType !== "LoC") {
+            setPathfindingError("This section only supports Dewey Decimal classified books. Please contact the help desk if you see this error.");
+            return;
+        }
+    
+        setPathfindingError(null);
+    }, [book.location, callNo]);
 
     // Function to Expand Shelves Data
     const expandShelves = (shelves) => {
@@ -239,8 +254,48 @@ export default function Pathfinder({ book }) {
         }
     };
 
+    function getClassificationType(callNo) {
+        const cleanedCallNo = callNo.trim();
+    
+        if (/^[A-Z]{1,3}\s?\d+/.test(cleanedCallNo)) {
+            console.log(callNo, "is LoC");
+            return "LoC";
+        } else if (/^\d{3}(\.\d+)?/.test(cleanedCallNo)) {
+            console.log(callNo, "is DDC");
+            return "DDC";
+        }
+        console.log(callNo, "is unknown");
+        return "Unknown";
+    }    
+
+    function normalizeCallNumber(callNo) {
+        const classification = getClassificationType(callNo);
+    
+        if (classification === "LoC") {
+            // Extract leading letters
+            const match = callNo.match(/^([A-Z]{1,3})/);
+            return match ? match[1] : callNo;
+        } else if (classification === "DDC") {
+            // Extract leading numeric part (whole number only)
+            const match = callNo.match(/^(\d{3})/);
+            return match ? match[1] : callNo;
+        }
+    
+        return callNo; // fallback
+    }    
+
     function isInRange(call, from, to) {
-        return from <= call && call <= to;
+        if (!call || (!from && !to)) return false;
+    
+        const normalize = (str) => str?.toUpperCase().replace(/[^A-Z0-9]/g, "") || "";
+    
+        const normCall = normalizeCallNumber(call);
+        const normFrom = normalize(from);
+        const normTo = normalize(to);
+
+        console.log(normCall, normFrom, normTo)
+    
+        return normFrom <= normCall && normCall <= normTo;
     }
 
     useEffect(() => {
