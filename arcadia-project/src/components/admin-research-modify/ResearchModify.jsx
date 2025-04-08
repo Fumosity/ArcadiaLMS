@@ -3,6 +3,7 @@ import { supabase } from "../../supabaseClient.js";
 import { v4 as uuidv4 } from "uuid";
 import WrngRmvRsrchInv from "../../z_modals/warning-modals/WrngRmvRsrchInv";
 import {useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ResearchModify = ({ formData, setFormData, onSave }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +29,14 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
     if (error) {
       alert("Failed to delete research: " + error.message);
     } else {
-      alert("Research deleted successfully.");
+      toast.success("Research deleted successfully!", {
+                    position: "bottom-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: false,
+                  })
       navigate("/admin/researchmanagement");
     }
   };
@@ -131,12 +139,23 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
 
       if (error) throw error;
 
-      console.log("Research updated successfully:", data);
+      toast.success("Research updated successfully!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      });
+      setTimeout(() => {
+        navigate("/admin/researchmanagement")
+      }, 2000)
+      
       if (onSave) await onSave(formData);
     } catch (err) {
       console.error("Error updating research:", err);
     }
-    alert("Changes saved successfully!");
+    // alert("Changes saved successfully!");
   };
 
   const updateDepartmentOptions = (college) => {

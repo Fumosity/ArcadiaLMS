@@ -1,68 +1,74 @@
-import React, { useRef, useEffect, useState } from "react";
-import { supabase } from "../../supabaseClient.js";
-import { v4 as uuidv4 } from "uuid";
-import { addResearch, newThesisIDGenerator } from "../../backend/ARAddBackend.jsx";
-import ResearchUploadModal from '../../z_modals/ResearchUploadModal';
-import ARAddPreview from "../admin-research-add-comp/ARAddPreview";
-import { getDocument } from 'pdfjs-dist';
-import * as pdfjsLib from 'pdfjs-dist';
-import { GlobalWorkerOptions } from 'pdfjs-dist';
+import { useEffect, useState } from "react"
+import { supabase } from "../../supabaseClient.js"
+import { v4 as uuidv4 } from "uuid"
+import { addResearch, newThesisIDGenerator } from "../../backend/ARAddBackend.jsx"
+import ResearchUploadModal from "../../z_modals/ResearchUploadModal"
+import { GlobalWorkerOptions } from "pdfjs-dist"
+import { toast } from "react-toastify"
 
 // Set the worker source explicitly
-GlobalWorkerOptions.workerSrc = '/pdfjs-dist/pdf.worker.min.mjs';
+GlobalWorkerOptions.workerSrc = "/pdfjs-dist/pdf.worker.min.mjs"
 
 //Main Function
 const ARAdding = ({ formData, setFormData }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [departmentOptions, setDepartmentOptions] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [uploadedFiles, setUploadedFiles] = useState([])
+  const [departmentOptions, setDepartmentOptions] = useState([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [validationErrors, setValidationErrors] = useState({})
+
+  // Define the error style for validation
+  const errorStyle = { border: "2px solid red" }
 
   const collegeDepartmentMap = {
-    "COECSA": ["DOA", "DCS", "DOE"],
-    "CLAE": [""],
-    "CITHM": [""],
-    "CAMS": [""],
-    "CON": [""],
-    "CBA": [""],
-    "LAW": [""],
-    "CFAD": [""],
-    "IS": ["JHS", "SHS"],
+    COECSA: ["DOA", "DCS", "DOE"],
+    CLAE: [""],
+    CITHM: [""],
+    CAMS: [""],
+    CON: [""],
+    CBA: [""],
+    LAW: [""],
+    CFAD: [""],
+    IS: ["JHS", "SHS"],
     "Graduate School": [""],
-  };
+  }
 
   //Aggregates form inputs
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
 
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
+    setFormData((prevData) => ({ ...prevData, [name]: value }))
+
+    if (value) {
+      setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: false }))
+    }
+  }
 
   const updateDepartmentOptions = (college) => {
     // Assuming `collegeDepartmentMap` contains the mapping from college to an array of departments
-    const options = collegeDepartmentMap[college] || [];
+    const options = collegeDepartmentMap[college] || []
 
-    setDepartmentOptions(options);
+    setDepartmentOptions(options)
 
     // If the currently selected department is no longer valid for the new college, reset it
     setFormData((prevData) => ({
       ...prevData,
       department: options.includes(prevData.department) ? prevData.department : "", // reset department if invalid
-    }));
-  };
+    }))
+  }
 
   // Separate function to handle file uploads
   const handleFileSelect = async (files) => {
-    console.log("Files received in handleFileSelect:", files);
+    console.log("Files received in handleFileSelect:", files)
 
     if (!Array.isArray(files)) {
-      setUploadedFiles([]);
-      return;
+      setUploadedFiles([])
+      return
     }
 
-    setUploadedFiles(files);
-  };
-
+    setUploadedFiles(files)
+    setValidationErrors((prevErrors) => ({ ...prevErrors, files: false }))
+  }
 
   // Function to handle extracted data and update formData
   const handleExtractedData = (data) => {
@@ -70,113 +76,174 @@ const ARAdding = ({ formData, setFormData }) => {
       ...prevData,
       ...data,
       college: data.college,
-      department: data.department,  // Ensure department is set from extracted data if available
-    }));
-    updateDepartmentOptions(data.college);  // Ensure department options are updated when data is autofilled
-  };
+      department: data.department, // Ensure department is set from extracted data if available
+    }))
+    updateDepartmentOptions(data.college) // Ensure department options are updated when data is autofilled
+  }
 
   //Handles the submission to the database
   const handleSubmit = async () => {
+    // Define base required fields without department
+    const baseRequiredFields = [
+      "title",
+      "author",
+      "college",
+      "abstract",
+      "keywords",
+      "pubDate",
+      "location",
+      "researchID",
+      "researchCallNum",
+    ]
 
-    const requiredFields = ["title", "author", "college", "department", "abstract", "keywords", "pubDate", "location", "researchID", "researchCallNum",];
+    // Add department to required fields only if college is COECSA or IS
+    const requiredFields = [...baseRequiredFields]
+    if (formData.college === "COECSA" || formData.college === "IS") {
+      requiredFields.push("department")
+    }
 
     // Ensure formData is fully updated
-    const updatedFormData = { ...formData }; // Capture current formData
+    const updatedFormData = { ...formData } // Capture current formData
 
     // Check for missing fields
     const missingFields = requiredFields.filter(
-      (field) => !updatedFormData[field] ||
-        (typeof updatedFormData[field] === "string" && !updatedFormData[field].trim())
-    );
+      (field) =>
+        !updatedFormData[field] || (typeof updatedFormData[field] === "string" && !updatedFormData[field].trim()),
+    )
+
     if (missingFields.length > 0) {
-      alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
-      return;
+      const newValidationErrors = {}
+      missingFields.forEach((field) => {
+        newValidationErrors[field] = true
+      })
+      setValidationErrors(newValidationErrors)
+
+      toast.error("Please fill in all required fields", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
+      return
     }
 
-    setIsSubmitting(true);
-    const pdfUrls = [];
-    const imageUrls = [];
+    setIsSubmitting(true)
+    const pdfUrls = []
+    const imageUrls = []
 
-    console.log(uploadedFiles)
+    try {
+      // Handle file uploads if there are any, but don't require them
+      if (Array.isArray(uploadedFiles) && uploadedFiles.length > 0) {
+        for (const file of uploadedFiles) {
+          const filePath = `${uuidv4()}_${file.name}`
+          const { error } = await supabase.storage.from("research-files").upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+          })
 
-    if (!Array.isArray(uploadedFiles)) {
-      console.error("uploadedFiles is not an array:", uploadedFiles);
-      return;
-    }
-
-    for (const file of uploadedFiles) { //error here
-      const filePath = `${uuidv4()}_${file.name}`;
-      const { error } = await supabase.storage.from("research-files").upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
-      });
-
-      if (error) {
-        console.error("Error uploading file: ", error);
-      } else {
-        const { data: publicData, error: urlError } = supabase.storage.from("research-files").getPublicUrl(filePath);
-        if (urlError) {
-          console.error("Error getting public URL: ", urlError.message);
-        } else {
-          if (file.type === "application/pdf") {
-            pdfUrls.push(publicData.publicUrl);
-          } else if (file.type.startsWith("image/")) {
-            imageUrls.push(publicData.publicUrl);
+          if (error) {
+            console.error("Error uploading file: ", error)
+            throw new Error(`Error uploading file: ${error.message}`)
+          } else {
+            const { data: publicData, error: urlError } = supabase.storage.from("research-files").getPublicUrl(filePath)
+            if (urlError) {
+              console.error("Error getting public URL: ", urlError.message)
+              throw new Error(`Error getting public URL: ${urlError.message}`)
+            } else {
+              if (file.type === "application/pdf") {
+                pdfUrls.push(publicData.publicUrl)
+              } else if (file.type.startsWith("image/")) {
+                imageUrls.push(publicData.publicUrl)
+              }
+            }
           }
         }
       }
+
+      const updatedFormDataWithFiles = {
+        ...formData,
+        pdf: pdfUrls.join(", "),
+        images: imageUrls.join(", "),
+      }
+
+      const success = await addResearch(updatedFormDataWithFiles)
+
+      if (success) {
+        toast.success("Research added successfully!", {
+          position: "bottom-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+        })
+
+        setFormData({
+          researchID: "",
+          title: "",
+          author: [],
+          college: "",
+          department: "",
+          abstract: "",
+          keywords: [],
+          location: "",
+          researchCallNum: "",
+          pubDate: "",
+          pdf: "",
+          images: "",
+        })
+
+        setUploadedFiles([])
+        await newThesisIDGenerator({}, setFormData)
+      } else {
+        toast.error("Failed to add research. Please try again.", {
+          position: "bottom-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+        })
+      }
+    } catch (error) {
+      console.error("Error in submission process:", error)
+      toast.error(`Error: ${error.message}`, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
+    } finally {
+      setIsSubmitting(false)
     }
-
-    setFormData((prevData) => ({
-      ...prevData,
-      pdf: pdfUrls.join(', '),
-      images: imageUrls.join(', '),
-    }));
-
-    await addResearch({ ...formData, pdf: pdfUrls.join(', '), images: imageUrls.join(', ') });
-
-    setFormData({
-      researchID: '',
-      title: '',
-      author: [],
-      college: '',
-      department: '',
-      abstract: '',
-      keywords: [],
-      location: '',
-      researchCallNum: '',
-      pubDate: '',
-      pdf: '',
-      images: '',
-    });
-
-    setUploadedFiles([]);
-    await newThesisIDGenerator({}, setFormData);
-    setIsSubmitting(false);
-  };
+  }
 
   //Generate a new researchID
-  useEffect(() => { newThesisIDGenerator(formData, setFormData) }, []);
+  useEffect(() => {
+    newThesisIDGenerator(formData, setFormData)
+  }, [])
 
   //Form
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="bg-white border border-grey rounded-lg p-4 w-full h-fit">
         <h2 className="text-2xl font-semibold mb-4">Research Adding</h2>
-        <div className='flex'>
+        <div className="flex">
           {/* Left Side: Form Section */}
           <div className="w-full">
-            <p className="text-gray-600 mb-8">
-              Use a semicolon (;) or comma (,) to add multiple authors and keywords.
-            </p>
+            <p className="text-gray-600 mb-8">Use a semicolon (;) or comma (,) to add multiple authors and keywords.</p>
 
             <div className="flex-col justify-between items-center mb-6 space-y-2">
               <div className="flex justify-start w-full">
                 <button
-                  className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+                  className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg hover:bg-light-gray transition border-grey"
                   onClick={() => setIsModalOpen(true)}
                 >
-                  Upload Pages to Autofill
+                  Upload Pages to Autofill (Optional)
                 </button>
               </div>
             </div>
@@ -188,11 +255,29 @@ const ARAdding = ({ formData, setFormData }) => {
                 <div className="flex-col justify-between items-center w-1/2 space-y-2">
                   <div className="flex justify-between items-center">
                     <label className="w-1/4">Title:</label>
-                    <input type="text" name="title" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.title} onChange={handleChange} placeholder="Full Research Title" required />
+                    <input
+                      type="text"
+                      name="title"
+                      className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                      value={formData.title}
+                      onChange={handleChange}
+                      placeholder="Full Research Title"
+                      style={validationErrors.title ? errorStyle : {}}
+                      required
+                    />
                   </div>
                   <div className="flex justify-between items-center">
                     <label className="w-1/4">Authors:</label>
-                    <input type="text" name="author" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.author} onChange={handleChange} placeholder="Author 1; Author 2; Author 3;..." required />
+                    <input
+                      type="text"
+                      name="author"
+                      className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                      value={formData.author}
+                      onChange={handleChange}
+                      placeholder="Author 1; Author 2; Author 3;..."
+                      style={validationErrors.author ? errorStyle : {}}
+                      required
+                    />
                   </div>
                   <div className="flex justify-between items-center">
                     <label className="w-1/4">College:</label>
@@ -201,9 +286,10 @@ const ARAdding = ({ formData, setFormData }) => {
                         name="college"
                         className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
                         value={formData.college}
+                        style={validationErrors.college ? errorStyle : {}}
                         onChange={(e) => {
-                          handleChange(e);
-                          updateDepartmentOptions(e.target.value);
+                          handleChange(e)
+                          updateDepartmentOptions(e.target.value)
                         }}
                       >
                         <option value="">Select a college</option>
@@ -217,15 +303,15 @@ const ARAdding = ({ formData, setFormData }) => {
                   </div>
                   {formData.college === "COECSA" || formData.college === "IS" ? (
                     <div className="flex justify-between items-center">
-                      <label className="w-1/4">
-                        {formData.college === "COECSA" ? "Department:" : "Grade Level:"}
-                      </label>
+                      <label className="w-1/4">{formData.college === "COECSA" ? "Department:" : "Grade Level:"}</label>
                       <div className="select-dropdown-wrapper w-2/3">
                         <select
                           name="department"
                           className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
                           value={formData.department}
+                          style={validationErrors.department ? errorStyle : {}}
                           onChange={handleChange}
+                          required={formData.college === "COECSA" || formData.college === "IS"}
                         >
                           <option value="">
                             {formData.college === "COECSA" ? "Select a department" : "Select level"}
@@ -241,35 +327,90 @@ const ARAdding = ({ formData, setFormData }) => {
                   ) : null}
                   <div className="flex justify-between items-center">
                     <label className="w-1/4">Keywords:</label>
-                    <input type="text" name="keywords" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.keywords} onChange={handleChange} placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
+                    <input
+                      type="text"
+                      name="keywords"
+                      className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                      value={formData.keywords}
+                      onChange={handleChange}
+                      placeholder="Keyword 1; Keyword 2; Keyword 3;..."
+                      style={validationErrors.keywords ? errorStyle : {}}
+                      required
+                    />
                   </div>
                   <div className="flex justify-between items-center">
                     <label className="w-1/4">Date Published:</label>
-                    <input type="date" name="pubDate" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.pubDate} onChange={handleChange} required />
+                    <input
+                      type="date"
+                      name="pubDate"
+                      className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                      value={formData.pubDate}
+                      onChange={handleChange}
+                      style={validationErrors.pubDate ? errorStyle : {}}
+                      required
+                    />
                   </div>
                   <div className="flex justify-between items-center">
                     <label className="w-1/4">Location:</label>
-                    <input type="text" name="location" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.location} onChange={handleChange} placeholder="Shelf Location" required />
+                    <input
+                      type="text"
+                      name="location"
+                      className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                      value={formData.location}
+                      onChange={handleChange}
+                      placeholder="Shelf Location"
+                      style={validationErrors.location ? errorStyle : {}}
+                      required
+                    />
                   </div>
                   <div className="flex justify-between items-center">
                     <label className="w-1/4">Call Number:</label>
-                    <input type="text" name="researchCallNum" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchCallNum} onChange={handleChange} placeholder="ARC Issued ID, eg. CITHM-123" required />
+                    <input
+                      type="text"
+                      name="researchCallNum"
+                      className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                      value={formData.researchCallNum}
+                      onChange={handleChange}
+                      placeholder="ARC Issued ID, eg. CITHM-123"
+                      style={validationErrors.researchCallNum ? errorStyle : {}}
+                      required
+                    />
                   </div>
                   <div className="justify-between items-center hidden">
                     <label className="w-1/4">Database ID*:</label>
-                    <input type="number" name="researchID" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.researchID} onChange={handleChange} required />
+                    <input
+                      type="number"
+                      name="researchID"
+                      className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                      value={formData.researchID}
+                      onChange={handleChange}
+                      required
+                    />
                   </div>
                 </div>
                 <div className="flex flex-col justify-between items-start w-1/2 space-y-2">
                   <label className="w-1/4 h-8">Abstract:</label>
-                  <textarea type="text" name="abstract" className="w-full px-3 py-1 rounded-2xl border border-grey min-h-72" value={formData.abstract} onChange={handleChange} placeholder="Full Abstract Text" required />
+                  <textarea
+                    type="text"
+                    name="abstract"
+                    className="w-full px-3 py-1 rounded-2xl border border-grey min-h-72"
+                    value={formData.abstract}
+                    onChange={handleChange}
+                    placeholder="Full Abstract Text"
+                    style={validationErrors.abstract ? errorStyle : {}}
+                    required
+                  />
                 </div>
               </div>
             </form>
           </div>
         </div>
         <div className="flex justify-center mt-8">
-          <button type="button" onClick={handleSubmit} className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+          >
             {isSubmitting ? "Submitting..." : "Add Research"}
           </button>
         </div>
@@ -279,10 +420,10 @@ const ARAdding = ({ formData, setFormData }) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onFileSelect={handleFileSelect}
-        onExtractedData={handleExtractedData}    // For autofill data
+        onExtractedData={handleExtractedData} // For autofill data
       />
     </div>
-  );
-};
+  )
+}
 
-export default ARAdding;
+export default ARAdding
