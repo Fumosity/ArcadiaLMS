@@ -40,6 +40,8 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
         Classification: chunk.Classification || "skip", // Default to "skip" if empty
       }));
 
+      console.log(extractedChunks)
+
       setExtractedChunks(extractedChunks);
 
       onFileSelect(uploadedFiles);

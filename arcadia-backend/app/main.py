@@ -142,7 +142,16 @@ def remove_sections(text):
         if header_pattern.search(line) and line.isupper():
             continue
 
-        if line_lower.startswith("in partial fulfillment") or line_lower.startswith("an undergraduate"): # title page
+        if line_lower.startswith("in partial fulfillment"):
+            skip_current_paragraph = True
+
+        if line_lower.startswith("an undergraduate"):
+            skip_current_paragraph = True
+
+        if "submitted to the" in line_lower:
+            skip_current_paragraph = True
+
+        if "requirements for the" in line_lower:
             skip_current_paragraph = True
 
         if line in added_lines:
@@ -435,8 +444,10 @@ def classify_text_chunks(preprocessed_text, original_text, pipeline):
             processed_text = replace_college_names(processed_text)
         elif predicted_section == "pubDate":
             processed_text = convert_date(processed_text)
-        elif predicted_section == "title":
+        if predicted_section == "title":
+            print("Before proper case:", processed_text)  # Debug print
             processed_text = proper_case(processed_text)
+            print("After proper case:", processed_text)  # Debug print
         elif predicted_section == "keywords":
             processed_text = re.sub(r'\b(keywords?|key words?)\b.*?(?:—|:)?\s*', '', processed_text, flags=re.IGNORECASE).strip()
 
