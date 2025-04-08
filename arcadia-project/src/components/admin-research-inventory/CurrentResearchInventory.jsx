@@ -351,23 +351,23 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-center items-center mt-2 space-x-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          className="uPage-btn"
-          disabled={currentPage === 1}
-        >
-          Previous Page
-        </button>
-        <span className="text-xs text-arcadia-red">Page {currentPage}</span>
-        <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          className="uPage-btn"
-          disabled={currentPage === totalPages}
-        >
-          Next Page
-        </button>
-      </div>
+      <div className="flex justify-center items-center mt-4 space-x-4">
+          <button
+            className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous Page
+          </button>
+          <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+          <button
+            className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next Page
+          </button>
+        </div>
     </div>
   )
 }
