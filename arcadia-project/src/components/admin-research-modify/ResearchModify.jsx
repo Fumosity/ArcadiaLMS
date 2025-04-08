@@ -433,18 +433,6 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
                     </div>
                   )}
                   <div className="flex justify-between items-center">
-                    <label className="w-1/4">Pages:</label>
-                    <input
-                      type="number"
-                      name="pages"
-                      className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                      value={formData.pages || ""}
-                      onChange={handleChange}
-                      min="0"
-                      placeholder="No. of pages (optional)"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
                     <label className="w-1/4">Keywords:</label>
                     <input
                       type="text"
