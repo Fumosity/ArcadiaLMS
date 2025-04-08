@@ -133,7 +133,7 @@ export default function BookInformation({ book }) {
             />
           ))}
         </span>
-        <span className="ml-2 text-md text-gray-600">{selectedRating || "No rating selected"}</span>
+        <span className="ml-2 text-sm text-gray-600">{selectedRating || "No rating selected"}</span>
       </span>
     )
   }
@@ -178,8 +178,8 @@ export default function BookInformation({ book }) {
               <span className="font-semibold">Category:</span> {book.category}{" "}
               <span className="font-semibold">Genres:</span> {book.genres.join(", ")}
             </p>
-            <p className="min-h-[6rem] leading-relaxed">
-              <span className="font-semibold"></span> {book.synopsis || "No synopsis available."}
+            <p className="min-h-[6rem] leading-relaxed text-justify">
+              <span className="font-semibold text-justify"></span> {book.synopsis || "No synopsis available."}
             </p>
           </div>
 

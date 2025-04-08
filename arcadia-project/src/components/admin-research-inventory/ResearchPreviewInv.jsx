@@ -99,12 +99,12 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
 
   const researchDetails = {
     title: research.title || "N/A",
-    author: research.author || "N/A",
+    author: Array.isArray(research.author) ? research.author.join(', ') : (research.author ?? '').split(';').join(', ') || 'N/A',
     college: research.college || "N/A",
     department: research.department || "N/A",
     abstract: abstractContent || "N/A", // Use the state variable instead of research.abstract
     researchCallNum: research.researchCallNum || "N/A",
-    keywords: research.keywords || "N/A",
+    keywords: Array.isArray(research.keywords) ? research.keywords.join(', ') : (research.keywords ?? '').split(';').join(', ') || 'N/A',
     pubDate: research.pubDate || "N/A",
     location: research.location || "N/A",
     researchID: research.researchID || "N/A"

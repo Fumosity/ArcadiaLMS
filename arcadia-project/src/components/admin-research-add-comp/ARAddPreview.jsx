@@ -3,11 +3,11 @@ import React from "react";
 const ARAddPreview = ({ formData }) => {
   const {
     title = "N/A",
-    author = "N/A",
+    author = [],
     college = "N/A",
     department = "N/A",
     abstract = "N/A",
-    keywords = "N/A",
+    keywords = [],
     pubDate = "N/A",
     location = "N/A",
     researchID = "N/A",
@@ -16,11 +16,13 @@ const ARAddPreview = ({ formData }) => {
 
   const thesisDetails = {
     title,
-    author,
+    author: Array.isArray(author) ? author.join(', ') : (author ?? '').split(';').join(', ') || 'N/A',
     college,
     department,
     abstract,
-    keywords: keywords,
+    keywords: Array.isArray(keywords) ? keywords.join(', ') : (keywords ?? '').split(';').join(', ') || 'N/A',
+
+    // Array.isArray(book.genres) ? book.genres.join(', ') : (book.genres ?? '').split(';').join(',') || '',
     datePublished: pubDate,
     location,
     databaseID: researchID,
