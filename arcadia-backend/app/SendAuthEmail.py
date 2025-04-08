@@ -8,6 +8,7 @@ import jwt
 import os
 import traceback
 from email.message import EmailMessage
+import json 
 
 # Load environment variables
 load_dotenv()
@@ -17,6 +18,10 @@ router = APIRouter()
 JWT_SECRET = os.getenv("JWT_SECRET")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
+
+with open("config.json", "r") as f:
+    config = json.load(f)
+    
 FRONTEND_URL = os.getenv("FRONTEND_URL", config["BASE_URL"])
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
