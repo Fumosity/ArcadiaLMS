@@ -552,7 +552,7 @@ async def extract_text(files: List[UploadFile] = File(...)):
         # Get classified fields and chunks
         title, authors, college, abstract, keywords, pubdate, classified_chunks = classify_text_chunks(cleaned_text, original_text, pipeline)
 
-        return JSONResponse(content={
+        response_data = {
             "text": cleaned_text,
             "total_pages": len(classified_chunks),
             "title": title if title else "",
@@ -563,7 +563,12 @@ async def extract_text(files: List[UploadFile] = File(...)):
             "pubDate": pubdate if pubdate else "",
             "keywords": keywords if keywords else "",
             "chunks": classified_chunks  # Now includes classification for each chunk
-        })
+        }
+
+        print(">>> Returning JSONResponse with data:")
+        print(response_data)  # Or use pprint if it's long
+
+        return JSONResponse(content=response_data)
 
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
