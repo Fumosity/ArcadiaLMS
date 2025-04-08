@@ -1,7 +1,6 @@
 import axios from "axios"
-import config from "./config.json"
 
-export const BASE_URL = config.BASE_URL
+export const BASE_URL = "http://13.212.180.191"
 export const API_URL = `${BASE_URL}/api`
 
 const api = axios.create({
@@ -9,3 +8,4 @@ const api = axios.create({
 })
 
 export default api
+
