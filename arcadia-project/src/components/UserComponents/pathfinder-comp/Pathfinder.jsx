@@ -8,20 +8,17 @@ export default function Pathfinder({ book }) {
     const [path, setPath] = useState([]);
     const [selectedStart, setSelectedStart] = useState("1"); // Default start point
     const [selectedShelf, setSelectedShelf] = useState("A1"); // Default destination
+    const [pathfindingError, setPathfindingError] = useState(null); // State for error message
     const location = useLocation();
     const prevPathRef = useRef([]);
 
     const callNo = book.titleCallNum || book.researchCallNum;
     const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
-    
+
     const locations = {
         "2nd Floor, Circulation Section": { w: 28, h: 19 },
         "4th Floor, Circulation Section": { w: 27, h: 11 },
         "4th Floor, Highschool and Multimedia Section": { w: 27, h: 7 },
-    }
-
-    if (!locations[book.location]) {
-        return <p>Pathfinding is not available.</p>;
     }
 
     const obstacleLoc = {
@@ -193,6 +190,19 @@ export default function Pathfinder({ book }) {
         }
     };
 
+    // Check location validity and set error
+    useEffect(() => {
+        console.log("Book info:", book);
+        console.log("Call Number Prefix:", callNoPrefix);
+        console.log(book.location)
+        if (!locations[book.location]) {
+            console.log("!locations[book.location]")
+            setPathfindingError("Pathfinding is not available.");
+        } else {
+            setPathfindingError(null)
+        }
+    }, [book.location]);
+
     // Function to Expand Shelves Data
     const expandShelves = (shelves) => {
         const expanded = {};
@@ -232,12 +242,6 @@ export default function Pathfinder({ book }) {
     function isInRange(call, from, to) {
         return from <= call && call <= to;
     }
-
-    useEffect(() => {
-        console.log("Book info:", book);
-        console.log("Call Number Prefix:", callNoPrefix);
-        console.log(book.location)
-    }, [book]);
 
     useEffect(() => {
         if (path.length === 0) return;
@@ -357,6 +361,11 @@ export default function Pathfinder({ book }) {
             }
         }
 
+        if (!exactMatch && !rangeMatch){
+            console.log("Pathfinding is not available.")
+            setPathfindingError("Pathfinding is not available.")
+        }
+
         // Assign the final match, prioritizing `_extra`
         let finalMatch = exactMatch || rangeMatch;
 
@@ -437,34 +446,38 @@ export default function Pathfinder({ book }) {
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Location</h2>
             </div>
-            <div className="w-full text-center font-semibold text-lg">
-                {callNo} is located at the {book.location}
-            </div>
-            <div className="my-2 flex justify-center items-center w-full overflow-hidden">
-                <div className="w-fit" style={gridStyle}>
-                    {gridData.flat().map((cell, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center",
-                                border: "1px solid black",
-                                backgroundColor:
-                                    cell.isObstacle
-                                        ? "gray"
-                                        : cell.isPath
-                                            ? "green"
-                                            : cell.isShelf
-                                                ? "red"
-                                                : "white",
-                                color: cell.isPath || cell.isShelf ? "white" : "black",
-                                fontSize: "10px",
-                            }}
-                        >
-                            {cell.isObstacle ? "" : cell.isShelf ? "" : cell.isPath ? "•" : ""}
+            {pathfindingError ? <p className="w-full text-center my-4">{pathfindingError}</p> :
+                <>
+                    <div className="w-full text-center font-semibold text-lg">
+                        {callNo} is located at the {book.location}
+                    </div>
+                    <div className="my-2 flex justify-center items-center w-full overflow-hidden">
+                        <div className="w-fit" style={gridStyle}>
+                            {gridData.flat().map((cell, index) => (
+                                <div
+                                    key={index}
+                                    style={{
+                                        width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center",
+                                        border: "1px solid black",
+                                        backgroundColor:
+                                            cell.isObstacle
+                                                ? "gray"
+                                                : cell.isPath
+                                                    ? "green"
+                                                    : cell.isShelf
+                                                        ? "red"
+                                                        : "white",
+                                        color: cell.isPath || cell.isShelf ? "white" : "black",
+                                        fontSize: "10px",
+                                    }}
+                                >
+                                    {cell.isObstacle ? "" : cell.isShelf ? "" : cell.isPath ? "•" : ""}
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-            </div>
+                    </div>
+                </>
+            }
         </div>
     );
 }

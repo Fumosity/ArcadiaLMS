@@ -308,13 +308,13 @@ def proper_case(name):
         "through", "over", "under", "within", "is", "are", "was", "were", "be", "been", "being"
     }
 
-    words = name.split()
+    words = name.strip().split()
     
     for i in range(len(words)):
         word = words[i]
 
         # Preserve abbreviations (all uppercase or inside parentheses)
-        if re.fullmatch(r"[A-Z]+", word) or re.fullmatch(r"$$[A-Z]+$$", word):
+        if re.fullmatch(r"[A-Z]{2,}", word) or re.fullmatch(r"\([A-Z]{2,}\)", word):
             continue  # Keep as-is
 
         # Handle special cases: McDonald, O'Neil, MacArthur
