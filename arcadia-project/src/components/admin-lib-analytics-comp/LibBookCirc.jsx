@@ -25,6 +25,8 @@ const LibBookCirc = () => {
       newDate.setDate(newDate.getDate() - 7)
     } else if (timeFrame === "month") {
       newDate.setMonth(newDate.getMonth() - 1)
+    } else if (timeFrame === "year") {
+      newDate.setFullYear(newDate.getFullYear() - 1)
     }
     setCurrentDate(newDate)
   }
@@ -35,6 +37,8 @@ const LibBookCirc = () => {
       newDate.setDate(newDate.getDate() + 7)
     } else if (timeFrame === "month") {
       newDate.setMonth(newDate.getMonth() + 1)
+    } else if (timeFrame === "year") {
+      newDate.setFullYear(newDate.getFullYear() + 1)
     }
     setCurrentDate(newDate)
   }
@@ -50,13 +54,14 @@ const LibBookCirc = () => {
       return `${startOfWeek.toLocaleDateString()} - ${endOfWeek.toLocaleDateString()}`
     } else if (timeFrame === "month") {
       return currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    } else if (timeFrame === "year") {
+      return currentDate.getFullYear().toString()
     }
     return ""
   }
 
   return (
     <div className="bg-white p-4 rounded-lg h-fit">
-
       <div className="flex items-center justify-start gap-2 mb-6">
         <select
           id="time-frame"
@@ -66,6 +71,7 @@ const LibBookCirc = () => {
         >
           <option value="week">Week</option>
           <option value="month">Month</option>
+          <option value="year">Year</option>
         </select>
 
         <div className="flex justify-center items-center gap-2 border border-grey rounded">

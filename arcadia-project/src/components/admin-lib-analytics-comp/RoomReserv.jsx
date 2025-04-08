@@ -152,8 +152,7 @@ const RoomReserv = () => {
         const resDate = new Date(res.date)
         return resDate >= weekStart && resDate <= weekEnd
       })
-    } else {
-      // month
+    } else if (timeFrame === "month") {
       const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
       monthEnd.setHours(23, 59, 59, 999)
@@ -162,7 +161,17 @@ const RoomReserv = () => {
         const resDate = new Date(res.date)
         return resDate >= monthStart && resDate <= monthEnd
       })
+    } else if (timeFrame === "year") {
+      const yearStart = new Date(date.getFullYear(), 0, 1)
+      const yearEnd = new Date(date.getFullYear(), 11, 31)
+      yearEnd.setHours(23, 59, 59, 999)
+
+      return filtered.filter((res) => {
+        const resDate = new Date(res.date)
+        return resDate >= yearStart && resDate <= yearEnd
+      })
     }
+    return filtered
   }, [reservations, timeFrame, currentDate])
 
   // Process data for the chart
@@ -207,6 +216,8 @@ const RoomReserv = () => {
       newDate.setDate(newDate.getDate() - 7)
     } else if (timeFrame === "month") {
       newDate.setMonth(newDate.getMonth() - 1)
+    } else if (timeFrame === "year") {
+      newDate.setFullYear(newDate.getFullYear() - 1)
     }
     setCurrentDate(newDate)
   }
@@ -219,6 +230,8 @@ const RoomReserv = () => {
       newDate.setDate(newDate.getDate() + 7)
     } else if (timeFrame === "month") {
       newDate.setMonth(newDate.getMonth() + 1)
+    } else if (timeFrame === "year") {
+      newDate.setFullYear(newDate.getFullYear() + 1)
     }
     setCurrentDate(newDate)
   }
@@ -240,6 +253,8 @@ const RoomReserv = () => {
       return `${startOfWeek.toLocaleDateString()} - ${endOfWeek.toLocaleDateString()}`
     } else if (timeFrame === "month") {
       return currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    } else if (timeFrame === "year") {
+      return currentDate.getFullYear().toString()
     }
     return ""
   }
@@ -262,6 +277,7 @@ const RoomReserv = () => {
           <option value="day">Day</option>
           <option value="week">Week</option>
           <option value="month">Month</option>
+          <option value="year">Year</option>
         </select>
 
         <div className="flex justify-center items-center gap-2 border border-grey rounded">

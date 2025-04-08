@@ -66,6 +66,8 @@ const filterDataByTimeFrame = (data, selectedTimeFrame, currentDate) => {
       return isInCurrentWeek(entryDate, currentDate)
     } else if (selectedTimeFrame === "month") {
       return isSameMonth(entryDate, currentDate)
+    } else if (selectedTimeFrame === "year") {
+      return entryDate.getFullYear() === currentDate.getFullYear()
     }
     return true
   })
@@ -129,6 +131,12 @@ const generateChartData = (data, selectedTimeFrame, currentDate) => {
       if (selectedTimeFrame === "day") {
         return Number.parseInt(a) - Number.parseInt(b)
       }
+      if (selectedTimeFrame === "year") {
+        // For year view, sort by month (Jan-Dec)
+        const monthA = new Date(new Date().getFullYear(), getMonthIndex(a), 1)
+        const monthB = new Date(new Date().getFullYear(), getMonthIndex(b), 1)
+        return monthA - monthB
+      }
       return 0
     })
     .map((key) => ({
@@ -136,6 +144,12 @@ const generateChartData = (data, selectedTimeFrame, currentDate) => {
       borrowed: chartData[key].borrowed,
       returned: chartData[key].returned,
     }))
+}
+
+// Helper function to get month index from month name
+const getMonthIndex = (monthName) => {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  return months.findIndex((month) => monthName.includes(month))
 }
 
 const isSameDay = (date1, date2) => {
@@ -187,6 +201,13 @@ const getTimeLabels = (selectedTimeFrame, currentDate = new Date()) => {
       const date = new Date(year, month, day)
       labels.push(date.toLocaleDateString())
     }
+  } else if (selectedTimeFrame === "year") {
+    const year = currentDate.getFullYear()
+
+    for (let month = 0; month < 12; month++) {
+      const date = new Date(year, month, 1)
+      labels.push(date.toLocaleDateString("en-US", { month: "short" }))
+    }
   }
 
   return labels
@@ -205,6 +226,8 @@ const formatTimeLabel = (date, selectedTimeFrame) => {
     return `${date.getHours()}:00`
   } else if (selectedTimeFrame === "week" || selectedTimeFrame === "month") {
     return date.toLocaleDateString()
+  } else if (selectedTimeFrame === "year") {
+    return date.toLocaleDateString("en-US", { month: "short" })
   }
   return ""
 }
