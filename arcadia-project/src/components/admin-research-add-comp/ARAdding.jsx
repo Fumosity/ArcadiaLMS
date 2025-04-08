@@ -78,7 +78,7 @@ const ARAdding = ({ formData, setFormData }) => {
   //Handles the submission to the database
   const handleSubmit = async () => {
 
-    const requiredFields = ["title", "author", "college", "department", "abstract", "keyword", "pubDate", "location", "researchID", "researchCallNum",];
+    const requiredFields = ["title", "author", "college", "department", "abstract", "keywords", "pubDate", "location", "researchID", "researchCallNum",];
 
     // Ensure formData is fully updated
     const updatedFormData = { ...formData }; // Capture current formData
@@ -90,12 +90,6 @@ const ARAdding = ({ formData, setFormData }) => {
     );
     if (missingFields.length > 0) {
       alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
-      return;
-    }
-
-    const arcIdRegex = /^LPUCAV\d{6}$/;
-    if (!arcIdRegex.test(formData.researchCallNum)) {
-      alert("ARC ID must follow the format (e.g., LPUCAV012345).");
       return;
     }
 
@@ -139,7 +133,7 @@ const ARAdding = ({ formData, setFormData }) => {
       images: imageUrls.join(', '),
     }));
 
-    await addResearch({ ...formData, pdf: pdfUrls.join(', '), images: imageUrls.join(', '), pages: formData.pages });
+    await addResearch({ ...formData, pdf: pdfUrls.join(', '), images: imageUrls.join(', ') });
 
     setFormData({
       researchID: '',
@@ -154,7 +148,6 @@ const ARAdding = ({ formData, setFormData }) => {
       pubDate: '',
       pdf: '',
       images: '',
-      pages: ''
     });
 
     setUploadedFiles([]);
@@ -222,9 +215,11 @@ const ARAdding = ({ formData, setFormData }) => {
                       </select>
                     </div>
                   </div>
-                  {formData.college === "COECSA" && (
+                  {formData.college === "COECSA" || formData.college === "IS" ? (
                     <div className="flex justify-between items-center">
-                      <label className="w-1/4">Department:</label>
+                      <label className="w-1/4">
+                        {formData.college === "COECSA" ? "Department:" : "Grade Level:"}
+                      </label>
                       <div className="select-dropdown-wrapper w-2/3">
                         <select
                           name="department"
@@ -232,7 +227,9 @@ const ARAdding = ({ formData, setFormData }) => {
                           value={formData.department}
                           onChange={handleChange}
                         >
-                          <option value="">Select a department</option>
+                          <option value="">
+                            {formData.college === "COECSA" ? "Select a department" : "Select level"}
+                          </option>
                           {departmentOptions.map((department) => (
                             <option key={department} value={department}>
                               {department}
@@ -241,34 +238,10 @@ const ARAdding = ({ formData, setFormData }) => {
                         </select>
                       </div>
                     </div>
-                  )}
-                  {formData.college === "IS" && (
-                    <div className="flex justify-between items-center">
-                      <label className="w-1/4">Grade Level:</label>
-                      <div className="select-dropdown-wrapper w-2/3">
-                        <select
-                          name="department"
-                          className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
-                          value={formData.department}
-                          onChange={handleChange}
-                        >
-                          <option value="">Select level</option>
-                          {departmentOptions.map((department) => (
-                            <option key={department} value={department}>
-                              {department}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  )}
-                  <div className="flex justify-between items-center">
-                    <label className="w-1/4">Pages:</label>
-                    <input type="number" name="pages" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.pages} onChange={handleChange} min="0" placeholder="No. of pages" required />
-                  </div>
+                  ) : null}
                   <div className="flex justify-between items-center">
                     <label className="w-1/4">Keywords:</label>
-                    <input type="text" name="keyword" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.keyword} onChange={handleChange} placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
+                    <input type="text" name="keywords" className="w-2/3 px-3 py-1 rounded-full border border-grey" value={formData.keywords} onChange={handleChange} placeholder="Keyword 1; Keyword 2; Keyword 3;..." required />
                   </div>
                   <div className="flex justify-between items-center">
                     <label className="w-1/4">Date Published:</label>

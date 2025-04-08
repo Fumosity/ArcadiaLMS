@@ -8,6 +8,7 @@ import jwt
 import os
 import traceback
 from email.message import EmailMessage
+import json 
 
 # Load environment variables
 load_dotenv()
@@ -17,6 +18,11 @@ router = APIRouter()
 JWT_SECRET = os.getenv("JWT_SECRET")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
+
+with open("config.json", "r") as f:
+    config = json.load(f)
+    
+FRONTEND_URL = os.getenv("FRONTEND_URL", config["BASE_URL"])
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -37,8 +43,8 @@ def verify_token(token: str) -> dict:
     return jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
 
 # Send email function
-def send_verification_email(to_email: str, first_name: str, token: str, ipAddress: str):
-    link = f"{ipAddress}/auth-complete?token={token}"
+def send_verification_email(to_email: str, first_name: str, token: str):
+    link = f"{FRONTEND_URL}/auth-complete?token={token}"
     msg = EmailMessage()
     msg.set_content(f"Hello, {first_name}. Verify your account here: {link}")
     msg["Subject"] = "Account Verification"
@@ -57,12 +63,11 @@ async def send_email(payload: EmailRequest):
 
     token = generate_token({
         "email": payload.email,
-        "lpuID": payload.lpuID,
-        "ipAddress": payload.ipAddress
+        "lpuID": payload.lpuID
     })
 
     try:
-        send_verification_email(payload.email, payload.firstName, token, payload.ipAddress)
+        send_verification_email(payload.email, payload.firstName, token)
         return {"message": "Email sent successfully."}
     except Exception as e:
         print("Email error:", e)

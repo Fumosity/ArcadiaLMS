@@ -28,6 +28,9 @@ const ABModify = () => {
     titleID: queryParams.get("titleID") || '',
   };
 
+  const titleID = queryParams.get("titleID")
+  console.log(titleID)
+
   const [formDataState, setFormData] = useState(formData);
 
   return (
@@ -41,6 +44,12 @@ const ABModify = () => {
               onClick={() => navigate("/admin/bookmanagement")}
             >
               Return to Book Inventory
+            </button>
+            <button
+              className="add-book w-1/2 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+              onClick={() => navigate(`/admin/abviewer?titleID=${encodeURIComponent(titleID)}`)}
+            >
+              Return to Book Viewer
             </button>
           </div>
           <BookModify formData={formDataState} setFormData={setFormData} />

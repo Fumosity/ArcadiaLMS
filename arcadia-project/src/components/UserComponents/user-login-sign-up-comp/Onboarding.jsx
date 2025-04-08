@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../../../supabaseClient.js"
 import { useUser } from "../../../backend/UserContext.jsx"
-import { API_URL, BASE_URL } from "../../../api.js"
+import { API_URL } from "../../../api.js"
 import { toast } from "react-toastify"
 
 export default function Onboarding({ userData, selectedGenres }) {
@@ -59,17 +59,15 @@ export default function Onboarding({ userData, selectedGenres }) {
 
             const newUserID = userInsertData[0].userID
             console.log("New userID:", newUserID)
-            console.log("BASE_URL", BASE_URL)
 
             // Send verification email - use API_URL to ensure correct endpoint
-            const response = await fetch(`${BASE_URL}/send-email`, {
+            const response = await fetch(`${API_URL}/send-email`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     email: userData.email + userData.emailSuffix,
                     firstName: userData.firstName,
                     lpuID: userData.studentNumber,
-                    ipAddress: BASE_URL
                 }),
             })
 

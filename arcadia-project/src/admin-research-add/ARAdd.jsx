@@ -22,7 +22,6 @@ const ARAdd = () => {
     location: '2nd Floor, Circulation Section',
     researchCallNum: '',
     pubDate: '',
-    pages: 0,
     pdf: ''
   })
 

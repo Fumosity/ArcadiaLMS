@@ -120,7 +120,7 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
       title: groupedData["title"] ? groupedData["title"].join(" ") : "",
       abstract: groupedData["abstract"] ? groupedData["abstract"].join(" ") : "",
       author: groupedData["author"] ? groupedData["author"].join(", ") : "",
-      keyword: groupedData["keyword"] ? groupedData["keyword"].join(", ") : "",
+      keywords: groupedData["keywords"] ? groupedData["keywords"].join(", ") : "",
       pubDate: formattedPubDate, // Now correctly formatted
       department: groupedData["department"] ? groupedData["department"].join(", ") : "",
       college: groupedData["college"] ? groupedData["college"].join(", ") : "",
@@ -151,7 +151,7 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
             <h1 className="text-xl font-semibold text-gray-900">Upload Research</h1>
             <div className="flex flex-col mt-4">
               {isUploading ? (
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-center justify-center space-x-2 pt-32">
                   <div className="loader"></div>
                   <span>Uploading...</span>
                 </div>
@@ -175,7 +175,7 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
                   <div className="mb-4">
                     <p className="text-gray-800">
                       Upload research pages for autofill. The uploaded pages should
-                      include the following: Title Page, Abstract, keyword.
+                      include the following: Title Page, Abstract, keywords.
                       <br /><br />
                       Accepted formats: PDF, PNG, JPEG
                     </p>
@@ -188,7 +188,13 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
                     <label className="text-gray-800">Files uploaded:</label>
                     <input type="text" value={uploadedFiles.length > 0 ? uploadedFiles.map(file => file.name).join(', ') : 'No files uploaded'} readOnly className="w-full p-2 border border-grey rounded-full" />
                     <div className='flex flex-col items-center justify-center space-y-2 mt-2'>
-                      <button onClick={handleUpload} className="penBtn">Upload</button>
+                      <button
+                        onClick={handleUpload}
+                        disabled={uploadedFiles.length === 0}
+                        className={`penBtn px-2.5 py-1 rounded-full ${uploadedFiles.length === 0 ? 'bg-grey cursor-not-allowed text-dark-gray border border-dark-gray' : 'bg-arcadia-red text-white hover:bg-red focus:outline-none focus:ring-2 focus:ring-arcadia-red focus:ring-offset-2'}`}
+                      >
+                        Upload
+                      </button>
                       <button onClick={handleCancel} className="cancelModify">Close Window</button>
                     </div>
                   </div>
@@ -247,7 +253,7 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
                               <option value="college">College</option>
                               <option value="department">Department</option>
                               <option value="abstract">Abstract</option>
-                              <option value="keyword">Keyword</option>
+                              <option value="keywords">Keyword/s</option>
                               <option value="pubDate">Pub. Date</option>
                               <option value="skip">Skip</option>
                             </select>

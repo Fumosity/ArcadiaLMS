@@ -20,6 +20,10 @@ export default function Pathfinder({ book }) {
         "4th Floor, Highschool and Multimedia Section": { w: 27, h: 7 },
     }
 
+    if (!locations[book.location]) {
+        return <p>Pathfinding is not available.</p>;
+    }
+
     const obstacleLoc = {
         "2nd Floor, Circulation Section": [
             { x: 23, y: 18 },
