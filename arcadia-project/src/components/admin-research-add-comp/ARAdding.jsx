@@ -190,11 +190,11 @@ const ARAdding = ({ formData, setFormData }) => {
         setFormData({
           researchID: "",
           title: "",
-          author: "", // Changed from [] to ""
+          author: [],
           college: "",
           department: "",
           abstract: "",
-          keywords: "", // Changed from [] to ""
+          keywords: [],
           location: "",
           researchCallNum: "",
           pubDate: "",
