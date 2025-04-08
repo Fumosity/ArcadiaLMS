@@ -258,13 +258,13 @@ export default function Pathfinder({ book }) {
         const cleanedCallNo = callNo.trim();
     
         if (/^[A-Z]{1,3}\s?\d+/.test(cleanedCallNo)) {
-            console.log(callNo, "is LoC");
+            //console.log(callNo, "is LoC");
             return "LoC";
         } else if (/^\d{3}(\.\d+)?/.test(cleanedCallNo)) {
-            console.log(callNo, "is DDC");
+            //console.log(callNo, "is DDC");
             return "DDC";
         }
-        console.log(callNo, "is unknown");
+        //console.log(callNo, "is unknown");
         return "Unknown";
     }    
 
@@ -293,7 +293,7 @@ export default function Pathfinder({ book }) {
         const normFrom = normalize(from);
         const normTo = normalize(to);
 
-        console.log(normCall, normFrom, normTo)
+        //console.log(normCall, normFrom, normTo)
     
         return normFrom <= normCall && normCall <= normTo;
     }
