@@ -211,7 +211,7 @@ export default function Pathfinder({ book }) {
         }
     
         if (!isHighschoolSection && classificationType !== "LoC") {
-            setPathfindingError("This section only supports Dewey Decimal classified books. Please contact the help desk if you see this error.");
+            setPathfindingError("This section only supports Library of Congress classified books. Please contact the help desk if you see this error.");
             return;
         }
     
