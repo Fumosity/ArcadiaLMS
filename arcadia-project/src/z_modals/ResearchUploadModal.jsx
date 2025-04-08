@@ -8,6 +8,92 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
   const [uploadComplete, setUploadComplete] = useState(false);
   const [extractedChunks, setExtractedChunks] = useState([]);
 
+  function properCase(name) {
+    const lowerCaseWords = new Set([
+      "a", "an", "and", "but", "or", "for", "nor", "so", "the", "to", "up", "in", "on",
+      "at", "by", "with", "as", "of", "from", "about", "between", "during", "into",
+      "through", "over", "under", "within", "is", "are", "was", "were", "be", "been", "being"
+    ]);
+
+    // Split the string into two parts: before the colon and after the colon
+    const [beforeColon, afterColon] = name.split(":");
+
+    // Function to apply proper case to a string
+    function applyProperCase(str) {
+      const words = str.split(" ");
+
+      for (let i = 0; i < words.length; i++) {
+        let word = words[i];
+
+        // Handle names like McDonald, O'Neil
+        if (/^(Mc|Mac)[A-Za-z]+$/.test(word)) {
+          words[i] = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+          continue;
+        }
+
+        if (/^O'[A-Za-z]+$/.test(word)) {
+          words[i] = "O'" + word.slice(2, 3).toUpperCase() + word.slice(3).toLowerCase();
+          continue;
+        }
+
+        // Capitalize the first word and all other words that aren't in lowercase words
+        if (i === 0 || !lowerCaseWords.has(word.toLowerCase())) {
+          words[i] = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        } else {
+          words[i] = word.toLowerCase();
+        }
+      }
+
+      // Special handling for hyphenated words like "Eco-Innovation"
+      return words.join(" ").replace(/\b([A-Za-z]+-[A-Za-z]+)\b/g, (match) => {
+        return match.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join("-");
+      });
+    }
+
+    // Apply formatting to the part after the colon, if any
+    const formattedBeforeColon = beforeColon.trim();  // Keep before colon as is
+    const formattedAfterColon = afterColon ? applyProperCase(afterColon.trim()) : "";
+
+    // Return the properly formatted string
+    return formattedBeforeColon + (formattedAfterColon ? ": " + formattedAfterColon : "");
+  }
+
+  function formatAuthors(authorsText) {
+    // Remove unwanted symbols but keep letters, spaces, periods, and hyphens
+    authorsText = authorsText.replace(/[^\w\s\.\-]/g, " "); // Convert unwanted chars to spaces
+    authorsText = authorsText.replace(/\s+/g, " ").trim(); // Normalize spaces
+
+    // Split potential author names
+    const words = authorsText.split(" ");
+    const formattedAuthors = [];
+    let currentAuthor = [];
+
+    // Process names properly
+    for (let i = 0; i < words.length; i++) {
+      currentAuthor.push(words[i]);
+
+      // Detect name endings (e.g., "V.", "Jr.", "III")
+      if (i > 0 && (/^[A-Z]\.$/.test(words[i - 1]) || /^(Jr|Sr|II|III|IV|V)\.?$/i.test(words[i]))) {
+        formattedAuthors.push(currentAuthor.join(" ").trim());
+        currentAuthor = [];
+      }
+    }
+
+    if (currentAuthor.length > 0) {
+      formattedAuthors.push(currentAuthor.join(" ").trim());
+    }
+
+    // Proper case formatting (capitalize first letter of each word, except suffixes)
+    function properCase(name) {
+      const nameParts = name.split(" ");
+      return nameParts
+        .map(part => /^(Jr|Sr|II|III|IV|V)\.?$/i.test(part) ? part : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(" ");
+    }
+
+    return formattedAuthors.map(author => properCase(author)).join("; ");
+  }
+
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
     const validFiles = files.filter(file =>
@@ -34,11 +120,22 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
 
       console.log("Backend response:", response.data);
 
-      // Fix: Ensure correct classification state update
-      const extractedChunks = response.data.chunks.map(chunk => ({
-        ...chunk,
-        Classification: chunk.Classification || "skip", // Default to "skip" if empty
-      }));
+      const extractedChunks = response.data.chunks.map(chunk => {
+        // Apply proper case for title and author fields
+        if (chunk.Classification === "title") {
+          chunk.Preprocessed_Text = properCase(chunk.Preprocessed_Text);
+        } else if (chunk.Classification === "authors") {
+          chunk.Preprocessed_Text = formatAuthors(chunk.Preprocessed_Text);
+        } else if (chunk.Classification === "keywords") {
+          chunk.Preprocessed_Text = chunk.Preprocessed_Text.replace(/\b(keywords?|key words?)\b.*?(?:—|:)?\s*/i, '').trim();
+          chunk.Preprocessed_Text = properCase(chunk.Preprocessed_Text);
+        }
+
+        return {
+          ...chunk,
+          Classification: chunk.Classification || "skip", // Default to "skip" if empty
+        };
+      });
 
       console.log(extractedChunks)
 
