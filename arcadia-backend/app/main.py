@@ -427,38 +427,42 @@ def classify_text_chunks(preprocessed_text, original_text, pipeline):
             if "academy" in chunk.lower() or "college" in chunk.lower() or "school" in chunk.lower():
                 predicted_section = "college"
 
-        print(f"\n=== CHUNK ===\n{original_chunk}\n=> Classified as: {predicted_section}\n")
+        # === Postprocessing per chunk ===
+        processed_text = original_chunk
+        if predicted_section == "authors":
+            processed_text = format_authors(processed_text)
+        elif predicted_section == "college":
+            processed_text = replace_college_names(processed_text)
+        elif predicted_section == "pubDate":
+            processed_text = convert_date(processed_text)
+        elif predicted_section == "title":
+            processed_text = proper_case(processed_text)
+        elif predicted_section == "keywords":
+            processed_text = re.sub(r'\b(keywords?|key words?)\b.*?(?:—|:)?\s*', '', processed_text, flags=re.IGNORECASE).strip()
+
+        print(f"\n=== CHUNK ===\n{original_chunk}\n=> Classified as: {predicted_section}")
+        print(f"Postprocessed: {processed_text}\n")
 
         # Store classified chunk
         classified_chunks.append({
             "Preprocessed_Text": chunk,
             "Original_Text": original_chunk,
             "Classification": predicted_section
-        }) 
+        })
 
-        # Append text to section
-        classified_sections[predicted_section] += original_chunk + " "
+        # Append cleaned text to classified section
+        classified_sections[predicted_section] += processed_text + " "
 
-    # Post-processing
-    title = classified_sections.get('title', "").strip()
-    authors = classified_sections.get('authors', "").strip()
-    college = classified_sections.get('college', "").strip()
-    abstract = classified_sections.get('abstract', "").strip()
-    keywords = classified_sections.get('keywords', "").strip()
-    pubdate = classified_sections.get('pubDate', "").strip()
-
-    # Additional Post-processing Steps
-    keywords_pattern = re.compile(r'\b(keywords?|key words?)\b', re.IGNORECASE)
-    if keywords_pattern.search(title):
-        title, keywords = keywords, title
-
-    keywords = re.sub(r'\b(keywords?|key words?)\b.*?(?:—|:)?\s*', '', keywords, flags=re.IGNORECASE).strip()
-    authors = format_authors(authors)
-    college = replace_college_names(college)
-    pubdate = convert_date(pubdate)
-    title = proper_case(title)
-
-    return title, authors, college, abstract, keywords, pubdate, classified_chunks
+    # Final cleanup
+    return (
+        classified_sections['title'].strip(),
+        classified_sections['authors'].strip(),
+        classified_sections['college'].strip(),
+        classified_sections['abstract'].strip(),
+        classified_sections['keywords'].strip(),
+        classified_sections['pubDate'].strip(),
+        classified_chunks
+    )
 
 # Load the trained model
 pipeline = joblib.load("app/text_classifier_svm.pkl")
