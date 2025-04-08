@@ -37,7 +37,14 @@ export default function LoginForm() {
 
       const passwordMatches = bcrypt.compareSync(password, loginData.userPassword)
       if (!passwordMatches) {
-        alert("Incorrect email or password. Please try again.")
+        toast.error("Incorrect email or password. Please try again.", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        })
         return
       }
 

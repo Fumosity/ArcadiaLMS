@@ -41,14 +41,14 @@ export const fetchBookCirculationData = async () => {
   }
 }
 
-export const processData = (data, selectedTimeFrame) => {
-  const filteredTableData = filterDataByTimeFrame(data, selectedTimeFrame)
-  const chartData = generateChartData(data, selectedTimeFrame)
+export const processData = (data, selectedTimeFrame, currentDate = new Date()) => {
+  const filteredTableData = filterDataByTimeFrame(data, selectedTimeFrame, currentDate)
+  const chartData = generateChartData(data, selectedTimeFrame, currentDate)
   return { filteredTableData, chartData }
 }
 
-const filterDataByTimeFrame = (data, selectedTimeFrame) => {
-  const currentDate = new Date()
+const filterDataByTimeFrame = (data, selectedTimeFrame, currentDate) => {
+  currentDate = new Date(currentDate)
   currentDate.setHours(0, 0, 0, 0) // Set to start of day
 
   return data.filter((entry) => {
@@ -71,8 +71,8 @@ const filterDataByTimeFrame = (data, selectedTimeFrame) => {
   })
 }
 
-const generateChartData = (data, selectedTimeFrame) => {
-  const timeLabels = getTimeLabels(selectedTimeFrame)
+const generateChartData = (data, selectedTimeFrame, currentDate) => {
+  const timeLabels = getTimeLabels(selectedTimeFrame, currentDate)
   const chartData = initializeChartData(timeLabels)
 
   // Create a map to track borrowed books with their original borrow dates
@@ -162,8 +162,7 @@ const isSameMonth = (date1, date2) => {
   return date1.getMonth() === date2.getMonth() && date1.getFullYear() === date2.getFullYear()
 }
 
-const getTimeLabels = (selectedTimeFrame) => {
-  const currentDate = new Date()
+const getTimeLabels = (selectedTimeFrame, currentDate = new Date()) => {
   const labels = []
 
   if (selectedTimeFrame === "day") {
@@ -209,4 +208,3 @@ const formatTimeLabel = (date, selectedTimeFrame) => {
   }
   return ""
 }
-
