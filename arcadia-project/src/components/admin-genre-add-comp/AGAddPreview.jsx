@@ -40,7 +40,9 @@ const AGAddPreview = ({ formData }) => {
                   <td className="px-1 py-1 font-semibold capitalize">
                     {key === "genreName" ? ["Genre"] : key.replace(/([A-Z])/g, " $1")}:
                   </td>
-                  <td className="px-1 py-1 text-sm w-full text-right">{value}</td>
+                  <td className={`px-1 py-1 text-sm w-full text-right ${key === "description" ? "text-justify" : ""}`}>
+                    {value}
+                  </td>
                 </tr>
               ))}
           </tbody>
@@ -51,4 +53,3 @@ const AGAddPreview = ({ formData }) => {
 }
 
 export default AGAddPreview
-

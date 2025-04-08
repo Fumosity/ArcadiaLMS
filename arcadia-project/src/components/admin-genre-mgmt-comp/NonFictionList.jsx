@@ -71,7 +71,7 @@ export default function NonFictionList({onGenreSelect}) {
     };
 
     return (
-        <div className="bg-white p-4 rounded-lg border-grey border w-full">
+        <div className="bg-white p-4 rounded-lg border-grey border w-full min-w-min">
             <h3 className="text-2xl font-semibold mb-4">Non-fiction Genres</h3>
             <div className="max-h-96 overflow-y-auto border border-x-0 border-dark-gray custom-scrollbar">
                 {isLoading ? (
