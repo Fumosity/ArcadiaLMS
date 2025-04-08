@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { supabase } from "../../supabaseClient"
 import { useNavigate } from "react-router-dom"
 
 const RoomReserv = () => {
   const [timeFrame, setTimeFrame] = useState("month")
+  const [currentDate, setCurrentDate] = useState(new Date())
   const [reservations, setReservations] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -129,31 +130,40 @@ const RoomReserv = () => {
     fetchReservations()
   }, [])
 
-  const filterDataByTimeFrame = () => {
-    const today = new Date()
+  const filterDataByTimeFrame = useCallback(() => {
+    const date = new Date(currentDate)
     const filtered = [...reservations]
 
     if (timeFrame === "day") {
       return filtered.filter((res) => {
         const resDate = new Date(res.date)
-        return resDate.toDateString() === today.toDateString()
+        return resDate.toDateString() === date.toDateString()
       })
     } else if (timeFrame === "week") {
-      const weekStart = new Date(today)
-      weekStart.setDate(today.getDate() - today.getDay())
+      const weekStart = new Date(date)
+      weekStart.setDate(date.getDate() - date.getDay())
+      weekStart.setHours(0, 0, 0, 0)
+
+      const weekEnd = new Date(weekStart)
+      weekEnd.setDate(weekStart.getDate() + 6)
+      weekEnd.setHours(23, 59, 59, 999)
+
       return filtered.filter((res) => {
         const resDate = new Date(res.date)
-        return resDate >= weekStart
+        return resDate >= weekStart && resDate <= weekEnd
       })
     } else {
       // month
-      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+      const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
+      const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+      monthEnd.setHours(23, 59, 59, 999)
+
       return filtered.filter((res) => {
         const resDate = new Date(res.date)
-        return resDate >= monthStart
+        return resDate >= monthStart && resDate <= monthEnd
       })
     }
-  }
+  }, [reservations, timeFrame, currentDate])
 
   // Process data for the chart
   const chartData = useMemo(() => {
@@ -187,17 +197,59 @@ const RoomReserv = () => {
     chartArray.sort((a, b) => new Date(a.date) - new Date(b.date))
 
     return chartArray
-  }, [reservations, timeFrame])
+  }, [filterDataByTimeFrame])
+
+  const navigatePrevious = () => {
+    const newDate = new Date(currentDate)
+    if (timeFrame === "day") {
+      newDate.setDate(newDate.getDate() - 1)
+    } else if (timeFrame === "week") {
+      newDate.setDate(newDate.getDate() - 7)
+    } else if (timeFrame === "month") {
+      newDate.setMonth(newDate.getMonth() - 1)
+    }
+    setCurrentDate(newDate)
+  }
+
+  const navigateNext = () => {
+    const newDate = new Date(currentDate)
+    if (timeFrame === "day") {
+      newDate.setDate(newDate.getDate() + 1)
+    } else if (timeFrame === "week") {
+      newDate.setDate(newDate.getDate() + 7)
+    } else if (timeFrame === "month") {
+      newDate.setMonth(newDate.getMonth() + 1)
+    }
+    setCurrentDate(newDate)
+  }
+
+  const formatDateRange = () => {
+    if (timeFrame === "day") {
+      return currentDate.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    } else if (timeFrame === "week") {
+      const startOfWeek = new Date(currentDate)
+      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay())
+
+      const endOfWeek = new Date(startOfWeek)
+      endOfWeek.setDate(startOfWeek.getDate() + 6)
+
+      return `${startOfWeek.toLocaleDateString()} - ${endOfWeek.toLocaleDateString()}`
+    } else if (timeFrame === "month") {
+      return currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    }
+    return ""
+  }
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
       <h3 className="text-2xl font-semibold mb-4">Room Reservation Data</h3>
 
-      {/* Time Frame Selector */}
-      <div className="mb-4">
-        <label htmlFor="time-frame" className="mr-2">
-          Select Time Frame:
-        </label>
+      {/* Time Frame Selector with Date Navigation */}
+      <div className="flex items-center justify-start gap-2 mb-6">
         <select
           id="time-frame"
           onChange={(e) => {
@@ -205,12 +257,22 @@ const RoomReserv = () => {
             // The chartData will automatically update due to the dependency in useMemo
           }}
           value={timeFrame}
-          className="border border-grey rounded-md py-1 px-2"
+          className="bg-white p-2 border border-grey rounded-md"
         >
           <option value="day">Day</option>
           <option value="week">Week</option>
           <option value="month">Month</option>
         </select>
+
+        <div className="flex justify-center items-center gap-2 border border-grey rounded">
+          <button onClick={navigatePrevious} className="p-2 hover:bg-grey">
+            &lt;
+          </button>
+          <span className="font-medium">{formatDateRange()}</span>
+          <button onClick={navigateNext} className="p-2 hover:bg-grey">
+            &gt;
+          </button>
+        </div>
       </div>
 
       {/* Stacked Bar Chart for Room Reservations */}
