@@ -17,7 +17,7 @@ router = APIRouter()
 JWT_SECRET = os.getenv("JWT_SECRET")
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://13.212.180.191")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://54.254.171.62")
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
