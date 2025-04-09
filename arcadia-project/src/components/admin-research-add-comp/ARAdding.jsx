@@ -287,7 +287,7 @@ const ARAdding = ({ formData, setFormData }) => {
                     />
                   </div>
                   <div className="flex justify-between items-center">
-                    <label className="w-1/4">College:</label>
+                    <label className="w-1/4">Program:</label>
                     <div className="select-dropdown-wrapper w-2/3">
                       <select
                         name="college"
@@ -299,7 +299,7 @@ const ARAdding = ({ formData, setFormData }) => {
                           updateDepartmentOptions(e.target.value)
                         }}
                       >
-                        <option value="">Select a college</option>
+                        <option value="">Select a program</option>
                         {Object.keys(collegeDepartmentMap).map((college) => (
                           <option key={college} value={college}>
                             {college}

@@ -301,6 +301,7 @@ const BCHistory = () => {
                     <Link
                       to={`/admin/abviewer?titleID=${encodeURIComponent(book.titleID)}`}
                       className="text-blue-600 hover:underline"
+                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                     >
                       {truncateTitle(book.bookTitle)}
                     </Link>

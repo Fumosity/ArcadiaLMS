@@ -112,14 +112,9 @@ const UFooter = () => {
                                 </li> */}
                                 <li>
                                     <Link 
-                                        to="/user/reservations#room-reservs" 
+                                        to="/user/reservations" 
                                         className="hover:text-white transition block"
-                                        onClick={() => {
-                                            setTimeout(() => {
-                                                const element = document.getElementById("room-reservs");
-                                                element?.scrollIntoView({ behavior: "smooth" });
-                                            }, 100);
-                                        }}
+                                        onClick={handleLinkClick}
                                     >
                                         View Reservation Schedule
                                     </Link>

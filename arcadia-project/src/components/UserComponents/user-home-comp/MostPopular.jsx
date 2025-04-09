@@ -83,7 +83,7 @@ export const fetchMostPopularBooks = async () => {
             return {
                 ...book,
                 weightedAvg: avgRating,
-                totalRatings: ratingMap[titleID]?.count,
+                totalRatings: ratingMap[titleID]?.count || 0,
                 genres: genreMap[titleID]?.genres || [],
                 category: genreMap[titleID]?.category || "Unknown",
             };

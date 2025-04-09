@@ -77,19 +77,40 @@ const ModifySchedule = ({ isOpen, onClose, event, onModify, onDelete }) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     if (startDate < today) {
-      toast.warning("Cannot create events for past dates")
+      toast.warning("Cannot create events for past dates", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
       return
     }
 
     // If it's today, check the time isn't in the past
     if (moment(startDate).isSame(moment(), "day") && isPastDateTime(startDate, startTime)) {
-      toast.warning("Cannot create events in the past for today")
+      toast.warning("Cannot create events in the past for today", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
       return
     }
 
     // Validate that end time is not before start time
     if (!isMultiDay && moment(`2000-01-01 ${endTime}`).isBefore(moment(`2000-01-01 ${startTime}`))) {
-      toast.warning("End time cannot be before start time")
+      toast.warning("End time cannot be before start time", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
       return
     }
 
@@ -180,7 +201,14 @@ const ModifySchedule = ({ isOpen, onClose, event, onModify, onDelete }) => {
                     // Only validate time if it's today
                     if (moment(startDate).isSame(moment(), "day")) {
                       if (isPastDateTime(startDate, newTime)) {
-                        toast.warning("Cannot select a time in the past for today")
+                        toast.warning("Cannot select a time in the past for today", {
+                          position: "bottom-right",
+                          autoClose: 2000,
+                          hideProgressBar: false,
+                          closeOnClick: true,
+                          pauseOnHover: false,
+                          draggable: false,
+                        })
                         return
                       }
                     }

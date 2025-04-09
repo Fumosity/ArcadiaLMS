@@ -302,7 +302,14 @@ const CheckingContainer = () => {
               bookTitle: titleData.title,
               bookBarcode: "", // No available copy
             }))
-            toast.error("No available copies of this book found.")
+            toast.error("No available copies of this book found.", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+            })
           }
         }
       }
@@ -368,7 +375,14 @@ const CheckingContainer = () => {
     if (Object.keys(emptyFields).length > 0) {
       setEmptyFields(emptyFields) // Set empty fields state
       console.log(emptyFields)
-      toast.error("Please fill in all required fields.")
+      toast.error("Please fill in all required fields.", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      })
       return // Prevent form submission if any required field is empty
     }
 

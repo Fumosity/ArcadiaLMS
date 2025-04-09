@@ -330,7 +330,7 @@ const UBkResults = ({ query }) => {
                   <span className="font-semibold">Category:</span> {book.category}{" "}
                   <span className="font-semibold">Genres:</span> {book.genres.join(", ")}
                 </p>
-                <p className="min-h-[6rem] leading-relaxed">
+                <p className="line-clamp-4 min-h-[6rem] leading-relaxed text-justify pr-2">
                   <span className="font-semibold"></span> {book.synopsis || "No synopsis available."}
                 </p>
 
@@ -342,7 +342,7 @@ const UBkResults = ({ query }) => {
                 </div>
                 <div className="justify-start space-x-2 w-1/2">
                   <button
-                    className="w-1/8 hover:bg-arcadia-red rounded-lg hover:text-white text-center text-sm px-2 py-1 bg-white text-arcadia-red border border-arcadia-red"
+                    className="w-1/4 hover:bg-arcadia-red rounded-lg hover:text-white text-center text-sm px-2 py-1 bg-white text-arcadia-red border border-arcadia-red"
                     onClick={() => {
                       window.scrollTo({ top: 0, behavior: "smooth" })
                       navigate(`/user/bookview?titleID=${book.titleID}`)

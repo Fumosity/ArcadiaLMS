@@ -82,8 +82,13 @@ const UpdateProfilePic = ({ isOpen, onClose }) => {
       // Successfully updated
       onClose();
       toast.success("Profile picture updated successfully!", {
-        autoClose: 2000, // 3 seconds
-    });
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      });
     } catch (err) {
       setErrorMessage(err.message);
       console.error("Error details:", err); // Added for debugging
