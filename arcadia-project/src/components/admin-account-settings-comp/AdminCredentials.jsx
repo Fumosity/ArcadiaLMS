@@ -27,6 +27,7 @@ export function AdminCredentials({ user = defaultUser }) {
         accountType: storedUser.userAccountType,
         // Use userPicture or fallback to placeholder
         photoUrl: storedUser.userPicture || "/placeholder.svg?height=100&width=100",
+        userCreationDate: storedUser.userCreationDate,
       })
     }
   }, [])
@@ -47,6 +48,20 @@ export function AdminCredentials({ user = defaultUser }) {
     }
 
     return id
+  }
+
+  // Format date to show only the date part (YYYY-MM-DD)
+  const formatDate = (dateString) => {
+    if (!dateString) return ""
+
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return "" // Invalid date
+
+      return date.toISOString().split("T")[0] // Get only YYYY-MM-DD part
+    } catch (error) {
+      return ""
+    }
   }
 
   return (
@@ -96,6 +111,9 @@ export function AdminCredentials({ user = defaultUser }) {
             <input type="text" value={currentUser.accountType} className="inputBox w-full" readOnly />
           </div>
         </div>
+      </div>
+      <div className="w-full flex justify-end">
+        <span className="text-xs text-dark-gray">Account Created at: {formatDate(currentUser.userCreationDate)}</span>
       </div>
     </div>
   )
