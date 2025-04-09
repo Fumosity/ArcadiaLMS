@@ -115,8 +115,6 @@ const UsrRegistration = () => {
       setCollege("COECSA")
       setDepartment("DCS")
       setEmail("")
-      setPassword("")
-      setConfirmPassword("")
       setErrorMessage("")
     } catch (error) {
       console.error("Error inserting data: ", error)
