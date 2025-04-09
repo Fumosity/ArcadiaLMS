@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+
 const defaultUser = {
   name: "Shiori Novella",
   schoolId: "2021-2-01080",
@@ -32,6 +33,7 @@ export function UserCredentials({ user = defaultUser }) {
         accountType: storedUser.userAccountType,
         photoUrl: storedUser.photoUrl || "/placeholder.svg?height=100&width=100",
         userPicture: storedUser.userPicture || "/placeholder.svg?height=100&width=100",
+        userCreationDate: storedUser.userCreationDate,
       })
     }
   }, [])
@@ -54,8 +56,22 @@ export function UserCredentials({ user = defaultUser }) {
     return id
   }
 
+  // Format date to show only the date part (YYYY-MM-DD)
+  const formatDate = (dateString) => {
+    if (!dateString) return ""
+
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return "" // Invalid date
+
+      return date.toISOString().split("T")[0] // Get only YYYY-MM-DD part
+    } catch (error) {
+      return ""
+    }
+  }
+
   return (
-    <div className="uMain-cont">
+    <div className="uMain-cont relative">
       {/* User Profile Section */}
       <div className="flex flex-col items-center mb-8">
         <div className="w-24 h-24 border border-grey rounded-full overflow-hidden mb-4">
@@ -100,7 +116,11 @@ export function UserCredentials({ user = defaultUser }) {
           </div>
         </div>
       </div>
+
+      {/* Account Creation Date - Positioned at bottom right */}
+      <div className="w-full flex justify-end">
+        <span className="text-xs text-dark-gray">Account Created at: {formatDate(currentUser.userCreationDate)}</span>
+      </div>
     </div>
   )
 }
-

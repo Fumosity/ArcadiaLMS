@@ -1,12 +1,9 @@
 import React from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
-import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import Title from "../../components/main-comp/Title";
-
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
 import UpEvents from "../../components/UserComponents/user-home-comp/UpEvents";
 import Services from "../../components/UserComponents/user-main-comp/Services";
-
 import { UserCredentials } from "../../components/UserComponents/user-account-comp/UserCredentials";
 import { UserInterests } from "../../components/UserComponents/user-account-comp/UserInterests";
 import { AccountSettings } from "../../components/UserComponents/user-account-comp/AccountSettings";
