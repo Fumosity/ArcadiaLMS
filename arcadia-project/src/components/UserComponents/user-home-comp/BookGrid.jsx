@@ -99,15 +99,16 @@ const BookGrid = ({ title, fetchBooks }) => {
                                 <p className="text-sm text-gray-500 mb-1 truncate">{formatAuthor(book.author)}</p>
                                 <p className="text-sm text-gray-400 mb-1 truncate">{book.category}</p>
                                 <p className="text-sm text-gray-500 mb-1 truncate">
-                                    {book.weightedAvg && (
+                                    {book.weightedAvg ? (
                                         <span className="flex items-center justify-start gap-1">
                                             {renderStars(book.weightedAvg)}
                                             <span className="text-xs text-gray-500">
                                                 ({book.totalRatings >= 1000 ? "1000+" : book.totalRatings})
                                             </span>
                                         </span>
-                                    )}
-                                    {!book.weightedAvg && "Rating not available"}
+                                    )
+                                    : 
+                                    "Rating not available"}
                                 </p>
                             </Link>
                         ))}
