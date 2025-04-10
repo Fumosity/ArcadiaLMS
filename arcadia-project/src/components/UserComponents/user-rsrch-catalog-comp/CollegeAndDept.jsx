@@ -15,23 +15,8 @@ export default function CollegeAndDept() {
       try {
         setLoading(true)
 
-        // Fetch unique colleges
-        const { data: collegeData, error: collegeError } = await supabase
-          .from("research")
-          .select("college")
-          .not("college", "is", null)
-
-        if (collegeError) {
-          console.error("Error fetching colleges:", collegeError)
-          return
-        }
-
-        // Extract unique colleges
-        const uniqueColleges = [...new Set(collegeData.map((item) => item.college))]
-          .filter((college) => college) // Remove empty values
-          .sort()
-
-        setColleges(uniqueColleges)
+        // No need to fetch colleges anymore as they are hardcoded
+        setColleges(["COECSA", "CLAE", "CITHM", "CAMS", "CBA", "LAW", "CFAD", "CON", "IS", "Graduate School"])
 
         // Fetch departments for the selected college
         await fetchDepartments(selectedCollege)
@@ -48,7 +33,6 @@ export default function CollegeAndDept() {
   // Fetch departments based on selected college
   const fetchDepartments = async (college) => {
     try {
-
       let query = supabase.from("research").select("department").not("department", "is", null)
 
       // If a college is selected (and not "All"), filter by that college
@@ -97,17 +81,16 @@ export default function CollegeAndDept() {
             onChange={(e) => setSelectedCollege(e.target.value)}
           >
             <option value="">All</option>
-            {loading ? (
-              <option value="" disabled>
-                Loading colleges...
-              </option>
-            ) : (
-              colleges.map((college) => (
-                <option key={college} value={college}>
-                  {college}
-                </option>
-              ))
-            )}
+            <option value="COECSA">COECSA</option>
+            <option value="CLAE">CLAE</option>
+            <option value="CITHM">CITHM</option>
+            <option value="CAMS">CAMS</option>
+            <option value="CBA">CBA</option>
+            <option value="LAW">LAW</option>
+            <option value="CFAD">CFAD</option>
+            <option value="CON">CON</option>
+            <option value="IS">IS</option>
+            <option value="Graduate School">Graduate School</option>
           </select>
 
           {/* Custom dropdown arrow */}
@@ -129,7 +112,7 @@ export default function CollegeAndDept() {
       </div>
 
       {/* Department Dropdown (Only Visible if the selected college is COECSA or IS) */}
-      {(selectedCollege === "COECSA") && (
+      {selectedCollege === "COECSA" && (
         <div className="mb-2">
           <label className="text-sm font-semibold block mb-1">Department:</label>
           <div className="relative w-full">
@@ -169,9 +152,8 @@ export default function CollegeAndDept() {
             </span>
           </div>
         </div>
-      )
-    }
-      {(selectedCollege === "IS") && (
+      )}
+      {selectedCollege === "IS" && (
         <div className="mb-2">
           <label className="text-sm font-semibold block mb-1">High School Level:</label>
           <div className="relative w-full">
@@ -211,9 +193,7 @@ export default function CollegeAndDept() {
             </span>
           </div>
         </div>
-      )
-
-      }
+      )}
     </div>
   )
 }

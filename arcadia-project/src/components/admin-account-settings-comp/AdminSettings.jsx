@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import { ChevronRight } from "lucide-react"
 import UpdateProfilePic from "../../z_modals/UpdateProfilePic" // Adjust the import path as needed
@@ -14,7 +16,7 @@ const settingsOptions = [
   {
     title: "Change Password",
     description: "Change your password through your registered email account.",
-    href: "/admin/useraccounts/viewusers"
+    href: "/admin/useraccounts/viewusers",
   },
   {
     title: "Update User Data",
@@ -44,7 +46,7 @@ export const AdminSettings = ({ options = settingsOptions }) => {
 
   const handleOptionClick = (option) => {
     if (option.action === "openModal") {
-      setIsModalOpen(true) // Open modal for updating profile photo
+      setIsModalOpen(true)
     } else if (option.href) {
       if (option.href === "/admin/useraccounts/viewusers") {
         // Navigate to AUAccView and pass the full user object and source
@@ -59,6 +61,8 @@ export const AdminSettings = ({ options = settingsOptions }) => {
         // Redirect to the provided link
         navigate(option.href)
       }
+      // Apply smooth scrolling for all navigation
+      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
 
@@ -81,4 +85,3 @@ export const AdminSettings = ({ options = settingsOptions }) => {
     </div>
   )
 }
-

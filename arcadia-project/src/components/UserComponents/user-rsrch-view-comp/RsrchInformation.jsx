@@ -50,7 +50,7 @@ export default function RsrchInformation({ research }) {
                             </p>
                         </span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-3">
+                    <p className="text-sm text-gray-600 mt-3 text-justify">
                         {research.abstract || "No abstract available"}
                     </p>
                 </div>

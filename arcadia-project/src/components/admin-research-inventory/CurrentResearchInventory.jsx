@@ -91,22 +91,31 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
       !searchTerm ||
       (typeof research.title === "string" && research.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (typeof research.college === "string" && research.college.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (typeof research.department === "string" && research.department.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (typeof research.department === "string" &&
+        research.department.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (typeof research.keywords === "string" && research.keywords.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (typeof research.author === "string" && research.author.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (Array.isArray(research.author) &&
-        research.author.some((author) => typeof author === "string" && author.toLowerCase().includes(searchTerm.toLowerCase())));
+        research.author.some(
+          (author) => typeof author === "string" && author.toLowerCase().includes(searchTerm.toLowerCase()),
+        ))
 
     // Filter by college type
     const matchesCollege =
-    collegeType === "All" ||
-    (research.college &&
-      research.college.toLowerCase().startsWith(collegeType.toLowerCase()));
+      collegeType === "All" ||
+      (research.college && research.college.toLowerCase().startsWith(collegeType.toLowerCase()))
     // Filter by department type
     const matchesDepartment = departmentType === "All" || research.department === departmentType
 
     return matchesPubDate && matchesSearch && matchesCollege && matchesDepartment
   })
+
+  // Check if there are any research items for the selected program
+  const hasResearchForProgram =
+    collegeType === "All" ||
+    inventoryData.some(
+      (research) => research.college && research.college.toLowerCase().startsWith(collegeType.toLowerCase()),
+    )
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / entriesPerPage)
@@ -163,20 +172,23 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
 
           {/* College Type Filter */}
           <div className="flex items-center space-x-2">
-            <span className="font-medium text-sm">College:</span>
+            <span className="font-medium text-sm">Program:</span>
             <select
               className="bg-gray-200 py-1 px-1 border border-grey rounded-lg text-sm w-[105px]"
               value={collegeType}
               onChange={(e) => setCollegeType(e.target.value)}
             >
-              <option value="All">All Colleges</option>
+              <option value="All">All Programs</option>
               <option value="COECSA">COECSA</option>
+              <option value="CLAE">CLAE</option>
               <option value="CITHM">CITHM</option>
               <option value="CAMS">CAMS</option>
               <option value="CBA">CBA</option>
-              <option value="COL">COL</option>
+              <option value="LAW">LAW</option>
               <option value="CFAD">CFAD</option>
               <option value="CON">CON</option>
+              <option value="IS">IS</option>
+              <option value="Graduate School">Graduate School</option>
             </select>
           </div>
 
@@ -247,7 +259,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
           <thead>
             <tr>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                College & Department
+                Program & Department
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Title
@@ -288,16 +300,15 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
               displayedResearch.map((item, index) => (
                 <tr
                   key={index}
-                  className={`hover:bg-light-gray cursor-pointer ${selectedResearch?.researchID === item.researchID ? "bg-gray-200" : ""
-                    }`}
+                  className={`hover:bg-light-gray cursor-pointer ${
+                    selectedResearch?.researchID === item.researchID ? "bg-gray-200" : ""
+                  }`}
                   onClick={() => handleRowClick(item)}
                 >
                   <td className="px-4 py-4 text-sm text-gray-900 max-w-36">
                     <div className="flex justify-center">
                       <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1">
-                        {item.department !== "N/A"
-                          ? `${item.college} - ${item.department}`
-                          : item.college}
+                        {item.department !== "N/A" ? `${item.college} - ${item.department}` : item.college}
                       </span>
                     </div>
                   </td>
@@ -342,7 +353,9 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
             ) : (
               <tr>
                 <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
-                  No research found.
+                  {collegeType !== "All" && !hasResearchForProgram
+                    ? "No Research under this program yet."
+                    : "No research found."}
                 </td>
               </tr>
             )}
@@ -352,25 +365,24 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
 
       {/* Pagination Controls */}
       <div className="flex justify-center items-center mt-4 space-x-4">
-          <button
-            className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous Page
-          </button>
-          <span className="text-xs text-arcadia-red">Page {currentPage}</span>
-          <button
-            className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next Page
-          </button>
-        </div>
+        <button
+          className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Previous Page
+        </button>
+        <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+        <button
+          className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Next Page
+        </button>
+      </div>
     </div>
   )
 }
 
 export default CurrentResearchInventory
-
