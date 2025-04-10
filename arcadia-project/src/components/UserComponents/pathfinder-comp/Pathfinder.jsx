@@ -13,8 +13,8 @@ export default function Pathfinder({ book }) {
     const prevPathRef = useRef([]);
 
     const callNo = book.titleCallNum || book.researchCallNum;
-    const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
-    
+    const callNoPrefix = callNo.trim().split(/[\s-]/)[0];
+    console.log(callNo, callNoPrefix);
     const locations = {
         "2nd Floor, Circulation Section": { w: 28, h: 19 },
         "4th Floor, Circulation Section": { w: 27, h: 11 },
@@ -146,20 +146,20 @@ export default function Pathfinder({ book }) {
             // top KPM-KZA PRA SCRA, bottom KF-KPM
             "K": { x_min: 12, x_max: 17, y: 11, top_range_from: "KPM", top_range_to: "KZA", top_extra: ["PRA", "SCRA"], bot_range_from: "KF", bot_range_to: "KPM" },
             // top HG-KF, bottom HF-HG
-            "L": { x_min: 12, x_max: 17, y: 13, top_range_from: "HG", top_range_to: "KF", bot_range_from: "HF", bot_range_to: "HG" },
+            "L": { x_min: 12, x_max: 17, y: 13, top_range_from: "HH", top_range_to: "KF", bot_range_from: "HF", bot_range_to: "HG" },
             //  top HD-HF, bottom HB-HD
-            "M": { x_min: 12, x_max: 17, y: 15, top_range_from: "HD", top_range_to: "HF", bot_range_from: "HB", bot_range_to: "HD" },
+            "M": { x_min: 12, x_max: 17, y: 15, top_range_from: "HE", top_range_to: "HF", bot_range_from: "HC", bot_range_to: "HD" },
             // top DS-HB, bottom A-DS
-            "N": { x_min: 12, x_max: 17, y: 17, top_range_from: "DS", top_range_to: "HB", bot_range_from: "A", bot_range_to: "DS" },
+            "N": { x_min: 12, x_max: 17, y: 17, top_range_from: "DT", top_range_to: "HB", bot_range_from: "A", bot_range_to: "DS" },
         },
         "4th Floor, Circulation Section":
         {
             // left HF-P, right A-HF
-            "A": { x: 1, y_min: 3, y_max: 8, left_range_from: "HF", left_range_to: "P", right_range_from: "A", right_range_to: "HF" },
+            "A": { x: 1, y_min: 3, y_max: 8, left_range_from: "HF", left_range_to: "P", right_range_from: "A", right_range_to: "HE" },
             // left R-RT, right RT-Z
-            "B": { x: 25, y_min: 3, y_max: 8, left_range_from: "R", left_range_to: "RT", right_range_from: "RT", right_range_to: "Z" },
+            "B": { x: 25, y_min: 3, y_max: 8, left_range_from: "R", left_range_to: "RT", right_range_from: "RS", right_range_to: "Z" },
             // top PL-PQ, bottom P-PL
-            "C": { x_min: 5, x_max: 6, y: 1, top_range_from: "PL", top_range_to: "PQ", bot_range_from: "P", bot_range_to: "PL" },
+            "C": { x_min: 5, x_max: 6, y: 1, top_range_from: "PM", top_range_to: "PQ", bot_range_from: "P", bot_range_to: "PL" },
             // top PR-PS, bottom PQ-PR
             "D": { x_min: 8, x_max: 9, y: 1, top_range_from: "PR", top_range_to: "PS", bot_range_from: "PQ", bot_range_to: "PR" },
             // top PS, bottom PS
@@ -169,7 +169,7 @@ export default function Pathfinder({ book }) {
             // top QA, bottom PZ-QA
             "G": { x_min: 17, x_max: 18, y: 1, top_extra: "QA", bot_range_from: "PZ", bot_range_to: "QA" },
             // top QD-QR, bottom QA-QD
-            "H": { x_min: 20, x_max: 21, y: 1, top_range_from: "QD", top_range_to: "QR", bot_range_from: "QA", bot_range_to: "QD" },
+            "H": { x_min: 20, x_max: 21, y: 1, top_range_from: "QE", top_range_to: "QR", bot_range_from: "QB", bot_range_to: "QD" },
         },
         "4th Floor, Highschool and Multimedia Section":
         {
@@ -257,46 +257,56 @@ export default function Pathfinder({ book }) {
     function getClassificationType(callNo) {
         const cleanedCallNo = callNo.trim();
     
+        if (book.researchCallNum){
+            console.log("is research");
+            return "LoC";
+        }
+    
         if (/^[A-Z]{1,3}\s?\d+/.test(cleanedCallNo)) {
-            //console.log(callNo, "is LoC");
+            console.log(callNo, "is LoC");
             return "LoC";
         } else if (/^\d{3}(\.\d+)?/.test(cleanedCallNo)) {
-            //console.log(callNo, "is DDC");
+            console.log(callNo, "is DDC");
             return "DDC";
         }
-        //console.log(callNo, "is unknown");
         return "Unknown";
-    }    
-
+    }
+    
     function normalizeCallNumber(callNo) {
         const classification = getClassificationType(callNo);
-    
         if (classification === "LoC") {
-            // Extract leading letters
             const match = callNo.match(/^([A-Z]{1,3})/);
-            return match ? match[1] : callNo;
+            return match ? match[1].padEnd(3, " ") : callNo;  // pad to 3 letters
         } else if (classification === "DDC") {
-            // Extract leading numeric part (whole number only)
             const match = callNo.match(/^(\d{3})/);
-            return match ? match[1] : callNo;
+            return match ? match[1].padStart(3, "0") : callNo; // pad numbers
         }
+        return callNo;
+    }
     
-        return callNo; // fallback
-    }    
-
+    function normalizeString(str, classification) {
+        if (!str) return "";
+        if (classification === "LoC") {
+            return str.toUpperCase().padEnd(3, " "); // ensure A becomes 'A  ', etc.
+        } else if (classification === "DDC") {
+            return str.padStart(3, "0");
+        }
+        return str;
+    }
+    
     function isInRange(call, from, to) {
         if (!call || (!from && !to)) return false;
     
-        const normalize = (str) => str?.toUpperCase().replace(/[^A-Z0-9]/g, "") || "";
+        const classification = getClassificationType(call);
+        const normCall = normalizeString(normalizeCallNumber(call), classification);
+        const normFrom = normalizeString(from, classification);
+        const normTo = normalizeString(to, classification);
     
-        const normCall = normalizeCallNumber(call);
-        const normFrom = normalize(from);
-        const normTo = normalize(to);
-
-        //console.log(normCall, normFrom, normTo)
+        console.log(`Comparing: ${normFrom} <= ${normCall} <= ${normTo}`);
     
         return normFrom <= normCall && normCall <= normTo;
     }
+    
 
     useEffect(() => {
         if (path.length === 0) return;
