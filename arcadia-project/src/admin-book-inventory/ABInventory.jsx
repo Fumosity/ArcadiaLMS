@@ -37,36 +37,45 @@ const ABInventory = () => {
     const currentDate = new Date().toISOString().split('T')[0];
 
     const headerRow = table.insertRow();
-    const headers = ["Research Call No.", "Title", "Author", "College", "Department", "PubDate"];
+    const headers = ["Title ID", "Title", "Author", "Publisher", "Synopsis", "Keywords", "PubDate", "Original PubDate", "Location", "Call No.", "ISBN", "Price", "Date Procured"];
     headers.forEach(header => {
       const cell = headerRow.insertCell();
       cell.textContent = header;
     });
 
     const { data, error } = await supabase
-      .from('research')
-      .select("researchCallNum, title, author, college, department, pubDate");
+      .from('book_titles')
+      .select("titleID, title, author, publisher, synopsis, keywords, currentPubDate, originalPubDate, location, titleCallNum, isbn, price, procurementDate");
 
     if (error) {
       console.error("Error fetching book inventory:", error);
       return;
     }
 
-    data.forEach(research => {
+    data.forEach(book_titles => {
       const row = table.insertRow();
-      row.insertCell().textContent = research.researchCallNum;
-      row.insertCell().textContent = research.title; research
-      row.insertCell().textContent = research.author;
-      row.insertCell().textContent = research.college;
-      row.insertCell().textContent = research.department;
-      row.insertCell().textContent = research.pubDate;
+      row.insertCell().textContent = book_titles.titleID;
+      row.insertCell().textContent = book_titles.title; 
+      row.insertCell().textContent = book_titles.author;
+      row.insertCell().textContent = book_titles.publisher;
+      row.insertCell().textContent = book_titles.synopsis;
+      row.insertCell().textContent = book_titles.keywords;
+      row.insertCell().textContent = book_titles.currentPubDate;
+      row.insertCell().textContent = book_titles.originalPubDate;
+      row.insertCell().textContent = book_titles.location;
+      row.insertCell().textContent = book_titles.titleCallNum;
+      row.insertCell().textContent = book_titles.isbn;
+      row.insertCell().textContent = book_titles.price;
+      row.insertCell().textContent = book_titles.procurementDate;
+      
+      
     });
 
     const link = document.createElement("a");
     document.body.appendChild(link);
     ExcellentExport.convert(
-      { anchor: link, filename: `Research_Inventory${currentDate}`, format: "xlsx" },
-      [{ name: "Research Inventory", from: { table } }]
+      { anchor: link, filename: `Book_Inventory${currentDate}`, format: "xlsx" },
+      [{ name: "Book Inventory", from: { table } }]
     );
     link.click();
     document.body.removeChild(link);
