@@ -172,7 +172,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
 
           {/* College Type Filter */}
           <div className="flex items-center space-x-2">
-            <span className="font-medium text-sm">College:</span>
+            <span className="font-medium text-sm">Program:</span>
             <select
               className="bg-gray-200 py-1 px-1 border border-grey rounded-lg text-sm w-[105px]"
               value={collegeType}
