@@ -17,6 +17,31 @@ export const UserProvider = ({ children }) => {
     setLoading(false)
   }, [])
 
+  // Add storage event listener to detect changes in localStorage from other tabs
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      // Only react to changes in the "user" item
+      if (event.key === "user") {
+        // If user was removed (logout in another tab)
+        if (event.newValue === null) {
+          setUser(null)
+          navigate("/user/login")
+        } else if (event.newValue) {
+          // If user was updated in another tab
+          setUser(JSON.parse(event.newValue))
+        }
+      }
+    }
+
+    // Add event listener
+    window.addEventListener("storage", handleStorageChange)
+
+    // Clean up event listener on unmount
+    return () => {
+      window.removeEventListener("storage", handleStorageChange)
+    }
+  }, [navigate])
+
   useEffect(() => {
     const mode = localStorage.getItem("mode")
     if (user && !loading && mode !== "user") {
