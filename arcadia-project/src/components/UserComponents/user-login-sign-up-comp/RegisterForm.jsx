@@ -244,7 +244,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
         </form>
       </div>
       <div className="w-1/2 relative rounded-2xl bg-cover bg-center hidden md:block max-h-full">
-        <img src="/image/hero2.jpeg" alt="Hero Background" className="w-full h-full object-cover rounded-lg" />
+        <img src="/image/hero2.jpeg" alt="Hero Background" className="w-[560px] h-full object-cover rounded-lg" />
 
         <div className="absolute inset-0 bg-black opacity-70 rounded-lg" />
 

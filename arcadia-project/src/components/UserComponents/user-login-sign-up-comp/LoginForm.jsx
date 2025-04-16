@@ -157,9 +157,9 @@ export default function LoginForm() {
           </div>
         </form>
       </div>
-
+    
       <div className="w-1/2 relative rounded-2xl bg-cover bg-center hidden md:block max-h-[600px]">
-        <img src="/image/hero2.jpeg" alt="Hero Background" className="w-full h-full object-cover rounded-lg" />
+        <img src="/image/hero2.jpeg" alt="Hero Background" className="w-[560px] h-full object-cover rounded-lg" />
         <div className="absolute inset-0 bg-black opacity-70 rounded-lg" />
         <div className="absolute inset-0 flex items-end p-12 z-10">
           <h2 className="text-white text-4xl text-right font-semibold">Knowledge that empowers.</h2>

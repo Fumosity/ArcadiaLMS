@@ -133,7 +133,7 @@ export default function Agreement({ onContinue }) {
                 <img
                     src="/image/hero2.jpeg"
                     alt="Hero Background"
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-[560px] h-full object-cover rounded-lg"
                 />
 
                 <div className="absolute inset-0 bg-black opacity-70 rounded-lg" />
