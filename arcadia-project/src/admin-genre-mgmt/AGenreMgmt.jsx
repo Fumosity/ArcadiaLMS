@@ -16,7 +16,7 @@ export default function AGenreMgmt() {
     return (
         <div className="bg-white">
             <Title>Genre Management</Title>
-            <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+            <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12 h-[85vh]">
                 <div className="flex-shrink-0 w-2/4">
                     <div className="flex justify-between w-full gap-2 h-fit">
                         <button

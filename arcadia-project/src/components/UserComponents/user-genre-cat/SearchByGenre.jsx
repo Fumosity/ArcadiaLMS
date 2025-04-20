@@ -67,7 +67,8 @@ export default function SearchByGenre({ onGenreClick, onSeeMoreGenresClick }) {
     try {
       const { data: allGenres, error } = await supabase
         .from("genres")
-        .select("genreID, genreName, category, img, description");
+        .select("genreID, genreName, category, img, description, book_genre_link!inner(*) ")
+        ;
 
       if (error) throw error;
 

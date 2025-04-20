@@ -180,6 +180,9 @@ const ABAdding = ({ formData, setFormData }) => {
       setCover("")
       setFormData((prevData) => ({ ...prevData, cover: "" }))
 
+      setCategoryFilter(null)
+      setSelectedGenres([])
+
       if (fileInputRef.current) {
         fileInputRef.current.value = null
       }
