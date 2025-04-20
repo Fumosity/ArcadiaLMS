@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 
 const defaultUser = {
-  name: "Shiori Novella",
-  schoolId: "2021-2-01080",
+  name: "Juan dela Cruz",
+  schoolId: "2000-2-00001",
   college: "COECSA",
   department: "DCS",
-  email: "shiori.novella@punetwork.edu.ph",
+  email: "jua.delacruz@punetwork.edu.ph",
   accountType: "Student",
   photoUrl: "/placeholder.svg?height=100&width=100",
   userPicture: "/placeholder.svg?height=100&width=100",

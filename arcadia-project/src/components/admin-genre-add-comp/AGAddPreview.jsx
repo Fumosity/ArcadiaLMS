@@ -37,10 +37,10 @@ const AGAddPreview = ({ formData }) => {
               .filter(([key]) => key !== "img")
               .map(([key, value], index) => (
                 <tr key={index} className="border-b border-grey">
-                  <td className="px-1 py-1 font-semibold capitalize">
+                  <td className="px-1 py-1 font-semibold capitalize w-1/8 align-top">
                     {key === "genreName" ? ["Genre"] : key.replace(/([A-Z])/g, " $1")}:
                   </td>
-                  <td className={`px-1 py-1 text-sm w-full text-right ${key === "description" ? "text-justify" : ""}`}>
+                  <td className={`px-1 py-1 text-sm w-full text-left ${key === "description" ? "text-justify" : ""}`}>
                     {value}
                   </td>
                 </tr>

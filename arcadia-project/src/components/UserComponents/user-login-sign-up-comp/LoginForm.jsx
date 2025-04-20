@@ -108,7 +108,7 @@ export default function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-3 py-1 border border-gray rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="shiori.novella@punetwork.edu.ph"
+              placeholder="Enter Email"
             />
           </div>
 
@@ -123,7 +123,7 @@ export default function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-3 py-1 border border-gray rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter password"
+              placeholder="Enter Password"
             />
           </div>
 

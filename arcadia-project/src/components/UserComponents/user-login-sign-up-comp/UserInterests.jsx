@@ -15,7 +15,11 @@ export default function UserInterests({ userData, onBack, onContinue }) {
       if (error) {
         console.error("Error fetching genres:", error)
       } else {
-        setGenres(data)
+        const sortedData = data.sort((a, b) => {
+          return a.genreName.localeCompare(b.genreName); 
+        });
+        console.log(data)
+        setGenres(sortedData)
       }
       setLoading(false)
     }
@@ -83,7 +87,7 @@ export default function UserInterests({ userData, onBack, onContinue }) {
         {loading ? (
           <p>Loading genres...</p>
         ) : (
-          <div className="flex flex-wrap gap-2 overflow-y-auto pr-2 custom-scrollbar max-h-[250px]">
+          <div className="flex flex-wrap justify-center gap-2 overflow-y-auto pr-2 custom-scrollbar max-h-[250px]">
             {filteredGenres.map((genre) => (
               <button
                 key={genre.genreID}

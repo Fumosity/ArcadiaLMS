@@ -155,10 +155,10 @@ const GenrePreview = ({ genre, onGenreDeleted }) => {
               .filter(([key]) => !["genreID", "img"].includes(key)) // Exclude multiple keys
               .map(([key, value], index) => (
                 <tr key={index} className="border-b border-grey">
-                  <td className="px-1 py-1 font-semibold capitalize align-top" style={{ width: '30%' }}>
+                  <td className="px-1 py-1 font-semibold capitalize align-top w-1/8">
                     {key.replace(/([A-Z])/g, " $1")}:
                   </td>
-                  <td className="px-1 py-1 text-sm w-full text-right">
+                  <td className="px-1 py-1 text-sm w-full text-left">
                     {key === 'description' ? (
                       <div className="text-justify">{value}</div>
                     ) : (

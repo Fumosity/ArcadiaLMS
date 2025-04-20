@@ -151,3 +151,69 @@ def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_
     print("Books DataFrame shape:", books_df.shape)
 
     return books_df[["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]].iloc[book_indices]
+
+
+def evaluate_recommendations(books_df, ratings_df, users_df, K=5):
+    """
+    Evaluates the recommendation system using Precision@K, Recall@K, and F1@K.
+    """
+    precision_list = []
+    recall_list = []
+    f1_list = []
+
+    # Ensure necessary columns exist
+    if 'userID' not in ratings_df.columns or 'titleID' not in ratings_df.columns:
+        print("Missing 'userID' or 'titleID' in ratings_df.")
+        return
+
+    user_ids = ratings_df['userID'].unique()
+
+    for user_id in user_ids:
+        # Get the books the user has rated
+        user_rated_books = ratings_df[ratings_df['userID'] == user_id]['titleID'].tolist()
+
+        # Skip users with fewer than 2 rated books
+        if len(user_rated_books) < 2:
+            continue
+
+        # Use the last rated book as the seed
+        seed_title_id = user_rated_books[-1]
+
+        # Get recommendations
+        recommended_books = get_recommendations(titleID=seed_title_id, userID=user_id)
+
+        # Ensure recommended_books is a DataFrame
+        if isinstance(recommended_books, pd.DataFrame):
+            recommended_ids = recommended_books['titleID'].tolist()
+        else:
+            continue
+
+        # Relevant items are those the user has rated, excluding the seed
+        relevant_items = set(user_rated_books[:-1])
+
+        # Recommended items
+        recommended_items = set(recommended_ids)
+
+        # True positives
+        true_positives = relevant_items & recommended_items
+
+        # Calculate metrics
+        precision = len(true_positives) / K if K else 0
+        recall = len(true_positives) / len(relevant_items) if relevant_items else 0
+        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) else 0
+
+        precision_list.append(precision)
+        recall_list.append(recall)
+        f1_list.append(f1)
+
+    # Compute average metrics
+    avg_precision = sum(precision_list) / len(precision_list) if precision_list else 0
+    avg_recall = sum(recall_list) / len(recall_list) if recall_list else 0
+    avg_f1 = sum(f1_list) / len(f1_list) if f1_list else 0
+
+    print(f"Precision@{K}: {avg_precision:.4f}")
+    print(f"Recall@{K}: {avg_recall:.4f}")
+    print(f"F1@{K}: {avg_f1:.4f}")
+
+if __name__ == "__main__":
+    evaluate_recommendations(books_df, ratings_df, users_df, K=5)
