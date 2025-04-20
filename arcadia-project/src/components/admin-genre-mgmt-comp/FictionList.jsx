@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "/src/supabaseClient.js";
 
-export default function FictionList({onGenreSelect}) {
+export default function FictionList({ onGenreSelect }) {
     const [genres, setGenres] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -13,39 +13,39 @@ export default function FictionList({onGenreSelect}) {
                     .from("genres")
                     .select("genreID, genreName, img, description, category")
                     .eq("category", "Fiction");
-                
+
                 if (genreError) throw genreError;
                 if (!genreData || genreData.length === 0) {
                     setGenres([]);
                     return;
                 }
-                
+
                 const genreIDs = genreData.map(g => g.genreID);
-                
+
                 // Fetch book count for each genre
                 const { data: bookLinks, error: bookError } = await supabase
                     .from("book_genre_link")
                     .select("genreID");
-                
+
                 if (bookError) throw bookError;
-                
+
                 const bookCountMap = bookLinks.reduce((acc, { genreID }) => {
                     acc[genreID] = (acc[genreID] || 0) + 1;
                     return acc;
                 }, {});
-                
+
                 // Fetch user interest count for each genre
                 const { data: userLinks, error: userError } = await supabase
                     .from("user_genre_link")
                     .select("genreID");
-                
+
                 if (userError) throw userError;
-                
+
                 const userCountMap = userLinks.reduce((acc, { genreID }) => {
                     acc[genreID] = (acc[genreID] || 0) + 1;
                     return acc;
                 }, {});
-                
+
                 // Combine data
                 const combinedGenres = genreData.map(genre => ({
                     ...genre,
@@ -53,16 +53,21 @@ export default function FictionList({onGenreSelect}) {
                     userCount: userCountMap[genre.genreID] || 0,
                 }));
 
-                console.log("Fiction List", combinedGenres)
-                
-                setGenres(combinedGenres);
+                const sortedCombinedGenres = combinedGenres.sort((a, b) => {
+                    // Use localeCompare for proper alphabetical sorting by genreName
+                    return a.genreName.localeCompare(b.genreName);
+                });
+
+                console.log("Fiction List", sortedCombinedGenres)
+
+                setGenres(sortedCombinedGenres)
             } catch (error) {
                 console.error("Error fetching fiction genres:", error.message);
             } finally {
                 setIsLoading(false);
             }
         };
-        
+
         fetchGenres();
     }, []);
 
@@ -93,7 +98,7 @@ export default function FictionList({onGenreSelect}) {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {genres.map((genre) => (
-                                <tr 
+                                <tr
                                     key={genre.genreID}
                                     className="hover:bg-light-gray cursor-pointer border-b border-grey"
                                     onClick={() => handleRowClick(genre)}
@@ -109,5 +114,5 @@ export default function FictionList({onGenreSelect}) {
             </div>
         </div>
     );
-    
+
 }

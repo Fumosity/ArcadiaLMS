@@ -179,7 +179,7 @@ export default function BookInformation({ book }) {
               <span className="font-semibold">Genres:</span> {book.genres.join(", ")}
             </p>
             <p className="min-h-[6rem] leading-relaxed text-justify">
-              <span className="font-semibold text-justify"></span> {book.synopsis || "No synopsis available."}
+              <span className="text-justify whitespace-pre-line"> {book.synopsis || "No synopsis available."} </span>
             </p>
           </div>
 

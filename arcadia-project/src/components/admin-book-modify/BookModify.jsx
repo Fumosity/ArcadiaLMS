@@ -112,8 +112,12 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       if (error) {
         console.error("Error fetching genres:", error);
       } else {
-        setGenres(data);
-
+        const sortedData = data.sort((a, b) => {
+          return a.genreName.localeCompare(b.genreName); 
+        });
+        console.log(data)
+        setGenres(sortedData)
+        
         // Map the genre names from formData to their corresponding genreIDs
         const selectedGenreIDs = data
           .filter((genre) => formData.genres.includes(genre.genreName))

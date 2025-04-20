@@ -53,9 +53,14 @@ export default function NonFictionList({onGenreSelect}) {
                     userCount: userCountMap[genre.genreID] || 0,
                 }));
 
-                console.log("Non-iction List", combinedGenres)
-                
-                setGenres(combinedGenres);
+                const sortedCombinedGenres = combinedGenres.sort((a, b) => {
+                    // Use localeCompare for proper alphabetical sorting by genreName
+                    return a.genreName.localeCompare(b.genreName);
+                });
+
+                console.log("Non-fiction List", sortedCombinedGenres)
+
+                setGenres(sortedCombinedGenres)
             } catch (error) {
                 console.error("Error fetching non-fiction genres:", error.message);
             } finally {

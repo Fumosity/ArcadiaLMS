@@ -63,7 +63,11 @@ const ABAdding = ({ formData, setFormData }) => {
       if (error) {
         console.error("Error fetching genres:", error)
       } else {
-        setGenres(data)
+        const sortedData = data.sort((a, b) => {
+          return a.genreName.localeCompare(b.genreName); 
+        });
+        console.log(data)
+        setGenres(sortedData)
       }
       setLoading(false)
     }

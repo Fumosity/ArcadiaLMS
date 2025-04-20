@@ -45,7 +45,7 @@ const BookInfo = ({ book }) => { // Accept book as a prop
       <h3 className="text-3xl font-medium mb-2 font-ZenSerif">{book.title}</h3>
       <p className="text-gray-600 text-xl mb-4">By {formatAuthor(book.author)}</p>
       <h4 className="font-semibold mb-2 text-lg">Synopsis:</h4>
-      <p className="text-md text-gray-700">{book.synopsis}</p>
+      <p className="text-md text-gray-700 whitespace-pre-line">{book.synopsis}</p>
     </div>
   );
 };
