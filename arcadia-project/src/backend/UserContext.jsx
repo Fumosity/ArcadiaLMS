@@ -65,7 +65,7 @@ export const UserProvider = ({ children }) => {
 
   const loginAsGuest = () => {
     const guestUser = {
-      userID: "guest-" + Date.now(), // Add timestamp for uniqueness
+      userID: "0", // Add timestamp for uniqueness
       name: "Guest",
       userAccountType: "Guest",
       isGuest: true, // Flag to identify guest users
