@@ -172,7 +172,7 @@ export default function BookInformation({ book }) {
               <span className="font-semibold">Author:</span> {book.author.join(", ")}
             </p>
             <p>
-              <span className="font-semibold">Published:</span> {book.publishedYear}
+              <span className="font-semibold">Year Published:</span> {book.publishedYear}
             </p>
             <p>
               <span className="font-semibold">Category:</span> {book.category}{" "}
@@ -230,12 +230,8 @@ export default function BookInformation({ book }) {
               <span className="font-semibold">Publisher:</span> {book.publisher || "No publisher information"}
             </p>
             <p>
-              <span className="font-semibold">Current Date Published:</span>{" "}
-              {book.currentPubDate || "No date information"}
-            </p>
-            <p>
-              <span className="font-semibold">Original Date Published:</span>{" "}
-              {book.originalPubDate || "No date information"}
+              <span className="font-semibold">Date Published:</span>{" "}
+              {book.pubDate || "No date information"}
             </p>
             <p>
               <span className="font-semibold">ISBN:</span> {book.isbn || "No ISBN available"}

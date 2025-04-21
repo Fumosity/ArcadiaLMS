@@ -5,28 +5,28 @@ const UHero = () => {
     const slides = [
         {
             image: "/image/arc1.JPG",
-            title: <h3>Explore ARC's<br />Services Now!</h3>,
-            description: <p>View Different Services ARC has to offer</p>,
+            title: <>Explore ARC's<br />Services Now!</>,
+            description: <>View Different Services ARC has to offer</>,
             buttonText: "View Services",
             link: "/user/services"
         },
         {
             image: "/image/arc3.JPG",
-            title: <h3>Browse the LPU-C <br /> Academic Resource Center</h3>,
-            description: <p>Discover knowledge, explore resources, and reserve your favorite books today.</p>,
+            title: <>Browse the LPU-C <br /> Academic Resource Center</>,
+            description: <>Discover knowledge, explore resources, and reserve your favorite books today.</>,
             buttonText: "See the Book Catalog",
             link: "/user/bookmanagement"
         },
         {
             image: "/image/arc2.JPG",
-            title: <h3>Explore our Research Collection</h3>,
-            description: <p>Find the resources you need for your academic success.</p>,
+            title: <>Explore our Research Collection</>,
+            description: <>Find the resources you need for your academic success.</>,
             buttonText: "View Research Catalog",
             link: "/user/researchmanagement"
         },
         {
             image: "/image/arc6.JPG",
-            title: <h3>Reservation of Rooms <br />Now Available!</h3>,
+            title: <>Reservation of Rooms <br />Now Available!</>,
             description: "Reserve rooms for academic purposes.",
             buttonText: "View Available Rooms",
             link: "/user/reservations"

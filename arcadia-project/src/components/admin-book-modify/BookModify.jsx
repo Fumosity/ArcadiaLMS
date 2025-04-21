@@ -59,8 +59,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       publisher: params.get("publisher") || "",
       synopsis: params.get("synopsis") || "",
       keywords: params.get("keywords") || [],
-      currentPubDate: params.get("currdatePublished") || "",
-      originalPubDate: params.get("orgdatePublished") || "",
+      pubDate: params.get("pubDate") || "",
       cover: params.get("cover") || "",
       location: params.get("location") || "",
       isbn: params.get("isbn") || "",
@@ -73,11 +72,21 @@ const BookModify = ({ formData, setFormData, onSave }) => {
     setCategoryFilter(initialFormData.category || null);
   }, [location.search, setFormData]);
 
+  const currentYear = (new Date().getFullYear()) + 10;
+
   const handleChange = (e) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+
+    if (name === 'pubDate' && value.length > 4) {
+      setFormData({ ...formData, [name]: value.slice(0, 4) });
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
+
+    if (value) {
+      setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: false }));
+    }
   };
 
   const uploadCover = async (e) => {
@@ -176,8 +185,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
       publisher: params.get("publisher") || "",
       synopsis: params.get("synopsis") || "",
       keywords: params.get("keywords") || [],
-      currentPubDate: params.get("republished") || "",
-      originalPubDate: params.get("datePublished") || "",
+      pubDate: params.get("pubDate") || "",
       quantity: params.get("quantity") || 0,
       cover: params.get("cover") || "",
       location: params.get("location") || "",
@@ -198,7 +206,7 @@ const BookModify = ({ formData, setFormData, onSave }) => {
 
     const requiredFields = [
       "title", "author", "publisher", "synopsis", "keywords",
-      "currentPubDate", "originalPubDate", "location", "isbn",
+      "pubDate", "location", "isbn",
       "price", "titleID", "titleCallNum", "category", "genres"
     ];
 
@@ -510,36 +518,37 @@ const BookModify = ({ formData, setFormData, onSave }) => {
                   placeholder="Keyword 1; Keyword 2; Keyword 3; ..."
                 />
               </div>
+
               <div className="flex justify-between items-center">
-                <label className="w-1/4">Current Pub. Date:</label>
-                <input type="date" name="currentPubDate" required
+                <label className="w-1/4">Year Published:</label>
+                <input
+                  type="number"
+                  name="pubDate"
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.currentPubDate}
+                  value={formData.pubDate}
                   onChange={handleChange}
-                  style={validationErrors.currentPubDate ? errorStyle : {}}
-                  placeholder="Publishing Date of Current Edition"
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Original Pub. Date:</label>
-                <input type="date" name="originalPubDate" required
-                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.originalPubDate}
-                  onChange={handleChange}
-                  style={validationErrors.originalPubDate ? errorStyle : {}}
-                  placeholder="Publishing Date of Original Edition"
+                  max={currentYear}
+                  placeholder="YYYY"
                 />
               </div>
 
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
-                <input type="text" name="location" required
-                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.location}
-                  onChange={handleChange}
-                  style={validationErrors.location ? errorStyle : {}}
-                  placeholder="Book Location"
-                />
+                <div className="select-dropdown-wrapper w-2/3">
+                  <select
+                    name="location"
+                    required
+                    className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
+                    value={formData.location}
+                    onChange={handleChange}
+                    style={validationErrors.location ? errorStyle : {}}
+                  >
+                    <option value="" disabled>Select Location</option>
+                    <option value="2nd Floor, Circulation Section">2nd Floor, Circulation Section</option>
+                    <option value="4th Floor, Circulation Section">4th Floor, Circulation Section</option>
+                    <option value="4th Floor, Highschool and Multimedia Section">4th Floor, Highschool and Multimedia Section</option>
+                  </select>
+                </div>
               </div>
 
               <div className="justify-between items-center hidden">

@@ -15,17 +15,26 @@ const ABAdding = ({ formData, setFormData }) => {
   const [categoryFilter, setCategoryFilter] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  const currentYear = (new Date().getFullYear()) + 10;
+
   // Define the error style for validation
   const errorStyle = { border: "2px solid red" }
 
   //Aggregates form inputs
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    const { name, value } = e.target;
 
-    if (e.target.value) {
-      setValidationErrors((prevErrors) => ({ ...prevErrors, [e.target.name]: false }))
+    if (name === 'pubDate' && value.length > 4) {
+      setFormData({ ...formData, [name]: value.slice(0, 4) });
+      return;
     }
-  }
+
+    setFormData({ ...formData, [name]: value });
+
+    if (value) {
+      setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: false }));
+    }
+  };
 
   //Holds and sends the uploaded cover image when submitted
   const uploadCover = async (e) => {
@@ -64,7 +73,7 @@ const ABAdding = ({ formData, setFormData }) => {
         console.error("Error fetching genres:", error)
       } else {
         const sortedData = data.sort((a, b) => {
-          return a.genreName.localeCompare(b.genreName); 
+          return a.genreName.localeCompare(b.genreName);
         });
         console.log(data)
         setGenres(sortedData)
@@ -165,8 +174,7 @@ const ABAdding = ({ formData, setFormData }) => {
         publisher: "",
         synopsis: "",
         keywords: [],
-        currentPubDate: "",
-        originalPubDate: "",
+        pubDate: "",
         procurementDate: "",
         location: "",
         bookID: "",
@@ -261,11 +269,10 @@ const ABAdding = ({ formData, setFormData }) => {
                         e.preventDefault()
                         handleCategoryChange(category)
                       }}
-                      className={`px-4 py-1 rounded-full w-full text-sm transition-colors ${
-                        categoryFilter === category
-                          ? "bg-arcadia-red border-arcadia-red border text-white"
-                          : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
-                      }`}
+                      className={`px-4 py-1 rounded-full w-full text-sm transition-colors ${categoryFilter === category
+                        ? "bg-arcadia-red border-arcadia-red border text-white"
+                        : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
+                        }`}
                     >
                       {category}
                     </button>
@@ -289,11 +296,10 @@ const ABAdding = ({ formData, setFormData }) => {
                             e.preventDefault()
                             toggleGenre(genres.genreID)
                           }}
-                          className={`px-4 py-1 rounded-full text-sm transition-colors ${
-                            selectedGenres.includes(genres.genreID)
-                              ? "bg-arcadia-red border-arcadia-red border text-white"
-                              : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
-                          }`}
+                          className={`px-4 py-1 rounded-full text-sm transition-colors ${selectedGenres.includes(genres.genreID)
+                            ? "bg-arcadia-red border-arcadia-red border text-white"
+                            : "border border-arcadia-red text-arcadia-red hover:bg-arcadia-red/5"
+                            }`}
                         >
                           {genres.genreName}
                         </button>
@@ -350,45 +356,37 @@ const ABAdding = ({ formData, setFormData }) => {
                   placeholder="Keyword 1; Keyword 2; Keyword 3; ..."
                 />
               </div>
+
               <div className="flex justify-between items-center">
-                <label className="w-1/4">Current Pub. Date:</label>
+                <label className="w-1/4">Year Published:</label>
                 <input
-                  type="date"
-                  name="currentPubDate"
-                  required
+                  type="number"
+                  name="pubDate"
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.currentPubDate}
+                  value={formData.pubDate}
                   onChange={handleChange}
-                  style={validationErrors.currentPubDate ? errorStyle : {}}
-                  placeholder="Publishing Date of Current Edition"
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <label className="w-1/4">Original Pub. Date:</label>
-                <input
-                  type="date"
-                  name="originalPubDate"
-                  required
-                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.originalPubDate}
-                  onChange={handleChange}
-                  style={validationErrors.originalPubDate ? errorStyle : {}}
-                  placeholder="Publishing Date of Original Edition"
+                  max={currentYear}
+                  placeholder="YYYY"
                 />
               </div>
 
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Location:</label>
-                <input
-                  type="text"
-                  name="location"
-                  required
-                  className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                  value={formData.location}
-                  onChange={handleChange}
-                  style={validationErrors.location ? errorStyle : {}}
-                  placeholder="Book Location"
-                />
+                <div className="select-dropdown-wrapper w-2/3">
+                  <select
+                    name="location"
+                    required
+                    className="w-full px-3 py-1 rounded-full border border-grey appearance-none"
+                    value={formData.location}
+                    onChange={handleChange}
+                    style={validationErrors.location ? errorStyle : {}}
+                  >
+                    <option value="" disabled>Select Location</option>
+                    <option value="2nd Floor, Circulation Section">2nd Floor, Circulation Section</option>
+                    <option value="4th Floor, Circulation Section">4th Floor, Circulation Section</option>
+                    <option value="4th Floor, Highschool and Multimedia Section">4th Floor, Highschool and Multimedia Section</option>
+                  </select>
+                </div>
               </div>
 
               <div className="justify-between items-center hidden">
@@ -481,17 +479,15 @@ const ABAdding = ({ formData, setFormData }) => {
             <label className="text-md mb-2">Book Cover:</label>
             <div className="w-full h-fit flex justify-center">
               <div
-                className={`border p-4 w-fit rounded-lg hover:bg-light-gray transition ${
-                  validationErrors.cover ? "border-red border-2" : "border-grey"
-                }`}
+                className={`border p-4 w-fit rounded-lg hover:bg-light-gray transition ${validationErrors.cover ? "border-red border-2" : "border-grey"
+                  }`}
                 onClick={handleDivClick}
               >
                 <img
                   src={formData.cover || "/image/book_research_placeholder.png"}
                   alt="Book cover placeholder"
-                  className={`h-[375px] w-[225px] object-cover rounded-lg ${
-                    validationErrors.cover ? "border-red border-2" : "border border-grey"
-                  }`}
+                  className={`h-[375px] w-[225px] object-cover rounded-lg ${validationErrors.cover ? "border-red border-2" : "border border-grey"
+                    }`}
                 />
               </div>
             </div>

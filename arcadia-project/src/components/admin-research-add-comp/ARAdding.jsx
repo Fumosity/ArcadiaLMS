@@ -33,16 +33,23 @@ const ARAdding = ({ formData, setFormData }) => {
     "Graduate School": [""],
   }
 
+  const currentYear = (new Date().getFullYear()) + 10;
+
   //Aggregates form inputs
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
-    setFormData((prevData) => ({ ...prevData, [name]: value }))
+    if (name === 'pubDate' && value.length > 4) {
+      setFormData({ ...formData, [name]: value.slice(0, 4) });
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
 
     if (value) {
-      setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: false }))
+      setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: false }));
     }
-  }
+  };
 
   const updateDepartmentOptions = (college) => {
     // Assuming `collegeDepartmentMap` contains the mapping from college to an array of departments
@@ -346,15 +353,16 @@ const ARAdding = ({ formData, setFormData }) => {
                     />
                   </div>
                   <div className="flex justify-between items-center">
-                    <label className="w-1/4">Date Published:</label>
+                    <label className="w-1/4">Year Published:</label>
                     <input
-                      type="date"
+                      type="number"
                       name="pubDate"
                       className="w-2/3 px-3 py-1 rounded-full border border-grey"
                       value={formData.pubDate}
                       onChange={handleChange}
-                      style={validationErrors.pubDate ? errorStyle : {}}
-                      required
+                      min={2000}
+                      max={currentYear}
+                      placeholder="YYYY"
                     />
                   </div>
                   <div className="flex justify-between items-center">
@@ -368,6 +376,7 @@ const ARAdding = ({ formData, setFormData }) => {
                       placeholder="Shelf Location"
                       style={validationErrors.location ? errorStyle : {}}
                       required
+                      disabled
                     />
                   </div>
                   <div className="flex justify-between items-center">

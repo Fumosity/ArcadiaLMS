@@ -7,7 +7,7 @@ import "react-loading-skeleton/dist/skeleton.css"
 
 const CurrentBookInventory = ({ onBookSelect }) => {
   const [inventoryData, setInventoryData] = useState([])
-  const [sortOrder, setSortOrder] = useState("Descending")
+  const [sortOrder, setSortOrder] = useState("Ascending")
   const [pubDateFilter, setPubDateFilter] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [hoveredGenreIndex, setHoveredGenreIndex] = useState(null)
@@ -161,7 +161,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
     // Filter by publication date if specified
     const matchesPubDate =
       !pubDateFilter ||
-      (book.originalPubDate && book.originalPubDate.toLowerCase().includes(pubDateFilter.toLowerCase()))
+      (book.pubDate && book.pubDate.toLowerCase().includes(pubDateFilter.toLowerCase()))
 
     // Helper function to check if a value matches the search term
     const matchesSearchTerm = (value) => {
@@ -249,7 +249,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
 
           {/* Pub Date Filter */}
           <div className="flex items-center space-x-2">
-            <span className="font-medium text-sm">Pub. Date:</span>
+            <span className="font-medium text-sm">Pub. Year:</span>
             <input
               type="text"
               className="bg-gray-200 py-1 px-2 border border-grey rounded-lg text-sm w-[90px]"
@@ -293,7 +293,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {["Category", "Genres", "Book Title", "Author", "Call No.", "Org. Pub. Date", "Copies"].map((header) => (
+              {["Category", "Genres", "Book Title", "Author", "Call No.", "Pub. Year", "Copies"].map((header) => (
                 <th
                   key={header}
                   className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -401,7 +401,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                       {item.titleCallNum || "N/A"}
                     </td>
                     <td className="px-4 py-4 text-center text-sm text-gray-500 truncate min-w-8">
-                      {item.originalPubDate}
+                      {item.pubDate}
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-500">
                       <button

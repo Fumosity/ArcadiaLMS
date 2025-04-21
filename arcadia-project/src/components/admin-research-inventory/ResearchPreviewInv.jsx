@@ -136,8 +136,8 @@ const ResearchPreviewInv = ({ research, onResearchUpdate }) => {
             .map(([key, value], index) => (
               <tr key={index} className="border-b border-grey">
                 <td className="px-1 py-1 font-semibold capitalize w-1/3">
-                  {key === "pubDate"
-                    ? "Original Pub. Date:"
+                  {key === "pubdate"
+                      ? "Pub. Year:"
                     : key === "researchCallNum"
                       ? "Call No."
                       : key.replace(/([A-Z])/g, " $1") + ":"}

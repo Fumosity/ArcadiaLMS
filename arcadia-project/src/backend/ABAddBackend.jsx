@@ -23,8 +23,7 @@ export const checkAndAddBookTitle = async (bookData) => {
             .map((item) => item.trim())
             .filter((item) => item !== ""),
       publisher: bookData.publisher,
-      currentPubDate: bookData.currentPubDate,
-      originalPubDate: bookData.originalPubDate,
+      pubDate: bookData.pubDate,
       procurementDate: bookData.procurementDate,
       cover: bookData.cover,
       isbn: bookData.isbn,

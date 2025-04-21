@@ -9,10 +9,8 @@ const fetchReleasedThisYearBooks = async () => {
         // Step 1: Fetch books released this year
         const { data: bookMetadata, error: bookError } = await supabase
             .from("book_titles")
-            .select("titleID, title, author, cover, currentPubDate")
-            .gte("currentPubDate", `${currentYear}-01-01`) // Fetch books from Jan 1 of the current year
-            .lte("currentPubDate", `${currentYear}-12-31`) // Up to Dec 31
-            .order("currentPubDate", { ascending: false });
+            .select("titleID, title, author, cover, pubDate")
+            .eq("pubDate", `${currentYear}`) // Fetch books from Jan 1 of the current year
 
         if (bookError) throw bookError;
 

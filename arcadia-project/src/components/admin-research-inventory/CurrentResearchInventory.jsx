@@ -6,7 +6,7 @@ import "react-loading-skeleton/dist/skeleton.css"
 
 const CurrentResearchInventory = ({ onResearchSelect }) => {
   const [inventoryData, setInventoryData] = useState([])
-  const [sortOrder, setSortOrder] = useState("Descending")
+  const [sortOrder, setSortOrder] = useState("Ascending")
   const [pubDateFilter, setPubDateFilter] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedResearch, setSelectedResearch] = useState(null)
@@ -212,11 +212,11 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
 
           {/* Pub Date Filter */}
           <div className="flex items-center space-x-2">
-            <span className="font-medium text-sm">Pub. Date:</span>
+            <span className="font-medium text-sm">Pub. Year:</span>
             <input
               type="text"
               className="bg-gray-200 py-1 px-2 border border-grey rounded-lg text-sm w-[90px]"
-              placeholder="YYYY-MM"
+              placeholder="YYYY"
               value={pubDateFilter}
               onChange={(e) => setPubDateFilter(e.target.value)}
             />
@@ -271,7 +271,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                 Call No.
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/8">
-                Pub. Date
+                Pub. Year
               </th>
             </tr>
           </thead>

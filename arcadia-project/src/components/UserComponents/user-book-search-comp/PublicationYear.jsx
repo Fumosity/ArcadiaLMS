@@ -17,8 +17,8 @@ export default function PublicationYear() {
         setLoading(true)
         const { data, error } = await supabase
           .from("book_titles")
-          .select("originalPubDate")
-          .not("originalPubDate", "is", null)
+          .select("pubDate")
+          .not("pubDate", "is", null)
 
         if (error) {
           console.error("Error fetching publication years:", error)
@@ -27,9 +27,9 @@ export default function PublicationYear() {
 
         // Extract years from dates and remove duplicates
         const years = data
-          .map((book) => new Date(book.originalPubDate).getFullYear())
-          .filter((year) => !isNaN(year))
-          .sort((a, b) => b - a) // Sort descending (newest first)
+          .map((book) => book.pubDate)
+          .filter((year) => typeof year === 'number' && !isNaN(year)) // Ensure it's a number
+          .sort((a, b) => b - a); // Sort descending (newest first)
 
         // Remove duplicates
         const uniqueYears = [...new Set(years)]

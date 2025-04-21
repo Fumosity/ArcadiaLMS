@@ -86,7 +86,7 @@ const UBookView = () => {
         });
 
         //console.log(genreMap)
-        const publishedYear = data.originalPubDate ? new Date(data.originalPubDate).getFullYear() : "Unknown Year"
+        const publishedYear = data.pubDate ? new Date(data.pubDate).getFullYear() : "Unknown Year"
 
         const callNo = data.titleCallNum
         const callNoPrefix = callNo.split(/[\s-]/)[0].trim();
@@ -97,8 +97,7 @@ const UBookView = () => {
           // If callNoPrefix is a number  
           currentLocation = "4th Floor, Highschool and Multimedia Section";
         } else {
-          // Extract year from pubDate (assuming it's a string in "yyyy-mm-dd" format)
-          const pubYear = parseInt(data.currentPubDate.split("-")[0], 10);
+          const pubYear = data.pubDate
 
           if (pubYear <= 2009) {
             currentLocation = "4th Floor, Circulation Section";

@@ -95,7 +95,7 @@ const UBkResults = ({ query }) => {
             category: bookGenresMap[book.titleID]?.category || "Uncategorized",
             genres: bookGenresMap[book.titleID]?.genres || [],
             book_indiv: book.book_indiv || [],
-            publishedYear: book.originalPubDate ? new Date(book.originalPubDate).getFullYear() : "Unknown Year",
+            publishedYear: book.pubDate ? new Date(book.pubDate).getFullYear() : "Unknown Year",
           }
         })
 
@@ -324,7 +324,7 @@ const UBkResults = ({ query }) => {
                   <span className="font-semibold">Author:</span> {book.author.join(", ")}
                 </p>
                 <p>
-                  <span className="font-semibold">Published:</span> {book.publishedYear}
+                  <span className="font-semibold">Year Published:</span> {book.publishedYear}
                 </p>
                 <p>
                   <span className="font-semibold">Category:</span> {book.category}{" "}

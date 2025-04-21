@@ -27,7 +27,7 @@ const ARAbout = ({ researchData }) => {
         keywords: Array.isArray(researchData.keywords) ? researchData.keywords.join(', ') : (researchData.keywords ?? '').split(';').join(',') || '',
         pubDate: researchData.pubDate,
         location: researchData.location,
-        researchARCID: researchData.researchARCID,
+        researchCallNum: researchData.researchCallNum,
     }
 
     console.log(researchData)
@@ -54,12 +54,13 @@ const ARAbout = ({ researchData }) => {
                 <table className="w-full border-collapse">
                     <tbody>
                         {Object.entries(researchDetails)
+                            .filter(([key]) => !["researchID"].includes(key)) // Exclude multiple keys
                             .map(([key, value], index) => (
                                 <tr key={index} className="border-b border-grey">
                                     <td className="px-1 py-1 font-semibold capitalize w-1/3">
-                                        {key === "pubDate"
-                                            ? "Pub. Date:"
-                                            : key === "researchARCID"
+                                        {key === "pubdate"
+                                            ? "Pub. Year:"
+                                            : key === "researchCallNum"
                                                 ? "Call No.:"
                                                 : key.replace(/([A-Z])/g, " $1") + ":"}
                                     </td>

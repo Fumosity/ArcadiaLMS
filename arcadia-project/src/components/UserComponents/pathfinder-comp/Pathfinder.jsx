@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Grid, Astar } from "fast-astar";
 import { supabase } from "../../../supabaseClient";
 import { useLocation } from "react-router-dom";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function Pathfinder({ book }) {
     const [gridData, setGridData] = useState([]);
@@ -11,10 +13,19 @@ export default function Pathfinder({ book }) {
     const [pathfindingError, setPathfindingError] = useState(null); // State for error message
     const location = useLocation();
     const prevPathRef = useRef([]);
+    const [gridColumns, setGridColumns] = useState("");
 
-    const callNo = book.titleCallNum || book.researchCallNum;
-    const callNoPrefix = callNo.trim().split(/[\s-]/)[0];
-    console.log(callNo, callNoPrefix);
+    //console.log(book)
+
+    let callNo = ""
+    let callNoPrefix = "";
+
+    if (book) {
+        callNo = book.titleCallNum || book.researchCallNum;
+        callNoPrefix = callNo.trim().split(/[\s-]/)[0];
+        //console.log(callNo, callNoPrefix);
+    }
+
     const locations = {
         "2nd Floor, Circulation Section": { w: 28, h: 19 },
         "4th Floor, Circulation Section": { w: 27, h: 11 },
@@ -194,29 +205,29 @@ export default function Pathfinder({ book }) {
     useEffect(() => {
         console.log("Book info:", book);
         console.log("Call Number Prefix:", callNoPrefix);
-        console.log(book.location);
-    
-        if (!locations[book.location]) {
-            console.log(!locations[book.location])
+        console.log(book?.location);
+
+        if (!locations[book?.location]) {
+            console.log(!locations[book?.location])
             setPathfindingError("Pathfinding is not available.");
             return;
         }
-    
+
         const classificationType = getClassificationType(callNo);
         const isHighschoolSection = book.location === "4th Floor, Highschool and Multimedia Section";
-    
+
         if (isHighschoolSection && classificationType !== "DDC") {
             setPathfindingError("This section only supports Dewey Decimal classified books. Please contact the help desk if you see this error.");
             return;
         }
-    
+
         if (!isHighschoolSection && classificationType !== "LoC") {
             setPathfindingError("This section only supports Library of Congress classified books. Please contact the help desk if you see this error.");
             return;
         }
-    
+
         setPathfindingError(null);
-    }, [book.location, callNo]);
+    }, [book?.location, callNo]);
 
     // Function to Expand Shelves Data
     const expandShelves = (shelves) => {
@@ -237,7 +248,7 @@ export default function Pathfinder({ book }) {
         return expanded;
     };
 
-    const expandedShelves = expandShelves(shelves[book.location]);
+    const expandedShelves = expandShelves(shelves[book?.location || "2nd Floor, Circulation Section"]);
 
     const starts = {
         "2nd Floor, Circulation Section": {
@@ -256,12 +267,12 @@ export default function Pathfinder({ book }) {
 
     function getClassificationType(callNo) {
         const cleanedCallNo = callNo.trim();
-    
-        if (book.researchCallNum){
+
+        if (book.researchCallNum) {
             console.log("is research");
             return "LoC";
         }
-    
+
         if (/^[A-Z]{1,3}\s?\d+/.test(cleanedCallNo)) {
             console.log(callNo, "is LoC");
             return "LoC";
@@ -271,7 +282,7 @@ export default function Pathfinder({ book }) {
         }
         return "Unknown";
     }
-    
+
     function normalizeCallNumber(callNo) {
         const classification = getClassificationType(callNo);
         if (classification === "LoC") {
@@ -283,7 +294,7 @@ export default function Pathfinder({ book }) {
         }
         return callNo;
     }
-    
+
     function normalizeString(str, classification) {
         if (!str) return "";
         if (classification === "LoC") {
@@ -293,20 +304,19 @@ export default function Pathfinder({ book }) {
         }
         return str;
     }
-    
+
     function isInRange(call, from, to) {
         if (!call || (!from && !to)) return false;
-    
+
         const classification = getClassificationType(call);
         const normCall = normalizeString(normalizeCallNumber(call), classification);
         const normFrom = normalizeString(from, classification);
         const normTo = normalizeString(to, classification);
-    
+
         console.log(`Comparing: ${normFrom} <= ${normCall} <= ${normTo}`);
-    
+
         return normFrom <= normCall && normCall <= normTo;
     }
-    
 
     useEffect(() => {
         if (path.length === 0) return;
@@ -345,15 +355,22 @@ export default function Pathfinder({ book }) {
     }, [path]); // Re-run when `path` changes
 
     useEffect(() => {
-        console.log("LOCATION RESULTS", book.title, callNoPrefix, book.location)
+        console.log("LOCATION RESULTS", book?.title, callNoPrefix, book?.location)
+
+        if (!book?.location) {
+            setGridColumns("");
+            setGridData([]);
+            return;
+        }
 
         const cols = locations[book.location]?.w;
         const rows = locations[book.location]?.h;
         let grid = new Grid({ col: cols, row: rows });
 
-        if (locations[book.location]) {
-            setGridColumns(`repeat(${locations[book.location].w}, 24px)`);
-        }
+        setGridColumns(
+            locations[book.location] ? `repeat(${locations[book.location].w}, 24px)` : ""
+        );
+
 
         let obstacles = obstacleLoc[book.location]?.map(({ x, y }) => [x, y]) || [];
 
@@ -426,7 +443,7 @@ export default function Pathfinder({ book }) {
             }
         }
 
-        if (!exactMatch && !rangeMatch){
+        if (!exactMatch && !rangeMatch) {
             console.log("Pathfinding is not available.")
             setPathfindingError("Pathfinding is not available.")
         }
@@ -488,7 +505,16 @@ export default function Pathfinder({ book }) {
         }
         setGridData(newGrid);
         console.log(book)
-    }, [selectedStart, selectedShelf, location, callNo]);
+    }, [selectedStart, selectedShelf, location, callNo, book?.location]);
+
+    if (!book) {
+        return (
+            <div className="bg-white p-4 rounded-lg border-grey border flex flex-col justify-center">
+                <Skeleton height={30} width={`25%`} className="mb-2" />
+                <Skeleton height={150} width={`100%`} className="mb-2" />
+            </div>
+        );
+    }
 
     const arePathsEqual = (pathA, pathB) => {
         if (pathA.length !== pathB.length) return false; // Different lengths → different paths
@@ -497,8 +523,6 @@ export default function Pathfinder({ book }) {
             point.x === pathB[index][0] && point.y === pathB[index][1]
         );
     };
-
-    const [gridColumns, setGridColumns] = useState("");
 
     // Then use gridColumns in your style:
     const gridStyle = {

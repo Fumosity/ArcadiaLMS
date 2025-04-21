@@ -11,7 +11,6 @@ import SelectFormat from "../z_modals/confirmation-modals/SelectFormat";
 const ABInventory = () => {
   const navigate = useNavigate(); // Initialize useNavigate
   const [selectedBook, setSelectedBook] = useState(null); // State to hold the selected book details
-  const currentDate = new Date().toISOString().split('T')[0];
 
   const handleBookSelect = (book) => {
     setSelectedBook(book); // Update selected book
@@ -37,7 +36,7 @@ const ABInventory = () => {
     const currentDate = new Date().toISOString().split('T')[0];
 
     const headerRow = table.insertRow();
-    const headers = ["Title ID", "Title", "Author", "Publisher", "Synopsis", "Keywords", "PubDate", "Original PubDate", "Location", "Call No.", "ISBN", "Price", "Date Procured"];
+    const headers = ["Title ID", "Title", "Author", "Publisher", "Synopsis", "Keywords", "Pub. Year", "Location", "Call No.", "ISBN", "Price", "Date Procured"];
     headers.forEach(header => {
       const cell = headerRow.insertCell();
       cell.textContent = header;
@@ -45,7 +44,7 @@ const ABInventory = () => {
 
     const { data, error } = await supabase
       .from('book_titles')
-      .select("titleID, title, author, publisher, synopsis, keywords, currentPubDate, originalPubDate, location, titleCallNum, isbn, price, procurementDate");
+      .select("titleID, title, author, publisher, synopsis, keywords, pubDate, location, titleCallNum, isbn, price, procurementDate");
 
     if (error) {
       console.error("Error fetching book inventory:", error);
@@ -60,8 +59,7 @@ const ABInventory = () => {
       row.insertCell().textContent = book_titles.publisher;
       row.insertCell().textContent = book_titles.synopsis;
       row.insertCell().textContent = book_titles.keywords;
-      row.insertCell().textContent = book_titles.currentPubDate;
-      row.insertCell().textContent = book_titles.originalPubDate;
+      row.insertCell().textContent = book_titles.pubDate;
       row.insertCell().textContent = book_titles.location;
       row.insertCell().textContent = book_titles.titleCallNum;
       row.insertCell().textContent = book_titles.isbn;
@@ -84,7 +82,7 @@ const ABInventory = () => {
   const exportAsCSV = async () => {
     const { data, error } = await supabase
       .from("book_titles")
-      .select("titleCallNum, title, author, publisher, isbn, currentPubDate, originalPubDate, procurementDate");
+      .select("titleCallNum, title, author, publisher, isbn, pubDate, procurementDate");
 
     if (error) {
       console.error("Error fetching book inventory:", error);
@@ -96,7 +94,7 @@ const ABInventory = () => {
     // Define CSV headers
     const headers = [
       "Title Call No.", "Title", "Author", "Publisher",
-      "ISBN", "Current Pub Date", "Original Pub Date", "Procurement Date"
+      "ISBN", "Pub Date", "Procurement Date"
     ];
 
     // Initialize CSV content with headers
@@ -109,8 +107,7 @@ const ABInventory = () => {
         `"${book.author}"`,
         `"${book.publisher}"`,
         `"${book.isbn}"`,
-        `"${book.currentPubDate}"`,
-        `"${book.originalPubDate}"`,
+        `"${book.pubDate}"`,
         `"${book.procurementDate}"`
       ].join(","));
     });

@@ -353,7 +353,7 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
                               <option value="department">Department</option>
                               <option value="abstract">Abstract</option>
                               <option value="keywords">Keyword/s</option>
-                              <option value="pubDate">Pub. Date</option>
+                              <option value="pubDate">Pub. Year</option>
                               <option value="skip">Skip</option>
                             </select>
                           </td>

@@ -9,8 +9,7 @@ const ABAddPreview = ({ formData }) => {
     publisher: formData.publisher || '',
     synopsis: formData.synopsis || '',
     keywords: Array.isArray(formData.keywords) ? formData.keywords.join(', ') : (formData.keywords ?? '').split(';').join(',') || '',
-    currentPubDate: formData.currentPubDate || '',
-    originalPubDate: formData.originalPubDate || '',
+    pubDate: formData.pubDate || '',
     procurementDate: formData.procDate || '',
     location: formData.location || '',
     titleCallNum: formData.titleCallNum || '',
@@ -33,18 +32,12 @@ const ABAddPreview = ({ formData }) => {
             {Object.entries(bookDetails)
               .filter(([key]) => !["cover", "procurementDate", "titleCallNum", "titleID"].includes(key)) // Exclude multiple keys
               .map(([key, value], index) => {
-                if (key === 'currentPubDate' || key === 'originalPubDate') {
+                if (key === 'pubDate') {
                   return (
                     <>
-                      {key === 'currentPubDate' && (
-                        <tr key="currentPubDate" className="border-b border-grey">
-                          <td className="px-1 py-1 font-semibold capitalize w-1/3">Current Pub. Date:</td>
-                          <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
-                        </tr>
-                      )}
-                      {key === 'originalPubDate' && (
-                        <tr key="originalPubDate" className="border-b border-grey">
-                          <td className="px-1 py-1 font-semibold capitalize w-1/3">Original Pub. Date:</td>
+                      {key === 'pubDate' && (
+                        <tr key="pubDate" className="border-b border-grey">
+                          <td className="px-1 py-1 font-semibold capitalize w-1/3">Pub. Year:</td>
                           <td className="px-1 py-1 text-sm break-words w-2/3">{value}</td>
                         </tr>
                       )}

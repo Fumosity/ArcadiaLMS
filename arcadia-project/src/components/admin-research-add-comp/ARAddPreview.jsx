@@ -42,7 +42,7 @@ const ARAddPreview = ({ formData }) => {
                 <td className="px-1 py-1 font-semibold capitalize w-1/3" >
                   {key == "researchCallNum" ? "Call No."
                   :
-                  key == "datePublished" ? "Pub. Date"
+                  key == "datePublished" ? "Pub. Year"
                   :
                   key.replace(/([A-Z])/g, ' $1')}:
                 </td>

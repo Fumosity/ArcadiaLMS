@@ -79,7 +79,7 @@ useEffect(() => {
             return
         }
 
-        const publishedYear = data.originalPubDate ? new Date(data.originalPubDate).getFullYear() : "Unknown Year"
+        const publishedYear = data.pubDate ? new Date(data.pubDate).getFullYear() : "Unknown Year"
 
         setBookDetails({
             ...data,

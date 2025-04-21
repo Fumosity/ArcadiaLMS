@@ -10,6 +10,7 @@ import Title from "../components/main-comp/Title"
 import { supabase } from "/src/supabaseClient.js" // Import Supabase client
 import { useNavigate } from "react-router-dom" // Import useNavigate
 import BookCopiesSection from "./BookCopiesSection"
+import Pathfinder from "../components/UserComponents/pathfinder-comp/Pathfinder"
 
 
 export default function ABViewer() {
@@ -102,6 +103,7 @@ export default function ABViewer() {
             <PopularAmong titleID={book?.titleID || titleID}/>
             <SimilarTo titleID={book?.titleID || titleID}/>
           </div>
+          <Pathfinder book={book} loading={loading}/>
           <BookCopiesSection titleID={book?.titleID || titleID} />
           <Analytics titleID={book?.titleID || titleID} />
           <PastReviews titleID={book?.titleID || titleID} />

@@ -41,8 +41,7 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
     publisher: book.publisher,
     synopsis: book.synopsis,
     keywords: Array.isArray(book.keywords) ? book.keywords.join(', ') : (book.keywords ?? '').split(';').join(',') || '',
-    currdatePublished: book.currentPubDate,
-    orgdatePublished: book.originalPubDate,
+    pubDate: book.pubDate,
     location: book.location,
     isbn: book.isbn,
     cover: book.cover,
@@ -98,11 +97,9 @@ const BookPreviewInventory = ({ book, onBookUpdate }) => {
               .map(([key, value], index) => (
                 <tr key={index} className="border-b border-grey">
                   <td className="px-1 py-1 font-semibold capitalize w-1/3">
-                    {key === "currdatePublished"
-                      ? "Current Pub. Date:"
-                      : key === "orgdatePublished"
-                        ? "Original Pub. Date:"
-                        : key === "isbn"
+                    {key === "pubdate"
+                      ? "Pub. Year:"
+                      : key === "isbn"
                           ? "ISBN:"
                           : key === "titleCallNum"
                             ? "Call No.:"

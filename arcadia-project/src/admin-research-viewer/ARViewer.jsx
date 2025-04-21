@@ -9,6 +9,7 @@ import ARPastReview from "../components/admin-research-viewer/ARPastReview";
 import { supabase } from "/src/supabaseClient.js";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import Pathfinder from "../components/UserComponents/pathfinder-comp/Pathfinder";
 
 const ARViewer = () => {
     const navigate = useNavigate(); // Initialize useNavigate
@@ -57,6 +58,8 @@ const ARViewer = () => {
                         </button>
                     </div>
                     <ARTitle researchData={researchData} /> {/* Pass research data to ARTitle */}
+                    <Pathfinder book={researchData}/>
+            
                     <ARFullText researchData={researchData} />
                 </div>
 

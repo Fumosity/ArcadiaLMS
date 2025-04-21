@@ -79,15 +79,22 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
     }
   }, [formData.college])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData({ ...formData, [name]: value })
+  const currentYear = (new Date().getFullYear()) + 10;
 
-    // Clear validation error when field is filled
-    if (value.trim() !== "") {
-      setValidationErrors((prev) => ({ ...prev, [name]: false }))
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === 'pubDate' && value.length > 4) {
+      setFormData({ ...formData, [name]: value.slice(0, 4) });
+      return;
     }
-  }
+
+    setFormData({ ...formData, [name]: value });
+
+    if (value) {
+      setValidationErrors((prevErrors) => ({ ...prevErrors, [name]: false }));
+    }
+  };
 
   const handleReset = async () => {
     const queryParams = new URLSearchParams(location.search)
@@ -447,16 +454,16 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
                     />
                   </div>
                   <div className="flex justify-between items-center">
-                    <label className="w-1/4">Date Published:</label>
+                    <label className="w-1/4">Year Published:</label>
                     <input
-                      type="date"
+                      type="number"
                       name="pubDate"
-                      className={`w-2/3 px-3 py-1 rounded-full border ${
-                        attemptedSubmit && validationErrors.pubDate ? "border-red border-2" : "border-grey"
-                      }`}
-                      value={formData.pubDate || ""}
+                      className="w-2/3 px-3 py-1 rounded-full border border-grey"
+                      value={formData.pubDate}
                       onChange={handleChange}
-                      required
+                      min={2000}
+                      max={currentYear}
+                      placeholder="YYYY"
                     />
                   </div>
                   <div className="flex justify-between items-center">
@@ -471,6 +478,7 @@ const ResearchModify = ({ formData, setFormData, onSave }) => {
                       onChange={handleChange}
                       placeholder="Shelf Location"
                       required
+                      disabled
                     />
                   </div>
                   <div className="flex justify-between items-center">
