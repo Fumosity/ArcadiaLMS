@@ -60,6 +60,23 @@ export default function Onboarding({ userData, selectedGenres }) {
             const newUserID = userInsertData[0].userID
             console.log("New userID:", newUserID)
 
+            // Insert selected genres
+            if (selectedGenres.length > 0) {
+                const genreLinks = selectedGenres.map((genreID) => ({
+                    userID: newUserID,
+                    genreID,
+                }))
+
+                const { error: genreInsertError } = await supabase.from("user_genre_link").insert(genreLinks)
+
+                if (genreInsertError) {
+                    console.error("Error inserting interests:", genreInsertError)
+                    alert("Failed to save interests.")
+                } else {
+                    console.log("User interests added successfully.")
+                }
+            }
+
             // Send verification email - use API_URL to ensure correct endpoint
             const response = await fetch(`${API_URL}/send-email`, {
                 method: "POST",
@@ -78,24 +95,7 @@ export default function Onboarding({ userData, selectedGenres }) {
               } else {
                 console.error("Email sending failed:", result.detail || result.error)
                 toast.error("Failed to send verification email.", { autoClose: false })
-              }
-
-            // Insert selected genres
-            if (selectedGenres.length > 0) {
-                const genreLinks = selectedGenres.map((genreID) => ({
-                    userID: newUserID,
-                    genreID,
-                }))
-
-                const { error: genreInsertError } = await supabase.from("user_genre_link").insert(genreLinks)
-
-                if (genreInsertError) {
-                    console.error("Error inserting interests:", genreInsertError)
-                    alert("Failed to save interests.")
-                } else {
-                    console.log("User interests added successfully.")
-                }
-            }
+              }  
 
             // Navigate to login after success
             navigate("/user/login")
