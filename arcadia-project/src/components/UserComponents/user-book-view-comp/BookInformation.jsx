@@ -172,7 +172,7 @@ export default function BookInformation({ book }) {
               <span className="font-semibold">Author:</span> {book.author.join(", ")}
             </p>
             <p>
-              <span className="font-semibold">Year Published:</span> {book.publishedYear}
+              <span className="font-semibold">Year Published:</span> {book.pubDate}
             </p>
             <p>
               <span className="font-semibold">Category:</span> {book.category}{" "}
