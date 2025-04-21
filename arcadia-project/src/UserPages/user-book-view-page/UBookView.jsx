@@ -115,7 +115,7 @@ const UBookView = () => {
           publishedYear,
           genres: genreMap[titleId]?.genres || [],
           category: genreMap[titleId]?.category || "Unknown",
-          location: currentLocation
+          //location: currentLocation
         })
       } catch (err) {
         console.error("Unexpected error:", err)
