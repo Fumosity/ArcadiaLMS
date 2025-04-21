@@ -510,11 +510,10 @@ const BookModify = ({ formData, setFormData, onSave }) => {
               </div>
               <div className="flex justify-between items-center">
                 <label className="w-1/4">Keywords:</label>
-                <input type="text" name="keywords" required
+                <input type="text" name="keywords"
                   className="w-2/3 px-3 py-1 rounded-full border border-grey"
                   value={formData.keywords}
                   onChange={handleChange}
-                  style={validationErrors.keywords ? errorStyle : {}}
                   placeholder="Keyword 1; Keyword 2; Keyword 3; ..."
                 />
               </div>

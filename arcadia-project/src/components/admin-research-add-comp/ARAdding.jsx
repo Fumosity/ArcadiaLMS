@@ -348,8 +348,6 @@ const ARAdding = ({ formData, setFormData }) => {
                       value={formData.keywords}
                       onChange={handleChange}
                       placeholder="Keyword 1; Keyword 2; Keyword 3;..."
-                      style={validationErrors.keywords ? errorStyle : {}}
-                      required
                     />
                   </div>
                   <div className="flex justify-between items-center">
