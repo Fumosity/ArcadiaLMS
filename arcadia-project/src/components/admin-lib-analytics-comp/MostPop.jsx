@@ -10,47 +10,78 @@ const MostPop = () => {
 
   const fetchMostPopular = async () => {
     try {
-      // Fetch all borrow transactions
+      // Step 1: Fetch all borrow transactions
       const { data: transactions, error: transactionError } = await supabase
         .from("book_transactions")
         .select("bookBarcode")
 
       if (transactionError) throw transactionError
 
-      // Count borrows per bookBarcode
+      // Step 2: Count borrows per bookBarcode
       const borrowCountMap = transactions.reduce((acc, { bookBarcode }) => {
         acc[bookBarcode] = (acc[bookBarcode] || 0) + 1
         return acc
       }, {})
 
-      // Fetch book metadata and join with book_titles
+      // Step 3: Fetch book metadata (bookBarcode, titleID, and book_titles details)
       const { data: bookMetadata, error: bookError } = await supabase
         .from("book_indiv")
-        .select("bookBarcode, titleID, book_titles(titleID, title)")
+        .select("bookBarcode, titleID, book_titles(titleID, title, author, cover)")
 
       if (bookError) throw bookError
 
-      // Aggregate borrow counts by titleID
+      // Step 4: Aggregate borrow counts by titleID
       const titleBorrowMap = {}
 
       bookMetadata.forEach(({ bookBarcode, titleID, book_titles }) => {
         if (!titleBorrowMap[titleID]) {
           titleBorrowMap[titleID] = {
-            title: book_titles.title,
-            borrowCount: 0,
-            titleID: book_titles.titleID,
+            ...book_titles,
+            borrowCount: 0, // Initialize borrow count
           }
         }
         titleBorrowMap[titleID].borrowCount += borrowCountMap[bookBarcode] || 0
       })
 
-      // Convert object to array, sort, and get top 10
-      const books = Object.values(titleBorrowMap)
-        .filter((book) => book.borrowCount > 0) // Only include books with at least one borrow
-        .sort((a, b) => b.borrowCount - a.borrowCount)
-        .slice(0, 10)
+      // Step 5: Fetch genres and categories
+      const titleIDs = Object.keys(titleBorrowMap)
+      const { data: genreData, error: genreError } = await supabase
+        .from("book_genre_link")
+        .select("titleID, genreID, genres(genreID, genreName, category)")
+        .in("titleID", titleIDs)
 
-      return books
+      if (genreError) throw genreError
+
+      // Step 6: Structure genres and categories
+      const genreMap = {}
+      if (genreData) {
+        genreData.forEach(({ titleID, genres }) => {
+          if (genres && titleID) {
+            if (!genreMap[titleID]) {
+              genreMap[titleID] = { genres: [], category: genres.category }
+            }
+            genreMap[titleID].genres.push(genres.genreName)
+          }
+        })
+      }
+
+      // Step 7: Add genres and categories to books
+      const booksWithDetails = Object.values(titleBorrowMap)
+        .filter((book) => book.borrowCount > 0) // Only include books that have been borrowed at least once
+        .map((book) => {
+          const titleID = book.titleID
+          return {
+            ...book,
+            genres: genreMap[titleID]?.genres || [],
+            category: genreMap[titleID]?.category || "Unknown",
+          }
+        })
+
+      // Step 8: Sort by borrow count and return the top books
+      const sortedBooks = booksWithDetails.sort((a, b) => b.borrowCount - a.borrowCount).slice(0, 5)
+
+      console.log("Top 5 most popular books:", sortedBooks)
+      return sortedBooks
     } catch (error) {
       console.error("Error fetching most popular books:", error)
       return []
@@ -123,4 +154,3 @@ const MostPop = () => {
 }
 
 export default MostPop
-
