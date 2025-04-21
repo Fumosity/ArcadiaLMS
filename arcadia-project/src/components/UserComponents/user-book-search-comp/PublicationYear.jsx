@@ -86,7 +86,7 @@ export default function PublicationYear() {
         </div>
         <div className="mt-4 w-full">
           <div className="flex items-center w-full space-x-4">
-            <div>
+            <div className="w-1/2">
               <b>
                 <label htmlFor="from" className="text-xs block mb-1">
                   From
@@ -103,7 +103,7 @@ export default function PublicationYear() {
                 max={maxYear}
               />
             </div>
-            <div>
+            <div className="w-1/2">
               <b>
                 <label htmlFor="to" className="text-xs block mb-1">
                   Through
@@ -131,7 +131,7 @@ export default function PublicationYear() {
           {loading && <p className="text-xs text-gray-500 mt-2">Loading publication years...</p>}
 
           {!loading && availableYears.length > 0 && (
-            <div className="mt-2 text-xs text-gray-500">
+            <div className="mt-2 text-sm text-gray-500">
               <p>
                 Available years: {minYear} - {maxYear}
               </p>
