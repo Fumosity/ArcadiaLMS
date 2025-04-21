@@ -11,6 +11,12 @@ const UFooter = () => {
         navigate(`${path}?view=${query}`);
         scrollToTop();
     };
+    const contactlink = [
+        {
+            email: "cav-arc@lpu.edu.ph",
+        },
+
+    ]
 
     return (
         <footer className="bg-arcadia-black text-white w-full px-6 py-12">
@@ -31,10 +37,14 @@ const UFooter = () => {
                     </p>
 
                     <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                            <FaEnvelope size={20} className="text-gray-300" />
-                            <span className="text-sm">cav-arc@lpu.edu.ph</span>
-                        </div>
+                        {contactlink.map((contact, index) => (
+                            <div key={index} className="flex items-center space-x-2">
+                                <FaEnvelope size={20} className="text-gray-300" />
+                                <a href={`mailto:${contact.email}`} className="text-sm hover:text-gray-300 transition">
+                                    {contact.email}
+                                </a>
+                            </div>
+                        ))}
                         <div className="flex items-center space-x-2">
                             <FaFacebookSquare size={20} className="text-blue-500" />
                             <a
@@ -57,7 +67,7 @@ const UFooter = () => {
                             <h3 className="font-bold text-lg mb-4">Resources</h3>
                             <ul className="space-y-3 text-sm text-gray-400">
                                 <li>
-                                    <button 
+                                    <button
                                         onClick={() => navigateWithQuery("/user/bookmanagement", "mostPopular")}
                                         className="hover:text-white transition text-left w-full"
                                     >
@@ -65,7 +75,7 @@ const UFooter = () => {
                                     </button>
                                 </li>
                                 <li>
-                                    <button 
+                                    <button
                                         onClick={() => navigateWithQuery("/user/bookmanagement", "highlyRated")}
                                         className="hover:text-white transition text-left w-full"
                                     >
@@ -73,7 +83,7 @@ const UFooter = () => {
                                     </button>
                                 </li>
                                 <li>
-                                    <button 
+                                    <button
                                         onClick={() => navigateWithQuery("/user/researchmanagement", "recommended")}
                                         className="hover:text-white transition text-left w-full"
                                     >
@@ -81,8 +91,8 @@ const UFooter = () => {
                                     </button>
                                 </li>
                                 <li>
-                                    <Link 
-                                        to="/user/faqs" 
+                                    <Link
+                                        to="/user/faqs"
                                         className="hover:text-white transition block"
                                         onClick={handleLinkClick}
                                     >
@@ -111,8 +121,8 @@ const UFooter = () => {
                                     </Link>
                                 </li> */}
                                 <li>
-                                    <Link 
-                                        to="/user/reservations" 
+                                    <Link
+                                        to="/user/reservations"
                                         className="hover:text-white transition block"
                                         onClick={handleLinkClick}
                                     >
@@ -120,8 +130,8 @@ const UFooter = () => {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link 
-                                        to="/user/services" 
+                                    <Link
+                                        to="/user/services"
                                         className="hover:text-white transition block"
                                         onClick={handleLinkClick}
                                     >
@@ -136,8 +146,8 @@ const UFooter = () => {
                             <h3 className="font-bold text-lg mb-4">Account</h3>
                             <ul className="space-y-3 text-sm text-gray-400">
                                 <li>
-                                    <Link 
-                                        to="/user/accountview" 
+                                    <Link
+                                        to="/user/accountview"
                                         className="hover:text-white transition block"
                                         onClick={handleLinkClick}
                                     >
@@ -145,8 +155,8 @@ const UFooter = () => {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link 
-                                        to="/user/accountview" 
+                                    <Link
+                                        to="/user/accountview"
                                         className="hover:text-white transition block"
                                         onClick={() => {
                                             const middle = Math.floor(document.documentElement.scrollHeight / 2);
@@ -157,8 +167,8 @@ const UFooter = () => {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link 
-                                        to="/user/support" 
+                                    <Link
+                                        to="/user/support"
                                         className="hover:text-white transition block"
                                         onClick={handleLinkClick}
                                     >

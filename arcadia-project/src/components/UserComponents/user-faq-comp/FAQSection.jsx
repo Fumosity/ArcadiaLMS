@@ -15,10 +15,7 @@ const faqData = [
     question: "How do I contact the ARC staff?",
     answer: "You can reach the ARC staff through our help desk during operating hours, or by using the contact form in the Support section of the website.",
   },
-  {
-    question: "Why can't I access Arcadia outside of the school premises?",
-    answer: "Access to Arcadia is restricted to school premises for security and licensing reasons. However, certain resources may be available remotely with proper authentication.",
-  },
+  
   {
     question: "Why can't I find the book that I am looking for?",
     answer: "If you cannot find a specific book, it might be currently checked out, in processing, or not part of our collection. Please check with the library staff for assistance or to place a hold.",
