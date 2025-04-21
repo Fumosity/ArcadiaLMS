@@ -95,7 +95,7 @@ const UBkResults = ({ query }) => {
             category: bookGenresMap[book.titleID]?.category || "Uncategorized",
             genres: bookGenresMap[book.titleID]?.genres || [],
             book_indiv: book.book_indiv || [],
-            publishedYear: book.pubDate ? new Date(book.pubDate).getFullYear() : "Unknown Year",
+            pubDate: book.pubDate,
           }
         })
 
@@ -163,15 +163,15 @@ const UBkResults = ({ query }) => {
 
         if (fromYear) {
           results = results.filter(
-            (book) => book.publishedYear !== "Unknown Year" && Number.parseInt(book.publishedYear) >= fromYear,
+            (book) => book.pubDate !== "Unknown Year" && Number.parseInt(book.pubDate) >= fromYear,
           )
         }
       } else if (yearRange.from || yearRange.to) {
         // Apply custom year range
         results = results.filter((book) => {
-          if (book.publishedYear === "Unknown Year") return false
+          if (book.pubDate === "Unknown Year") return false
 
-          const pubYear = Number.parseInt(book.publishedYear)
+          const pubYear = Number.parseInt(book.pubDate)
           const fromCondition = yearRange.from ? pubYear >= Number.parseInt(yearRange.from) : true
           const toCondition = yearRange.to ? pubYear <= Number.parseInt(yearRange.to) : true
 
@@ -218,16 +218,16 @@ const UBkResults = ({ query }) => {
           break
         case "date-desc":
           results.sort((a, b) => {
-            if (a.publishedYear === "Unknown Year") return 1
-            if (b.publishedYear === "Unknown Year") return -1
-            return Number.parseInt(b.publishedYear) - Number.parseInt(a.publishedYear)
+            if (a.pubDate === "Unknown Year") return 1
+            if (b.pubDate === "Unknown Year") return -1
+            return Number.parseInt(b.pubDate) - Number.parseInt(a.pubDate)
           })
           break
         case "date-asc":
           results.sort((a, b) => {
-            if (a.publishedYear === "Unknown Year") return 1
-            if (b.publishedYear === "Unknown Year") return -1
-            return Number.parseInt(a.publishedYear) - Number.parseInt(b.publishedYear)
+            if (a.pubDate === "Unknown Year") return 1
+            if (b.pubDate === "Unknown Year") return -1
+            return Number.parseInt(a.pubDate) - Number.parseInt(b.pubDate)
           })
           break
         case "rating-desc":
@@ -324,7 +324,7 @@ const UBkResults = ({ query }) => {
                   <span className="font-semibold">Author:</span> {book.author.join(", ")}
                 </p>
                 <p>
-                  <span className="font-semibold">Year Published:</span> {book.publishedYear}
+                  <span className="font-semibold">Year Published:</span> {book.pubDate}
                 </p>
                 <p>
                   <span className="font-semibold">Category:</span> {book.category}{" "}

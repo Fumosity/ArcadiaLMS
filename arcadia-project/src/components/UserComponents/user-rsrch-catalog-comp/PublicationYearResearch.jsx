@@ -24,9 +24,9 @@ export default function PublicationYearResearch() {
 
         // Extract years from dates and remove duplicates
         const years = data
-          .map((research) => new Date(research.pubDate).getFullYear())
-          .filter((year) => !isNaN(year))
-          .sort((a, b) => b - a) // Sort descending (newest first)
+          .map((book) => book.pubDate)
+          .filter((year) => typeof year === 'number' && !isNaN(year)) // Ensure it's a number
+          .sort((a, b) => b - a); // Sort descending (newest first)
 
         // Remove duplicates
         const uniqueYears = [...new Set(years)]
