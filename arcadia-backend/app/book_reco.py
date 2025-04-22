@@ -2,6 +2,8 @@ import pandas as pd
 from supabase import create_client, Client
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from typing import List, Optional
+import random
 
 # Your Supabase credentials
 SUPABASE_URL = "https://mibimdahipesicbwtmkv.supabase.co"
@@ -73,56 +75,67 @@ if 'features' in books_df.columns:
     cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 else:
     print("Warning: 'features' column is missing for TF-IDF calculation.")
+    cosine_sim = None # Set to None if features are missing
 
-def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df):
-    print("GETTING RECOMMENDATIONS - TITLEID:", titleID, "USERID:", userID)
+def get_recommendations(titleID: Optional[str] = None, userID: Optional[str] = None, recommend_type: str = 'hybrid', cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df):
+    #print(f"GETTING RECOMMENDATIONS - TYPE: {recommend_type}, TITLEID: {titleID}, USERID: {userID}")
+
+    if recommend_type == 'random':
+        if not books_df.empty:
+            random_indices = random.sample(books_df.index.tolist(), min(5, len(books_df)))
+            return books_df.loc[random_indices][["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]]
+        else:
+            return pd.DataFrame()
 
     if titleID is None and userID is None:
         print("No titleID or userID provided. Returning top-rated books.")
-        return books_df.sort_values(by="average_rating", ascending=False).head(5)
+        return books_df.sort_values(by="average_rating", ascending=False).head(5)[["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]]
 
-    book_indices = []  # Ensure book_indices is initialized
+    book_indices = []
 
-    if titleID is not None and userID is not None:
-        print("Using Hybrid Recommendation (Content + Collaborative)")
+    if recommend_type == 'hybrid' and titleID is not None and userID is not None and cosine_sim is not None:
+        #print("Using Hybrid Recommendation (Content + Collaborative)")
         if titleID not in books_df["titleID"].values:
-            print("Warning: titleID not found in books_df. Falling back to top-rated books.")
-            return books_df.sort_values(by="average_rating", ascending=False).head(5)
+            print("Warning: titleID not found in books_df. Falling back to collaborative.")
+            return get_recommendations(userID=userID, recommend_type='collaborative', cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df)
 
         idx = books_df[books_df["titleID"] == titleID].index[0]
         content_sim_scores = list(enumerate(cosine_sim[idx]))
         content_sim_scores = sorted(content_sim_scores, key=lambda x: x[1], reverse=True)[1:6]
 
-        rating_sim_scores = []
-        for i, row in books_df.iterrows():
-            other_titleID = row["titleID"]
-            other_ratings = ratings_df[ratings_df["titleID"] == other_titleID]
-            rating_sim = 1 / (1 + abs(books_df["average_rating"].iloc[idx] - other_ratings["ratingValue"].mean())) if not other_ratings.empty else 0
-            rating_sim_scores.append((i, rating_sim))
-        
-        combined_scores = [
-            (i, content_sim * 0.7 + rating_sim * 0.3)
-            for (i, content_sim), (_, rating_sim) in zip(content_sim_scores, rating_sim_scores)
-        ]
-        combined_scores = sorted(combined_scores, key=lambda x: x[1], reverse=True)
-        book_indices = [i[0] for i in combined_scores]
+        user_college = users_df[users_df["userID"] == userID]["userCollege"].iloc[0]
+        user_department = users_df[users_df["userID"] == userID]["userDepartment"].iloc[0]
+        college_ratings = ratings_df[(ratings_df["userCollege"] == user_college) & (ratings_df["userDepartment"] == user_department)]
+        college_avg_ratings = college_ratings.groupby("titleID")["ratingValue"].mean()
+        rating_sim_indices = [books_df[books_df["titleID"] == tid].index[0] for tid in college_avg_ratings.nlargest(5).index if tid in books_df["titleID"].values]
+        rating_sim_scores = [(i, 1.0) for i in rating_sim_indices] # Assign a high score for simplicity
 
-    elif titleID is not None:
-        print("Using Content-Based Recommendation")
+        # Combine scores (simple average for now)
+        combined_scores = {}
+        for content_idx, content_score in content_sim_scores:
+            combined_scores[content_idx] = combined_scores.get(content_idx, 0) + content_score * 0.5
+        for rating_idx, rating_score in rating_sim_scores:
+            combined_scores[rating_idx] = combined_scores.get(rating_idx, 0) + rating_score * 0.5
+
+        sorted_combined_scores = sorted(combined_scores.items(), key=lambda item: item[1], reverse=True)
+        book_indices = [i[0] for i in sorted_combined_scores[:5]]
+
+    elif recommend_type == 'content' and titleID is not None and cosine_sim is not None:
+        #print("Using Content-Based Recommendation")
         if titleID not in books_df["titleID"].values:
-            print("Warning: titleID not found in books_df. Falling back to top-rated books.")
-            return books_df.sort_values(by="average_rating", ascending=False).head(5)
+            print("Warning: titleID not found in books_df.")
+            return pd.DataFrame()
 
         idx = books_df[books_df["titleID"] == titleID].index[0]
         content_sim_scores = list(enumerate(cosine_sim[idx]))
         content_sim_scores = sorted(content_sim_scores, key=lambda x: x[1], reverse=True)[1:6]
         book_indices = [i[0] for i in content_sim_scores]
 
-    elif userID is not None:
-        print("Using Collaborative Filtering")
+    elif recommend_type == 'collaborative' and userID is not None:
+        #print("Using Collaborative Filtering")
         if userID not in users_df["userID"].values:
-            print("Warning: userID not found in users_df. Falling back to top-rated books.")
-            return books_df.sort_values(by="average_rating", ascending=False).head(5)
+            print("Warning: userID not found in users_df.")
+            return pd.DataFrame()
 
         user_college = users_df[users_df["userID"] == userID]["userCollege"].iloc[0]
         user_department = users_df[users_df["userID"] == userID]["userDepartment"].iloc[0]
@@ -131,89 +144,144 @@ def get_recommendations(titleID=None, userID=None, cosine_sim=cosine_sim, books_
         college_avg_ratings = college_ratings.groupby("titleID")["ratingValue"].mean()
         recommended_books = college_avg_ratings.sort_values(ascending=False).index.tolist()
 
-        # Get the valid book indices from the books_df
         valid_titleIDs = set(books_df["titleID"])
-        book_indices = [books_df[books_df["titleID"] == titleID].index[0] for titleID in recommended_books if titleID in valid_titleIDs]
+        book_indices = [books_df[books_df["titleID"] == tid].index[0] for tid in recommended_books[:5] if tid in valid_titleIDs]
 
-        # If no valid books were found, fallback to top-rated books
-        if not book_indices:
-            print("No valid books found, returning top-rated books.")
-            return books_df.sort_values(by="average_rating", ascending=False).head(5)
-
-        print("Book indices:", book_indices)
+    if book_indices:
         return books_df[["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]].iloc[book_indices]
-
     else:
-        print("Returning Top-Rated Books")
-        book_indices = books_df.sort_values(by="average_rating", ascending=False).head(5).index.tolist()
+        return pd.DataFrame()
 
-    print("Book indices:", book_indices)
-    print("Books DataFrame shape:", books_df.shape)
+def precision_at_k(actual: List[str], predicted: List[str], k: int) -> float:
+    """Calculates precision at k."""
+    if not predicted:
+        return 0.0
+    relevant_in_top_k = sum(1 for item in predicted[:k] if item in actual)
+    return relevant_in_top_k / min(k, len(predicted))
 
-    return books_df[["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]].iloc[book_indices]
+def recall_at_k(actual: List[str], predicted: List[str], k: int) -> float:
+    """Calculates recall at k."""
+    if not actual:
+        return 1.0
+    relevant_in_top_k = sum(1 for item in predicted[:k] if item in actual)
+    return relevant_in_top_k / len(actual)
 
+def f1_at_k(precision: float, recall: float) -> float:
+    """Calculates F1-score."""
+    if precision + recall == 0:
+        return 0.0
+    return 2 * (precision * recall) / (precision + recall)
 
-def evaluate_recommendations(books_df, ratings_df, users_df, K=5):
-    """
-    Evaluates the recommendation system using Precision@K, Recall@K, and F1@K.
-    """
-    precision_list = []
-    recall_list = []
-    f1_list = []
+def evaluate_single_strategy(books_df, ratings_df, users_df, strategy: str, cosine_sim, k_values: List[int] = [5, 10, 20], rating_threshold: int = 4):
+    """Evaluates a single recommendation strategy for a set of k values."""
+    all_user_ids = users_df['userID'].unique()
+    results = {}
 
-    # Ensure necessary columns exist
-    if 'userID' not in ratings_df.columns or 'titleID' not in ratings_df.columns:
-        print("Missing 'userID' or 'titleID' in ratings_df.")
-        return
+    for k in k_values:
+        precision_scores = []
+        recall_scores = []
+        f1_scores = []
 
-    user_ids = ratings_df['userID'].unique()
+        for user_id in all_user_ids:
+            user_ratings = ratings_df[ratings_df['userID'] == user_id]
+            if user_ratings.empty or user_ratings['titleID'].nunique() < 1:
+                continue
 
-    for user_id in user_ids:
-        # Get the books the user has rated
-        user_rated_books = ratings_df[ratings_df['userID'] == user_id]['titleID'].tolist()
+            actual_liked_books = user_ratings[user_ratings['ratingValue'] >= rating_threshold]['titleID'].tolist()
+            predicted_df = pd.DataFrame()
 
-        # Skip users with fewer than 2 rated books
-        if len(user_rated_books) < 2:
-            continue
+            if strategy == 'hybrid':
+                rated_books_by_user = user_ratings['titleID'].unique().tolist()
+                random_rated_book = random.choice(rated_books_by_user)
+                predicted_df = get_recommendations(userID=user_id, titleID=random_rated_book, recommend_type=strategy, cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df)
+            elif strategy == 'content':
+                rated_books_by_user = user_ratings['titleID'].unique().tolist()
+                random_rated_book = random.choice(rated_books_by_user)
+                predicted_df = get_recommendations(titleID=random_rated_book, recommend_type=strategy, cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df)
+            elif strategy == 'collaborative':
+                predicted_df = get_recommendations(userID=user_id, recommend_type=strategy, cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df)
+            elif strategy == 'random':
+                predicted_df = get_recommendations(recommend_type=strategy, books_df=books_df)
 
-        # Use the last rated book as the seed
-        seed_title_id = user_rated_books[-1]
+            predicted_books = []
+            if not predicted_df.empty and 'titleID' in predicted_df.columns:
+                predicted_books = predicted_df['titleID'].tolist()[:k]
+            elif not predicted_df.empty:
+                print(f"Warning: DataFrame returned by get_recommendations for strategy '{strategy}' does not contain 'titleID' column.")
 
-        # Get recommendations
-        recommended_books = get_recommendations(titleID=seed_title_id, userID=user_id)
+            precision = precision_at_k(actual_liked_books, predicted_books, k)
+            recall = recall_at_k(actual_liked_books, predicted_books, k)
+            f1 = f1_at_k(precision, recall)
 
-        # Ensure recommended_books is a DataFrame
-        if isinstance(recommended_books, pd.DataFrame):
-            recommended_ids = recommended_books['titleID'].tolist()
-        else:
-            continue
+            precision_scores.append(precision)
+            recall_scores.append(recall)
+            f1_scores.append(f1)
 
-        # Relevant items are those the user has rated, excluding the seed
-        relevant_items = set(user_rated_books[:-1])
+        avg_precision = sum(precision_scores) / len(precision_scores) if precision_scores else 0
+        avg_recall = sum(recall_scores) / len(recall_scores) if recall_scores else 0
+        avg_f1 = sum(f1_scores) / len(f1_scores) if f1_scores else 0
 
-        # Recommended items
-        recommended_items = set(recommended_ids)
+        results[f'Precision@{k}'] = avg_precision
+        results[f'Recall@{k}'] = avg_recall
+        results[f'F1@{k}'] = avg_f1
 
-        # True positives
-        true_positives = relevant_items & recommended_items
+    print(f"\n--- Evaluation Results for {strategy.capitalize()} Recommendations (rating_threshold={rating_threshold}) ---")
+    for k in k_values:
+        print(f"  Precision@{k}: {results[f'Precision@{k}']:.4f}")
+        print(f"  Recall@{k}: {results[f'Recall@{k}']:.4f}")
+        print(f"  F1@{k}: {results[f'F1@{k}']:.4f}")
+    return results
 
-        # Calculate metrics
-        precision = len(true_positives) / K if K else 0
-        recall = len(true_positives) / len(relevant_items) if relevant_items else 0
-        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) else 0
+def evaluate_content_based(books_df, ratings_df, users_df, cosine_sim, k_values: List[int] = [5, 10, 20], rating_threshold: int = 4):
+    """Evaluates content-based recommendations."""
+    all_user_ids = users_df['userID'].unique()
+    results = {}
 
-        precision_list.append(precision)
-        recall_list.append(recall)
-        f1_list.append(f1)
+    for k in k_values:
+        precision_scores = []
+        recall_scores = []
+        f1_scores = []
 
-    # Compute average metrics
-    avg_precision = sum(precision_list) / len(precision_list) if precision_list else 0
-    avg_recall = sum(recall_list) / len(recall_list) if recall_list else 0
-    avg_f1 = sum(f1_list) / len(f1_list) if f1_list else 0
+        for user_id in all_user_ids:
+            user_ratings = ratings_df[ratings_df['userID'] == user_id]
+            if user_ratings.empty or user_ratings['titleID'].nunique() < 1: # Need at least one rated book for context
+                continue
 
-    print(f"Precision@{K}: {avg_precision:.4f}")
-    print(f"Recall@{K}: {avg_recall:.4f}")
-    print(f"F1@{K}: {avg_f1:.4f}")
+            actual_liked_books = user_ratings[user_ratings['ratingValue'] >= rating_threshold]['titleID'].tolist()
+            rated_books_by_user = user_ratings['titleID'].unique().tolist()
+            random_rated_book = random.choice(rated_books_by_user)
+            predicted_df = get_recommendations(titleID=random_rated_book, recommend_type='content', cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df)
+            predicted_books = predicted_df['titleID'].tolist()[:k]
 
-if __name__ == "__main__":
-    evaluate_recommendations(books_df, ratings_df, users_df, K=5)
+            precision = precision_at_k(actual_liked_books, predicted_books, k)
+            recall = recall_at_k(actual_liked_books, predicted_books, k)
+            f1 = f1_at_k(precision, recall)
+
+            precision_scores.append(precision)
+            recall_scores.append(recall)
+            f1_scores.append(f1)
+
+        avg_precision = sum(precision_scores) / len(precision_scores) if precision_scores else 0
+        avg_recall = sum(recall_scores) / len(recall_scores) if recall_scores else 0
+        avg_f1 = sum(f1_scores) / len(f1_scores) if f1_scores else 0
+
+        results[f'Precision@{k}'] = avg_precision
+        results[f'Recall@{k}'] = avg_recall
+        results[f'F1@{k}'] = avg_f1
+
+    print(f"\n--- Evaluation Results for Content-Based Recommendations (rating_threshold={rating_threshold}) ---")
+    for k in k_values:
+        print(f"  Precision@{k}: {results[f'Precision@{k}']:.4f}")
+        print(f"  Recall@{k}: {results[f'Recall@{k}']:.4f}")
+        print(f"  F1@{k}: {results[f'F1@{k}']:.4f}")
+    return results
+
+def evaluate_all_strategies(books_df, ratings_df, users_df, cosine_sim, k_values: List[int] = [5, 10, 20], rating_threshold: int = 4):
+    """Evaluates Hybrid, Content-based, Collaborative, and Random recommendation strategies."""
+    evaluate_single_strategy(books_df, ratings_df, users_df, 'hybrid', cosine_sim, k_values, rating_threshold)
+    evaluate_single_strategy(books_df, ratings_df, users_df, 'content', cosine_sim, k_values, rating_threshold)
+    evaluate_single_strategy(books_df, ratings_df, users_df, 'collaborative', cosine_sim, k_values, rating_threshold)
+    evaluate_single_strategy(books_df, ratings_df, users_df, 'random', cosine_sim, k_values, rating_threshold)
+
+# --- Evaluation ---
+evaluate_all_strategies(books_df, ratings_df, users_df, cosine_sim, k_values=[5, 10, 20], rating_threshold=4)
