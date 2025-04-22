@@ -203,9 +203,9 @@ export default function Pathfinder({ book }) {
 
     // Check location validity and set error
     useEffect(() => {
-        console.log("Book info:", book);
-        console.log("Call Number Prefix:", callNoPrefix);
-        console.log(book?.location);
+        //console.log("Book info:", book);
+        //console.log("Call Number Prefix:", callNoPrefix);
+        //console.log(book?.location);
 
         if (!locations[book?.location]) {
             console.log(!locations[book?.location])
@@ -269,15 +269,15 @@ export default function Pathfinder({ book }) {
         const cleanedCallNo = callNo.trim();
 
         if (book.researchCallNum) {
-            console.log("is research");
+            //og("is research");
             return "LoC";
         }
 
         if (/^[A-Z]{1,3}\s?\d+/.test(cleanedCallNo)) {
-            console.log(callNo, "is LoC");
+            //console.log(callNo, "is LoC");
             return "LoC";
         } else if (/^\d{3}(\.\d+)?/.test(cleanedCallNo)) {
-            console.log(callNo, "is DDC");
+            //console.log(callNo, "is DDC");
             return "DDC";
         }
         return "Unknown";
@@ -313,7 +313,7 @@ export default function Pathfinder({ book }) {
         const normFrom = normalizeString(from, classification);
         const normTo = normalizeString(to, classification);
 
-        console.log(`Comparing: ${normFrom} <= ${normCall} <= ${normTo}`);
+        //console.log(`Comparing: ${normFrom} <= ${normCall} <= ${normTo}`);
 
         return normFrom <= normCall && normCall <= normTo;
     }

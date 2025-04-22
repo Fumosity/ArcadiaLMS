@@ -10,7 +10,7 @@ SUPABASE_URL = "https://mibimdahipesicbwtmkv.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pYmltZGFoaXBlc2ljYnd0bWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgyOTY2NjYsImV4cCI6MjA0Mzg3MjY2Nn0.mkrsAS6Hhg3YRTXEZurTNvTSJnU3N1S3f9jLleRUgQU"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Fetch data
+# Fetch all data
 books_data = supabase.table("book_titles").select("*").execute()
 books_df = pd.DataFrame(books_data.data)
 
@@ -26,27 +26,30 @@ book_genre_df = pd.DataFrame(book_genre_link_data.data)
 genres_data = supabase.table("genres").select("*").execute()
 genres_df = pd.DataFrame(genres_data.data)
 
-# Merge genres safely (only if the necessary columns exist)
+user_genre_link_data = supabase.table("user_genre_link").select("*").execute()
+user_genre_df_interests = pd.DataFrame(user_genre_link_data.data) # Separate dataframe for user interests to avoid confusion
+
+# Merge genres with book_genre_df
 if 'genreID' in book_genre_df.columns and 'genreID' in genres_df.columns:
     book_genre_df = book_genre_df.merge(genres_df, on="genreID", how="left")
 else:
     print("Warning: Missing 'genreID' column for merging genres.")
 
-# Group genres by titleID (only if the necessary columns exist)
+# Group genres by titleID and merge with books_df
 if 'titleID' in book_genre_df.columns and 'genreName' in book_genre_df.columns:
     book_genres_grouped = book_genre_df.groupby("titleID")["genreName"].apply(lambda x: ' '.join(x)).reset_index()
     books_df = books_df.merge(book_genres_grouped, on="titleID", how="left")
 else:
     print("Warning: Missing 'titleID' or 'genreName' columns for genre grouping.")
 
-# Merge categories (only if category exists)
+# Merge categories with books_df
 if 'titleID' in book_genre_df.columns and 'category' in book_genre_df.columns:
     book_category_grouped = book_genre_df.groupby("titleID")["category"].first().reset_index()
     books_df = books_df.merge(book_category_grouped, on="titleID", how="left")
 else:
     print("Warning: Missing 'category' column for merging categories.")
 
-# Create feature set (ensure all columns exist)
+# Create feature set
 if 'keywords' in books_df.columns and 'category' in books_df.columns and 'genreName' in books_df.columns:
     books_df["features"] = (
         books_df["keywords"].astype(str) + " " + books_df["category"].astype(str) + " " + books_df["genreName"].astype(str)
@@ -54,85 +57,141 @@ if 'keywords' in books_df.columns and 'category' in books_df.columns and 'genreN
 else:
     print("Warning: Missing one or more columns ('keywords', 'category', 'genreName') for feature creation.")
 
-# Calculate average ratings safely
+# Calculate average ratings
 if not ratings_df.empty:
     average_ratings = ratings_df.groupby("titleID")["ratingValue"].mean()
 else:
-    average_ratings = pd.Series(dtype=float)  # Create an empty series to avoid errors
+    average_ratings = pd.Series(dtype=float)
 
-books_df["average_rating"] = books_df["titleID"].map(average_ratings).fillna(0)  # Fill missing ratings with 0
+books_df["average_rating"] = books_df["titleID"].map(average_ratings).fillna(0)
 
-# Merge user information only if userID exists
+# Merge user information with ratings_df
 if "userID" in ratings_df.columns and "userID" in users_df.columns:
-    ratings_df = ratings_df.merge(users_df, on="userID", how="left")  # Left join to keep all ratings even if no user info exists
+    ratings_df = ratings_df.merge(users_df, on="userID", how="left")
 else:
     print("Warning: 'userID' column missing in ratings_df or users_df. Skipping user merge.")
 
-# Calculate TF-IDF vectors only if 'features' exist
+# Calculate TF-IDF vectors
 if 'features' in books_df.columns:
     tfidf = TfidfVectorizer()
-    tfidf_matrix = tfidf.fit_transform(books_df["features"].fillna(""))  # Fill missing features with empty string
+    tfidf_matrix = tfidf.fit_transform(books_df["features"].fillna(""))
     cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 else:
     print("Warning: 'features' column is missing for TF-IDF calculation.")
-    cosine_sim = None # Set to None if features are missing
+    cosine_sim = None
 
-def get_recommendations(titleID: Optional[str] = None, userID: Optional[str] = None, recommend_type: str = 'hybrid', cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df):
-    #print(f"GETTING RECOMMENDATIONS - TYPE: {recommend_type}, TITLEID: {titleID}, USERID: {userID}")
+# Merge user interests with users_df
+if 'userID' in users_df.columns and 'userID' in user_genre_df_interests.columns and 'genreID' in user_genre_df_interests.columns and 'genreID' in genres_df.columns and 'genreName' in genres_df.columns:
+    user_genre_df_interests = user_genre_df_interests.merge(genres_df, on='genreID', how='left')
+    user_interests = user_genre_df_interests.groupby('userID')['genreName'].apply(list).reset_index(name='interested_genres')
+    users_df = users_df.merge(user_interests, on='userID', how='left')
+    # Handle NaN in 'interested_genres' column explicitly
+    users_df['interested_genres'] = users_df['interested_genres'].apply(lambda x: [] if isinstance(x, float) and pd.isna(x) else x)
+else:
+    print("Warning: Missing necessary columns for incorporating user interests.")
+    users_df['interested_genres'] = [[]] * len(users_df) # Initialize an empty list if merge fails
 
+def get_recommendations(titleID: Optional[str] = None, userID: Optional[str] = None, recommend_type: str = Optional[str], cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df):
     if recommend_type == 'random':
         if not books_df.empty:
-            random_indices = random.sample(books_df.index.tolist(), min(5, len(books_df)))
+            random_indices = random.sample(books_df.index.tolist(), min(10, len(books_df)))
             return books_df.loc[random_indices][["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]]
         else:
             return pd.DataFrame()
 
     if titleID is None and userID is None:
         print("No titleID or userID provided. Returning top-rated books.")
-        return books_df.sort_values(by="average_rating", ascending=False).head(5)[["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]]
+        return books_df.sort_values(by="average_rating", ascending=False).head(10)[["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]]
 
     book_indices = []
 
-    if recommend_type == 'hybrid' and titleID is not None and userID is not None and cosine_sim is not None:
-        #print("Using Hybrid Recommendation (Content + Collaborative)")
+    if titleID is not None and userID is not None and cosine_sim is not None:
+        #print("Using Improved Hybrid Recommendation (Content + College + Interests) - Category Filtered")
         if titleID not in books_df["titleID"].values:
             print("Warning: titleID not found in books_df. Falling back to collaborative.")
             return get_recommendations(userID=userID, recommend_type='collaborative', cosine_sim=cosine_sim, books_df=books_df, ratings_df=ratings_df, users_df=users_df)
 
+        current_book_category = books_df[books_df["titleID"] == titleID]["category"].iloc[0]
+        current_book_genres = books_df[books_df["titleID"] == titleID]["genreName"].str.split(' ').iloc[0] if 'genreName' in books_df.columns and not pd.isna(books_df.loc[books_df['titleID'] == titleID, 'genreName'].iloc[0]) else []
+        user_interested_genres = users_df[users_df["userID"] == userID]["interested_genres"].iloc[0]
+
         idx = books_df[books_df["titleID"] == titleID].index[0]
         content_sim_scores = list(enumerate(cosine_sim[idx]))
-        content_sim_scores = sorted(content_sim_scores, key=lambda x: x[1], reverse=True)[1:6]
+        # Filter for books in the same category
+        same_category_indices = books_df[books_df["category"] == current_book_category].index
+        filtered_content_sim_scores = [
+            (i, score) for i, score in content_sim_scores if i in same_category_indices and i != idx
+        ]
+        filtered_content_sim_scores = sorted(filtered_content_sim_scores, key=lambda x: x[1], reverse=True)[:20] # Consider more for initial ranking
 
         user_college = users_df[users_df["userID"] == userID]["userCollege"].iloc[0]
         user_department = users_df[users_df["userID"] == userID]["userDepartment"].iloc[0]
         college_ratings = ratings_df[(ratings_df["userCollege"] == user_college) & (ratings_df["userDepartment"] == user_department)]
         college_avg_ratings = college_ratings.groupby("titleID")["ratingValue"].mean()
-        rating_sim_indices = [books_df[books_df["titleID"] == tid].index[0] for tid in college_avg_ratings.nlargest(5).index if tid in books_df["titleID"].values]
-        rating_sim_scores = [(i, 1.0) for i in rating_sim_indices] # Assign a high score for simplicity
+        top_college_books_in_category = set(
+            college_avg_ratings[college_avg_ratings.index.isin(books_df[books_df["category"] == current_book_category]["titleID"])].nlargest(20).index.tolist()
+        ) # Consider more for initial ranking
 
-        # Combine scores (simple average for now)
-        combined_scores = {}
-        for content_idx, content_score in content_sim_scores:
-            combined_scores[content_idx] = combined_scores.get(content_idx, 0) + content_score * 0.5
-        for rating_idx, rating_score in rating_sim_scores:
-            combined_scores[rating_idx] = combined_scores.get(rating_idx, 0) + rating_score * 0.5
+        # Combine recommendations: Content, College Popularity, and User Interests (within category)
+        hybrid_recommendations = []
+        content_based_titles = set()
 
-        sorted_combined_scores = sorted(combined_scores.items(), key=lambda item: item[1], reverse=True)
-        book_indices = [i[0] for i in sorted_combined_scores[:5]]
+        for content_idx, content_score in filtered_content_sim_scores:
+            similar_book_titleID = books_df.loc[content_idx, "titleID"]
+            genre_name = books_df.loc[content_idx, "genreName"]
+            similar_book_genres = []
+            if isinstance(genre_name, str):
+                similar_book_genres = genre_name.split(' ')
+            elif pd.isna(genre_name):
+                similar_book_genres = []
 
-    elif recommend_type == 'content' and titleID is not None and cosine_sim is not None:
-        #print("Using Content-Based Recommendation")
+            interest_score = 0.1 if any(genre in user_interested_genres for genre in similar_book_genres) else 0 # Small bonus for matching interest
+
+            hybrid_recommendations.append((content_idx, content_score * 0.43 + (1.0 if similar_book_titleID in top_college_books_in_category else 0) * 0.34 + interest_score * 0.23)) # Weights: Content, College, Interests
+
+            content_based_titles.add(similar_book_titleID)
+
+        # Add popular college books (within category) that weren't already in content recommendations
+        for book_titleID in top_college_books_in_category:
+            if book_titleID not in content_based_titles:
+                book_index = books_df[books_df["titleID"] == book_titleID].index[0]
+                genre_name = books_df.loc[book_index, "genreName"]
+                book_genres = []
+                if isinstance(genre_name, str):
+                    book_genres = genre_name.split(' ')
+                elif pd.isna(genre_name):
+                    book_genres = []
+                interest_score = 0.1 if any(genre in user_interested_genres for genre in book_genres) else 0
+                # Assign a lower score for these, as they are not content-similar
+                hybrid_recommendations.append((book_index, 0.40 + interest_score * 0.20))
+
+        hybrid_recommendations.sort(key=lambda item: item[1], reverse=True)
+        # Filter out the input titleID and then take the top 10
+        recommended_indices = [item[0] for item in hybrid_recommendations if books_df.loc[item[0], 'titleID'] != titleID][:10]
+        book_indices = recommended_indices
+
+    elif titleID is not None and cosine_sim is not None:
+        #print("Using Content-Based Recommendation - Category Filtered")
         if titleID not in books_df["titleID"].values:
             print("Warning: titleID not found in books_df.")
             return pd.DataFrame()
 
+        current_book_category = books_df[books_df["titleID"] == titleID]["category"].iloc[0]
         idx = books_df[books_df["titleID"] == titleID].index[0]
         content_sim_scores = list(enumerate(cosine_sim[idx]))
-        content_sim_scores = sorted(content_sim_scores, key=lambda x: x[1], reverse=True)[1:6]
-        book_indices = [i[0] for i in content_sim_scores]
+        # Filter for books in the same category
+        same_category_indices = books_df[books_df["category"] == current_book_category].index
+        filtered_content_sim_scores = [
+            (i, score) for i, score in content_sim_scores if i in same_category_indices and i != idx
+        ]
+        filtered_content_sim_scores = sorted(filtered_content_sim_scores, key=lambda x: x[1], reverse=True)[:10] # Take top 10
+        # Filter out the input titleID
+        recommended_indices = [i[0] for i in filtered_content_sim_scores if books_df.loc[i[0], 'titleID'] != titleID][:10]
+        book_indices = recommended_indices
 
-    elif recommend_type == 'collaborative' and userID is not None:
-        #print("Using Collaborative Filtering")
+    elif userID is not None:
+        # Collaborative remains the same (doesn't take a specific book as input)
+        #print("Using Collaborative Filtering (College-Based)")
         if userID not in users_df["userID"].values:
             print("Warning: userID not found in users_df.")
             return pd.DataFrame()
@@ -145,13 +204,13 @@ def get_recommendations(titleID: Optional[str] = None, userID: Optional[str] = N
         recommended_books = college_avg_ratings.sort_values(ascending=False).index.tolist()
 
         valid_titleIDs = set(books_df["titleID"])
-        book_indices = [books_df[books_df["titleID"] == tid].index[0] for tid in recommended_books[:5] if tid in valid_titleIDs]
+        book_indices = [books_df[books_df["titleID"] == tid].index[0] for tid in recommended_books[:10] if tid in valid_titleIDs]
 
     if book_indices:
         return books_df[["titleID", "title", "author", "genreName", "category", "keywords", "average_rating", "cover"]].iloc[book_indices]
     else:
         return pd.DataFrame()
-
+        
 def precision_at_k(actual: List[str], predicted: List[str], k: int) -> float:
     """Calculates precision at k."""
     if not predicted:
