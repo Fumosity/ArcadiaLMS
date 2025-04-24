@@ -12,7 +12,7 @@ export default function RsrchAvailability({ research }) {
     currentLocation = "4th Floor, Highschool and Multimedia Section"
   } else {
     // Extract year from pubDate (assuming it's a string in "yyyy-mm-dd" format)
-    const pubYear = Number.parseInt(research.pubDate.split("-")[0], 10)
+    const pubYear = research.pubDate
 
     if (pubYear <= 2009) {
       currentLocation = "4th Floor, Circulation Section"

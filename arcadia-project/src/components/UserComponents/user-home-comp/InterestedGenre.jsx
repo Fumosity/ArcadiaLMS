@@ -13,7 +13,25 @@ const fetchBooksByUserInterest = async (userID) => {
         if (userGenresError) throw userGenresError;
         if (!userGenres || userGenres.length === 0) return { genreName: "Unknown", books: [] };
 
-        const randomGenre = userGenres[Math.floor(Math.random() * userGenres.length)];
+        // Fetch all book genre links for the user's interested genres
+        const interestedGenreIDs = userGenres.map(ug => ug.genreID);
+        const { data: bookGenreLinksAll, error: bookGenreLinksError } = await supabase
+            .from("book_genre_link")
+            .select("genreID")
+            .in("genreID", interestedGenreIDs);
+
+        if (bookGenreLinksError) throw bookGenreLinksError;
+
+        // Filter user's interested genres to only those that have associated books
+        const genresWithBooks = userGenres.filter(ug =>
+            bookGenreLinksAll.some(bgl => bgl.genreID === ug.genreID)
+        );
+
+        if (genresWithBooks.length === 0) {
+            return { genreName: "No books found for your interests", books: [] };
+        }
+
+        const randomGenre = genresWithBooks[Math.floor(Math.random() * genresWithBooks.length)];
 
         const { data: bookGenreLinks, error: bookError } = await supabase
             .from("book_genre_link")
@@ -40,7 +58,7 @@ const fetchBooksByUserInterest = async (userID) => {
             return acc;
         }, {});
 
-        const books = bookGenreLinks
+        const allBooks = bookGenreLinks
             .filter(link => link.book_titles) // Ensure book_titles is not null
             .map(link => {
                 const titleID = link.titleID;
@@ -55,21 +73,28 @@ const fetchBooksByUserInterest = async (userID) => {
                 };
             });
 
-        return { genreName: randomGenre.genres.genreName, books: { books } };
+        // Limit the books to a maximum of 15
+        const limitedBooks = allBooks.slice(0, 15);
+
+        return { genreName: randomGenre.genres.genreName, books: { books: limitedBooks } };
     } catch (error) {
         console.error("Error fetching books by user interest:", error);
         return { genreName: "Unknown", books: [] };
     }
 };
 
-const InterestedGenre = ({ userID, onSeeMoreClick }) => {
+const InterestedGenre = ({ userID, onSeeMoreClick, booksPerPage = 10 }) => {
     const { user } = useUser();
     const [genreData, setGenreData] = useState({ genreName: "", books: [] });
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1); // Initialize page state
 
     userID = user?.userID || userID;
 
     useEffect(() => {
+        // Reset page to 1 whenever the userID changes (data refresh)
+        setPage(1);
+
         if (!userID) {
             console.log("InterestedGenre: Guest Mode");
             return;
@@ -80,7 +105,6 @@ const InterestedGenre = ({ userID, onSeeMoreClick }) => {
             try {
                 const data = await fetchBooksByUserInterest(userID);
                 if (!data.books || data.books.length === 0) {
-                    // If there are no books to show, return early, meaning the component won't render
                     setGenreData({ genreName: "", books: [] });
                     return;
                 }
@@ -93,17 +117,21 @@ const InterestedGenre = ({ userID, onSeeMoreClick }) => {
         };
 
         fetchData();
-    }, [userID]);
+    }, [userID]); // Re-run effect when userID changes
 
     // If there are no genres or books, don't render the component
     if (!genreData.books || genreData.books.length === 0) {
         return null;
     }
 
+    const startIndex = (page - 1) * booksPerPage;
+    const endIndex = startIndex + booksPerPage;
+    const displayedBooks = genreData.books.books.slice(startIndex, endIndex);
+
     return (
         <BookCards
             title={`Because you like ${genreData.genreName}`}
-            fetchBooks={() => Promise.resolve(genreData.books)} // Use the stored books
+            fetchBooks={() => Promise.resolve({ books: displayedBooks })} // Pass only the current page's books
             onSeeMoreClick={() =>
                 onSeeMoreClick(`Because you like ${genreData.genreName}`, () => Promise.resolve(genreData.books))
             }

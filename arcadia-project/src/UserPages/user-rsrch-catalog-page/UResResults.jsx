@@ -25,7 +25,7 @@ const UResResults = ({ query }) => {
         // Process the data to ensure consistent format
         const processedData = data.map((research) => ({
           ...research,
-          publishedYear: research.pubDate ? new Date(research.pubDate).getFullYear() : "Unknown Year",
+          publishedYear: research.pubDate ? research.pubDate : "Unknown Year",
         }))
 
         setResearchList(processedData)
@@ -237,7 +237,7 @@ const UResResults = ({ query }) => {
                 <span className="ml-1">
                   {research.department && research.department !== "N/A" && `- ${research.department} `}
                 </span>
-                <span className="">&nbsp;•&nbsp;&nbsp;{formatPubDate(research.pubDate)}</span>
+                <span className="">&nbsp;•&nbsp;&nbsp;{research.pubDate}</span>
               </p>
               <p className="w-full leading-tight whitespace-pre-wrap line-clamp-3 truncate break-words">
                 {research.abstract}

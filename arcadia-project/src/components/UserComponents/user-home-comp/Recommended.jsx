@@ -18,7 +18,7 @@ const fetchRecommendedBooks = async (userID, titleID) => {
 
         if (recommendations.length === 0) return [];
 
-        console.log(recommendations)
+        console.log("Recommended books:", recommendations)
 
         // Fetch genres and categories from book_genre_link and genre tables
         const titleIDs = recommendations.map(book => book.titleID);

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Query
+from fastapi import FastAPI, File, UploadFile, Query, Request
 from fastapi.responses import JSONResponse
 from PIL import Image, ExifTags
 import pytesseract
@@ -592,12 +592,19 @@ class RecommendationRequest(BaseModel):
     titleID: Optional[int] = None
     userID: Optional[int] = None
 
-@app.post("/book-recommend")
-async def recommend(request: RecommendationRequest):
-    print("Received Request:", request.dict())  # Debugging
+@app.post("/debug-request")
+async def debug_request(request: Request, body: RecommendationRequest):
+    print("Headers:", request.headers)
+    print("Received Body:", body.dict())
+    return {"received": body.dict(), "headers": dict(request.headers)}
 
-    user_id = request.userID
-    title_id = request.titleID
+@app.post("/book-recommend")
+async def recommend(request: Request, body: RecommendationRequest):
+    print("Received Headers:", request.headers)
+    print("Received Request Body:", body.dict())  # <--- Keep this
+
+    user_id = body.userID
+    title_id = body.titleID
     
     # Call book_reco to get recommendations
     recommendations = get_recommendations(title_id, user_id)

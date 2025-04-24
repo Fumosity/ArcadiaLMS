@@ -45,12 +45,6 @@ const ResearchGrid = ({ title, fetchResearch }) => {
       .join(", ")
   }
 
-  const formatPubDate = (dateString) => {
-    if (!dateString) return "Unknown Date"
-    const date = new Date(dateString)
-    return date.toLocaleString("en-US", { month: "long", year: "numeric" })
-  }
-
   if (error) {
     return <div>Error: {error}</div>
   }
@@ -101,7 +95,7 @@ const ResearchGrid = ({ title, fetchResearch }) => {
                     <span className="ml-1">
                       {research.department && research.department !== "N/A" && `- ${research.department} `}
                     </span>
-                    <span className="">&nbsp;•&nbsp;&nbsp;{formatPubDate(research.pubDate)}</span>
+                    <span className="">&nbsp;•&nbsp;&nbsp;{(research.pubDate)}</span>
                   </p>
                   <p className="w-full leading-tight whitespace-pre-wrap line-clamp-3 break-words">
                     {research.abstract}
