@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useRegisterForm } from "../../../backend/RegisterFormBackend"
+import { Eye, EyeOff } from "lucide-react"
 
 export default function RegisterForm({ onBack, onRegister, userData }) {
   const {
@@ -19,6 +20,8 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
   } = useRegisterForm(onBack, onRegister, userData)
 
   const [userType, setUserType] = useState("student")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   // Update email suffix and student number format when user type changes
   useEffect(() => {
@@ -41,6 +44,14 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
       const parts = [cleaned.slice(0, 4), cleaned.slice(4, 5), cleaned.slice(5, 10)]
       return parts.filter(Boolean).join("-") || "XXXX-X-XXXXX"
     }
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword)
   }
 
   return (
@@ -199,14 +210,27 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
           {/* Password & Confirm Password */}
           <div className="space-y-2">
             <label htmlFor="password">Password:</label>
-            <input
-              id="password"
-              type="password"
-              value={new_data.password}
-              onChange={(e) => checkPasswordStrength(e.target.value)}
-              placeholder={placeholders.password}
-              className="w-full px-2.5 py-1 border border-gray rounded-full"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={new_data.password}
+                onChange={(e) => checkPasswordStrength(e.target.value)}
+                placeholder={placeholders.password}
+                className="w-full px-2.5 py-1 border border-gray rounded-full"
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                {showPassword ? (
+                  <EyeOff size={18} className="text-gray-500" />
+                ) : (
+                  <Eye size={18} className="text-gray-500" />
+                )}
+              </button>
+            </div>
             <div className="h-2 bg-gray-200 rounded relative">
               <div
                 className={`h-full ${getStrengthColor()} rounded transition-all duration-300 ease-in-out`}
@@ -221,14 +245,27 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
 
           <div className="space-y-2">
             <label htmlFor="confirmPassword">Confirm Password:</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={new_data.confirmPassword}
-              onChange={handleChange}
-              placeholder={placeholders.confirmPassword}
-              className="w-full px-2.5 py-1 border border-gray rounded-full"
-            />
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={new_data.confirmPassword}
+                onChange={handleChange}
+                placeholder={placeholders.confirmPassword}
+                className="w-full px-2.5 py-1 border border-gray rounded-full"
+              />
+              <button
+                type="button"
+                onClick={toggleConfirmPasswordVisibility}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff size={18} className="text-gray-500" />
+                ) : (
+                  <Eye size={18} className="text-gray-500" />
+                )}
+              </button>
+            </div>
           </div>
 
           {formError && <p className="text-red text-sm">{formError}</p>}

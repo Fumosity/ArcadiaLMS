@@ -6,6 +6,7 @@ import RecentSupport from "../components/admin-user-support-report-view-comp/Rec
 import UserInformations from "../components/admin-user-account-view-comp/UserInformations"
 import AUserReport from "../components/admin-user-account-view-comp/AUserReport"
 import AUserSupport from "../components/admin-user-account-view-comp/AUserSupport"
+import AUserOutstandingFines from "../components/admin-user-account-view-comp/AUserOutstandingFines"
 const AUAccView = () => {
   const location = useLocation()
   const user = location.state?.user || {}
@@ -51,6 +52,7 @@ const AUAccView = () => {
             <AUserCirc user={user} source={source} />
             <AUserReport user={user} source={source} />
             <AUserSupport user={user} source={source} />
+            <AUserOutstandingFines user={user} source={source} />
           </div>
         </div>
 

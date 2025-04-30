@@ -44,10 +44,10 @@ const UReports = () => {
                     onClick={handleBackToMakeReport}
                     className="w-[300px] h-[44px] border border-grey rounded-xl px-5 text-center items-center text-md text-black hover:bg-light-gray transition-colors"
                   >
-                    <span className="w-5 h-5 flex items-center justify-center">
-                      <ArrowLeft className="w-3 h-3 text-white" />
-                    </span>
-                    Back to Make Support
+                    {/* <span className="w-5 h-5 flex items-center justify-center">
+                      <ArrowLeft className="w-3 h-3 text-center align-middle text-white" />
+                    </span> */}
+                    Back to Make Report
                   </button>
                 )}
               </div>

@@ -123,7 +123,9 @@ const AUserCirc = ({ user }) => {
           <thead>
             <tr>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {typeOrder === "Borrowed" ? "Date Borrowed" : typeOrder === "Returned" ? "Date Returned" : "Date"}
+              </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Borrower
@@ -133,6 +135,9 @@ const AUserCirc = ({ user }) => {
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Barcode
+              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Deadline
               </th>
             </tr>
           </thead>
@@ -148,7 +153,9 @@ const AUserCirc = ({ user }) => {
                       {book.type}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.date}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">
+                    {book.type === "Borrowed" ? book.dateOut : book.dateIn}
+                  </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.time}</td>
                   <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
                     <button onClick={() => handleUserClick(book)} className="text-blue-500 hover:underline">
@@ -164,11 +171,12 @@ const AUserCirc = ({ user }) => {
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.deadline || "N/A"}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
+                <td colSpan="7" className="px-4 py-2 text-center text-zinc-600">
                   No data available.
                 </td>
               </tr>
@@ -200,4 +208,3 @@ const AUserCirc = ({ user }) => {
 }
 
 export default AUserCirc
-

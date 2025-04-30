@@ -6,6 +6,8 @@ import Title from "../components/main-comp/Title"
 import SBOverdue from "../components/admin-system-reports-comp/SBOverdue"
 import DamagedBks from "../components/admin-book-circ-pg-comp/DamagedBks"
 import BCSideButtons from "../components/admin-book-circ-pg-comp/BCSideButtons"
+import DecommissionedBks from "../components/admin-book-circ-pg-comp/DecommissionedBks"
+import TopBorrower from "../components/admin-book-circ-pg-comp/TopBorrower"
 
 export default function ABCirculationPage() {
   // Check if there's a hash in the URL and scroll to it after render
@@ -35,11 +37,15 @@ export default function ABCirculationPage() {
           <div id="damaged-books">
             <DamagedBks />
           </div>
+          <div>
+            <DecommissionedBks />
+          </div>
         </div>
 
         <div className="flex flex-col items-start flex-shrink-0 w-1/4 space-y-2">
           <BCSideButtons />
           <BksDueTdy />
+          <TopBorrower />
           <SBOverdue />
         </div>
       </div>

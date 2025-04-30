@@ -59,7 +59,8 @@ export const useUserCirculation = (propUser) => {
             checkinDate, 
             checkinTime, 
             checkoutDate, 
-            checkoutTime, 
+            checkoutTime,
+            deadline, 
             userID, 
             bookBarcode, 
             book_indiv(
@@ -82,15 +83,41 @@ export const useUserCirculation = (propUser) => {
           console.error("Error fetching data: ", error.message)
         } else {
           const formattedData = data.map((item) => {
-            const date = item.checkinDate || item.checkoutDate
+            const dateIn = item.checkinDate
+            const dateOut = item.checkoutDate
+            const deadline = item.deadline
             const time = item.checkinTime || item.checkoutTime
 
-            // Format date to "Month Day, Year" format
-            let formattedDate = null
-            if (date) {
-              const [year, month, day] = date.split("-")
+            // Format dateIn to "Month Day, Year" format
+            let formattedDateIn = null
+            if (dateIn) {
+              const [year, month, day] = dateIn.split("-")
               const dateObj = new Date(year, month - 1, day)
-              formattedDate = dateObj.toLocaleDateString("en-US", {
+              formattedDateIn = dateObj.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+
+            // Format dateOut to "Month Day, Year" format
+            let formattedDateOut = null
+            if (dateOut) {
+              const [year, month, day] = dateOut.split("-")
+              const dateObj = new Date(year, month - 1, day)
+              formattedDateOut = dateObj.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+
+            // Format deadline to "Month Day, Year" format
+            let formattedDeadline = null
+            if (deadline) {
+              const [year, month, day] = deadline.split("-")
+              const dateObj = new Date(year, month - 1, day)
+              formattedDeadline = dateObj.toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -114,8 +141,10 @@ export const useUserCirculation = (propUser) => {
 
             return {
               type: item.transactionType,
-              rawDate: date, // Keep original for sorting and filtering
-              date: formattedDate,
+              rawDate: dateIn || dateOut, // Keep original for sorting and filtering
+              dateIn: formattedDateIn,
+              dateOut: formattedDateOut,
+              date: item.transactionType === "Borrowed" ? formattedDateOut : formattedDateIn,
               rawTime: time, // Keep original for sorting
               time: formattedTime,
               borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
@@ -123,6 +152,7 @@ export const useUserCirculation = (propUser) => {
               bookBarcode: item.bookBarcode,
               user_id: item.userID,
               titleID: bookDetails.titleID,
+              deadline: formattedDeadline,
             }
           })
 
@@ -263,4 +293,3 @@ export const useUserCirculation = (propUser) => {
     totalEntries,
   }
 }
-

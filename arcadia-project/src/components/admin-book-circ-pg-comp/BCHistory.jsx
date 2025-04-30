@@ -23,7 +23,8 @@ const BCHistory = () => {
                         checkinDate, 
                         checkinTime, 
                         checkoutDate, 
-                        checkoutTime, 
+                        checkoutTime,
+                        deadline, 
                         userID, 
                         bookBarcode, 
                         book_indiv(
@@ -48,9 +49,44 @@ const BCHistory = () => {
 
           const formattedData = data.map((item) => {
             const date = item.checkinDate || item.checkoutDate
+            const dateIn = item.checkinDate
+            const dateOut = item.checkoutDate
             const time = item.checkinTime || item.checkoutTime
+            const deadline = item.deadline
 
             // Format date to "Month Day, Year" format
+            let formattedDateIn = null
+            if (dateIn) {
+              const [year, month, day] = dateIn.split("-")
+              const dateObj = new Date(year, month - 1, day)
+              formattedDateIn = dateObj.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+            let formattedDateOut
+            if (dateOut) {
+              const [year, month, day] = dateOut.split("-")
+              const dateObj = new Date(year, month - 1, day)
+              formattedDateOut = dateObj.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+
+            let formattedDeadline = null
+            if (deadline) {
+              const [year, month, day] = deadline.split("-")
+              const dateObj = new Date(year, month - 1, day)
+              formattedDeadline = dateObj.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            }
+
             let formattedDate = null
             if (date) {
               const [year, month, day] = date.split("-")
@@ -80,12 +116,15 @@ const BCHistory = () => {
             return {
               type: item.transactionType,
               rawDate: date, // Keep the original date for sorting if needed
-              date: formattedDate,
+              dateIn: formattedDateIn,
+              dateOut: formattedDateOut,
+              date: item.transactionType === "Borrowed" ? formattedDateOut : formattedDateIn, // Use appropriate date based on type
               time: formattedTime,
               borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
               bookTitle: bookDetails.title,
               bookBarcode: item.book_indiv.bookBarcode,
               userId: item.userID,
+              deadline: formattedDeadline,
               titleID: bookDetails.titleID,
             }
           })
@@ -148,9 +187,9 @@ const BCHistory = () => {
     }
 
     const matchesSearch =
-      book.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.borrower.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      book.bookBarcode.includes(searchTerm)
+      book.bookTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.borrower?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.bookBarcode?.includes(searchTerm)
 
     return matchesType && matchesDateRange && matchesSearch
   })
@@ -182,7 +221,7 @@ const BCHistory = () => {
         <div className="flex flex-wrap items-center gap-4">
           {/* Sort By */}
           <div className="flex items-center space-x-2">
-            <span className="font-medium text-sm">Sort:</span>
+            <span className="font-medium text-sm">Sort Name:</span>
             <button
               onClick={() => setSortOrder(sortOrder === "Ascending" ? "Descending" : "Ascending")}
               className="sort-by bg-gray-200 border-grey py-1 px-3 rounded-lg text-sm w-28"
@@ -259,7 +298,9 @@ const BCHistory = () => {
           <thead>
             <tr>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {typeFilter === "Borrowed" ? "Date Borrowed" : typeFilter === "Returned" ? "Date Returned" : "Date"}
+              </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Borrower
@@ -269,6 +310,9 @@ const BCHistory = () => {
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Barcode
+              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Deadline
               </th>
             </tr>
           </thead>
@@ -290,7 +334,9 @@ const BCHistory = () => {
                       {book.type}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.date}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">
+                    {book.type === "Borrowed" ? book.dateOut : book.dateIn}
+                  </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.time}</td>
                   <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
                     <button onClick={() => handleUserClick(book)} className="text-blue-500 hover:underline">
@@ -307,6 +353,7 @@ const BCHistory = () => {
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.deadline}</td>
                 </tr>
               ))
             ) : (
@@ -343,4 +390,3 @@ const BCHistory = () => {
 }
 
 export default BCHistory
-

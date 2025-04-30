@@ -2,7 +2,7 @@ import { supabase } from "../../supabaseClient"
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 
-const DamagedBks = () => {
+const DecommissionedBks = () => {
   const [sortOrder, setSortOrder] = useState("Descending")
   const [entriesPerPage, setEntriesPerPage] = useState(10)
   const [searchTerm, setSearchTerm] = useState("")
@@ -39,12 +39,12 @@ const DamagedBks = () => {
                             )
                         )
                     `)
-          .eq("bookStatus", "Damaged")
+          .eq("bookStatus", "Decommissioned")
 
         if (error) {
           console.error("Error fetching data: ", error.message)
         } else {
-          console.log("Damaged books data from Supabase:", data) // Debugging: raw data from Supabase
+          console.log("Decommissioned books data from Supabase:", data) // Debugging: raw data from Supabase
 
           const formattedData = data.map((item) => {
             // Get the most recent transaction with a checkinDate
@@ -88,7 +88,7 @@ const DamagedBks = () => {
             const bookDetails = item.book_titles || {}
 
             return {
-              type: "Damaged",
+              type: "Decommissioned",
               status: item.bookStatus,
               rawDate: checkinDate, // Keep original for sorting
               dateAcquired: formattedDate,
@@ -187,7 +187,7 @@ const DamagedBks = () => {
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
-      <h3 className="text-2xl font-semibold mb-4">Damaged Books</h3>
+      <h3 className="text-2xl font-semibold mb-4">Decommissioned Books</h3>
 
       {/* Controls for sort, filter, and search */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -289,7 +289,7 @@ const DamagedBks = () => {
                   <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
                     <span
                       className="inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
-                        bg-intended text-white"
+                        bg-grey text-black"
                     >
                       {book.status}
                     </span>
@@ -319,7 +319,7 @@ const DamagedBks = () => {
             ) : (
               <tr>
                 <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
-                  No damaged books found.
+                  No decommissioned books found.
                 </td>
               </tr>
             )}
@@ -349,4 +349,4 @@ const DamagedBks = () => {
   )
 }
 
-export default DamagedBks
+export default DecommissionedBks

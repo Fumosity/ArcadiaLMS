@@ -11,6 +11,7 @@ const UserCirculationHistory = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [entriesPerPage, setEntriesPerPage] = useState(5)
   const [loading, setLoading] = useState(true)
+  const [dateRange, setDateRange] = useState("All Time")
 
   // Fetch current user from localStorage
   useEffect(() => {
@@ -51,7 +52,6 @@ const UserCirculationHistory = () => {
                         *,
                         book_indiv:bookBarcode (
                             bookBarcode,
-                        
                             bookStatus,
                             book_titles:titleID (
                                 titleID,
@@ -77,28 +77,70 @@ const UserCirculationHistory = () => {
         }
 
         const formattedData = data.map((item) => {
-          const date = item.checkinDate || item.checkoutDate
-          const time = item.checkinTime || item.checkoutTime
+          const dateIn = item.checkinDate
+          const dateOut = item.checkoutDate
+          const deadline = item.deadline
+          const timeIn = item.checkinTime
+          const timeOut = item.checkoutTime
 
-          // Format date to "Month Day, Year" format
-          let formattedDate = null
-          if (date) {
-            const [year, month, day] = date.split("-")
+          // Format dateIn to "Month Day, Year" format
+          let formattedDateIn = null
+          if (dateIn) {
+            const [year, month, day] = dateIn.split("-")
             const dateObj = new Date(year, month - 1, day)
-            formattedDate = dateObj.toLocaleDateString("en-US", {
+            formattedDateIn = dateObj.toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
             })
           }
 
-          let formattedTime = null
-          if (time) {
+          // Format dateOut to "Month Day, Year" format
+          let formattedDateOut = null
+          if (dateOut) {
+            const [year, month, day] = dateOut.split("-")
+            const dateObj = new Date(year, month - 1, day)
+            formattedDateOut = dateObj.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          }
+
+          // Format deadline to "Month Day, Year" format
+          let formattedDeadline = null
+          if (deadline) {
+            const [year, month, day] = deadline.split("-")
+            const dateObj = new Date(year, month - 1, day)
+            formattedDeadline = dateObj.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          }
+
+          // Format timeIn
+          let formattedTimeIn = null
+          if (timeIn) {
             // Ensure time is in the format HH:mm (24-hour format)
-            const timeString = time.includes(":") ? time : `${time.slice(0, 2)}:${time.slice(2)}`
+            const timeString = timeIn.includes(":") ? timeIn : `${timeIn.slice(0, 2)}:${timeIn.slice(2)}`
 
             // Convert time into 12-hour format with AM/PM, no 'Z' for local time
-            formattedTime = new Date(`1970-01-01T${timeString}`).toLocaleString("en-PH", {
+            formattedTimeIn = new Date(`1970-01-01T${timeString}`).toLocaleString("en-PH", {
+              hour: "numeric",
+              minute: "numeric",
+              hour12: true,
+            })
+          }
+
+          // Format timeOut
+          let formattedTimeOut = null
+          if (timeOut) {
+            // Ensure time is in the format HH:mm (24-hour format)
+            const timeString = timeOut.includes(":") ? timeOut : `${timeOut.slice(0, 2)}:${timeOut.slice(2)}`
+
+            // Convert time into 12-hour format with AM/PM, no 'Z' for local time
+            formattedTimeOut = new Date(`1970-01-01T${timeString}`).toLocaleString("en-PH", {
               hour: "numeric",
               minute: "numeric",
               hour12: true,
@@ -110,13 +152,18 @@ const UserCirculationHistory = () => {
 
           return {
             type: item.transactionType || "Unknown",
-            date: formattedDate || "N/A", // Use formattedDate here
-            time: formattedTime || "N/A",
-            rawDate: date || "", // Store the original date for sorting
-            rawTime: time || "", // Store the original time for sorting
+            dateIn: formattedDateIn || "Not yet Returned",
+            dateOut: formattedDateOut || "N/A",
+            timeIn: formattedTimeIn || "N/A",
+            timeOut: formattedTimeOut || "N/A",
+            rawDateIn: dateIn || "",
+            rawDateOut: dateOut || "",
+            // Use the most recent date for sorting
+            rawDate: dateIn || dateOut || "",
             bookTitle: bookTitles.title || "Unknown Title",
             bookBarcode: bookIndiv.bookBarcode || item.bookBarcode || "N/A",
             titleID: bookTitles.titleID,
+            deadline: formattedDeadline || "N/A",
           }
         })
 
@@ -134,26 +181,52 @@ const UserCirculationHistory = () => {
 
   // Handle sorting
   const sortedData = [...circulationHistory].sort((a, b) => {
-    // Get the dates and times for comparison
+    // Get the dates for comparison
     const dateA = a.rawDate || ""
     const dateB = b.rawDate || ""
-    const timeA = a.rawTime || ""
-    const timeB = b.rawTime || ""
-
-    // Combine date and time for more accurate sorting
-    const dateTimeA = `${dateA} ${timeA}`
-    const dateTimeB = `${dateB} ${timeB}`
 
     // Sort based on the current sort order
     if (sortOrder === "Ascending") {
-      return dateTimeA.localeCompare(dateTimeB)
+      return dateA.localeCompare(dateB)
     } else {
-      return dateTimeB.localeCompare(dateTimeA)
+      return dateB.localeCompare(dateA)
     }
   })
 
+  // Handle filtering by date range
+  const filterByDateRange = (data) => {
+    if (dateRange === "All Time") return data
+
+    return data.filter((book) => {
+      if (!book.rawDate) return false
+
+      const bookDate = new Date(book.rawDate)
+      const today = new Date()
+
+      switch (dateRange) {
+        case "Last 7 Days":
+          const sevenDaysAgo = new Date()
+          sevenDaysAgo.setDate(today.getDate() - 7)
+          return bookDate >= sevenDaysAgo
+        case "Last 30 Days":
+          const thirtyDaysAgo = new Date()
+          thirtyDaysAgo.setDate(today.getDate() - 30)
+          return bookDate >= thirtyDaysAgo
+        case "Last 90 Days":
+          const ninetyDaysAgo = new Date()
+          ninetyDaysAgo.setDate(today.getDate() - 90)
+          return bookDate >= ninetyDaysAgo
+        case "This Year":
+          const startOfYear = new Date(today.getFullYear(), 0, 1)
+          return bookDate >= startOfYear
+        default:
+          return true
+      }
+    })
+  }
+
   // Handle filtering and searching
-  const filteredData = sortedData.filter((book) => {
+  const filteredData = filterByDateRange(sortedData).filter((book) => {
     const matchesType = typeFilter === "All" || book.type === typeFilter
 
     const matchesSearch =
@@ -207,6 +280,22 @@ const UserCirculationHistory = () => {
             </select>
           </div>
 
+          {/* Date Range */}
+          <div className="flex items-center space-x-2">
+            <span className="font-medium text-sm">Date Range:</span>
+            <select
+              className="bg-gray-200 py-1 px-3 border border-grey rounded-lg text-sm w-32"
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+            >
+              <option value="All Time">All Time</option>
+              <option value="Last 7 Days">Last 7 Days</option>
+              <option value="Last 30 Days">Last 30 Days</option>
+              <option value="Last 90 Days">Last 90 Days</option>
+              <option value="This Year">This Year</option>
+            </select>
+          </div>
+
           {/* Entries Per Page */}
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Entries:</span>
@@ -244,20 +333,27 @@ const UserCirculationHistory = () => {
           <thead>
             <tr>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date Borrowed
+              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date Returned
+              </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Book Title
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Barcode
               </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Deadline
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y ">
             {loading ? (
               <tr>
-                <td colSpan="5" className="px-4 py-2 text-center">
+                <td colSpan="6" className="px-4 py-2 text-center">
                   Loading data...
                 </td>
               </tr>
@@ -280,8 +376,8 @@ const UserCirculationHistory = () => {
                       {book.type}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.date}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.time}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.dateOut}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.dateIn}</td>
                   <td className="px-4 py-3 text-sm text-arcadia-red font-semibold truncate text-center">
                     {book.titleID ? (
                       <Link
@@ -296,11 +392,12 @@ const UserCirculationHistory = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.deadline}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-4 py-2 text-center text-zinc-600">
+                <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
                   {currentUser ? "No circulation history found." : "Please log in to view your circulation history."}
                 </td>
               </tr>
@@ -332,4 +429,3 @@ const UserCirculationHistory = () => {
 }
 
 export default UserCirculationHistory
-
