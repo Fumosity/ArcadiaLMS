@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar"
-import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar"
 import Title from "../../components/main-comp/Title"
 import ReportStatus from "../../components/UserComponents/user-report-comp/ReportStatus"
 import MakeReport from "../../components/UserComponents/user-report-comp/MakeReport"
 import ReportDetails from "../../components/UserComponents/user-report-view-comp/ReportDetails"
 import ReturnSupportButton from "../../components/UserComponents/user-support-tix-comp/ReturnSupportButton"
-import { ArrowLeft } from "lucide-react";
-
 
 const UReports = () => {
+  useEffect(() => {
+          document.title = "Arcadia | Report";
+      }, []);
   const [selectedReportID, setSelectedReportID] = useState(null)
   const [searchParams] = useSearchParams()
 

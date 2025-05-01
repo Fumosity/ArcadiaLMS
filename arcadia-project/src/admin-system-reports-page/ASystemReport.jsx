@@ -6,6 +6,9 @@ import SBOverdue from "../components/admin-system-reports-comp/SBOverdue";
 import SBFines from "../components/admin-system-reports-comp/SBFines";
 
 const ASystemReport = () => {
+    useEffect(() => {
+        document.title = "Arcadia | System Reports";
+    }, []);
     const [exportedData, setExportedData] = useState(null);
 
     React.useEffect(() => {

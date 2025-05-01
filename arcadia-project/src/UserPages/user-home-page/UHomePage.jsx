@@ -18,6 +18,9 @@ import SeeMore from "../../components/UserComponents/user-home-comp/SeeMore"
 import SeeMoreGenres from "../../components/UserComponents/user-home-comp/SeeMoreGenres"
 
 const UHomePage = () => {
+  useEffect(() => {
+          document.title = "Arcadia | Home";
+      }, []);
   const [selectedGenre, setSelectedGenre] = useState(null)
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
   const [seeMoreGenresComponent, setSeeMoreGenresComponent] = useState(null)

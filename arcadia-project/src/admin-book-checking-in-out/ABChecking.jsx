@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useRef, useEffect} from "react"
 import Title from "../components/main-comp/Title"
 import BksDueTdy from "../components/admin-book-circ-pg-comp/BksDueTdy"
 import CheckingContainer from "../components/admin-book-check-in-out-comp/CheckingContainer"
@@ -7,6 +7,9 @@ import OverdueBks from "../components/admin-book-circ-pg-comp/OverdueBks"
 import BCSideButtons from "../components/admin-book-circ-pg-comp/BCSideButtons"
 
 const ABChecking = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Book Checking";
+}, []);
   // Create a ref to access the CheckingContainer methods
   const checkingContainerRef = useRef(null)
 

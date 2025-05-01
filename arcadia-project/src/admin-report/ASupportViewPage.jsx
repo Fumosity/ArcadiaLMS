@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Title from "../components/main-comp/Title";
 import RecentSupport from "../components/admin-user-support-report-view-comp/RecentSupport";
 import SupportView from "../components/admin-report-view-comp/SupportView"
@@ -7,6 +7,9 @@ import RecentReports from "../components/admin-user-support-report-view-comp/Rec
 import { ArrowLeft } from "lucide-react";
 
 const ASupportViewPage = () => {
+    useEffect(() => {
+        document.title = "Arcadia | Support View";
+    }, []);
     const navigate = useNavigate(); // Initialize useNavigate
     return (
         <div className="min-h-screen bg-white">

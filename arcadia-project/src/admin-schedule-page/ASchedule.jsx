@@ -4,8 +4,12 @@ import WeeklySched from "../components/admin-schedule-comp/WeeklySched";
 import Title from "../components/main-comp/Title";
 import OperatingHours from "../components/admin-schedule-comp/OperatingHours";
 import EventView from "../components/admin-schedule-comp/EventView";
+import { useEffect } from "react";
 
-const AAccountSettings = () => {
+const ASchedule = () => {
+    useEffect(() => {
+          document.title = "Arcadia | Schedule";
+      }, []);
     React.useEffect(() => {
             if (window.location.hash) {
                 const id = window.location.hash.substring(1)
@@ -38,4 +42,4 @@ const AAccountSettings = () => {
     );
 };
 
-export default AAccountSettings;
+export default ASchedule;

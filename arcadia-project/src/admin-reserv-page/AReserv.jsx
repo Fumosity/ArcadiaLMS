@@ -8,6 +8,9 @@ import RoomReserv from "../components/admin-lib-analytics-comp/RoomReserv";
 import ACurrentReserv from "./ACurrentReserv";
 
 const AReserv = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Room Reservation";
+}, []);
   const [events, setEvents] = useState([]);
 
   // Fetch reservations from Supabase

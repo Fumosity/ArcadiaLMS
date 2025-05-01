@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Title from "../components/main-comp/Title";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import AGModifying from "../components/admin-genre-modify-comp/AGModifying";
@@ -6,6 +6,9 @@ import AGAddPreview from "../components/admin-genre-add-comp/AGAddPreview";
 import { useLocation } from "react-router-dom";
 
 const AGModify = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Genre Modify";
+}, []);
     const navigate = useNavigate(); // Initialize useNavigate
   
   const { search } = useLocation();

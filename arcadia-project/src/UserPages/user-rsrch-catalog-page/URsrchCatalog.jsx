@@ -18,6 +18,9 @@ import { ResearchFilterProvider } from "../../backend/ResearchFilterContext"
 import { Filter } from "lucide-react"
 
 const URsrchCatalog = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Research Catalog";
+}, []);
   const [query, setSearchQuery] = useState("")
   const { user, updateUser } = useUser()
   const location = useLocation()

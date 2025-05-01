@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainHeader from "../components/main-comp/MainHeader";
 import Navbar from "../components/main-comp/Navbar";
 import Footer from "../components/main-comp/Footer";
@@ -9,6 +9,9 @@ import Title from "../components/main-comp/Title";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const ARAdd = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Research Adding";
+}, []);
     const navigate = useNavigate(); // Initialize useNavigate
   
   const [formData, setFormData] = useState({

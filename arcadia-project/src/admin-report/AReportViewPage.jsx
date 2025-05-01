@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Title from "../components/main-comp/Title";
 import RecentReports from "../components/admin-user-support-report-view-comp/RecentReports";
 import ReportView from "../components/admin-report-view-comp/ReportView";
@@ -9,6 +9,9 @@ import { ArrowLeft } from "lucide-react";
 
 
 const AReportViewPage = () => {
+    useEffect(() => {
+        document.title = "Arcadia | Report View";
+    }, []);
     const navigate = useNavigate(); // Initialize useNavigate
 
     return (

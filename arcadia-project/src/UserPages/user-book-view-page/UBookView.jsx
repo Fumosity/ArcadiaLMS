@@ -11,6 +11,9 @@ import { useUser } from "../../backend/UserContext"
 import Pathfinder from "../../components/UserComponents/pathfinder-comp/Pathfinder"
 
 const UBookView = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Book View";
+}, []);
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const titleId = queryParams.get("titleID")

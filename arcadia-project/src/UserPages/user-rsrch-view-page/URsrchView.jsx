@@ -10,6 +10,9 @@ import { useLocation } from "react-router-dom";  // To read URL params
 import Pathfinder from "../../components/UserComponents/pathfinder-comp/Pathfinder";
 
 const URsrchView = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Research View";
+}, []);
   const [research, setResearch] = useState(null);
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)

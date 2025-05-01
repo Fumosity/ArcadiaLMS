@@ -38,6 +38,7 @@ export default function ACurrentReserv() {
   const [reservations, setReservations] = useState({})
   const [activeReservations, setActiveReservations] = useState([])
   const [loading, setLoading] = useState(true)
+  const [holidays, setHolidays] = useState({})
 
   // Table controls
   const [sortOrder, setSortOrder] = useState("Ascending")
@@ -53,6 +54,32 @@ export default function ACurrentReserv() {
   const [reservationToDelete, setReservationToDelete] = useState(null)
 
   const navigate = useNavigate()
+
+  // Fetch holidays when year changes
+  useEffect(() => {
+    fetchHolidays(currentYear)
+  }, [currentYear])
+
+  const fetchHolidays = async (year) => {
+    try {
+      const response = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/PH`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch holidays")
+      }
+      const data = await response.json()
+
+      // Convert to an object with dates as keys for easier lookup
+      const holidayMap = {}
+      data.forEach((holiday) => {
+        const date = holiday.date
+        holidayMap[date] = holiday.name
+      })
+
+      setHolidays(holidayMap)
+    } catch (error) {
+      console.error("Error fetching holidays:", error)
+    }
+  }
 
   useEffect(() => {
     async function fetchReservations() {
@@ -75,71 +102,84 @@ export default function ACurrentReserv() {
         })
       })
 
-      data.forEach(({ reservationData }) => {
-        const { date, room, startTime, endTime } = reservationData
+      // Check if selected date is a holiday
+      const isSelectedDateHoliday = holidays[selectedDate]
 
-        // Fix timezone handling to ensure correct date comparison
-        const reservationDate = new Date(date)
-        const formattedDate = reservationDate.toISOString().split("T")[0]
+      // If it's a holiday, mark all slots as reserved
+      if (isSelectedDateHoliday) {
+        periods.forEach((period) => {
+          rooms.forEach((room) => {
+            availability[period][room] = "Reserved"
+          })
+        })
+      } else {
+        // Process normal reservations
+        data.forEach(({ reservationData }) => {
+          const { date, room, startTime, endTime } = reservationData
 
-        if (formattedDate === selectedDate) {
-          // Properly parse 12-hour time format to 24-hour
-          const parse12HourTime = (time12) => {
-            if (!time12) return { hours: 0, minutes: 0 }
+          // Fix timezone handling to ensure correct date comparison
+          const reservationDate = new Date(date)
+          const formattedDate = reservationDate.toISOString().split("T")[0]
 
-            const [timePart, modifier] = time12.split(" ")
-            let [hours, minutes] = timePart.split(":").map((num) => Number.parseInt(num, 10))
+          if (formattedDate === selectedDate) {
+            // Properly parse 12-hour time format to 24-hour
+            const parse12HourTime = (time12) => {
+              if (!time12) return { hours: 0, minutes: 0 }
 
-            if (modifier === "PM" && hours < 12) {
-              hours += 12
-            } else if (modifier === "AM" && hours === 12) {
-              hours = 0
-            }
+              const [timePart, modifier] = time12.split(" ")
+              let [hours, minutes] = timePart.split(":").map((num) => Number.parseInt(num, 10))
 
-            return { hours, minutes }
-          }
-
-          // Parse reservation times
-          const reservationStart = parse12HourTime(startTime)
-          const reservationEnd = parse12HourTime(endTime)
-
-          // Convert to decimal for easier comparison
-          const reservationStartDecimal = reservationStart.hours + reservationStart.minutes / 60
-          const reservationEndDecimal = reservationEnd.hours + reservationEnd.minutes / 60
-
-          periods.forEach((period) => {
-            // Parse period times (format: "HH:00 - HH:00")
-            const [periodStart, periodEnd] = period.split(" - ")
-
-            // Handle the special case for afternoon hours (12:00 - 01:00, etc.)
-            const parsePeriodTime = (timeStr) => {
-              const [hourStr] = timeStr.split(":")
-              let hour = Number.parseInt(hourStr, 10)
-
-              // Convert 12-hour format to 24-hour
-              // For periods after 12:00, we need to add 12 to get PM hours
-              if (hour < 7 && periods.indexOf(period) >= 6) {
-                // If hour is 1-6 and it's in the afternoon periods
-                hour += 12
+              if (modifier === "PM" && hours < 12) {
+                hours += 12
+              } else if (modifier === "AM" && hours === 12) {
+                hours = 0
               }
 
-              return hour
+              return { hours, minutes }
             }
 
-            const periodStartHour = parsePeriodTime(periodStart)
-            const periodEndHour = parsePeriodTime(periodEnd)
+            // Parse reservation times
+            const reservationStart = parse12HourTime(startTime)
+            const reservationEnd = parse12HourTime(endTime)
 
-            // Check if this period overlaps with the reservation
-            if (
-              (periodStartHour >= reservationStartDecimal && periodStartHour < reservationEndDecimal) ||
-              (periodEndHour > reservationStartDecimal && periodEndHour <= reservationEndDecimal) ||
-              (periodStartHour <= reservationStartDecimal && periodEndHour >= reservationEndDecimal)
-            ) {
-              availability[period][room] = "Reserved"
-            }
-          })
-        }
-      })
+            // Convert to decimal for easier comparison
+            const reservationStartDecimal = reservationStart.hours + reservationStart.minutes / 60
+            const reservationEndDecimal = reservationEnd.hours + reservationEnd.minutes / 60
+
+            periods.forEach((period) => {
+              // Parse period times (format: "HH:00 - HH:00")
+              const [periodStart, periodEnd] = period.split(" - ")
+
+              // Handle the special case for afternoon hours (12:00 - 01:00, etc.)
+              const parsePeriodTime = (timeStr) => {
+                const [hourStr] = timeStr.split(":")
+                let hour = Number.parseInt(hourStr, 10)
+
+                // Convert 12-hour format to 24-hour
+                // For periods after 12:00, we need to add 12 to get PM hours
+                if (hour < 7 && periods.indexOf(period) >= 6) {
+                  // If hour is 1-6 and it's in the afternoon periods
+                  hour += 12
+                }
+
+                return hour
+              }
+
+              const periodStartHour = parsePeriodTime(periodStart)
+              const periodEndHour = parsePeriodTime(periodEnd)
+
+              // Check if this period overlaps with the reservation
+              if (
+                (periodStartHour >= reservationStartDecimal && periodStartHour < reservationEndDecimal) ||
+                (periodEndHour > reservationStartDecimal && periodEndHour <= reservationEndDecimal) ||
+                (periodStartHour <= reservationStartDecimal && periodEndHour >= reservationEndDecimal)
+              ) {
+                availability[period][room] = "Reserved"
+              }
+            })
+          }
+        })
+      }
 
       setReservations(availability)
 
@@ -174,7 +214,7 @@ export default function ACurrentReserv() {
     }
 
     fetchReservations()
-  }, [selectedDate])
+  }, [selectedDate, holidays])
 
   // Filter, Sort, and Search Logic for active reservations
   const filteredReservations = useMemo(() => {
@@ -348,8 +388,6 @@ export default function ACurrentReserv() {
     }
   }
 
-  // Add this function after the confirmDeleteReservation function
-
   return (
     <div className="uHero-cont max-w-[1500px] w-full p-6 bg-white rounded-lg border border-grey">
       <h2 className="text-2xl font-semibold mb-6">Room Reservations</h2>
@@ -429,21 +467,27 @@ export default function ACurrentReserv() {
               const isSunday = date.getDay() === 0
               const isToday = date.getTime() === today.getTime()
               const isSelected = dateString === selectedDate
+              const isHoliday = holidays[dateString] // Check if date is a holiday
 
               // Build class string conditionally
               let dayClasses =
-                "h-10 w-full flex items-center justify-center rounded-md text-sm transition-all duration-200"
+                "h-10 w-full flex items-center justify-center rounded-md text-sm transition-all duration-200 relative"
 
               if (isToday) {
-                dayClasses += " bg-arcadia-red text-white" // Always highlight today
+                dayClasses += " bg-arcadia-red text-white" // Today color
               } else if (isSelected) {
-                dayClasses += " bg-ongoing text-white" // Highlight selected future dates
+                dayClasses += " bg-ongoing text-white" // Selected color
+              } else if (isHoliday) {
+                dayClasses += " bg-red text-gray-400" // Holiday color
               } else {
                 dayClasses += " hover:bg-gray-100" // Default hover effect
               }
 
-              if (isPast || isSunday) {
-                dayClasses += " text-grey cursor-not-allowed" // Disable past dates and Sundays
+              if (isPast || isSunday || isHoliday) {
+                dayClasses += " text-grey cursor-not-allowed" // Disable past dates, Sundays, and holidays
+                if (!isToday && !isSelected) {
+                  dayClasses += " bg-gray-100" // Grey background for unselectable dates
+                }
               } else {
                 dayClasses += " cursor-pointer" // Enable clickable dates
               }
@@ -452,12 +496,22 @@ export default function ACurrentReserv() {
                 <div
                   key={i}
                   className={dayClasses}
-                  onClick={() => !(isPast || isSunday) && setSelectedDate(dateString)}
+                  onClick={() => !(isPast || isSunday || isHoliday) && setSelectedDate(dateString)}
+                  title={isHoliday ? holidays[dateString] : ""}
                 >
                   {date.getDate()}
+                  {isHoliday && !isToday && !isSelected && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-red-300 rounded-b-md"></div>
+                  )}
                 </div>
               )
             })}
+          </div>
+
+          {/* Holiday Legend */}
+          <div className="mt-4 text-xs text-gray-500 flex items-center">
+            <div className="w-3 h-3 bg-red ml-3 mr-1 rounded-sm"></div>
+            <span>Philippine Holiday</span>
           </div>
         </div>
 
@@ -466,6 +520,9 @@ export default function ACurrentReserv() {
           <div className="bg-white rounded-lg border border-grey overflow-hidden p-2">
             <div className="text-md font-medium text-gray-700 p-3 bg-gray-50 border-b">
               Availability for {formattedSelectedDate}
+              {holidays[selectedDate] && (
+                <span className="ml-2 text-sm text-red-500 font-normal">(Holiday: {holidays[selectedDate]})</span>
+              )}
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border border-t-0 border-grey">
@@ -622,6 +679,9 @@ export default function ACurrentReserv() {
                         day: "numeric",
                         year: "numeric",
                       })}
+                      {holidays[res.date] && (
+                        <div className="text-xs text-red-500 mt-1">Holiday: {holidays[res.date]}</div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-sm text-center">{formatPeriod(res.period)}</td>
                     <td className="px-4 py-3 text-sm text-center">

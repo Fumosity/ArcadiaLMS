@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
+import { useEffect } from "react"
 import Title from "../components/main-comp/Title"
 import AUserCirc from "../components/admin-user-account-view-comp/AUserCirc"
 import RecentReports from "../components/admin-user-support-report-view-comp/RecentReports"
@@ -8,6 +9,9 @@ import AUserReport from "../components/admin-user-account-view-comp/AUserReport"
 import AUserSupport from "../components/admin-user-account-view-comp/AUserSupport"
 import AUserOutstandingFines from "../components/admin-user-account-view-comp/AUserOutstandingFines"
 const AUAccView = () => {
+  useEffect(() => {
+      document.title = "Arcadia | Account View";
+  }, []);
   const location = useLocation()
   const user = location.state?.user || {}
   const navigate = useNavigate()

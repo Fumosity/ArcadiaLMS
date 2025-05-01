@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useEffect} from "react"
 import BCHistory from "../components/admin-book-circ-pg-comp/BCHistory"
 import OverdueBks from "../components/admin-book-circ-pg-comp/OverdueBks"
 import BksDueTdy from "../components/admin-book-circ-pg-comp/BksDueTdy"
@@ -10,6 +10,9 @@ import DecommissionedBks from "../components/admin-book-circ-pg-comp/Decommissio
 import TopBorrower from "../components/admin-book-circ-pg-comp/TopBorrower"
 
 export default function ABCirculationPage() {
+  useEffect(() => {
+    document.title = "Arcadia | Book Circulation";
+}, []);
   // Check if there's a hash in the URL and scroll to it after render
   React.useEffect(() => {
     if (window.location.hash) {

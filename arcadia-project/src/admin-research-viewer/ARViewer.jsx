@@ -12,6 +12,9 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import Pathfinder from "../components/UserComponents/pathfinder-comp/Pathfinder";
 
 const ARViewer = () => {
+    useEffect(() => {
+        document.title = "Arcadia | Research View";
+    }, []);
     const navigate = useNavigate(); // Initialize useNavigate
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);

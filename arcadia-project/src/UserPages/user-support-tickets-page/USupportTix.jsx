@@ -9,6 +9,9 @@ import ReturnSupportButton from "../../components/UserComponents/user-support-ti
 import { ArrowLeft } from "lucide-react";
 
 const USupportTix = () => {
+  useEffect(() => {
+          document.title = "Arcadia | Support";
+      }, []);
   const [selectedSupportID, setSelectedSupportID] = useState(null)
   const [searchParams] = useSearchParams()
 

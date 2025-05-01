@@ -14,6 +14,7 @@ export default function LoginForm() {
   const navigate = useNavigate()
   const { updateUser, loginAsGuest } = useUser()
 
+  
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
   }

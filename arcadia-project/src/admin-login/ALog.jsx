@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import Title from "../components/main-comp/Title";
-import MainHeader from "../components/main-comp/MainHeader";
 
 const ALog = ({ onLogin, onForgotPassword }) => {
+    useEffect(() => {
+        document.title = "Arcadia | Login";
+    }, []);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 

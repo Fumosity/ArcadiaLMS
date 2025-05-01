@@ -10,6 +10,9 @@ import "react-loading-skeleton/dist/skeleton.css"
 import ABCopiesHistory from "../components/admin-book-copies-comp/ABCopiesHistory"
 
 const ABCopies = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Book Copies";
+}, []);
   const navigate = useNavigate()
   const location = useLocation()
   const [book, setBook] = useState(null) // State to hold the fetched book details

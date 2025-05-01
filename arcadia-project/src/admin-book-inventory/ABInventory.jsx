@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CurrentBookInventory from "../components/admin-book-inventory-comp/CurrentBookInventory";
 import BookPreviewInv from "../components/admin-book-inventory-comp/BookPreviewInventory";
@@ -9,6 +9,9 @@ import SelectFormat from "../z_modals/confirmation-modals/SelectFormat";
 
 
 const ABInventory = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Book Inventory";
+}, []);
   const navigate = useNavigate(); // Initialize useNavigate
   const [selectedBook, setSelectedBook] = useState(null); // State to hold the selected book details
 

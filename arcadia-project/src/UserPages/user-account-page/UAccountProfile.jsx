@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import Title from "../../components/main-comp/Title";
 import ArcOpHr from "../../components/UserComponents/user-home-comp/ArcOpHr";
@@ -11,6 +11,9 @@ import UserCirculationHistory from "../../components/UserComponents/user-account
 import UserOutstandingFines from "../../components/UserComponents/user-account-comp/UserOutstandingFines";
 
 const UAccountProfile = () => {
+    useEffect(() => {
+            document.title = "Arcadia | Account";
+        }, []);
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />

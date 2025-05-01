@@ -1,6 +1,6 @@
 import axios from "axios"
 
-export const BASE_URL = "https://arcadialms.online"
+export const BASE_URL = "https://arcadialib.site"
 
 export const API_URL = `${BASE_URL}/api`
 

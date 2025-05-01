@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Title from "../components/main-comp/Title";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import AGAdding from "../components/admin-genre-add-comp/AGAdding";
 import AGAddPreview from "../components/admin-genre-add-comp/AGAddPreview";
 
 const AGAdd = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Genre Adding";
+}, []);
   const navigate = useNavigate(); // Initialize useNavigate
 
   const [formData, setFormData] = useState({

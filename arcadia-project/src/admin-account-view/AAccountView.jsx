@@ -5,6 +5,9 @@ import AAListAdmin from "../components/admin-account-view-comp/AAListAdmin";
 import AdminInformations from "../components/admin-account-view-comp/AdminInformations";
 
 const AAccountView = () => {
+    useEffect(() => {
+        document.title = "Arcadia | Account View";
+    }, []);
     const location = useLocation();
     const user = location.state?.user || {};
 

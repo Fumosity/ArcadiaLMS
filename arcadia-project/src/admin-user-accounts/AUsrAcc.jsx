@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import RcntLibVisit from "../components/admin-user-acc-comp/RcntLibVisit";
 import AccessTable from "../components/admin-home-page-comp/HomeShortcutButtons";
 import Title from "../components/main-comp/Title";
@@ -8,6 +8,9 @@ import RecentReports from "../components/admin-user-support-report-view-comp/Rec
 import RecentSupport from "../components/admin-user-support-report-view-comp/RecentSupport";
 
 const AUsrAcc = () => {
+  useEffect(() => {
+      document.title = "Arcadia | User Accounts";
+  }, []);
 
     React.useEffect(() => {
         if (window.location.hash) {

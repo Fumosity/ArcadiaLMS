@@ -14,6 +14,9 @@ import Pathfinder from "../components/UserComponents/pathfinder-comp/Pathfinder"
 
 
 export default function ABViewer() {
+  useEffect(() => {
+    document.title = "Arcadia | Book View";
+}, []);
   const navigate = useNavigate() // Initialize useNavigate
   const location = useLocation()
   const [book, setBook] = useState(null) // State to hold the fetched book details

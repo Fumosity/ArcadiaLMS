@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import ABAdding from "../components/admin-book-add-comp/ABAdding";
 import ABAddPreview from "../components/admin-book-add-comp/ABAddPreview";
 import Title from "../components/main-comp/Title";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const ABAdd = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Book Adding";
+}, []);
   const navigate = useNavigate(); // Initialize useNavigate
 
   const [formData, setFormData] = useState({

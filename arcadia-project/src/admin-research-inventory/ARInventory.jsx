@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Title from "../components/main-comp/Title";
 import CurrentResearchInventory from "../components/admin-research-inventory/CurrentResearchInventory";
@@ -8,6 +8,9 @@ import ExcellentExport from "excellentexport";
 import SelectFormat from "../z_modals/confirmation-modals/SelectFormat";
 
 const ARInventory = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Research Inventory";
+}, []);
   const [selectedResearch, setSelectedResearch] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();

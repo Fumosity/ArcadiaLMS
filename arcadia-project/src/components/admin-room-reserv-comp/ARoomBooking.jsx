@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { supabase } from "../../supabaseClient"
 import { toast } from "react-toastify"
@@ -16,6 +18,7 @@ export default function ARoomBooking({ addReservation }) {
     endTime: "08:00",
     title: "",
   })
+  const [holidays, setHolidays] = useState({})
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0]
@@ -23,13 +26,54 @@ export default function ARoomBooking({ addReservation }) {
       ...prev,
       date: today,
     }))
+
+    // Try to get holidays from sessionStorage first (set by UDiscussionReserv)
+    const storedHolidays = sessionStorage.getItem("philippineHolidays")
+    if (storedHolidays) {
+      setHolidays(JSON.parse(storedHolidays))
+    } else {
+      // If not in sessionStorage, fetch them directly
+      fetchHolidays(new Date().getFullYear())
+    }
   }, [])
+
+  // Function to fetch holidays from API
+  const fetchHolidays = async (year) => {
+    try {
+      const response = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/PH`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch holidays")
+      }
+      const data = await response.json()
+
+      // Convert to an object with dates as keys for easier lookup
+      const holidayMap = {}
+      data.forEach((holiday) => {
+        const date = holiday.date
+        holidayMap[date] = holiday.name
+      })
+
+      setHolidays(holidayMap)
+    } catch (error) {
+      console.error("Error fetching holidays:", error)
+    }
+  }
 
   const handleInputChange = async (e) => {
     const { name, value } = e.target
 
     // Update the form data with the new value
     setFormData((prev) => ({ ...prev, [name]: value }))
+
+    // If the date field is updated, check if we need to fetch holidays for a different year
+    if (name === "date" && value) {
+      const selectedYear = new Date(value).getFullYear()
+      const currentYear = new Date().getFullYear()
+
+      if (selectedYear !== currentYear) {
+        fetchHolidays(selectedYear)
+      }
+    }
 
     // If the school ID field is updated
     if (name === "schoolId") {
@@ -203,6 +247,10 @@ export default function ARoomBooking({ addReservation }) {
     return selectedDay === 0
   }
 
+  const isHoliday = (date) => {
+    return holidays[date] !== undefined
+  }
+
   const handleFormSubmit = async () => {
     const now = new Date()
     const selectedDateTime = new Date(`${formData.date}T${formData.startTime}`)
@@ -243,6 +291,21 @@ export default function ARoomBooking({ addReservation }) {
 
     if (isSunday(formData.date)) {
       toast.error("Bookings are not allowed on Sundays!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        className: "bg-red text-white",
+      })
+      return
+    }
+
+    if (isHoliday(formData.date)) {
+      toast.error(`Bookings are not allowed on holidays! (${holidays[formData.date]})`, {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -475,14 +538,20 @@ export default function ARoomBooking({ addReservation }) {
 
           <div className="flex items-center">
             <span className="w-1/3 text-md capitalize">Reservation Date:</span>
-            <div className="w-2/3 flex items-center">
+            <div className="w-2/3 flex items-center relative">
               <input
                 type="date"
                 name="date"
                 value={formData.date}
                 onChange={handleInputChange}
-                className="px-3 py-1 rounded-full border border-grey w-full"
+                className={`px-3 py-1 rounded-full border border-grey w-full text-black ${isHoliday(formData.date) ? "border-orange bg-orange" : ""
+                  }`}
               />
+              {isHoliday(formData.date) && (
+                <div className="absolute top-1/2 left-60 transform -translate-y-1/2 text-xs text-black">
+                  Holiday: {holidays[formData.date]}
+                </div>
+              )}
             </div>
           </div>
 

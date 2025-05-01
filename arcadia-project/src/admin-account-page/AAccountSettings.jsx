@@ -1,13 +1,16 @@
-import React from "react";
-
+import React, { useEffect } from "react";
 import { AdminSettings } from "../components/admin-account-settings-comp/AdminSettings";
 import { AdminCredentials } from "../components/admin-account-settings-comp/AdminCredentials";
 import Title from "../components/main-comp/Title";
 
 const AAccountSettings = () => {
+    useEffect(() => {
+        document.title = "Arcadia | Account Settings";
+    }, []);
+
     return (
         <div className="min-h-screen bg-white">
-            <Title>Account Settings </Title>
+            <Title>Account Settings</Title>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Content Container */}
@@ -20,9 +23,8 @@ const AAccountSettings = () => {
                     </div>
                 </div>
             </main>
-
         </div>
-    )
+    );
 };
 
 export default AAccountSettings;

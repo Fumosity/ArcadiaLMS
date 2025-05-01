@@ -1,11 +1,7 @@
-import React from "react";
+import React, {useEffect} from "react";
 import TodayReserv from "../components/admin-reserv-comp/TodayReserv";
-import MainHeader from "../components/main-comp/MainHeader";
 import Title from "../components/main-comp/Title";
-import ARoomBooking from "../components/admin-room-reserv-comp/ARoomBooking";
-import ARoomReservations from "../components/admin-room-reserv-comp/ARoomReservations";
 import ReservInformation from "../components/admin-room-reserv-comp/ReservInformation";
-
 
 const AReservView = () => (
     <div className="min-h-screen bg-white">

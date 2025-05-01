@@ -24,6 +24,10 @@ import { FilterProvider } from "../../backend/FilterContext"
 import { Filter } from "lucide-react"
 
 const UBkCatalog = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Book Catalog";
+}, []);
+
   const [query, setQuery] = useState("")
   const { user, updateUser } = useUser()
   const location = useLocation()

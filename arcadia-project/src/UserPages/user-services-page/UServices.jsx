@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect} from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import Title from "../../components/main-comp/Title";
@@ -13,6 +13,9 @@ import LibServ from "../../components/UserComponents/user-serv-comp/LibServ";
 import ServicesHero from "../../components/UserComponents/user-home-comp/ServicesHero";
 
 const UServices = () => {
+    useEffect(() => {
+        document.title = "Arcadia | Services";
+    }, []);
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />

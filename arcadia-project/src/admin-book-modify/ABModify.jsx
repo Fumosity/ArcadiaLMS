@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Title from "../components/main-comp/Title";
 import BookModify from "../components/admin-book-modify/BookModify";
@@ -6,6 +6,9 @@ import ABAddPreview from "../components/admin-book-add-comp/ABAddPreview";
 import { supabase } from "../supabaseClient";
 
 const ABModify = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Book Modify";
+}, []);
   const navigate = useNavigate();
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);

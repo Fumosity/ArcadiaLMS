@@ -6,6 +6,9 @@ import GenrePreview from "../components/admin-genre-mgmt-comp/GenrePreview";
 import NonFictionList from "../components/admin-genre-mgmt-comp/NonFictionList";
 
 export default function AGenreMgmt() {
+    useEffect(() => {
+        document.title = "Arcadia | Genre Management";
+    }, []);
     const navigate = useNavigate(); // Initialize useNavigate
     const [selectedGenre, setSelectedGenre] = useState(null); // State to hold the selected book details
 

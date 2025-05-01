@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar";
 import UsearchBar from "../../components/UserComponents/user-main-comp/USearchBar";
 import Title from "../../components/main-comp/Title";
@@ -10,6 +10,9 @@ import SupportCont from "../../components/UserComponents/user-support-comp/Suppo
 import ContactUs from "../../components/UserComponents/user-support-comp/ContactUs";
 
 const USupport = () => {
+    useEffect(() => {
+            document.title = "Arcadia | Support";
+        }, []);
     return (
         <div className="min-h-screen bg-light-white">
             <UNavbar />

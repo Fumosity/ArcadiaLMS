@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Title from "../components/main-comp/Title";
 import UserReports from "../components/admin-user-support-report-view-comp/UserReports";
 import SupportTicket from "../components/admin-user-support-report-view-comp/SupportTicket";
@@ -8,6 +8,9 @@ import ReportSupportBarPlot from "../components/admin-user-support-report-view-c
 import ReportSupportPieChart from "../components/admin-user-support-report-view-comp/ReportSupportPieChart";
 
 const ASupportPage = () => {
+    useEffect(() => {
+        document.title = "Arcadia | Support";
+    }, []);
     React.useEffect(() => {
         if (window.location.hash) {
             const id = window.location.hash.substring(1)

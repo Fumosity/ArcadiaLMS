@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import AccessTable from '../components/admin-home-page-comp/HomeShortcutButtons';
 import TodayReserv from '../components/admin-reserv-comp/TodayReserv';
@@ -16,6 +16,9 @@ import RcntLibVisit from '../components/admin-user-acc-comp/RcntLibVisit';
 import LeastPop from '../components/admin-lib-analytics-comp/LeastPop';
 
 const AHomePage = () => {
+  useEffect(() => {
+    document.title = "Arcadia | Home";
+}, []);
   const navigate = useNavigate(); 
 
   return (
