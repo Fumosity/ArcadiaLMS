@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import { supabase } from "../../../supabaseClient"
 
@@ -296,8 +298,8 @@ export default function CurrentReservations() {
                 dayClasses += " hover:bg-gray" // Default hover effect
               }
 
-              if (isPast || isSunday || isHoliday) {
-                dayClasses += " text-grey cursor-not-allowed bg-gray" // Disable past dates, Sundays, and holidays
+              if ((isPast && !isToday) || isSunday || isHoliday) {
+                dayClasses += " text-grey cursor-not-allowed bg-gray" // Disable past dates (except today), Sundays, and holidays
               } else {
                 dayClasses += " cursor-pointer" // Enable clickable dates
               }
@@ -306,7 +308,12 @@ export default function CurrentReservations() {
                 <div
                   key={i}
                   className={dayClasses}
-                  onClick={() => !(isPast || isSunday || isHoliday) && setSelectedDate(dateString)}
+                  onClick={() => {
+                    // Allow clicking today's date even after selecting other dates
+                    if (isToday || !(isPast || isSunday || isHoliday)) {
+                      setSelectedDate(dateString)
+                    }
+                  }}
                 >
                   {date.getDate()}
                   {isHoliday && !isToday && !isSelected && (

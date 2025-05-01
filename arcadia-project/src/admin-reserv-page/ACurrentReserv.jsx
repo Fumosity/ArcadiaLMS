@@ -496,7 +496,12 @@ export default function ACurrentReserv() {
                 <div
                   key={i}
                   className={dayClasses}
-                  onClick={() => !(isPast || isSunday || isHoliday) && setSelectedDate(dateString)}
+                  onClick={() => {
+                    // Allow clicking today's date even after selecting other dates
+                    if (!(isPast && !isToday) && !isSunday && !isHoliday) {
+                      setSelectedDate(dateString)
+                    }
+                  }}
                   title={isHoliday ? holidays[dateString] : ""}
                 >
                   {date.getDate()}
