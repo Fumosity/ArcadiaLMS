@@ -34,9 +34,9 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
 
   const formatStudentNumberByType = (value) => {
     if (userType === "faculty") {
-      // For faculty, limit to 9 characters (XXXX-XXXXX)
-      const cleaned = value.replace(/[^\w]/g, "").substring(0, 9)
-      const parts = [cleaned.slice(0, 4), cleaned.slice(4, 9)]
+      // For faculty, limit to 10 characters (XXXX-XXXXX)
+      const cleaned = value.replace(/[^\w]/g, "").substring(0, 10)
+      const parts = [cleaned.slice(0, 4), cleaned.slice(4, 10)]
       return parts.filter(Boolean).join("-") || "XXXX-XXXXX"
     } else {
       // For students, only allow digits and format as XXXX-X-XXXXX
@@ -117,7 +117,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
 
                 if (userType === "faculty") {
                   // For faculty, allow alphanumeric characters, limit to 9 chars
-                  cleanedValue = e.target.value.replace(/[^\w]/g, "").substring(0, 9)
+                  cleanedValue = e.target.value.replace(/[^\w]/g, "").substring(0, 10)
                 } else {
                   // For students, only allow digits
                   cleanedValue = e.target.value.replace(/[^\d]/g, "").substring(0, 10)
@@ -131,7 +131,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
                   formattedStudentNumber: formatted,
                 }))
               }}
-              placeholder={userType === "student" ? "XXXX-X-XXXXX" : "XXXX-XXXXX"}
+              placeholder={userType === "student" ? "XXXX-X-XXXXX" : "XXXX-XXXXXX"}
               className="w-full px-2.5 py-1 border border-gray rounded-full"
               maxLength={userType === "faculty" ? 11 : 12} // Account for hyphens in display
             />
