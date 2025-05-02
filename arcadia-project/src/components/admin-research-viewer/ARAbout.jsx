@@ -28,6 +28,7 @@ const ARAbout = ({ researchData }) => {
         pubDate: researchData.pubDate,
         location: researchData.location,
         researchCallNum: researchData.researchCallNum,
+        abstract: researchData.abstract
     }
 
     console.log(researchData)
