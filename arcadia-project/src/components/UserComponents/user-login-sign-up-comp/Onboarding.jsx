@@ -82,9 +82,9 @@ export default function Onboarding({ userData, selectedGenres }) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    email: userData.email + userData.emailSuffix,
-                    firstName: userData.firstName,
-                    lpuID: userData.studentNumber,
+                    userEmail: userData.email + userData.emailSuffix,
+                    userFName: userData.firstName,
+                    userLPUID: userData.studentNumber,
                 }),
             })
 
