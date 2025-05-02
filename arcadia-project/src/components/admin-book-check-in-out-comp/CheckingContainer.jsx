@@ -3,7 +3,7 @@ import { supabase } from "../../supabaseClient"
 import { toast, ToastContainer } from "react-toastify" // Import ToastContainer
 import "react-toastify/dist/ReactToastify.css"
 import ScanBarcodeModal from "../../z_modals/ScanBarcodeModal"
-
+import { useUser } from "../../backend/UserContext"
 const CheckingContainer = () => {
   const [checkMode, setCheckMode] = useState("Check Out")
   const [isSubmitting, setIsSubmitting] = useState(false) // State for loading indicator
@@ -15,6 +15,11 @@ const CheckingContainer = () => {
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [isViewOpen, setViewOpen] = useState("")
   const [scanResult, setScanResult] = useState("") // Store scanned barcode
+
+  const { user } = useUser()
+  console.log(user)
+  const username = user.userFName + " " + user.userLName
+  console.log(username)
 
   const handleBarcodeScan = (barcode) => {
     setScanResult(barcode) // Update the scanned barcode
@@ -303,12 +308,12 @@ const CheckingContainer = () => {
               bookBarcode: "", // No available copy
             }))
             toast.error("No available copies of this book found.", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: false,
             })
           }
         }
@@ -456,6 +461,85 @@ const CheckingContainer = () => {
           toast.error("Error submitting the form. Please try again.")
         } else {
           console.log("Transaction successful:", data)
+
+
+          const printData = {
+            schoolNo: formData.schoolNo,
+            name: formData.name,
+            college: formData.college,
+            department: formData.department,
+            bookTitle: formData.bookTitle,
+            bookBarcode: formData.bookBarcode,
+            date: formatDate(formData.date), // Format the date for printing
+            time: formData.time,
+            deadline: formatDate(formData.deadline), // Format the deadline for printing
+          };
+
+          // Format the data for printing
+          const printContent = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Book Check Out Slip</title>
+            <style type="text/css" media="print">
+              body {
+                font-family: sans-serif;
+                font-size: 10pt;
+              }
+              h3 {
+                margin-top: 12px;
+                font-size: 14pt;
+              }
+              p {
+                margin-bottom: 2px;
+              }
+              strong {
+                font-weight: bold;
+              }
+              .note {
+                margin-top: 12px;
+                font-size: 8pt;
+                font-style: italic;
+              }
+              .center {
+                text-align: center;
+                margin-bottom: 0;
+              }
+              .small {
+                font-size: 8pt;
+              }
+            </style>
+          </head>
+          <body>
+            <p class="center">Lyceum of the Philippines University - Cavite</p>
+            <p class="center small">Governors Drive, Brgy. Manggahan, General Trias, Cavite 4107</p>
+            <h3 class="center">Book Check Out Slip</h3>
+            <br />
+            <p><strong>School ID:</strong> ${printData.schoolNo}</p>
+            <p><strong>Name:</strong> ${printData.name}</p>
+            <p><strong>College:</strong> ${printData.college} ${printData.department ? `- ${printData.department}` : ''}</p>
+            <p><strong>Book Title:</strong> ${printData.bookTitle}</p>
+            <p><strong>Book Barcode:</strong> ${printData.bookBarcode}</p>
+            <p><strong>Check Out Date:</strong> ${printData.date}</p>
+            <p><strong>Check Out Time:</strong> ${printData.time}</p>
+            <p><strong>Return Deadline:</strong> ${printData.deadline}</p>
+            <br />
+            <p><strong>Served by:</strong> ${username}</p>
+            <br />
+            <p class="note">This slip serves as your temporary record. Please return the book by the deadline, else a fine of P10 per day will be incurred for each school day that passes.</p>
+          </body>
+          </html>
+        `;
+
+          const printWindow = window.open('', '_blank');
+          if (printWindow) {
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+          } else {
+            toast.error("Failed to open print window.");
+          }
+
           toast.success("Book checked out successfully!")
           // Reset form for a new transaction
           resetForm()

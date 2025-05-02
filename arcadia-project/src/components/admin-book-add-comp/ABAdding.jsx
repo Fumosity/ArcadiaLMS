@@ -154,8 +154,42 @@ const ABAdding = ({ formData, setFormData }) => {
     setValidationErrors({})
     setIsSubmitting(true)
 
-    console.log("pre addBook")
-    const success = await addBook(formData)
+    // Check if ISBN already exists
+    const { data: existingBook, error: selectError } = await supabase
+      .from("book_titles")
+      .select("isbn")
+      .eq("isbn", formData.isbn)
+      .single();
+
+    if (selectError) {
+      console.error("Error checking for existing ISBN:", selectError);
+      toast.error("Error checking ISBN. Please try again.", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (existingBook) {
+      toast.warning("A book with this ISBN already exists.", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    console.log("pre addBook");
+    const success = await addBook(formData);
 
     if (success) {
       toast.success("Book added successfully!", {

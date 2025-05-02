@@ -2,6 +2,9 @@ import { supabase } from "../../supabaseClient"
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import LibBookCirc from "../admin-lib-analytics-comp/LibBookCirc"
+import BookReceiptView from "../../z_modals/BookReceiptView"
+import { toast } from "react-toastify";
+import { useUser } from "../../backend/UserContext"
 
 const BCHistory = () => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -12,6 +15,14 @@ const BCHistory = () => {
   const [dateRange, setDateRange] = useState("All Time")
   const [bkhistoryData, setBkhistoryData] = useState([])
   const [loading, setLoading] = useState(true)
+  const [transactionContent, setTransactionContent] = useState([])
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const { user } = useUser()
+  console.log(user)
+  const username = user.userFName + " " + user.userLName
+  console.log(username)
+
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -19,6 +30,7 @@ const BCHistory = () => {
       try {
         setLoading(true)
         const { data, error } = await supabase.from("book_transactions").select(`
+                        transactionID,
                         transactionType, 
                         checkinDate, 
                         checkinTime, 
@@ -39,7 +51,9 @@ const BCHistory = () => {
                         user_accounts (
                             userFName,
                             userLName,
-                            userLPUID
+                            userLPUID,
+                            userCollege,
+                            userDepartment
                         )`)
 
         if (error) {
@@ -115,12 +129,18 @@ const BCHistory = () => {
 
             return {
               type: item.transactionType,
+              transNo: item.transactionID,
               rawDate: date, // Keep the original date for sorting if needed
               dateIn: formattedDateIn,
               dateOut: formattedDateOut,
               date: item.transactionType === "Borrowed" ? formattedDateOut : formattedDateIn, // Use appropriate date based on type
               time: formattedTime,
+              checkoutTime: item.checkoutTime,
+              checkinTime: item.checkinTime,
               borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
+              schoolNo: item.user_accounts.userLPUID,
+              college: item.user_accounts.userCollege,
+              department: item.user_accounts.userDepartment,
               bookTitle: bookDetails.title,
               bookBarcode: item.book_indiv.bookBarcode,
               userId: item.userID,
@@ -204,6 +224,83 @@ const BCHistory = () => {
       state: { userId: book.userId, user: book },
     })
     window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleReceiptPrint = (transactionContent) => {
+    // Format the data for printing
+    const printContent = `
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <title>Book Check Out Slip</title>
+                <style type="text/css" media="print">
+                  body {
+                    font-family: sans-serif;
+                    font-size: 10pt;
+                  }
+                  h3 {
+                    margin-top: 12px;
+                    font-size: 14pt;
+                  }
+                  p {
+                    margin-bottom: 2px;
+                  }
+                  strong {
+                    font-weight: bold;
+                  }
+                  .note {
+                    margin-top: 12px;
+                    font-size: 8pt;
+                    font-style: italic;
+                  }
+                  .center {
+                    text-align: center;
+                    margin-bottom: 0;
+                  }
+                  .small {
+                    font-size: 8pt;
+                  }
+                </style>
+              </head>
+              <body>
+                <p class="center">Lyceum of the Philippines University - Cavite</p>
+                <p class="center small">Governors Drive, Brgy. Manggahan, General Trias, Cavite 4107</p>
+                <h3 class="center">Book Check Out Slip</h3>
+                <br />
+                <p><strong>Transaction No.:</strong> ${transactionContent.transNo}</p>
+                <p><strong>School ID:</strong> ${transactionContent.schoolNo}</p>
+                <p><strong>Name:</strong> ${transactionContent.borrower}</p>
+                <p><strong>College:</strong> ${transactionContent.college} ${transactionContent.department ? `- ${transactionContent.department}` : ''}</p>
+                <p><strong>Book Title:</strong> ${transactionContent.bookTitle}</p>
+                <p><strong>Book Barcode:</strong> ${transactionContent.bookBarcode}</p>
+                <p><strong>Check Out Date:</strong> ${transactionContent.date}</p>
+                <p><strong>Check Out Time:</strong> ${transactionContent.time}</p>
+                <p><strong>Return Deadline:</strong> ${transactionContent.deadline}</p>
+                <br />
+                <p><strong>Printed by:</strong> ${username}</p>
+                <br />
+                <p class="note">This slip serves as your temporary record. Please return the book by the deadline, else a fine of P10 per day will be incurred for each school day that passes.</p>
+              </body>
+              </html>
+            `;
+
+    const printWindow = window.open('', '_blank');
+
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.print();
+    } else {
+      toast.error("Failed to open print window.", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+    }
   }
 
   const truncateTitle = (title, maxLength = 25) => {
@@ -314,6 +411,9 @@ const BCHistory = () => {
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Deadline
               </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Receipt
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -354,6 +454,19 @@ const BCHistory = () => {
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.deadline}</td>
+                  <td className="px-4 py-3 text-sm text-center">
+                    <div className="flex justify-center space-x-2">
+                      <button
+                        onClick={() => {
+                          setTransactionContent(book)
+                          setDeleteModalOpen(true)
+                        }}
+                        className="bg-arcadia-red hover:bg-red text-white py-1 px-2 rounded-xl text-xs"
+                      >
+                        View
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             ) : (
@@ -385,6 +498,12 @@ const BCHistory = () => {
           Next Page
         </button>
       </div>
+      <BookReceiptView
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={() => handleReceiptPrint(transactionContent)}
+        content={transactionContent}
+      />
     </div>
   )
 }

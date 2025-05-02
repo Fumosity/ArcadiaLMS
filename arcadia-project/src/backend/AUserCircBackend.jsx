@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { supabase } from "../supabaseClient"
+import { useUser } from "./UserContext"
 
 export const useUserCirculation = (propUser) => {
   const [sortOrder, setSortOrder] = useState("Descending")
@@ -13,6 +14,11 @@ export const useUserCirculation = (propUser) => {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const location = useLocation()
+
+  const { user } = useUser()
+  console.log(user)
+  const username = user.userFName + " " + user.userLName
+  console.log(username)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,28 +61,31 @@ export const useUserCirculation = (propUser) => {
         const { data, error } = await supabase
           .from("book_transactions")
           .select(`
-            transactionType, 
-            checkinDate, 
-            checkinTime, 
-            checkoutDate, 
-            checkoutTime,
-            deadline, 
-            userID, 
-            bookBarcode, 
-            book_indiv(
-              bookBarcode,
-              bookStatus,
-              book_titles (
-                titleID,
-                title,
-                price
-              )
-            ),
-            user_accounts (
-              userFName,
-              userLName,
-              userLPUID
-            )`)
+            transactionID,
+                        transactionType, 
+                        checkinDate, 
+                        checkinTime, 
+                        checkoutDate, 
+                        checkoutTime,
+                        deadline, 
+                        userID, 
+                        bookBarcode, 
+                        book_indiv(
+                            bookBarcode,
+                            bookStatus,
+                            book_titles (
+                                titleID,
+                                title,
+                                price
+                            )
+                        ),
+                        user_accounts (
+                            userFName,
+                            userLName,
+                            userLPUID,
+                            userCollege,
+                            userDepartment
+                        )`)
           .eq("userID", userId)
 
         if (error) {
@@ -141,18 +150,22 @@ export const useUserCirculation = (propUser) => {
 
             return {
               type: item.transactionType,
-              rawDate: dateIn || dateOut, // Keep original for sorting and filtering
+              transNo: item.transactionID,
               dateIn: formattedDateIn,
               dateOut: formattedDateOut,
-              date: item.transactionType === "Borrowed" ? formattedDateOut : formattedDateIn,
-              rawTime: time, // Keep original for sorting
+              date: item.transactionType === "Borrowed" ? formattedDateOut : formattedDateIn, // Use appropriate date based on type
               time: formattedTime,
+              checkoutTime: item.checkoutTime,
+              checkinTime: item.checkinTime,
               borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
+              schoolNo: item.user_accounts.userLPUID,
+              college: item.user_accounts.userCollege,
+              department: item.user_accounts.userDepartment,
               bookTitle: bookDetails.title,
-              bookBarcode: item.bookBarcode,
-              user_id: item.userID,
-              titleID: bookDetails.titleID,
+              bookBarcode: item.book_indiv.bookBarcode,
+              userId: item.userID,
               deadline: formattedDeadline,
+              titleID: bookDetails.titleID,
             }
           })
 
@@ -291,5 +304,6 @@ export const useUserCirculation = (propUser) => {
     handleUserClick,
     truncateTitle,
     totalEntries,
+    username
   }
 }
