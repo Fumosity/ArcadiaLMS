@@ -42,7 +42,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
       // For students, only allow digits and format as XXXX-X-XXXXX
       const cleaned = value.replace(/[^\d]/g, "").substring(0, 10)
       const parts = [cleaned.slice(0, 4), cleaned.slice(4, 5), cleaned.slice(5, 10)]
-      return parts.filter(Boolean).join("-") || "XXXX-X-XXXXX"
+      return parts.filter(Boolean).join("-") || ""
     }
   }
 

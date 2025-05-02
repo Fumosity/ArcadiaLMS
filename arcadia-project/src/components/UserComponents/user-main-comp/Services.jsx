@@ -21,7 +21,7 @@ const Services = () => {
                 <li className="py-1">
                     <Link to="/user/reservations" className="hover:underline"
                     onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-                        Reserve Discussion Room
+                        View Room Schedule
                     </Link>
                 </li>
                 <li className="py-1">

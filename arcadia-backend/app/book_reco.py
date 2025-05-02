@@ -403,4 +403,4 @@ def evaluate_all_strategies(books_df, ratings_df, users_df, cosine_sim, k_values
     evaluate_single_strategy(books_df, ratings_df, users_df, 'random', cosine_sim, k_values, rating_threshold)
 
 # --- Evaluation ---
-evaluate_all_strategies(books_df, ratings_df, users_df, cosine_sim, k_values=[5, 10, 20], rating_threshold=4)
+#evaluate_all_strategies(books_df, ratings_df, users_df, cosine_sim, k_values=[5, 10, 20], rating_threshold=4)

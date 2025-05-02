@@ -146,4 +146,4 @@ def evaluate_all_research_strategies(df, cosine_sim, k_values: List[int] = [5, 1
     evaluate_single_strategy(df, cosine_sim, 'random', k_values)
 
 # Run the evaluations
-evaluate_all_research_strategies(df, cosine_sim, k_values=[5, 10])
+#evaluate_all_research_strategies(df, cosine_sim, k_values=[5, 10])

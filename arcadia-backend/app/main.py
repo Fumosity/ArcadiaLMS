@@ -21,8 +21,8 @@ from .research_reco import get_rsrch_recommendations
 
 from .SendAuthEmail import router as email_router
 
-#app = FastAPI(root_path="/api")
-app = FastAPI()
+app = FastAPI(root_path="/api")
+#app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,

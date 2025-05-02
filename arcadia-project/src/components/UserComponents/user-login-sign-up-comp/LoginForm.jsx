@@ -80,7 +80,7 @@ export default function LoginForm() {
   }
 
   const handleForgotPassword = () => {
-    window.location.href = "mailto:cav-arc@lpu.edu.ph?subject=Password Reset Request"
+    navigate('/user/forgotpassword')
   }
 
   const handleGuestLogin = (e) => {

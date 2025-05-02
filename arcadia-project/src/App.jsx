@@ -49,6 +49,8 @@ import AReportViewPage from './admin-report/AReportViewPage';
 import ASupportViewPage from './admin-report/ASupportViewPage';
 import ULogin from './UserPages/user-log-sign-page/ULogin';
 import UBookView from './UserPages/user-book-view-page/UBookView.jsx';
+import ForgotPassword from './components/forgot-password-comp/ForgotPassword.jsx';
+import ResetPassword from './components/reset-password-comp/ResetPassword.jsx';
 
 import ErrorPage from './UserPages/ErrorPage';
 import URegister from './UserPages/user-log-sign-page/URegister';
@@ -75,6 +77,8 @@ function App() {
     <ToastContainer />
     <Routes>
       <Route path="/user/login" element={<ULogin />}/>
+      <Route path="/user/forgotpassword" element={<ForgotPassword />}/>
+      <Route path="/user/resetpassword/:token" element={<ResetPassword />}/>
       <Route path="/user/register" element={<URegister />} />
       <Route
         path="/*"
