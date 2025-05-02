@@ -186,30 +186,29 @@ async def forgot_password(payload: ForgotPasswordRequest):
         raise HTTPException(status_code=500, detail="Failed to initiate password reset: " + str(e))
       
 @router.get("/verify-reset-token")
-async def verify_reset_token(token: str):  # Get the token from the query parameter
+async def verify_reset_token(token: str):
     if not token:
         raise HTTPException(status_code=400, detail="Token is missing")
-
     try:
-        # ... your token verification logic ...
-        # Example:
+        # 1.  Verify the token against your database
         reset_record = supabase.table("password_reset_tokens").select("email, expiry_time").eq("reset_token", token).single().execute()
 
         if not reset_record.data:
             raise HTTPException(status_code=400, detail="Invalid reset token.")
 
+        # 2. Check if the token has expired
         expiry_time_str = reset_record.data["expiry_time"]
-        expiry_time = datetime.datetime.fromisoformat(expiry_time_str.replace("Z", "+00:00"))
+        expiry_time = datetime.datetime.fromisoformat(expiry_time_str.replace("Z", "+00:00")) #correct
         if datetime.datetime.utcnow() > expiry_time:
             raise HTTPException(status_code=400, detail="Reset token has expired.")
 
-        return {"message": "Token is valid."}
+        # 3.  If the token is valid, return a JSON response
+        return {"message": "Token is valid"}  # <--- VERY IMPORTANT: JSON!
 
     except HTTPException as e:
-        raise e
+        raise e  # Re-raise the HTTPException
     except Exception as e:
-        print("Error verifying reset token:", e)
-        traceback.print_exc()
+        print(f"Error in /verify-reset-token: {e}")  # Log the error
         raise HTTPException(status_code=500, detail="Internal server error")
 
 # Endpoint to handle password reset

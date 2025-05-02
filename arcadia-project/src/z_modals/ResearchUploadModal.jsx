@@ -182,34 +182,31 @@ function ResearchUploadModal({ isOpen, onClose, onFileSelect, onExtractedData })
 
     console.log("Grouped Data Before Formatting:", groupedData);
 
-    // Convert publication date to YYYY-MM-DD format for date input
+    // Extract publication year only
     let formattedPubDate = "";
     if (groupedData["pubDate"] && groupedData["pubDate"].length > 0) {
       const rawDate = groupedData["pubDate"].join("").trim();
       console.log("Raw pubDate:", rawDate);
 
-      // Handle month-name formats like "April 2019"
-      const monthMap = {
-        January: "01", February: "02", March: "03", April: "04",
-        May: "05", June: "06", July: "07", August: "08",
-        September: "09", October: "10", November: "11", December: "12"
-      };
-
       const dateParts = rawDate.split(" ");
-      if (dateParts.length === 2 && monthMap[dateParts[0]]) {
-        // Convert "April 2019" → "2019-04-01"
-        formattedPubDate = `${dateParts[1]}-${monthMap[dateParts[0]]}-01`;
-      } else if (/^\d{4}-\d{2}$/.test(rawDate)) {
-        // Already in "YYYY-MM" format, so append "-01"
-        formattedPubDate = `${rawDate}-01`;
-      } else if (/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
-        // Already in correct format
+
+      if (dateParts.length === 2) {
+        // Handles cases like "April 2019", "april 2019", "APRIL 2019"
+        const yearPart = dateParts[1];
+        if (/^\d{4}$/.test(yearPart)) {
+          formattedPubDate = yearPart;
+        }
+      } else if (/^\d{4}$/.test(rawDate)) {
+        // Already just a year
         formattedPubDate = rawDate;
+      } else if (/^\d{4}-\d{2}(-\d{2})?$/.test(rawDate)) {
+        // Extract the year from "YYYY-MM" or "YYYY-MM-DD"
+        formattedPubDate = rawDate.slice(0, 4);
       } else {
-        console.warn("Invalid date format detected:", rawDate);
+        console.warn("Unrecognized date format:", rawDate);
       }
 
-      console.log("Formatted pubDate:", formattedPubDate);
+      console.log("Formatted pubDate (year only):", formattedPubDate);
     } else {
       console.warn("No pubDate found in grouped data.");
     }

@@ -8,7 +8,7 @@ export const fetchSimilarBooks = async (titleID, userID) => {
     try {
         // Step 1: Fetch recommended books
         const response = await api.post(`/book-recommend`, {
-            userID,
+            userID: null,
             titleID
         });
         const recommendedBooks = response.data.recommendations || [];

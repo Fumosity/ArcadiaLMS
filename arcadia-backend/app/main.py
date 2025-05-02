@@ -36,7 +36,7 @@ print("Current Working Directory:", os.getcwd())
 
 # Include the email router with the correct prefix
 # This ensures the endpoint is available at /api/send-email
-app.include_router(email_router)
+app.include_router(email_router, prefix="/api") # Include the router
 
 # Rest of your code remains the same
 excluded_sections = ["Approval Sheet", "Certificate of Originality", "Acknowledgement", "Table of Contents", "Access Leaf", "Acceptance Sheet", "Author Permission Statement", "List of Tables", "List of Figures", "List of Appendices", "List of Abbreviations"]
