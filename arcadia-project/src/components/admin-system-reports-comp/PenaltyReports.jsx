@@ -60,7 +60,7 @@ function PenaltyReports({ exportData }) {
       row.insertCell().textContent = entry.user_name
       row.insertCell().textContent = formatSchoolNo(entry.school_id)
       row.insertCell().textContent = "Overdue"
-      row.insertCell().textContent = `${entry.total_fine}`
+      row.insertCell().textContent = `${entry.fine_amount}`
     })
 
     // Add damage fines
