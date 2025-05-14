@@ -91,7 +91,8 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
             {["firstName", "lastName"].map((field) => (
               <div key={field} className="space-y-2">
                 <label htmlFor={field} className="block text-sm font-medium text-gray-700">
-                  {field === "firstName" ? "First Name:" : "Last Name:"}
+                  <span>{field === "firstName" ? "First Name: " : "Last Name: "}</span>
+                  <span className="text-red">*</span>
                 </label>
                 <input
                   id={field}
@@ -107,7 +108,8 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
           {/* Student Number / School ID */}
           <div className="space-y-2">
             <label htmlFor="studentNumber" className="block text-sm font-medium text-gray-700">
-              {userType === "student" ? "School ID:" : "Faculty ID:"}
+              <span>{userType === "student" ? "School ID: " : "Faculty ID: "}</span>
+              <span className="text-red">*</span>
             </label>
             <input
               id="studentNumber"
@@ -141,7 +143,8 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <label htmlFor="college" className="block text-sm font-medium text-gray-700">
-                College/High School:
+                <span>College/High School: </span>
+                <span className="text-red">*</span>
               </label>
               <select
                 id="college"
@@ -160,7 +163,12 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
 
             <div className="space-y-2">
               <label htmlFor="department" className="block text-sm font-medium text-gray-700">
-                Department/Year:
+                <div className="flex items-center space-x-1">
+                  <span>Department/Year: </span>
+                  {["COECSA", "IS"].includes(new_data.college) && (
+                    <span className="text-red">*</span>
+                  )}
+                </div>
               </label>
               <select
                 id="department"
@@ -183,7 +191,8 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email:
+                <span>Email: </span>
+                <span className="text-red">*</span>
               </label>
               <input
                 id="email"
@@ -209,7 +218,10 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
 
           {/* Password & Confirm Password */}
           <div className="space-y-2">
-            <label htmlFor="password">Password:</label>
+            <label htmlFor="password">
+              <span>Password: </span>
+              <span className="text-red">*</span>
+            </label>
             <div className="relative">
               <input
                 id="password"
@@ -244,7 +256,10 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="confirmPassword">Confirm Password:</label>
+            <label htmlFor="confirmPassword">
+              <span>Confirm Password: </span>
+              <span className="text-red">*</span>
+              </label>
             <div className="relative">
               <input
                 id="confirmPassword"

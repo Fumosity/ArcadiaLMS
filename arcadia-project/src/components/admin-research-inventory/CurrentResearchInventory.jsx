@@ -84,7 +84,8 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
   const filteredData = sortedData.filter((research) => {
     // Filter by publication date if specified
     const matchesPubDate =
-      !pubDateFilter || (research.pubDate && research.pubDate.toLowerCase().includes(pubDateFilter.toLowerCase()))
+      !pubDateFilter ||
+      (String(research.pubDate).toLowerCase().includes(pubDateFilter.toLowerCase()))
 
     // Filter by search term
     const matchesSearch =
@@ -93,7 +94,15 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
       (typeof research.college === "string" && research.college.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (typeof research.department === "string" &&
         research.department.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (typeof research.keywords === "string" && research.keywords.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (typeof research.keywords === "string" &&
+        (research.keywords.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          research.keywords
+            .split(",")
+            .some((keyword) => keyword.trim().toLowerCase().includes(searchTerm.toLowerCase())))) ||
+      (Array.isArray(research.keywords) &&
+        research.keywords.some(
+          (keyword) => typeof keyword === "string" && keyword.toLowerCase().includes(searchTerm.toLowerCase()),
+        )) ||
       (typeof research.author === "string" && research.author.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (Array.isArray(research.author) &&
         research.author.some(

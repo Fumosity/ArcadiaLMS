@@ -5,6 +5,7 @@ import Title from "../components/main-comp/Title";
 import OperatingHours from "../components/admin-schedule-comp/OperatingHours";
 import EventView from "../components/admin-schedule-comp/EventView";
 import { useEffect } from "react";
+import CMSOperatingHours from "../components/admin-schedule-comp/CMSOperatingHours";
 
 const ASchedule = () => {
     useEffect(() => {
@@ -28,6 +29,7 @@ const ASchedule = () => {
                 <div className="flex-shrink-0 w-3/4 space-y-2">
                 <div id="set-sched">
                     <WeeklySched />
+                    <CMSOperatingHours />
                 </div>
                 </div>
 

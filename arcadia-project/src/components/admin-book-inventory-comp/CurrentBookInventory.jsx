@@ -161,8 +161,8 @@ const CurrentBookInventory = ({ onBookSelect }) => {
     // Filter by publication date if specified
     const matchesPubDate =
       !pubDateFilter ||
-      (book.pubDate && book.pubDate.toLowerCase().includes(pubDateFilter.toLowerCase()))
-
+      (String(book.pubDate).toLowerCase().includes(pubDateFilter.toLowerCase()))
+  
     // Helper function to check if a value matches the search term
     const matchesSearchTerm = (value) => {
       if (typeof value === "string") {
@@ -172,7 +172,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
       }
       return false
     }
-
+  
     // Filter by search term
     const matchesSearch =
       !searchTerm ||
@@ -183,15 +183,16 @@ const CurrentBookInventory = ({ onBookSelect }) => {
       (book.author &&
         ((typeof book.author === "string" && matchesSearchTerm(book.author)) ||
           (Array.isArray(book.author) && book.author.some((author) => matchesSearchTerm(author)))))
-
+  
     // Filter by category type
     const matchesCategory = categoryType === "All" || book.category === categoryType
-
+  
     // Filter by genre type
     const matchesGenre = genreType === "All" || (book.genres && book.genres.includes(genreType))
-
+  
     return matchesPubDate && matchesSearch && matchesCategory && matchesGenre
   })
+  
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / entriesPerPage)
@@ -335,9 +336,8 @@ const CurrentBookInventory = ({ onBookSelect }) => {
                 return (
                   <tr
                     key={index}
-                    className={`hover:bg-light-gray cursor-pointer ${
-                      selectedBook?.titleID === item.titleID ? "bg-grey" : ""
-                    }`}
+                    className={`hover:bg-light-gray cursor-pointer ${selectedBook?.titleID === item.titleID ? "bg-grey" : ""
+                      }`}
                     onClick={() => handleRowClick(item)}
                   >
                     {/* Rest of the row content remains the same */}
@@ -427,25 +427,25 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           </tbody>
         </table>
       </div>
-      
+
       {/* Pagination Controls */}
       <div className="flex justify-center items-center mt-4 space-x-4">
-          <button
-            className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous Page
-          </button>
-          <span className="text-xs text-arcadia-red">Page {currentPage}</span>
-          <button
-            className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next Page
-          </button>
-        </div>
+        <button
+          className={`uPage-btn ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Previous Page
+        </button>
+        <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+        <button
+          className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Next Page
+        </button>
+      </div>
 
       {isModalOpen && selectedBook && (
         <BookCopies isOpen={isModalOpen} onClose={closeModal} titleID={selectedBook.titleID} />
