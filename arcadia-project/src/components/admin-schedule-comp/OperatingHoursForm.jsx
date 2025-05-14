@@ -325,7 +325,7 @@ export default function OperatingHoursForm({ onCancel, onSuccess }) {
             {/* Holiday Hours Section */}
             <div className="border-b border-grey pb-4">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium">Philippine Holiday Hours</h3>
+                    <h3 className="text-lg font-medium">Philippine Holidays</h3>
                     <button
                         type="button"
                         onClick={() => setShowHolidays(!showHolidays)}
