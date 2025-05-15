@@ -9,7 +9,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // Admin Components
 import AHomePage from './admin-home-page/AHomePage';
-import ALibAnal from './admin-lib-analytics/ALibAnal';
+import ALibAnal from './admin-lib-services/AServices.jsx';
 import ABCirculationPage from './admin-book-circulation-page/ABCirculationPage';
 import ABInventory from './admin-book-inventory/ABInventory';
 import ASupportPage from './admin-support/ASupportPage';
@@ -70,6 +70,7 @@ import GenrePage from './components/UserComponents/user-genre-cat/GenrePage.jsx'
 import ARExport from './admin-research-export/ARExport.jsx';
 import DPAPage from './UserPages/DPAPage.jsx';
 import BookReservation from './components/UserComponents/user-book-view-comp/BookReservation.jsx';
+import AServices from './admin-lib-services/AServices.jsx';
 
 function App() {
   return (
@@ -122,7 +123,7 @@ function App() {
             <Navbar />
             <Routes>
               <Route path="/" element={<ProtectedRoute><AHomePage /></ProtectedRoute>} />
-              <Route path="analytics" element={<ALibAnal />} />
+              <Route path="adminservices" element={<AServices />} />
               <Route path="circulationhistory" element={<ABCirculationPage />} />
               <Route path="bookmanagement" element={<ABInventory />} />
               <Route path="researchmanagement" element={<ARInventory />} />

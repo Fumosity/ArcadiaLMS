@@ -126,7 +126,7 @@ export default function OperatingHoursTable() {
             <button
               type="button"
               onClick={() => setShowHolidays(!showHolidays)}
-              className="text-sm text-blue-600 hover:text-blue-800"
+              className="text-sm text-arcadia-red hover:underline"
             >
               {showHolidays ? 'Hide' : 'Show'}
             </button>

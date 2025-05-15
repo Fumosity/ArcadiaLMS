@@ -1,8 +1,8 @@
 import React from "react"
 import { useState, useEffect, useRef } from "react"
-import { supabase } from "../../../supabaseClient"
+import { supabase } from "../../supabaseClient"
 
-const LibServ = () => {
+const LibraryServicesPreview = () => {
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -110,7 +110,7 @@ const LibServ = () => {
           <h2 className="text-2xl font-semibold">Library Services</h2>
         </div>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-grey"></div>
         </div>
       </div>
     )
@@ -120,9 +120,9 @@ const LibServ = () => {
     return (
       <div className="uMain-cont">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Library Services</h2>
+          <h2 className="text-2xl font-semibold">Library Services Preview</h2>
         </div>
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>
+        <div className="bg-red-100 border border-grey text-red-700 px-4 py-3 rounded mb-4">{error}</div>
       </div>
     )
   }
@@ -130,7 +130,7 @@ const LibServ = () => {
   return (
     <div className="uMain-cont">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">Library Services</h2>
+        <h2 className="text-2xl font-semibold">Library Services Preview</h2>
       </div>
 
       <div className="space-y-6">
@@ -177,4 +177,4 @@ const LibServ = () => {
   )
 }
 
-export default LibServ
+export default LibraryServicesPreview
