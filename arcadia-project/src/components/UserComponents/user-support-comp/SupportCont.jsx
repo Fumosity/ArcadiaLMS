@@ -25,7 +25,7 @@ const SupportCont = () => {
             },
             {
                 title: "Support Tickets",
-                desc: "Do you have problems with your account, library card, or transactions? File a support ticket so we can help you!",
+                desc: "Do you have problems with your account, inquiries, or transactions? File a support ticket so we can help you!",
                 more: "File a support ticket",
                 link: "/user/support/supportticket",
             },

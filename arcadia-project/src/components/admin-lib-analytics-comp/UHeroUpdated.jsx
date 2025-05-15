@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { supabase } from "../../../supabaseClient"
+import { supabase } from "../../supabaseClient"
 
-const UHero = () => {
+const UHeroUpdated = () => {
   const [slides, setSlides] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -137,4 +137,4 @@ const UHero = () => {
   )
 }
 
-export default UHero
+export default UHeroUpdated
