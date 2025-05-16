@@ -34,6 +34,7 @@
     "calendar-react": "^0.2.2",
     "cors": "^2.8.5",
     "date-fns": "4.1.0",
+    "date-holidays": "3.24.3",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "excellentexport": "3.9.9",
