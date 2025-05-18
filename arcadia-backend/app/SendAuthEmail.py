@@ -63,7 +63,7 @@ def send_verification_email(to_email: str, first_name: str, token: str):
             <p><a href="{link}">Verify Account</a></p>
             <p>If you did not register for this account, please ignore this message.</p>
             <p>Thank you,</p>
-            <strong>Arcadia</strong>
+            <p><strong>Arcadia</strong></p>
             <img src="cid:{image_cid[1:-1]}" alt="Verification Image" style="width:500px;" />
         </body>
     </html>
