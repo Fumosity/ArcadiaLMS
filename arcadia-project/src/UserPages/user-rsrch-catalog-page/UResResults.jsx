@@ -46,10 +46,25 @@ const UResResults = ({ query }) => {
         const searchQuery = query.toLowerCase()
         results = results.filter((research) => {
           const titleMatch = research.title.toLowerCase().includes(searchQuery)
+
+          // Handle author matching
           const authorString =
-            research.author && Array.isArray(research.author) ? research.author.join(", ").toLowerCase() : ""
+            research.author && Array.isArray(research.author)
+              ? research.author.join(", ").toLowerCase()
+              : typeof research.author === "string"
+                ? research.author.toLowerCase()
+                : ""
           const authorMatch = authorString.includes(searchQuery)
-          return titleMatch || authorMatch
+
+          // Add keyword matching
+          let keywordMatch = false
+          if (research.keywords && Array.isArray(research.keywords)) {
+            keywordMatch = research.keywords.some(
+              (keyword) => keyword && typeof keyword === "string" && keyword.toLowerCase().includes(searchQuery),
+            )
+          }
+
+          return titleMatch || authorMatch || keywordMatch
         })
       }
 
@@ -288,4 +303,3 @@ const UResResults = ({ query }) => {
 }
 
 export default UResResults
-

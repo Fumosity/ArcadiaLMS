@@ -112,6 +112,13 @@ const UBkResults = ({ query }) => {
             const authorString = authorNames.join(", ")
             newTrie.insert(authorString.toLowerCase())
           }
+
+          // Add keywords to trie
+          if (book.keywords && Array.isArray(book.keywords)) {
+            book.keywords.forEach((keyword) => {
+              newTrie.insert(keyword.toLowerCase())
+            })
+          }
         })
         setTrie(newTrie)
       } catch (error) {
@@ -134,7 +141,13 @@ const UBkResults = ({ query }) => {
         const authorString = book.author && Array.isArray(book.author) ? book.author.join(", ").toLowerCase() : ""
         const authorMatch = authorString.includes(searchQuery)
 
-        return titleMatch || authorMatch
+        // Check for keyword matches
+        const keywordMatch =
+          book.keywords && Array.isArray(book.keywords)
+            ? book.keywords.some((keyword) => keyword.toLowerCase().includes(searchQuery))
+            : false
+
+        return titleMatch || authorMatch || keywordMatch
       })
 
       // Apply category filter
@@ -399,4 +412,3 @@ const UBkResults = ({ query }) => {
 }
 
 export default UBkResults
-
