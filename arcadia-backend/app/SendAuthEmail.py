@@ -11,6 +11,10 @@ from email.message import EmailMessage
 import datetime
 import secrets
 from passlib.hash import bcrypt
+from email.message import EmailMessage
+from email.utils import make_msgid
+import smtplib
+from pathlib import Path
 
 # Load environment variables
 load_dotenv()
@@ -44,10 +48,35 @@ def verify_token(token: str) -> dict:
 def send_verification_email(to_email: str, first_name: str, token: str):
     link = f"{FRONTEND_URL}/auth-complete?token={token}"
     msg = EmailMessage()
-    msg.set_content(f"Hello, {first_name}. Verify your account here: {link}")
+    
+    # Generate a Content-ID for the image
+    image_cid = make_msgid(domain="xyz.com")  # You can use your own domain
+    
+    # Set HTML content with embedded image
+    msg.set_content(f"Hello, {first_name}. Verify your account here: {link}")  # Fallback plain text
+    msg.add_alternative(f"""
+    <html>
+        <body>
+            <p>Hello, {first_name}.</p>
+            <p>Click <a href="{link}">here</a> to verify your account.</p>
+            <img src="cid:{image_cid[1:-1]}" alt="Verification Image" style="width:300px;" />
+        </body>
+    </html>
+    """, subtype='html')
+    
     msg["Subject"] = "Account Verification"
     msg["From"] = EMAIL_USER
     msg["To"] = to_email
+
+    # Load and attach the image
+    image_path = Path("arcadia-project\public\image\emailimage.png")
+    with image_path.open("rb") as img:
+        msg.get_payload()[1].add_related(
+            img.read(),
+            maintype='image',
+            subtype='jpeg',
+            cid=image_cid
+        )
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(EMAIL_USER, EMAIL_PASS)
