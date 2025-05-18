@@ -16,15 +16,17 @@ import SearchByGenre from "../../components/UserComponents/user-genre-cat/Search
 import GenrePage from "../../components/UserComponents/user-genre-cat/GenrePage"
 import SeeMore from "../../components/UserComponents/user-home-comp/SeeMore"
 import SeeMoreGenres from "../../components/UserComponents/user-home-comp/SeeMoreGenres"
+import FeaturedBook from "../../components/admin-lib-analytics-comp/FeaturedBook"
+import FeaturedResearch from "../../components/admin-lib-analytics-comp/FeaturedResearch"
 
 const UHomePage = () => {
   useEffect(() => {
-          document.title = "Arcadia | Home";
-      }, []);
+    document.title = "Arcadia | Home";
+  }, []);
   const [selectedGenre, setSelectedGenre] = useState(null)
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
   const [seeMoreGenresComponent, setSeeMoreGenresComponent] = useState(null)
-  const { user } = useUser() 
+  const { user } = useUser()
 
   // Get location to check for query parameters
   const location = useLocation()
@@ -99,13 +101,15 @@ const UHomePage = () => {
       <UNavbar />
 
       <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
-        <div className="lg:w-1/4 lg:block md:hidden space-y-4">
+        <div className="lg:w-1/4 lg:block md:hidden space-y-4 min-h-full">
           <ArcOpHr />
           <UpEvents />
           {/* Hide Services component for guest users */}
           {!isGuest && <Services />}
-          <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-          <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+          <div className="space-y-4 sticky top-4">
+            <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+            <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+          </div>
         </div>
 
         <div className="userMain-content lg:w-3/4 md:w-full">
@@ -131,8 +135,16 @@ const UHomePage = () => {
                 onGenreClick={handleGenreClick}
                 onSeeMoreGenresClick={(title, fetchData) => handleSeeMoreGenresClick(title, fetchData)}
               />
-              {!isGuest &&<Recommended onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />}
-              {!isGuest &&<InterestedGenre onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />}
+              <div className="flex flex-row gap-4">
+                <div className="w-1/2">
+                  <FeaturedBook />
+                </div>
+                <div className="w-1/2">
+                  <FeaturedResearch />
+                </div>
+              </div>
+              {!isGuest && <Recommended onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />}
+              {!isGuest && <InterestedGenre onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />}
               <MostPopular onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
               <HighlyRated onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
             </>

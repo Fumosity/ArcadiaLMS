@@ -355,7 +355,7 @@ const UBkResults = ({ query }) => {
                 </div>
                 <div className="justify-start space-x-2 w-1/2">
                   <button
-                    className="w-1/4 hover:bg-arcadia-red rounded-lg hover:text-white text-center text-sm px-2 py-1 bg-white text-arcadia-red border border-arcadia-red"
+                    className="w-1/3 hover:bg-arcadia-red rounded-lg hover:text-white text-center text-sm px-2 py-1 bg-white text-arcadia-red border border-arcadia-red"
                     onClick={() => {
                       window.scrollTo({ top: 0, behavior: "smooth" })
                       navigate(`/user/bookview?titleID=${book.titleID}`)
