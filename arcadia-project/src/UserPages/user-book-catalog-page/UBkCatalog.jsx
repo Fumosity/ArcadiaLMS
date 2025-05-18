@@ -26,7 +26,7 @@ import { Filter } from "lucide-react"
 const UBkCatalog = () => {
   useEffect(() => {
     document.title = "Arcadia | Book Catalog";
-}, []);
+  }, []);
 
   const [query, setQuery] = useState("")
   const { user, updateUser } = useUser()
@@ -178,12 +178,16 @@ const UBkCatalog = () => {
               <FilterSidebar />
             </div>
           ) : (
-            <div className="lg:w-1/4 lg:block md:hidden space-y-4">
-              <ArcOpHr />
-              <UpEvents />
-              {!isGuest && <Services />}
-              <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
-              <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+            <div className="lg:w-1/4 lg:block md:hidden space-y-4 min-h-full">
+              <div className="space-y-4">
+                <ArcOpHr />
+                <UpEvents />
+                {!isGuest && <Services />}
+              </div>
+              <div className="space-y-4 sticky top-4">
+                <MostPopBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+                <HighestRatedBk onSeeMoreClick={(title, fetchFunc) => handleSeeMoreClick(title, fetchFunc)} />
+              </div>
             </div>
           )}
 

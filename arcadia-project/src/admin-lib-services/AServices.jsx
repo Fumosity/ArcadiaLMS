@@ -1,11 +1,7 @@
 import React from "react";
 import Title from "../components/main-comp/Title";
 import BCHistory from "../components/admin-book-circ-pg-comp/BCHistory";
-import LibraryServicesCMS from "../components/admin-lib-analytics-comp/LibraryServicesCMS";
-import LibraryServicesPreview from "../components/admin-lib-analytics-comp/LibraryServicesPreview";
-import DragDropReorder from "../components/admin-lib-analytics-comp/DragDropReorder";
-import HeroCarouselCMS from "../components/admin-lib-analytics-comp/HeroCarouselCMS";
-import UHeroUpdated from "../components/admin-lib-analytics-comp/UHeroUpdated";
+import CMSMainContainer from "../components/admin-lib-analytics-comp/CMSMainContainer";
 
 const AServices = () => {
     React.useEffect(() => {
@@ -19,6 +15,17 @@ const AServices = () => {
             }
         }
     }, [])
+
+    return (
+        <div className="min-h-screen bg-white">
+            <Title>Content Management</Title>
+            <div className="flex justify-center items-start space-x-2 pb-12 pt-8 px-12">
+                <div className="flex-shrink-0 w-full space-y-2">
+                    <CMSMainContainer />
+                </div>
+            </div>
+        </div>
+    )
 
     return (
         <div className="min-h-screen bg-white">
