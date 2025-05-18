@@ -462,7 +462,6 @@ const CheckingContainer = () => {
         } else {
           console.log("Transaction successful:", data)
 
-
           const printData = {
             schoolNo: formData.schoolNo,
             name: formData.name,
@@ -473,7 +472,7 @@ const CheckingContainer = () => {
             date: formatDate(formData.date), // Format the date for printing
             time: formData.time,
             deadline: formatDate(formData.deadline), // Format the deadline for printing
-          };
+          }
 
           // Format the data for printing
           const printContent = `
@@ -517,7 +516,7 @@ const CheckingContainer = () => {
             <br />
             <p><strong>School ID:</strong> ${printData.schoolNo}</p>
             <p><strong>Name:</strong> ${printData.name}</p>
-            <p><strong>College:</strong> ${printData.college} ${printData.department ? `- ${printData.department}` : ''}</p>
+            <p><strong>College:</strong> ${printData.college} ${printData.department ? `- ${printData.department}` : ""}</p>
             <p><strong>Book Title:</strong> ${printData.bookTitle}</p>
             <p><strong>Book Barcode:</strong> ${printData.bookBarcode}</p>
             <p><strong>Check Out Date:</strong> ${printData.date}</p>
@@ -529,15 +528,15 @@ const CheckingContainer = () => {
             <p class="note">This slip serves as your temporary record. Please return the book by the deadline, else a fine of P10 per day will be incurred for each school day that passes.</p>
           </body>
           </html>
-        `;
+        `
 
-          const printWindow = window.open('', '_blank');
+          const printWindow = window.open("", "_blank")
           if (printWindow) {
-            printWindow.document.write(printContent);
-            printWindow.document.close();
-            printWindow.print();
+            printWindow.document.write(printContent)
+            printWindow.document.close()
+            printWindow.print()
           } else {
-            toast.error("Failed to open print window.");
+            toast.error("Failed to open print window.")
           }
 
           toast.success("Book checked out successfully!")
@@ -636,8 +635,9 @@ const CheckingContainer = () => {
   }
 
   const fetchBookTitles = useCallback(async () => {
-    if (formData.bookTitle.length < 2) {
-      // Prevent excessive API calls
+    // For Check Out mode, only search when there's at least 2 characters
+    if (checkMode === "Check Out" && formData.bookTitle.length < 2) {
+      // Prevent excessive API calls for Check Out mode
       setBookSuggestions([])
       return
     }
@@ -646,8 +646,8 @@ const CheckingContainer = () => {
     try {
       // Different query based on check mode
       if (checkMode === "Check In") {
-        // For Check In, we want to search for books that are currently borrowed
-        // First, get the user's borrowed books from transactions
+        // For Check In, we want to search for books that are currently borrowed by this user
+        // regardless of search term when the field is focused
         if (!formData.userID) {
           setBookSuggestions([])
           setIsSearching(false)
@@ -671,12 +671,19 @@ const CheckingContainer = () => {
         // Get the barcodes of borrowed books
         const borrowedBarcodes = borrowedBooks.map((book) => book.bookBarcode)
 
-        // Now fetch book details for these barcodes that match the search term
-        const { data: bookDetails, error: detailsError } = await supabase
+        // Now fetch book details for these barcodes
+        // If there's a search term, filter by it, otherwise show all borrowed books
+        let query = supabase
           .from("book_indiv")
           .select("bookBarcode, book_titles!inner(title)")
           .in("bookBarcode", borrowedBarcodes)
-          .ilike("book_titles.title", `%${formData.bookTitle}%`)
+
+        // Only apply the title filter if there's a search term
+        if (formData.bookTitle.length >= 2) {
+          query = query.ilike("book_titles.title", `%${formData.bookTitle}%`)
+        }
+
+        const { data: bookDetails, error: detailsError } = await query
 
         if (detailsError) {
           console.error("Error fetching book details:", detailsError)
@@ -723,6 +730,14 @@ const CheckingContainer = () => {
   useEffect(() => {
     barcodeEffect()
   }, [barcodeEffect])
+
+  // Add this useEffect after the other useEffect hooks
+  useEffect(() => {
+    if (checkMode === "Check In" && formData.userID) {
+      // Automatically fetch borrowed books when switching to Check In mode
+      fetchBookTitles()
+    }
+  }, [checkMode, formData.userID, fetchBookTitles])
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
@@ -807,11 +822,18 @@ const CheckingContainer = () => {
                         value={formData.bookTitle}
                         onChange={handleInputChange}
                         placeholder={
-                          checkMode === "Check In" ? "Search your borrowed books..." : "Search available books..."
+                          checkMode === "Check In" ? "Click to see your borrowed books..." : "Search available books..."
                         }
                         className="px-3 py-1 w-full rounded-full border border-grey"
                         onFocus={() => {
-                          if (bookSuggestions.length > 0) setShowSuggestions(true)
+                          if (checkMode === "Check In") {
+                            // For Check In mode, fetch borrowed books immediately on focus
+                            fetchBookTitles()
+                            setShowSuggestions(true)
+                          } else if (bookSuggestions.length > 0) {
+                            // For Check Out mode, only show suggestions if they exist
+                            setShowSuggestions(true)
+                          }
                         }}
                         onBlur={() => {
                           setTimeout(() => setShowSuggestions(false), 200)
