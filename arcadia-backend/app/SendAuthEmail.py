@@ -58,8 +58,13 @@ def send_verification_email(to_email: str, first_name: str, token: str):
     <html>
         <body>
             <p>Hello, {first_name}.</p>
-            <p>Click <a href="{link}">here</a> to verify your account.</p>
-            <img src="cid:{image_cid[1:-1]}" alt="Verification Image" style="width:300px;" />
+            <p>Thank you for registering in Arcadia!</p>
+            <p>To activate your account and access all library services, please verify your email by clicking the button below:</p>
+            <p><a href="{link}">Verify Account</a></p>
+            <p>If you did not register for this account, please ignore this message.</p>
+            <p>Thank you,</p>
+            <strong>Arcadia</strong>
+            <img src="cid:{image_cid[1:-1]}" alt="Verification Image" style="width:500px;" />
         </body>
     </html>
     """, subtype='html')
@@ -69,7 +74,7 @@ def send_verification_email(to_email: str, first_name: str, token: str):
     msg["To"] = to_email
 
     # Load and attach the image
-    image_path = Path("../arcadia-project/public/image/emailimage.png")
+    image_path = Path("../arcadia-project/public/image/arclogtex.png")
     with image_path.open("rb") as img:
         msg.get_payload()[1].add_related(
             img.read(),
