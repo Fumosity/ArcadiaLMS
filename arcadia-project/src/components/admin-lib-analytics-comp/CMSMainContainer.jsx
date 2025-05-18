@@ -10,7 +10,7 @@ import FeaturedBookCMS from "./FeaturedBookCMS";
 const CMSMainContainer = () => {
     const [toggleCarousel, setToggleCarousel] = useState(false)
     const [toggleLibServ, setLibServ] = useState(false)
-    const [toggleFeatured, setToggleFeatured] = useState(false)
+    const [toggleFeatured, setToggleFeatured] = useState(true)
 
     return (
         <>
@@ -37,24 +37,31 @@ const CMSMainContainer = () => {
             <div id="cms-cont">
                 {toggleLibServ ? (
                     <>
-                    <LibraryServicesCMS />
-                    <DragDropReorder />
-                    <LibraryServicesPreview />
+                        <LibraryServicesCMS />
+                        <div className="flex gap-4">
+                            <div className="w-2/3">
+                                <LibraryServicesPreview />
+                            </div>
+                            <div className="w-1/3 h-full sticky top-4">
+                                <DragDropReorder />
+                            </div>
+                        </div>
+
                     </>
                 ) :
-                toggleCarousel ? (
-                    <>
-                    <HeroCarouselCMS />
-                    <UHeroUpdated />
-                    </>
-                )
-                 :
-                toggleFeatured ? (
-                    <>
-                    <FeaturedBookCMS />
-                    </>
-                )
-                : (<></>)
+                    toggleCarousel ? (
+                        <>
+                            <HeroCarouselCMS />
+                            <UHeroUpdated />
+                        </>
+                    )
+                        :
+                        toggleFeatured ? (
+                            <>
+                                <FeaturedBookCMS />
+                            </>
+                        )
+                            : (<></>)
                 }
             </div>
         </>

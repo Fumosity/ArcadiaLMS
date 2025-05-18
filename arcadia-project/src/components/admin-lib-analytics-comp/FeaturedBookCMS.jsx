@@ -8,7 +8,7 @@ const FeaturedBookCMS = () => {
     const [error, setError] = useState(null);
     const [emptyFields, setEmptyFields] = useState({});
     const [formDataBook, setFormDataBook] = useState({ bookTitle: "", notes: "" });
-    const [formDataResearch, setFormDataResearch] = useState({ researchTitle: "", notes: ""})
+    const [formDataResearch, setFormDataResearch] = useState({ researchTitle: "", notes: "" })
     const [loading, setLoading] = useState(false);
     const [bookSuggestionsBk, setBookSuggestionsBk] = useState([]) // Store search results
     const [showSuggestionsBk, setShowSuggestionsBk] = useState(false)
@@ -249,159 +249,157 @@ const FeaturedBookCMS = () => {
     return (
         <div className="uMain-cont">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold">Featured Work Management</h1>
+                <h1 className="text-2xl font-semibold">Featured Works Management</h1>
             </div>
 
-            <div className="flex gap-8">
+            <div className="flex gap-4">
+                <div className="w-1/2">
+                    {error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {error}
+                        </div>
+                    )}
 
-            
-            <div className="w-1/2">
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                        {error}
-                    </div>
-                )}
+                    <div className="flex flex-col gap-4">
+                        <div className="w-full">
+                            <FeaturedBook refreshKey={refreshKeyBook} />
+                        </div>
 
-                <div className="flex flex-col gap-4">
-                    <div className="w-full">
-                        <FeaturedBook refreshKey={refreshKeyBook} />
-                    </div>
+                        <div className="w-full">
+                            <h2 className="text-xl font-semibold mb-4">Change Featured Book</h2>
+                            <form onSubmit={handleSubmitBook} className="space-y-4 h-fit">
+                                <div className="relative w-full">
+                                    <div className="flex flex-row gap-2">
+                                        <label className="w-1/3 content-center">Title:</label>
+                                        <input
+                                            type="text"
+                                            name="bookTitle"
+                                            value={formDataBook.bookTitle}
+                                            onChange={handleInputChangeBook}
+                                            placeholder={
+                                                "Search book title"
+                                            }
+                                            className="px-3 py-1 w-2/3 rounded-full border border-grey"
+                                            onFocus={() => {
+                                                if (bookSuggestionsBk.length > 0) setShowSuggestionsBk(true)
+                                            }}
+                                            onBlur={() => {
+                                                setTimeout(() => setShowSuggestionsBk(false), 200)
+                                            }}
+                                        />
 
-                    <div className="w-full">
-                        <h2 className="text-xl font-semibold mb-4">Change Featured Book</h2>
-                        <form onSubmit={handleSubmitBook} className="space-y-4 h-fit">
-                            <div className="relative w-full">
-                                <div className="flex flex-row gap-2">
-                                    <label className="w-1/3 content-center">Title:</label>
-                                    <input
-                                        type="text"
-                                        name="bookTitle"
-                                        value={formDataBook.bookTitle}
+                                        {showSuggestionsBk && bookSuggestionsBk.length > 0 && (
+                                            <div className="absolute top-full left-0 mt-1 w-full bg-white border border-grey rounded-md shadow-md z-5">
+                                                {bookSuggestionsBk.map((book, index) => (
+                                                    <div
+                                                        key={`fallback-key-${index}`}
+                                                        className="px-4 py-2 hover:bg-grey cursor-pointer"
+                                                        onMouseDown={() => handleBookSelection(book)}
+                                                    >
+                                                        {book.title || "Unknown Title"}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2 h-1/2">
+                                    <label className="w-full">Librarian's Notes:</label>
+                                    <textarea
+                                        name="notes"
+                                        placeholder="Notes"
+                                        value={formDataBook.notes}
                                         onChange={handleInputChangeBook}
-                                        placeholder={
-                                            "Search book title"
-                                        }
-                                        className="px-3 py-1 w-2/3 rounded-full border border-grey"
-                                        onFocus={() => {
-                                            if (bookSuggestionsBk.length > 0) setShowSuggestionsBk(true)
-                                        }}
-                                        onBlur={() => {
-                                            setTimeout(() => setShowSuggestionsBk(false), 200)
-                                        }}
+                                        className="px-3 py-1 w-full h-full rounded-xl border border-grey"
+                                        rows="6"
+                                        disabled={loading}
                                     />
-
-                                    {showSuggestionsBk && bookSuggestionsBk.length > 0 && (
-                                        <div className="absolute top-full left-0 mt-1 w-full bg-white border border-grey rounded-md shadow-md z-5">
-                                            {bookSuggestionsBk.map((book, index) => (
-                                                <div
-                                                    key={`fallback-key-${index}`}
-                                                    className="px-4 py-2 hover:bg-grey cursor-pointer"
-                                                    onMouseDown={() => handleBookSelection(book)}
-                                                >
-                                                    {book.title || "Unknown Title"}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
                                 </div>
-                            </div>
-                            <div className="flex flex-col gap-2 h-1/2">
-                                <label className="w-full">Librarian's Notes:</label>
-                                <textarea
-                                    name="notes"
-                                    placeholder="Notes"
-                                    value={formDataBook.notes}
-                                    onChange={handleInputChangeBook}
-                                    className="px-3 py-1 w-full h-full rounded-xl border border-grey"
-                                    rows="6"
+                                <button
+                                    type="submit"
+                                    className="add-book w-full px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
                                     disabled={loading}
-                                />
-                            </div>
-                            <button
-                                type="submit"
-                                className="add-book w-full px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-                                disabled={loading}
-                            >
-                                {loading ? "Adding..." : "Add Featured Book"}
-                            </button>
-                        </form>
+                                >
+                                    {loading ? "Adding..." : "Add Featured Book"}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="w-1/2">
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                        {error}
-                    </div>
-                )}
+                <div className="w-1/2">
+                    {error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {error}
+                        </div>
+                    )}
 
-                <div className="flex flex-col gap-4">
-                    <div className="w-full">
-                        <FeaturedResearch refreshKey={refreshKeyResearch} />
-                    </div>
+                    <div className="flex flex-col gap-4">
+                        <div className="w-full">
+                            <FeaturedResearch refreshKey={refreshKeyResearch} />
+                        </div>
 
-                    <div className="w-full">
-                        <h2 className="text-xl font-semibold mb-4">Change Featured Research</h2>
-                        <form onSubmit={handleSubmitResearch} className="space-y-4 h-fit">
-                            <div className="relative w-full">
-                                <div className="flex flex-row gap-2">
-                                    <label className="w-1/3 content-center">Title:</label>
-                                    <input
-                                        type="text"
-                                        name="researchTitle"
-                                        value={formDataResearch.researchTitle}
+                        <div className="w-full">
+                            <h2 className="text-xl font-semibold mb-4">Change Featured Research</h2>
+                            <form onSubmit={handleSubmitResearch} className="space-y-4 h-fit">
+                                <div className="relative w-full">
+                                    <div className="flex flex-row gap-2">
+                                        <label className="w-1/3 content-center">Title:</label>
+                                        <input
+                                            type="text"
+                                            name="researchTitle"
+                                            value={formDataResearch.researchTitle}
+                                            onChange={handleInputChangeResearch}
+                                            placeholder={
+                                                "Search research title"
+                                            }
+                                            className="px-3 py-1 w-2/3 rounded-full border border-grey"
+                                            onFocus={() => {
+                                                if (researchSuggestionsRs.length > 0) setShowSuggestionsRs(true)
+                                            }}
+                                            onBlur={() => {
+                                                setTimeout(() => setShowSuggestionsRs(false), 200)
+                                            }}
+                                        />
+
+                                        {showSuggestionsRs && researchSuggestionsRs.length > 0 && (
+                                            <div className="absolute top-full left-0 mt-1 w-full bg-white border border-grey rounded-md shadow-md z-5">
+                                                {researchSuggestionsRs.map((research, index) => (
+                                                    <div
+                                                        key={`fallback-key-${index}-rs`}
+                                                        className="px-4 py-2 hover:bg-grey cursor-pointer"
+                                                        onMouseDown={() => handleResearchSelection(research)}
+                                                    >
+                                                        {research.title || "Unknown Title"}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2 h-1/2">
+                                    <label className="w-full">Librarian's Notes:</label>
+                                    <textarea
+                                        name="notes"
+                                        placeholder="Notes"
+                                        value={formDataResearch.notes}
                                         onChange={handleInputChangeResearch}
-                                        placeholder={
-                                            "Search research title"
-                                        }
-                                        className="px-3 py-1 w-2/3 rounded-full border border-grey"
-                                        onFocus={() => {
-                                            if (researchSuggestionsRs.length > 0) setShowSuggestionsRs(true)
-                                        }}
-                                        onBlur={() => {
-                                            setTimeout(() => setShowSuggestionsRs(false), 200)
-                                        }}
+                                        className="px-3 py-1 w-full h-full rounded-xl border border-grey"
+                                        rows="6"
+                                        disabled={loading}
                                     />
-
-                                    {showSuggestionsRs && researchSuggestionsRs.length > 0 && (
-                                        <div className="absolute top-full left-0 mt-1 w-full bg-white border border-grey rounded-md shadow-md z-5">
-                                            {researchSuggestionsRs.map((research, index) => (
-                                                <div
-                                                    key={`fallback-key-${index}-rs`}
-                                                    className="px-4 py-2 hover:bg-grey cursor-pointer"
-                                                    onMouseDown={() => handleResearchSelection(research)}
-                                                >
-                                                    {research.title || "Unknown Title"}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
                                 </div>
-                            </div>
-                            <div className="flex flex-col gap-2 h-1/2">
-                                <label className="w-full">Librarian's Notes:</label>
-                                <textarea
-                                    name="notes"
-                                    placeholder="Notes"
-                                    value={formDataResearch.notes}
-                                    onChange={handleInputChangeResearch}
-                                    className="px-3 py-1 w-full h-full rounded-xl border border-grey"
-                                    rows="6"
+                                <button
+                                    type="submit"
+                                    className="add-book w-full px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
                                     disabled={loading}
-                                />
-                            </div>
-                            <button
-                                type="submit"
-                                className="add-book w-full px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-                                disabled={loading}
-                            >
-                                {loading ? "Adding..." : "Add Featured Research"}
-                            </button>
-                        </form>
+                                >
+                                    {loading ? "Adding..." : "Add Featured Research"}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
 
             </div>
         </div>
