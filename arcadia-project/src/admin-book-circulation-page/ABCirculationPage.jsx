@@ -8,6 +8,10 @@ import DamagedBks from "../components/admin-book-circ-pg-comp/DamagedBks"
 import BCSideButtons from "../components/admin-book-circ-pg-comp/BCSideButtons"
 import DecommissionedBks from "../components/admin-book-circ-pg-comp/DecommissionedBks"
 import TopBorrower from "../components/admin-book-circ-pg-comp/TopBorrower"
+import HighRates from "../components/admin-lib-analytics-comp/HighRates"
+import LeastPop from "../components/admin-lib-analytics-comp/LeastPop"
+import LowRates from "../components/admin-lib-analytics-comp/LowRates"
+import MostPop from "../components/admin-lib-analytics-comp/MostPop"
 
 export default function ABCirculationPage() {
   useEffect(() => {
@@ -50,6 +54,11 @@ export default function ABCirculationPage() {
           <BksDueTdy />
           <TopBorrower />
           <SBOverdue />
+          <HighRates />
+          <LowRates />
+          <MostPop />
+          <LeastPop />
+
         </div>
       </div>
     </div>
