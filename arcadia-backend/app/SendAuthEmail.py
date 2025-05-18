@@ -69,7 +69,7 @@ def send_verification_email(to_email: str, first_name: str, token: str):
     msg["To"] = to_email
 
     # Load and attach the image
-    image_path = Path("arcadia-project/public/image/emailimage.png")
+    image_path = Path("../arcadia-project/public/image/emailimage.png")
     with image_path.open("rb") as img:
         msg.get_payload()[1].add_related(
             img.read(),
