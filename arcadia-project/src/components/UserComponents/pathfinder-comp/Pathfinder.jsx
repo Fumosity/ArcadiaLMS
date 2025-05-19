@@ -341,10 +341,11 @@ export default function Pathfinder({ book }) {
                     prevGrid.map((row) =>
                         row.map((cell) => ({
                             ...cell,
-                            isPath: animatedPath.some(p => p.x === cell.x && p.y === cell.y),
+                            isPath: animatedPath.some(p => p.x === cell.x && p.y === cell.y) && !(cell.x === path[0].x && cell.y === path[0].y),
                         }))
                     )
                 );
+
                 index++;
             } else {
                 clearInterval(interval);
@@ -468,6 +469,7 @@ export default function Pathfinder({ book }) {
         let astar = new Astar(grid);
         let startPos = starts[book.location]?.[selectedStart];
         let endPos = targetPosition;
+        console.log("startPos:", startPos);
 
         console.log(startPos, endPos)
 
@@ -497,13 +499,22 @@ export default function Pathfinder({ book }) {
                 );
                 let isObstacle = !isShelf && obstacles.some(([x, y]) => x === c && y === r);
                 let isPath = pathResult.some(([x, y]) => x === c && y === r);
-                let startName = Object.keys(starts[book.location]?.[selectedStart]).find(name => starts[book.location]?.[selectedStart][name].x === c && starts[book.location]?.[selectedStart][name].y === r);
+                let startName = Object.keys(starts[book.location] || {}).find(name => {
+                    const point = starts[book.location][name];
+                    return point.x === c && point.y === r;
+                });
+
+                if (c === 9 && r === 18) {
+                    console.log("Checking cell (9,18):", starts[book.location]?.[selectedStart]);
+                    console.log("Found startName:", startName);
+                }
 
                 row.push({ x: c, y: r, isObstacle, isPath, startName, isShelf });
             }
             newGrid.push(row);
         }
         setGridData(newGrid);
+
         console.log(book)
     }, [selectedStart, selectedShelf, location, callNo, book?.location]);
 
@@ -524,49 +535,89 @@ export default function Pathfinder({ book }) {
         );
     };
 
-    // Then use gridColumns in your style:
+    const cellSize = 24;
+
     const gridStyle = {
         display: "grid",
         gridTemplateColumns: gridColumns,
+        gap: "2px",
     };
+
+    const cellStyle = (cell) => {
+        let backgroundColor = "white";
+        let color = "black";
+
+        if (cell.isObstacle) backgroundColor = "#4a4a4a"; // dark gray
+        else if (cell.startName) backgroundColor = "#2980b9"; // blue for start
+        else if (cell.isPath) backgroundColor = "#27ae60"; // green
+        else if (cell.isShelf) backgroundColor = "#c0392b"; // dark red
+
+        if (cell.isPath || cell.isShelf || cell.startName) color = "white";
+
+
+        return {
+            width: `${cellSize}px`,
+            height: `${cellSize}px`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "6px",
+            border: "1px solid #bbb",
+            backgroundColor,
+            color,
+            fontWeight: "bold",
+            fontSize: "14px",
+            cursor: "default",
+            userSelect: "none",
+            transition: "background-color 0.3s ease",
+        };
+    }
 
     return (
         <div className="uMain-cont">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">Location</h2>
             </div>
-            {pathfindingError ? <p className="w-full text-center my-4">{pathfindingError}</p> :
+            {!pathfindingError && (
                 <>
-                    <div className="w-full text-center font-semibold text-lg">
+                    <div className="w-full text-center font-semibold text-lg mb-3">
                         {callNo} is located at the {book.location}
                     </div>
-                    <div className="my-2 flex justify-center items-center w-full overflow-hidden">
-                        <div className="w-fit" style={gridStyle}>
+                    <div className="my-4 flex justify-center overflow-auto">
+                        <div style={gridStyle}>
                             {gridData.flat().map((cell, index) => (
-                                <div
-                                    key={index}
-                                    style={{
-                                        width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center",
-                                        border: "1px solid black",
-                                        backgroundColor:
-                                            cell.isObstacle
-                                                ? "gray"
-                                                : cell.isPath
-                                                    ? "green"
-                                                    : cell.isShelf
-                                                        ? "red"
-                                                        : "white",
-                                        color: cell.isPath || cell.isShelf ? "white" : "black",
-                                        fontSize: "10px",
-                                    }}
-                                >
-                                    {cell.isObstacle ? "" : cell.isShelf ? "" : cell.isPath ? "•" : ""}
+                                <div key={index} style={cellStyle(cell)} title={`x: ${cell.x}, y: ${cell.y}`}>
+                                    {cell.startName || ""}
                                 </div>
                             ))}
                         </div>
                     </div>
+
+                    {/* Legend */}
+                    <div className="flex justify-center gap-2 mt-4 flex-wrap max-w-full">
+                        {[
+                            { label: "Entrance", color: "#2980b9" },
+                            { label: "Path", color: "#27ae60" },
+                            { label: "Shelf", color: "#c0392b" },
+                            { label: "Obstacle", color: "#4a4a4a" },
+                            { label: "Empty", color: "white", border: "1px solid #bbb" },
+                        ].map(({ label, color, border }, idx) => (
+                            <div key={idx} className="flex items-center gap-2 select-none">
+                                <div
+                                    style={{
+                                        width: 24,
+                                        height: 24,
+                                        backgroundColor: color,
+                                        borderRadius: 4,
+                                        border: border || "none",
+                                    }}
+                                />
+                                <span className="text-sm">{label}</span>
+                            </div>
+                        ))}
+                    </div>
                 </>
-            }
+            )}
         </div>
     );
 }
