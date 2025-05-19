@@ -241,6 +241,71 @@ const ARAdding = ({ formData, setFormData }) => {
     newThesisIDGenerator(formData, setFormData)
   }, [])
 
+  const fetchNextCallNumber = async (prefix) => {
+    if (!prefix) return ""
+
+    try {
+      // Query all call numbers starting with the prefix plus dash
+      const { data, error } = await supabase
+        .from("research") // <-- adjust table name if different
+        .select("researchCallNum")
+        .ilike("researchCallNum", `${prefix}-%`)
+
+      if (error) {
+        console.error("Error fetching call numbers:", error)
+        return ""
+      }
+
+      if (!data || data.length === 0) {
+        // No existing call numbers, start at 1
+        return `${prefix}-1`
+      }
+
+      // Extract numbers from existing call numbers, ignoring trailing letters
+      const numbers = data
+        .map((item) => {
+          const callNum = item.researchCallNum
+          if (!callNum) return 0
+          // Remove prefix and dash, e.g. "DCS-123A" -> "123A"
+          const suffix = callNum.slice(prefix.length + 1)
+          // Extract numeric part at start
+          const match = suffix.match(/^(\d+)/)
+          return match ? parseInt(match[1], 10) : 0
+        })
+        .filter((num) => num > 0)
+
+      if (numbers.length === 0) {
+        return `${prefix}-1`
+      }
+
+      const maxNumber = Math.max(...numbers)
+      return `${prefix}-${maxNumber + 1}`
+    } catch (err) {
+      console.error("Unexpected error in fetchNextCallNumber:", err)
+      return ""
+    }
+  }
+
+  // Run this effect whenever college or department changes to autofill call number
+  useEffect(() => {
+    const updateCallNumber = async () => {
+      // Priority: department if present, else college
+      const prefix = formData.department?.trim() || formData.college?.trim()
+      if (!prefix) {
+        setFormData((prev) => ({ ...prev, researchCallNum: "" }))
+        return
+      }
+
+      const nextCallNum = await fetchNextCallNumber(prefix)
+      setFormData((prev) => ({
+        ...prev,
+        researchCallNum: nextCallNum,
+      }))
+    }
+
+    updateCallNumber()
+  }, [formData.college, formData.department])
+
   //Form
   return (
     <div className="min-h-screen bg-gray-100">
