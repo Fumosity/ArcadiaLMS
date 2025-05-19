@@ -31,21 +31,62 @@ export function useRegisterForm(onBack, onRegister, userData) {
   const [isChecking, setIsChecking] = useState(false)
   const [isPasswordHashed, setIsPasswordHashed] = useState(false)
 
-  const colleges = ["CLAE", "CFAD", "COECSA", "CITHM", "CAMS", "CON", "CBA", "LAW", "IS", "ASP", "Graduate School"]
+  const [colleges, setColleges] = useState([])
+  const [departments, setDepartments] = useState({})
 
-  const departments = {
-    COECSA: ["DCS", "DOA", "DOE"],
-    CLAE: [],
-    CITHM: [],
-    CAMS: [],
-    CON: [],
-    CBA: [],
-    LAW: [],
-    CFAD: [],
-    IS: ["JHS", "SHS"],
-    ASP: [],
-    "Graduate School": [],
-  }
+  useEffect(() => {
+    async function fetchCollegesAndDepartments() {
+      try {
+        // Fetch colleges
+        const { data: collegeData, error: collegeError } = await supabase
+          .from("college_list")
+          .select("collegeID, collegeAbbrev");
+
+        if (collegeError) throw new Error(collegeError.message);
+
+        // Map colleges and replace "Graduate School" with "GS"
+        const fetchedColleges = collegeData
+          .map(c => c.collegeAbbrev === "Graduate School" ? "GS" : c.collegeAbbrev)
+
+        setColleges(fetchedColleges);
+
+        // Fetch departments
+        const { data: departmentData, error: departmentError } = await supabase
+          .from("department_list")
+          .select("*");
+
+        if (departmentError) throw new Error(departmentError.message);
+
+        // Map college IDs to names
+        const collegeIdToName = {};
+        collegeData.forEach(c => {
+          const collegeAbbrev = c.collegeAbbrev;
+          collegeIdToName[c.collegeID] = collegeAbbrev;
+        });
+
+        // Group departments by college name
+        const deptByCollege = {};
+        fetchedColleges.forEach(college => {
+          deptByCollege[college] = [];
+        });
+
+        departmentData.forEach(dept => {
+          const collegeAbbrev = collegeIdToName[dept.collegeID];
+          if (collegeAbbrev) {
+            if (!deptByCollege[collegeAbbrev]) deptByCollege[collegeAbbrev] = [];
+            deptByCollege[collegeAbbrev].push(dept.departmentAbbrev);
+          }
+        });
+
+        setDepartments(deptByCollege);
+      } catch (error) {
+        console.error("Error fetching colleges or departments:", error.message);
+      }
+    }
+
+    fetchCollegesAndDepartments();
+  }, []);
+
 
   // Initialize form with userData if available (when returning from next step)
   useEffect(() => {
@@ -63,11 +104,11 @@ export function useRegisterForm(onBack, onRegister, userData) {
   }, [userData])
 
   useEffect(() => {
-    setNewData((prev) => ({
+    setNewData(prev => ({
       ...prev,
-      department: ["COECSA", "IS"].includes(prev.college) ? prev.department : "",
-    }))
-  }, [new_data.college])
+      department: departments[prev.college]?.length > 0 ? prev.department : "",
+    }));
+  }, [new_data.college, departments]);
 
   const handleChange = (e) => {
     const { id, value } = e.target
@@ -83,10 +124,10 @@ export function useRegisterForm(onBack, onRegister, userData) {
       number: /[0-9]/.test(password),
       special: /[^a-zA-Z0-9]/.test(password),
     }
-  
+
     // Calculate strength based on criteria
     let strength = 0
-  
+
     // Length contributes up to 20% of strength
     if (password.length === 0) {
       strength = 0
@@ -96,22 +137,22 @@ export function useRegisterForm(onBack, onRegister, userData) {
     } else {
       // Full 20% for 8+ characters
       strength += 20
-  
+
       // Each additional criterion adds 20%
       if (criteria.lowercase) strength += 20
       if (criteria.uppercase) strength += 20
       if (criteria.number) strength += 20
       if (criteria.special) strength += 20
     }
-  
+
     // Ensure strength is capped at 100
     strength = Math.min(100, strength)
-  
+
     setPasswordStrength(strength)
     setNewData((prev) => ({ ...prev, password }))
     setFormError("")
   }
-  
+
   const getStrengthColor = () => {
     if (passwordStrength <= 20) return "bg-red" // Very Weak
     if (passwordStrength <= 40) return "bg-orange" // Weak
@@ -148,7 +189,7 @@ export function useRegisterForm(onBack, onRegister, userData) {
   const handleRegister = async (e, userType = "student") => {
     e.preventDefault()
     setFormError("");
-  
+
     // Check if any required fields are empty
     const requiredFields = [
       { field: "firstName", label: "First Name" },
@@ -157,47 +198,48 @@ export function useRegisterForm(onBack, onRegister, userData) {
       { field: "email", label: "Email" },
       { field: "college", label: "College/High School" },
     ]
-  
+
     for (const { field, label } of requiredFields) {
       if (!new_data[field]) {
         setFormError(`Please enter your ${label}`)
         return
       }
     }
-  
-    // Department is required for COECSA and IS
-    if (["COECSA", "IS"].includes(new_data.college) && !new_data.department) {
-      setFormError("Please select a department for your college")
-      return
+
+    // Check if the selected college has departments and if none is selected
+    if (departments[new_data.college]?.length > 0 && !new_data.department) {
+      setFormError("Please select a department for your college");
+      return;
     }
-  
+
+
     if (!new_data.password) {
       setFormError("Please enter a password")
       return
     }
-  
+
     // Check password length first
     if (new_data.password.length < 8) {
       setFormError("Password must be at least 8 characters long")
       return
     }
-  
+
     if (new_data.password !== new_data.confirmPassword) {
       setFormError("Passwords do not match")
       return
     }
-  
+
     // Check for password complexity
     const hasLower = /[a-z]/.test(new_data.password)
     const hasUpper = /[A-Z]/.test(new_data.password)
     const hasNumber = /[0-9]/.test(new_data.password)
     const hasSpecial = /[^a-zA-Z0-9]/.test(new_data.password)
-  
+
     if (!hasLower || !hasUpper || !hasNumber || !hasSpecial) {
       setFormError("Password must include uppercase, lowercase, numbers, and special characters")
       return
     }
-  
+
     //Get account details from form
     const userEmail = `${new_data.email}${new_data.emailSuffix}`;
     const studentNumber = new_data.studentNumber;
@@ -218,16 +260,16 @@ export function useRegisterForm(onBack, onRegister, userData) {
       setFormError("This email or student number is already registered.");
       return;
     }
-  
+
     // Create a copy of the data for submission
     const submissionData = { ...new_data }
-  
+
     // Set the correct email suffix based on user type
     submissionData.emailSuffix = userType === "student" ? "@lpunetwork.edu.ph" : "@lpu.edu.ph"
-  
+
     // Convert college to uppercase before sending to database
     submissionData.college = submissionData.college.toUpperCase()
-  
+
     // Only hash the password if it's not already hashed
     if (!isPasswordHashed) {
       submissionData.password = bcrypt.hashSync(submissionData.password, 10) // Salt rounds: 10

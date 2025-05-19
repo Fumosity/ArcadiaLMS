@@ -31,6 +31,7 @@ import AGAdd from './admin-genre-add/AGAdd.jsx';
 import AGModify from './admin-genre-modify/AGModify.jsx';
 import ABExport from './admin-book-export/ABExport.jsx';
 import ADPAPage from './ADPAPage.jsx';
+import ACollegeMgmt from './admin-college-mgmt/ACollegeMgmt.jsx';
 
 // User Components
 import UsrRegistration from './UserPages/user-registration-page/UsrRegistration';
@@ -138,6 +139,9 @@ function App() {
               <Route path="genremanagement" element={<AGenreMgmt />} />
               <Route path="genreadding" element={<AGAdd />} />
               <Route path="genremodify" element={<AGModify />} />
+              <Route path="collegemanagement" element={<ACollegeMgmt />} />
+              <Route path="departmentadding" element={<AGAdd />} />
+              <Route path="departmentmodify" element={<AGModify />} />
               <Route path="researchadding" element={<ARAdd />} />
               <Route path="researchexport" element={<ARExport />} />
               <Route path="abviewer" element={<ABViewer />} />

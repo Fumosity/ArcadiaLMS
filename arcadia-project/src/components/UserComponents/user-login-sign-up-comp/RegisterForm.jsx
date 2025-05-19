@@ -67,7 +67,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
         <div className="flex gap-4 mb-4 justify-center">
           <label className="flex items-center">
             <input
-              type="checkbox"
+              type="radio"
               checked={userType === "student"}
               onChange={() => setUserType("student")}
               className="mr-2"
@@ -76,7 +76,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
           </label>
           <label className="flex items-center">
             <input
-              type="checkbox"
+              type="radio"
               checked={userType === "faculty"}
               onChange={() => setUserType("faculty")}
               className="mr-2"
@@ -165,7 +165,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
               <label htmlFor="department" className="block text-sm font-medium text-gray-700">
                 <div className="flex items-center space-x-1">
                   <span>Department/Year: </span>
-                  {["COECSA", "IS"].includes(new_data.college) && (
+                  {departments[new_data.college]?.length > 0 && (
                     <span className="text-red">*</span>
                   )}
                 </div>
@@ -174,17 +174,20 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
                 id="department"
                 value={new_data.department}
                 onChange={(e) => setNewData((prev) => ({ ...prev, department: e.target.value }))}
-                disabled={!["COECSA", "IS"].includes(new_data.college)}
+                disabled={!departments[new_data.college]?.length}
                 className="w-full px-2.5 py-1 border border-gray rounded-full"
               >
                 <option value="">Select Department</option>
-                {departments[new_data.college]?.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
+                {departments[new_data.college]
+                  ?.filter((d) => !(userType === "student" && d.toUpperCase().includes("ASP")))
+                  .map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
               </select>
             </div>
+
           </div>
 
           {/* Email */}
@@ -259,7 +262,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
             <label htmlFor="confirmPassword">
               <span>Confirm Password: </span>
               <span className="text-red">*</span>
-              </label>
+            </label>
             <div className="relative">
               <input
                 id="confirmPassword"
