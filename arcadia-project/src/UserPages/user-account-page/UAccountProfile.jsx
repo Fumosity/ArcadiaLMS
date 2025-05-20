@@ -16,7 +16,7 @@ const UAccountProfile = () => {
         }, []);
     return (
         <div className="min-h-screen bg-light-white">
-            <UNavbar />
+            {/* <UNavbar/> */}
             <Title>User Account</Title>
 
             <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">

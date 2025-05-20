@@ -45,7 +45,6 @@ function CustomLink({ to, children, className, restricted, ...props }) {
     if (user?.userAccountType === "Guest" && restricted) {
       e.preventDefault()
 
-      // Create toast with custom close button that sets toastClosed to true
       toastIdRef.current = toast.warning("You need to log in first to access this page! Redirecting to Login...", {
         position: "bottom-right",
         autoClose: 3000,
@@ -55,26 +54,26 @@ function CustomLink({ to, children, className, restricted, ...props }) {
         draggable: false,
         theme: "colored",
         onClose: (closedByUser) => {
-          // If toast was closed manually by user (not by timeout)
-          if (closedByUser) {
-            setToastClosed(true)
-          } else {
-            // If toast closed automatically (timeout), navigate to login
+          if (!closedByUser) {
             navigate("/user/login")
+            window.scrollTo({ top: 0, behavior: "smooth" }) // 👈 Scroll to top after redirect
           }
         },
       })
+    } else {
+      // Not restricted or user is not guest — scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
+
 
   return (
     <Link
       to={to}
       {...props}
       onClick={handleClick}
-      className={`userNav-link px-2 py-3 text-white transition duration-200 ${
-        isActive ? "bg-red font-semibold !text-white" : "hover:bg-grey hover:text-black"
-      } ${className}`}
+      className={`userNav-link px-2 py-3 text-white transition duration-200 ${isActive ? "bg-red font-semibold !text-white" : "hover:bg-grey hover:text-black"
+        } ${className}`}
     >
       {children}
     </Link>

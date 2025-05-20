@@ -3,6 +3,7 @@ import { FiUser } from "react-icons/fi"
 import { Link, useNavigate } from "react-router-dom"
 import { useUser } from "../../backend/UserContext"
 import HamburgerIcon from "./HamburgerIcon"
+import Navbar from "./Navbar"
 
 const Header = () => {
   const navigate = useNavigate()
@@ -42,7 +43,7 @@ const Header = () => {
   }, [])
 
   return (
-    <header className="bg-white shadow">
+    <header className="bg-white shadow sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center w-full">
         {/* Left-aligned Logo and Text */}
         <div className="flex items-center">
@@ -115,6 +116,9 @@ const Header = () => {
             </Link>
           )}
         </div>
+      </div>
+      <div className="">
+        <Navbar />
       </div>
     </header>
   )

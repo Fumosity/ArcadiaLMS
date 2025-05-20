@@ -64,7 +64,7 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
         </div>
 
         {/* User Type Selection */}
-        <div className="flex gap-4 mb-4 justify-center">
+        <div className="flex gap-4 mb-2 justify-center">
           <label className="flex items-center">
             <input
               type="radio"
@@ -84,8 +84,9 @@ export default function RegisterForm({ onBack, onRegister, userData }) {
             Faculty
           </label>
         </div>
-
+        <p className="text-xs italic text-red text-center mb-2">All input fields that has the * is required.</p>
         <form onSubmit={(e) => handleRegister(e, userType)} className="space-y-3">
+
           {/* First Name & Last Name */}
           <div className="grid grid-cols-2 gap-3">
             {["firstName", "lastName"].map((field) => (

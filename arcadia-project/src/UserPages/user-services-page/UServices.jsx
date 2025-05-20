@@ -18,7 +18,7 @@ const UServices = () => {
     }, []);
     return (
         <div className="min-h-screen bg-light-white">
-            <UNavbar />
+            {/* <UNavbar/> */}
 
             <Title>Library Services</Title>
 

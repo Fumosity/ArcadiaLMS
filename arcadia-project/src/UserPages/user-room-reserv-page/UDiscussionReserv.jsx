@@ -58,7 +58,7 @@ const UDiscussionReserv = () => {
 
   return (
     <div className="min-h-screen bg-light-white">
-      <UNavbar />
+      {/* <UNavbar/> */}
 
       <Title>Discussion Room Reservations</Title>
 

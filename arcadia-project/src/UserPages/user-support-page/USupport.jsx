@@ -15,7 +15,7 @@ const USupport = () => {
         }, []);
     return (
         <div className="min-h-screen bg-light-white">
-            <UNavbar />
+            {/* <UNavbar/> */}
 
             <Title>User Support</Title>
 

@@ -227,7 +227,7 @@ const URsrchCatalog = () => {
 
   return (
     <div className="min-h-screen bg-light-white">
-      <UNavbar />
+      {/* <UNavbar/> */}
       <USearchBarR placeholder="Search for research..." onSearch={setSearchQuery} />
       <Title>Research Catalog</Title>
 

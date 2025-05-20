@@ -98,7 +98,8 @@ const UHomePage = () => {
 
   return (
     <div className="min-h-screen bg-light-white">
-      <UNavbar />
+      
+      
 
       <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">
         <div className="lg:w-1/4 lg:block md:hidden space-y-4 min-h-full">

@@ -121,7 +121,6 @@ function App() {
         element={
           <>
             <Header />
-            <Navbar />
             <Routes>
               <Route path="/" element={<ProtectedRoute><AHomePage /></ProtectedRoute>} />
               <Route path="adminservices" element={<AServices />} />

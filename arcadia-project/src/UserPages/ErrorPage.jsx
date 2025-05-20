@@ -11,7 +11,7 @@ const ErrorPage = () => {
 
     return (
         <div className="min-h-screen bg-light-white">
-            <UNavbar />
+            {/* <UNavbar/> */}
             <div className="flex items-center justify-center text-center" style={{ minHeight: "calc(100vh - 4rem)" }}>
                 <div className="space-y-4">
                     <p className="text-6xl font-extrabold text-black">404</p>

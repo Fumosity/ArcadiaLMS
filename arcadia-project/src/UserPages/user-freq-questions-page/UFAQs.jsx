@@ -11,7 +11,7 @@ import USearchBar from "../../components/UserComponents/user-main-comp/USearchBa
 const UFAQs = () => {
     return (
         <div className="min-h-screen bg-light-white">
-            <UNavbar />
+            {/* <UNavbar/> */}
             <Title>Frequently Asked Questions</Title>
 
             <div className="w-10/12 mx-auto py-8 userContent-container flex flex-col lg:flex-row justify-center justify-items-start">

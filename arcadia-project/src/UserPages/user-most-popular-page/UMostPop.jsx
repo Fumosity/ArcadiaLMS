@@ -13,7 +13,7 @@ import ExpandedMostPop from "../../components/UserComponents/user-most-popular-c
 const UMostPop = () => {
     return (
         <div className="min-h-screen bg-light-white">
-            <UNavbar />
+            {/* <UNavbar/> */}
             <USearchBar />
             <Title>Book Catalog</Title>
 

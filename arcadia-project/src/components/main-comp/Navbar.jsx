@@ -22,12 +22,22 @@ export default function Navbar(){
   </div>)
 }
 
-function CustomLink({ to, children, ...props }){
+function CustomLink({ to, children, ...props }) {
   const resolvePath = useResolvedPath(to)
-  const isActive = useMatch({ path: resolvePath.pathname, end: true})
+  const isActive = useMatch({ path: resolvePath.pathname, end: true })
+
+  const handleClick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" }) // Scroll to top
+  }
+
   return (
     <Link 
-        to={to} {...props} className="nav-link">{children}
+      to={to}
+      onClick={handleClick}
+      {...props}
+      className={`nav-link ${isActive ? "font-semibold text-arcadia-red" : ""}`}
+    >
+      {children}
     </Link>
   )
 }

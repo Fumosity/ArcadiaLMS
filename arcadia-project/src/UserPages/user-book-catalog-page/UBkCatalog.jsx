@@ -152,7 +152,7 @@ const UBkCatalog = () => {
 
   return (
     <div className="min-h-screen bg-light-white">
-      <UNavbar />
+      {/* <UNavbar/> */}
       <USearchBar placeholder="Search books/authors.." onSearch={setQuery} />
       <Title>Book Catalog</Title>
 
