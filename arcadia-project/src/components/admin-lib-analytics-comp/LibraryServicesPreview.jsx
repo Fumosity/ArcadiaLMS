@@ -19,6 +19,7 @@ const LibraryServicesPreview = () => {
         const { data, error } = await supabase
           .from("library_services")
           .select("*")
+          .eq("isarchived", false) // Only fetch non-archived services
           .order("displayOrder", { ascending: true })
 
         if (error) throw error
@@ -120,7 +121,7 @@ const LibraryServicesPreview = () => {
     return (
       <div className="uMain-cont">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Library Services Preview</h2>
+          <h2 className="text-2xl font-semibold">Library Services</h2>
         </div>
         <div className="bg-red-100 border border-grey text-red-700 px-4 py-3 rounded mb-4">{error}</div>
       </div>
@@ -130,7 +131,7 @@ const LibraryServicesPreview = () => {
   return (
     <div className="uMain-cont">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">Library Services Preview</h2>
+        <h2 className="text-2xl font-semibold">Library Services</h2>
       </div>
 
       <div className="space-y-6">
@@ -153,7 +154,7 @@ const LibraryServicesPreview = () => {
                   <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
                   <p
                     ref={descriptionRefs.current[service.id]}
-                    className={`text-sm text-gray-500 mb-1.5 text-justify ${expandedCards[service.id] ? "" : "line-clamp-3"}`}
+                    className={`text-sm text-gray-500 mb-1.5 ${expandedCards[service.id] ? "" : "line-clamp-3"}`}
                   >
                     {service.description}
                   </p>
@@ -161,9 +162,9 @@ const LibraryServicesPreview = () => {
                 {(truncatedTexts[service.id] || expandedCards[service.id]) && (
                   <button
                     onClick={() => toggleCardExpansion(service.id)}
-                    className="text-sm text-arcadia-red text-left font-medium hover:underline mt-auto"
+                    className="text-sm text-arcadia-red font-medium hover:underline mt-auto"
                   >
-                    {expandedCards[service.id] ? "Hide" : "Read more"}
+                    {expandedCards[service.id] ? "Hide" : "Learn more"}
                   </button>
                 )}
               </div>

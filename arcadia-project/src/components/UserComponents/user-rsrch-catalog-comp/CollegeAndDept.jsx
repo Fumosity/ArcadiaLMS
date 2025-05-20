@@ -8,6 +8,7 @@ export default function CollegeAndDept() {
   const [colleges, setColleges] = useState([])
   const [departments, setDepartments] = useState([])
   const [loading, setLoading] = useState(true)
+  const [activeColleges, setActiveColleges] = useState([])
 
   // Fetch colleges and departments from the database
   useEffect(() => {
@@ -15,8 +16,30 @@ export default function CollegeAndDept() {
       try {
         setLoading(true)
 
-        // No need to fetch colleges anymore as they are hardcoded
-        setColleges(["COECSA", "CLAE", "CITHM", "CAMS", "CBA", "LAW", "CFAD", "CON", "IS", "Graduate School"])
+        // Fetch active colleges (not archived)
+        const { data: collegeData, error: collegeError } = await supabase
+          .from("college_list")
+          .select("college, isarchived")
+          .eq("isarchived", false)
+
+        if (collegeError) {
+          console.error("Error fetching colleges:", collegeError)
+          return
+        }
+
+        // Extract college abbreviations from the data
+        const activeCollegeList = collegeData.map((college) => college.college)
+        setActiveColleges(activeCollegeList)
+
+        // Filter the hardcoded college list to only include active colleges
+        const allColleges = ["COECSA", "CLAE", "CITHM", "CAMS", "CBA", "LAW", "CFAD", "CON", "IS", "Graduate School"]
+        const filteredColleges = allColleges.filter((college) => activeCollegeList.includes(college))
+        setColleges(filteredColleges)
+
+        // If the currently selected college is archived, reset it
+        if (selectedCollege && !activeCollegeList.includes(selectedCollege) && selectedCollege !== "All") {
+          setSelectedCollege("")
+        }
 
         // Fetch departments for the selected college
         await fetchDepartments(selectedCollege)
@@ -33,11 +56,20 @@ export default function CollegeAndDept() {
   // Fetch departments based on selected college
   const fetchDepartments = async (college) => {
     try {
+      // First, check if the selected college is active
+      if (college && college !== "All" && !activeColleges.includes(college)) {
+        setDepartments([])
+        return
+      }
+
       let query = supabase.from("research").select("department").not("department", "is", null)
 
       // If a college is selected (and not "All"), filter by that college
       if (college && college !== "All") {
         query = query.eq("college", college)
+      } else if (activeColleges.length > 0) {
+        // If no specific college is selected, only include departments from active colleges
+        query = query.in("college", activeColleges)
       }
 
       const { data, error } = await query
@@ -65,7 +97,7 @@ export default function CollegeAndDept() {
     if (selectedCollege !== "All") {
       setSelectedDepartment("")
     }
-  }, [selectedCollege])
+  }, [selectedCollege, activeColleges])
 
   return (
     <div className="uSidebar-filter">
@@ -81,16 +113,11 @@ export default function CollegeAndDept() {
             onChange={(e) => setSelectedCollege(e.target.value)}
           >
             <option value="">All</option>
-            <option value="COECSA">COECSA</option>
-            <option value="CLAE">CLAE</option>
-            <option value="CITHM">CITHM</option>
-            <option value="CAMS">CAMS</option>
-            <option value="CBA">CBA</option>
-            <option value="LAW">LAW</option>
-            <option value="CFAD">CFAD</option>
-            <option value="CON">CON</option>
-            <option value="IS">IS</option>
-            <option value="Graduate School">Graduate School</option>
+            {colleges.map((college) => (
+              <option key={college} value={college}>
+                {college}
+              </option>
+            ))}
           </select>
 
           {/* Custom dropdown arrow */}

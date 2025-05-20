@@ -19,6 +19,7 @@ const LibServ = () => {
         const { data, error } = await supabase
           .from("library_services")
           .select("*")
+          .eq("isarchived", false) // Only fetch non-archived services
           .order("displayOrder", { ascending: true })
 
         if (error) throw error
@@ -153,7 +154,7 @@ const LibServ = () => {
                   <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
                   <p
                     ref={descriptionRefs.current[service.id]}
-                    className={`text-sm text-gray-500 mb-1.5 text-justify ${expandedCards[service.id] ? "" : "line-clamp-3"}`}
+                    className={`text-sm text-gray-500 mb-1.5 ${expandedCards[service.id] ? "" : "line-clamp-3"}`}
                   >
                     {service.description}
                   </p>
@@ -161,9 +162,9 @@ const LibServ = () => {
                 {(truncatedTexts[service.id] || expandedCards[service.id]) && (
                   <button
                     onClick={() => toggleCardExpansion(service.id)}
-                    className="text-sm text-arcadia-red text-left font-medium hover:underline mt-auto"
+                    className="text-sm text-arcadia-red font-medium hover:underline mt-auto"
                   >
-                    {expandedCards[service.id] ? "Hide" : "Read more"}
+                    {expandedCards[service.id] ? "Hide" : "Learn more"}
                   </button>
                 )}
               </div>

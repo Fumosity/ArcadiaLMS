@@ -1,110 +1,143 @@
-import React, { useEffect, useRef, useState } from "react";
-import { supabase } from "../../supabaseClient";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useEffect, useState } from "react"
+import { supabase } from "../../supabaseClient"
+import { useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
 
 const ACAdding = ({ formData, setFormData, refreshColleges, isModifying }) => {
-  const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [validationErrors, setValidationErrors] = useState({});
-  const [departments, setDepartments] = useState([{ name: "", abbrev: "" }]);
+  const navigate = useNavigate()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [validationErrors, setValidationErrors] = useState({})
+  const [departments, setDepartments] = useState([{ name: "", abbrev: "" }])
 
   // Initialize formData if not provided
   useEffect(() => {
     if (!formData || typeof formData !== "object") {
       setFormData({
         collegeName: "",
-        collegeAbbrev: ""
-      });
+        college: "",
+      })
     }
-  }, [formData, setFormData]);
+  }, [formData, setFormData])
 
   useEffect(() => {
     // If not in modify mode, clear the form fields
     if (!isModifying) {
       setFormData({
         collegeName: "",
-        collegeAbbrev: ""
-      });
+        college: "",
+      })
     }
-  }, [isModifying]);
+  }, [isModifying])
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
 
   const addDepartmentRow = (e) => {
-    e.preventDefault();
-    setDepartments([...departments, { name: "", abbrev: "" }]);
-  };
+    e.preventDefault()
+    setDepartments([...departments, { name: "", abbrev: "" }])
+  }
 
   const removeDepartmentRow = (index, e) => {
-    e.preventDefault();
-    const newDepartments = departments.filter((_, i) => i !== index);
-    setDepartments(newDepartments);
-  };
+    e.preventDefault()
+    const newDepartments = departments.filter((_, i) => i !== index)
+    setDepartments(newDepartments)
+  }
 
   const handleDepartmentChange = (index, field, value) => {
-    const newDepartments = [...departments];
-    newDepartments[index][field] = value;
-    setDepartments(newDepartments);
-  };
+    const newDepartments = [...departments]
+    newDepartments[index][field] = value
+    setDepartments(newDepartments)
+  }
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setValidationErrors({});
+    setIsSubmitting(true)
+    setValidationErrors({})
 
     // Validate college name and abbreviation
     if (!formData.collegeName.trim()) {
-      setValidationErrors((prev) => ({ ...prev, collegeName: "College name is required" }));
-      setIsSubmitting(false);
-      return;
+      setValidationErrors((prev) => ({ ...prev, collegeName: "College name is required" }))
+      setIsSubmitting(false)
+      return
     }
-    if (!formData.collegeAbbrev.trim()) {
-      setValidationErrors((prev) => ({ ...prev, collegeAbbrev: "College abbreviation is required" }));
-      setIsSubmitting(false);
-      return;
+    if (!formData.college.trim()) {
+      setValidationErrors((prev) => ({ ...prev, college: "College abbreviation is required" }))
+      setIsSubmitting(false)
+      return
     }
-
-    // Filter out blank department rows
-    const validDepartments = departments.filter(
-      (dept) => dept.name.trim() && dept.abbrev.trim()
-    );
 
     try {
+      // Check if college with same name or abbreviation already exists
+      const { data: existingColleges, error: checkError } = await supabase
+        .from("college_list")
+        .select("collegeName, college")
+        .or(`collegeName.eq.${formData.collegeName},college.eq.${formData.college}`)
+
+      if (checkError) throw checkError
+
+      // If colleges with the same name or abbreviation exist, show error
+      if (existingColleges && existingColleges.length > 0) {
+        const nameExists = existingColleges.some(
+          (c) => c.collegeName.toLowerCase() === formData.collegeName.toLowerCase(),
+        )
+        const abbrevExists = existingColleges.some(
+          (c) => c.college.toLowerCase() === formData.college.toLowerCase(),
+        )
+
+        if (nameExists) {
+          setValidationErrors((prev) => ({ ...prev, collegeName: "A college with this name already exists" }))
+        }
+
+        if (abbrevExists) {
+          setValidationErrors((prev) => ({ ...prev, college: "A college with this abbreviation already exists" }))
+        }
+
+        setIsSubmitting(false)
+        return
+      }
+
+      // Filter out blank department rows
+      const validDepartments = departments.filter((dept) => dept.name.trim() && dept.abbrev.trim())
+
       const { data: college, error: collegeError } = await supabase
         .from("college_list")
-        .insert([{ collegeName: formData.collegeName, collegeAbbrev: formData.collegeAbbrev }])
-        .select("collegeID");
+        .insert([
+          {
+            collegeName: formData.collegeName,
+            college: formData.college,
+            isarchived: false,
+          },
+        ])
+        .select("collegeID")
 
-      if (collegeError) throw collegeError;
+      if (collegeError) throw collegeError
 
-      const collegeID = college[0].collegeID;
+      const collegeID = college[0].collegeID
 
       if (validDepartments.length > 0) {
         const departmentData = validDepartments.map((dept) => ({
           collegeID,
           departmentName: dept.name,
           departmentAbbrev: dept.abbrev,
-        }));
+        }))
 
-        const { error: deptError } = await supabase.from("department_list").insert(departmentData);
-        if (deptError) throw deptError;
+        const { error: deptError } = await supabase.from("department_list").insert(departmentData)
+        if (deptError) throw deptError
       }
 
-      toast.success("College and departments added successfully!");
-      refreshColleges();
+      toast.success("College and departments added successfully!")
+      refreshColleges()
 
       // Reset form and department fields
-      setFormData({ collegeName: "", collegeAbbrev: "" });
-      setDepartments([{ name: "", abbrev: "" }]);
+      setFormData({ collegeName: "", college: "" })
+      setDepartments([{ name: "", abbrev: "" }])
     } catch (error) {
-      console.error("Error adding college or departments: ", error);
-      toast.error("Failed to add college or departments.");
+      console.error("Error adding college or departments: ", error)
+      toast.error("Failed to add college or departments.")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="bg-white border border-grey rounded-lg p-4 mt-12 w-full h-fit">
@@ -119,22 +152,20 @@ const ACAdding = ({ formData, setFormData, refreshColleges, isModifying }) => {
             value={formData?.collegeName || ""}
             onChange={handleChange}
           />
-          {validationErrors.collegeName && (
-            <span className="text-red-500 text-sm">{validationErrors.collegeName}</span>
-          )}
+          {validationErrors.collegeName && <span className="text-red-500 text-sm">{validationErrors.collegeName}</span>}
         </div>
 
         <div className="flex justify-between items-center">
           <label className="w-1/3">College Abbreviation:</label>
           <input
             type="text"
-            name="collegeAbbrev"
+            name="college"
             className="w-2/3 px-3 py-1 rounded-full border border-grey"
-            value={formData?.collegeAbbrev || ""}
+            value={formData?.college || ""}
             onChange={handleChange}
           />
-          {validationErrors.collegeAbbrev && (
-            <span className="text-red-500 text-sm">{validationErrors.collegeAbbrev}</span>
+          {validationErrors.college && (
+            <span className="text-red-500 text-sm">{validationErrors.college}</span>
           )}
         </div>
 
@@ -153,18 +184,17 @@ const ACAdding = ({ formData, setFormData, refreshColleges, isModifying }) => {
               value={dept.abbrev}
               onChange={(e) => handleDepartmentChange(index, "abbrev", e.target.value)}
             />
-            <button
-              className="px-2 py-1 text-red-500"
-              onClick={(e) => removeDepartmentRow(index, e)}
-            >
+            <button className="px-2 py-1 text-red-500" onClick={(e) => removeDepartmentRow(index, e)}>
               X
             </button>
           </div>
         ))}
 
         <div className="flex justify-end">
-          <button className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
-            onClick={addDepartmentRow}>
+          <button
+            className="add-book w-1/4 mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+            onClick={addDepartmentRow}
+          >
             Add Department
           </button>
         </div>
@@ -181,7 +211,7 @@ const ACAdding = ({ formData, setFormData, refreshColleges, isModifying }) => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default ACAdding;
+export default ACAdding

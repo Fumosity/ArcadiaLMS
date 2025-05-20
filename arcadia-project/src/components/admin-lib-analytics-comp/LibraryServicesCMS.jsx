@@ -12,10 +12,13 @@ const LibraryServicesCMS = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentService, setCurrentService] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false)
   const [serviceToDelete, setServiceToDelete] = useState(null)
+  const [serviceToArchive, setServiceToArchive] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortField, setSortField] = useState("displayOrder")
   const [sortDirection, setSortDirection] = useState("asc")
+  const [showArchived, setShowArchived] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -34,8 +37,14 @@ const LibraryServicesCMS = () => {
         .select("*")
         .order(sortField, { ascending: sortDirection === "asc" })
 
+      // Filter by search term if provided
       if (searchTerm) {
         query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+      }
+
+      // Filter by archive status
+      if (!showArchived) {
+        query = query.eq("isarchived", false)
       }
 
       const { data, error } = await query
@@ -56,7 +65,7 @@ const LibraryServicesCMS = () => {
 
   useEffect(() => {
     fetchServices()
-  }, [searchTerm, sortField, sortDirection])
+  }, [searchTerm, sortField, sortDirection, showArchived])
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -97,6 +106,12 @@ const LibraryServicesCMS = () => {
     setIsDeleteModalOpen(true)
   }
 
+  // Open archive confirmation modal
+  const handleArchiveClick = (service) => {
+    setServiceToArchive(service)
+    setIsArchiveModalOpen(true)
+  }
+
   // Submit form to create or update a service
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -120,7 +135,7 @@ const LibraryServicesCMS = () => {
         toast.success("Service updated successfully!", {
           position: "bottom-right",
           autoClose: 2000,
-          onClose: () => window.location.reload(),
+          onClose: () => fetchServices(),
         })
       } else {
         // Create new service
@@ -131,7 +146,7 @@ const LibraryServicesCMS = () => {
         toast.success("Service created successfully!", {
           position: "bottom-right",
           autoClose: 2000,
-          onClose: () => window.location.reload(),
+          onClose: () => fetchServices(),
         })
       }
 
@@ -164,12 +179,45 @@ const LibraryServicesCMS = () => {
       toast.success("Service deleted successfully!", {
         position: "bottom-right",
         autoClose: 2000,
-        onClose: () => window.location.reload(),
+        onClose: () => fetchServices(),
       })
     } catch (err) {
       console.error("Error deleting service:", err)
       setError("Failed to delete library service")
       toast.error("Failed to delete library service", {
+        position: "bottom-right",
+        autoClose: 3000,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Archive a service
+  const handleArchive = async () => {
+    if (!serviceToArchive) return
+
+    try {
+      setLoading(true)
+      const { error } = await supabase
+        .from("library_services")
+        .update({ isarchived: !serviceToArchive.isarchived })
+        .eq("id", serviceToArchive.id)
+
+      if (error) throw error
+
+      setIsArchiveModalOpen(false)
+      setServiceToArchive(null)
+
+      toast.success(serviceToArchive.isarchived ? "Service restored successfully!" : "Service archived successfully!", {
+        position: "bottom-right",
+        autoClose: 2000,
+        onClose: () => fetchServices(),
+      })
+    } catch (err) {
+      console.error("Error archiving service:", err)
+      setError("Failed to archive library service")
+      toast.error("Failed to archive library service", {
         position: "bottom-right",
         autoClose: 3000,
       })
@@ -231,6 +279,11 @@ const LibraryServicesCMS = () => {
     }
   }
 
+  // Toggle showing archived services
+  const toggleShowArchived = () => {
+    setShowArchived(!showArchived)
+  }
+
   return (
     <div className="uMain-cont">
       <div className="flex justify-between items-center mb-6">
@@ -246,7 +299,7 @@ const LibraryServicesCMS = () => {
       {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
 
       {/* Search and filter */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4">
+      <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center">
         <div className="relative flex-grow">
           <input
             type="text"
@@ -269,6 +322,15 @@ const LibraryServicesCMS = () => {
               </svg>
             )}
           </button>
+        </div>
+        <div className="flex items-center">
+          <label className="inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked={showArchived} onChange={toggleShowArchived} className="sr-only peer" />
+            <div className="relative w-11 h-6 bg-grey peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-arcadia-red"></div>
+            <span className="ms-3 text-sm font-medium text-gray-700">
+              {showArchived ? "Showing Archived" : "Show Archived"}
+            </span>
+          </label>
         </div>
       </div>
 
@@ -299,6 +361,7 @@ const LibraryServicesCMS = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Description
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
@@ -319,7 +382,7 @@ const LibraryServicesCMS = () => {
               </tr>
             ) : (
               services.map((service) => (
-                <tr key={service.id} className="hover:bg-gray-50">
+                <tr key={service.id} className={`hover:bg-gray-50 ${service.isarchived ? "bg-gray-100" : ""}`}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{service.displayOrder || "-"}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {service.imageUrl ? (
@@ -336,14 +399,30 @@ const LibraryServicesCMS = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{service.title}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{service.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {service.isarchived ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        Archived
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Active
+                      </span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button onClick={() => handleEdit(service)} className="text-arcadia-red hover:underline">
                         Edit
                       </button>
-                      <button onClick={() => handleDeleteClick(service)} className="text-arcadia-red hover:underline">
-                        Delete
+                      <button onClick={() => handleArchiveClick(service)} className="text-arcadia-red hover:underline">
+                        {service.isarchived ? "Restore" : "Archive"}
                       </button>
+                      {service.isarchived && (
+                        <button onClick={() => handleDeleteClick(service)} className="text-arcadia-red hover:underline">
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -450,13 +529,45 @@ const LibraryServicesCMS = () => {
         </div>
       )}
 
+      {/* Archive Confirmation Modal */}
+      {isArchiveModalOpen && serviceToArchive && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">
+              {serviceToArchive.isarchived ? "Restore Service" : "Archive Service"}
+            </h2>
+            <p className="mb-6">
+              {serviceToArchive.isarchived
+                ? `Are you sure you want to restore the service "${serviceToArchive.title}"? This will make it visible to users again.`
+                : `Are you sure you want to archive the service "${serviceToArchive.title}"? This will hide it from users but keep it in your database.`}
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setIsArchiveModalOpen(false)}
+                className="px-4 py-2 border border-grey rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleArchive}
+                className="px-4 py-2 bg-arcadia-red hover:bg-grey hover:text-black text-white rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                disabled={loading}
+              >
+                {loading ? "Processing..." : serviceToArchive.isarchived ? "Restore" : "Archive"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && serviceToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
             <p className="mb-6">
-              Are you sure you want to delete the service "{serviceToDelete.title}"? This action cannot be undone.
+              Are you sure you want to permanently delete the service "{serviceToDelete.title}"? This action cannot be
+              undone.
             </p>
             <div className="flex justify-end space-x-3">
               <button

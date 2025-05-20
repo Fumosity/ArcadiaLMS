@@ -252,9 +252,9 @@ const CurrentBookInventory = ({ onBookSelect }) => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Pub. Year:</span>
             <input
-              type="text"
+              type="number"
               className="bg-gray-200 py-1 px-2 border border-grey rounded-lg text-sm w-[90px]"
-              placeholder="YYYY-MM"
+              placeholder="YYYY"
               value={pubDateFilter}
               onChange={(e) => setPubDateFilter(e.target.value)}
             />

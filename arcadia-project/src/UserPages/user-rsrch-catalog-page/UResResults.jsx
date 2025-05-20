@@ -9,9 +9,37 @@ const UResResults = ({ query }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const entriesPerPage = 8
   const navigate = useNavigate()
+  const [collegeArchiveStatus, setCollegeArchiveStatus] = useState({})
+  const [showArchivedColleges, setShowArchivedColleges] = useState(false)
 
   // Get filter state from context
   const { selectedYear, yearRange, selectedCollege, selectedDepartment, sortOption } = useResearchFilters()
+
+  // Fetch college archive status
+  useEffect(() => {
+    const fetchCollegeStatus = async () => {
+      try {
+        const { data, error } = await supabase.from("college_list").select("college, isarchived")
+
+        if (error) {
+          console.error("Error fetching college status:", error)
+          return
+        }
+
+        // Create a map of college abbreviations to their archive status
+        const archiveStatusMap = {}
+        data.forEach((college) => {
+          archiveStatusMap[college.college] = college.isarchived || false
+        })
+
+        setCollegeArchiveStatus(archiveStatusMap)
+      } catch (error) {
+        console.error("Error processing college status:", error)
+      }
+    }
+
+    fetchCollegeStatus()
+  }, [])
 
   useEffect(() => {
     const fetchResearch = async () => {
@@ -40,6 +68,15 @@ const UResResults = ({ query }) => {
   useEffect(() => {
     if (researchList.length > 0) {
       let results = [...researchList]
+
+      // Filter out research from archived colleges unless showArchivedColleges is true
+      results = results.filter((research) => {
+        // If college is archived and we're not showing archived, filter it out
+        if (collegeArchiveStatus[research.college] && !showArchivedColleges) {
+          return false
+        }
+        return true
+      })
 
       // Filter by search query
       if (query) {
@@ -149,7 +186,17 @@ const UResResults = ({ query }) => {
       // Reset to first page when filters change
       setCurrentPage(1)
     }
-  }, [query, researchList, selectedYear, yearRange, selectedCollege, selectedDepartment, sortOption])
+  }, [
+    query,
+    researchList,
+    selectedYear,
+    yearRange,
+    selectedCollege,
+    selectedDepartment,
+    sortOption,
+    collegeArchiveStatus,
+    showArchivedColleges,
+  ])
 
   const totalPages = Math.ceil(filteredResearch.length / entriesPerPage)
   const displayedResearch = filteredResearch.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage)
@@ -211,6 +258,9 @@ const UResResults = ({ query }) => {
 
   const activeFilters = getActiveFilters()
 
+  // Check if there are any archived colleges in the current search results
+  const hasArchivedColleges = researchList.some((research) => collegeArchiveStatus[research.college])
+
   return (
     <div className="uMain-cont">
       {query && (
@@ -230,9 +280,30 @@ const UResResults = ({ query }) => {
         </h2>
       )}
 
+      {/* Show archived toggle if there are archived colleges */}
+      {hasArchivedColleges && (
+        <div className="flex items-center mb-4">
+          {/* <label className="inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showArchivedColleges}
+              onChange={() => setShowArchivedColleges(!showArchivedColleges)}
+              className="sr-only peer"
+            />
+            <div className="relative w-11 h-6 bg-grey peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-arcadia-red"></div>
+            <span className="ms-3 text-sm font-medium text-gray-700">
+              {showArchivedColleges ? "Showing Archived Colleges" : "Show Archived Colleges"}
+            </span>
+          </label> */}
+        </div>
+      )}
+
       <div className="flex flex-col w-full space-y-2 my-4">
         {displayedResearch.map((research, index) => (
-          <div key={index} className="block genCard-cont">
+          <div
+            key={index}
+            className={`block genCard-cont ${collegeArchiveStatus[research.college] ? "bg-gray-50 border-gray-300" : ""}`}
+          >
             <div className="w-full flex flex-col">
               <div className="flex justify-between items-start">
                 <h3 className="w-3/4 text-xl h-auto leading-tight font-ZenSerif whitespace-pre-wrap line-clamp-2 mb-1 truncate break-words">
@@ -249,6 +320,9 @@ const UResResults = ({ query }) => {
               </p>
               <p className="text-gray-400 mb-1 truncate">
                 {research.college}
+                {collegeArchiveStatus[research.college] && (
+                  <span className="ml-1 text-xs text-gray-500 italic">(Archived)</span>
+                )}
                 <span className="ml-1">
                   {research.department && research.department !== "N/A" && `- ${research.department} `}
                 </span>
@@ -272,6 +346,15 @@ const UResResults = ({ query }) => {
           </div>
         ))}
       </div>
+
+      {filteredResearch.length === 0 && !showArchivedColleges && hasArchivedColleges && (
+        <div className="text-center py-4 text-gray-600">
+          <p>No results, some contents maybe hidden.</p>
+          {/* <button className="text-arcadia-red hover:underline mt-2" onClick={() => setShowArchivedColleges(true)}>
+            Show results from archived colleges
+          </button> */}
+        </div>
+      )}
 
       {filteredResearch.length > 0 && (
         <div className="flex justify-center items-center mt-6 space-x-4">

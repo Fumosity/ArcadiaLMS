@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
 
-const CurrentResearchInventory = ({ onResearchSelect }) => {
+const CurrentResearchInventory = ({ onResearchSelect, showArchived = false }) => {
   const [inventoryData, setInventoryData] = useState([])
   const [sortOrder, setSortOrder] = useState("Ascending")
   const [pubDateFilter, setPubDateFilter] = useState("")
@@ -16,6 +16,33 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
   const [collegeType, setCollegeType] = useState("All")
   const [departmentType, setDepartmentType] = useState("All")
   const [availableDepartments, setAvailableDepartments] = useState([])
+  const [collegeArchiveStatus, setCollegeArchiveStatus] = useState({})
+  const [showArchivedColleges, setShowArchivedColleges] = useState(false)
+
+  useEffect(() => {
+    const fetchColleges = async () => {
+      try {
+        const { data, error } = await supabase.from("college_list").select("college, isarchived")
+
+        if (error) {
+          console.error("Error fetching colleges:", error)
+          return
+        }
+
+        // Create a map of college abbreviations to their archive status
+        const archiveStatusMap = {}
+        data.forEach((college) => {
+          archiveStatusMap[college.college] = college.isarchived || false
+        })
+
+        setCollegeArchiveStatus(archiveStatusMap)
+      } catch (error) {
+        console.error("Unexpected error fetching colleges:", error)
+      }
+    }
+
+    fetchColleges()
+  }, [])
 
   useEffect(() => {
     const fetchResearch = async () => {
@@ -48,28 +75,31 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
     if (inventoryData.length > 0) {
       const departments = []
 
-      if (collegeType === "All") {
-        inventoryData.forEach((research) => {
-          if (research.department) {
-            departments.push(research.department)
-          }
-        })
-      } else {
-        inventoryData
-          .filter((research) => research.college === collegeType)
-          .forEach((research) => {
-            if (research.department) {
-              departments.push(research.department)
-            }
-          })
-      }
+      // Filter research by college type and archive status
+      const filteredResearch = inventoryData.filter((research) => {
+        // Skip if college is archived and we're not showing archived
+        if (collegeArchiveStatus[research.college] && !showArchivedColleges) {
+          return false
+        }
+
+        return collegeType === "All" || research.college === collegeType
+      })
+
+      filteredResearch.forEach((research) => {
+        if (research.department) {
+          departments.push(research.department)
+        }
+      })
 
       const uniqueDepartments = [...new Set(departments)]
       setAvailableDepartments(uniqueDepartments)
 
-      setDepartmentType("All")
+      // Reset department filter if the current selection is no longer available
+      if (departmentType !== "All" && !uniqueDepartments.includes(departmentType)) {
+        setDepartmentType("All")
+      }
     }
-  }, [collegeType, inventoryData])
+  }, [collegeType, inventoryData, collegeArchiveStatus, showArchivedColleges])
 
   // Handle sorting
   const sortedData = [...inventoryData].sort((a, b) => {
@@ -82,10 +112,14 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
 
   // Handle filtering and searching
   const filteredData = sortedData.filter((research) => {
+    // Skip if college is archived and we're not showing archived
+    if (collegeArchiveStatus[research.college] && !showArchivedColleges) {
+      return false
+    }
+
     // Filter by publication date if specified
     const matchesPubDate =
-      !pubDateFilter ||
-      (String(research.pubDate).toLowerCase().includes(pubDateFilter.toLowerCase()))
+      !pubDateFilter || String(research.pubDate).toLowerCase().includes(pubDateFilter.toLowerCase())
 
     // Filter by search term
     const matchesSearch =
@@ -123,7 +157,10 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
   const hasResearchForProgram =
     collegeType === "All" ||
     inventoryData.some(
-      (research) => research.college && research.college.toLowerCase().startsWith(collegeType.toLowerCase()),
+      (research) =>
+        research.college &&
+        research.college.toLowerCase().startsWith(collegeType.toLowerCase()) &&
+        (!collegeArchiveStatus[research.college] || showArchivedColleges),
     )
 
   // Pagination logic
@@ -160,6 +197,11 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
       return `${formattedAuthors[0]}, ${formattedAuthors[1]}, ...`
     }
   }
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, collegeType, departmentType, pubDateFilter, showArchivedColleges])
 
   return (
     <div className="bg-white p-4 rounded-lg border-grey border">
@@ -223,7 +265,7 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
           <div className="flex items-center space-x-2">
             <span className="font-medium text-sm">Pub. Year:</span>
             <input
-              type="text"
+              type="number"
               className="bg-gray-200 py-1 px-2 border border-grey rounded-lg text-sm w-[90px]"
               placeholder="YYYY"
               value={pubDateFilter}
@@ -245,7 +287,8 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
               <option value="50">50</option>
             </select>
           </div>
-        </div>
+
+          
 
         {/* Search */}
         <div className="flex items-center space-x-2 min-w-[0]">
@@ -260,6 +303,23 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+        </div>
+
+        {/* Show Archived Toggle */}
+          <div className="flex items-center">
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showArchivedColleges}
+                onChange={() => setShowArchivedColleges(!showArchivedColleges)}
+                className="sr-only peer"
+              />
+              <div className="relative w-11 h-6 bg-grey peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-arcadia-red"></div>
+              <span className="ms-3 text-sm font-medium text-gray-700">
+                {showArchivedColleges ? "Showing Archived" : "Show Archived"}
+              </span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -311,13 +371,16 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
                   key={index}
                   className={`hover:bg-light-gray cursor-pointer ${
                     selectedResearch?.researchID === item.researchID ? "bg-gray-200" : ""
-                  }`}
+                  } ${collegeArchiveStatus[item.college] ? "bg-gray-100" : ""}`}
                   onClick={() => handleRowClick(item)}
                 >
                   <td className="px-4 py-4 text-sm text-gray-900 max-w-36">
                     <div className="flex justify-center">
                       <span className="bookinv-category inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1">
                         {item.department !== "N/A" ? `${item.college} - ${item.department}` : item.college}
+                        {collegeArchiveStatus[item.college] && (
+                          <span className="ml-1 text-xs text-gray-500">(Archived)</span>
+                        )}
                       </span>
                     </div>
                   </td>
@@ -363,8 +426,12 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
               <tr>
                 <td colSpan="6" className="px-4 py-2 text-center text-zinc-600">
                   {collegeType !== "All" && !hasResearchForProgram
-                    ? "No Research under this program yet."
-                    : "No research found."}
+                    ? showArchivedColleges
+                      ? "No Research under this program yet."
+                      : "No active Research under this program. Try enabling 'Show Archived'."
+                    : showArchivedColleges
+                      ? "No research found."
+                      : "No active research found. Try enabling 'Show Archived'."}
                 </td>
               </tr>
             )}
@@ -381,11 +448,13 @@ const CurrentResearchInventory = ({ onResearchSelect }) => {
         >
           Previous Page
         </button>
-        <span className="text-xs text-arcadia-red">Page {currentPage}</span>
+        <span className="text-xs text-arcadia-red">
+          Page {currentPage} of {Math.max(1, totalPages)}
+        </span>
         <button
-          className={`uPage-btn ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
+          className={`uPage-btn ${currentPage === totalPages || totalPages === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-grey"}`}
           onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
+          disabled={currentPage === totalPages || totalPages === 0}
         >
           Next Page
         </button>

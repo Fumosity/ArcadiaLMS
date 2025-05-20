@@ -2,7 +2,6 @@ import React from "react"
 import { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import { supabase } from "../../supabaseClient"
-import UNavbar from "../../components/UserComponents/user-main-comp/UNavbar"
 import USearchBarR from "../../components/UserComponents/user-main-comp/USearchBarR"
 import Title from "../../components/main-comp/Title"
 import URFilterSidebar from "../../components/UserComponents/user-rsrch-catalog-comp/URFilterSidebar"
@@ -19,8 +18,8 @@ import { Filter } from "lucide-react"
 
 const URsrchCatalog = () => {
   useEffect(() => {
-    document.title = "Arcadia | Research Catalog";
-}, []);
+    document.title = "Arcadia | Research Catalog"
+  }, [])
   const [query, setSearchQuery] = useState("")
   const { user, updateUser } = useUser()
   const location = useLocation()
@@ -34,6 +33,7 @@ const URsrchCatalog = () => {
   const [resultsLoading, setResultsLoading] = useState(false)
   const [seeMoreComponent, setSeeMoreComponent] = useState(null)
   const isGuest = user?.userAccountType === "Guest"
+  const [collegeArchiveStatus, setCollegeArchiveStatus] = useState({})
 
   React.useEffect(() => {
     if (window.location.hash) {
@@ -45,6 +45,32 @@ const URsrchCatalog = () => {
         }, 300)
       }
     }
+  }, [])
+
+  // Fetch college archive status
+  useEffect(() => {
+    const fetchCollegeStatus = async () => {
+      try {
+        const { data, error } = await supabase.from("college_list").select("college, isarchived")
+
+        if (error) {
+          console.error("Error fetching college status:", error)
+          return
+        }
+
+        // Create a map of college abbreviations to their archive status
+        const archiveStatusMap = {}
+        data.forEach((college) => {
+          archiveStatusMap[college.college] = college.isarchived || false
+        })
+
+        setCollegeArchiveStatus(archiveStatusMap)
+      } catch (error) {
+        console.error("Error processing college status:", error)
+      }
+    }
+
+    fetchCollegeStatus()
   }, [])
 
   // Check URL query parameters on component mount
@@ -148,8 +174,7 @@ const URsrchCatalog = () => {
     window.history.pushState({}, "", url)
   }
 
-  // These functions are placeholders to match the expected function signatures
-  // They should be imported from the actual components in a real implementation
+  // Modified to respect archived colleges
   const fetchRecommendedResearch = async (userCollege, userDepartment) => {
     try {
       console.log(userCollege, userDepartment)
@@ -162,11 +187,14 @@ const URsrchCatalog = () => {
 
         if (researchError) throw researchError
 
+        // Filter out research from archived colleges
+        const filteredResearch = research.filter((paper) => !collegeArchiveStatus[paper.college])
+
         const currentYear = new Date().getFullYear()
         const fiveYearsAgo = currentYear - 5
 
         // Sort by department first, then prioritize within COECSA
-        const sortedResearch = research
+        const sortedResearch = filteredResearch
           .map((paper) => ({
             ...paper,
             isSameDepartment: paper.department === userDepartment ? 1 : 0, // Highest priority
@@ -188,10 +216,13 @@ const URsrchCatalog = () => {
 
         if (researchError) throw researchError
 
+        // Filter out research from archived colleges
+        const filteredResearch = research.filter((paper) => !collegeArchiveStatus[paper.college])
+
         const currentYear = new Date().getFullYear()
         const fiveYearsAgo = currentYear - 5
 
-        const sortedResearch = research
+        const sortedResearch = filteredResearch
           .map((paper) => ({
             ...paper,
             priority: (paper.pdf ? 2 : 0) + (paper.pubdate >= fiveYearsAgo ? 1 : 0),
@@ -208,6 +239,7 @@ const URsrchCatalog = () => {
     }
   }
 
+  // Modified to respect archived colleges
   const fetchNewlyAddedResearch = async () => {
     try {
       const { data: research, error } = await supabase
@@ -217,8 +249,11 @@ const URsrchCatalog = () => {
 
       if (error) throw error
 
-      console.log({ research })
-      return { research }
+      // Filter out research from archived colleges
+      const filteredResearch = research.filter((paper) => !collegeArchiveStatus[paper.college])
+
+      console.log({ filteredResearch })
+      return { research: filteredResearch }
     } catch (error) {
       console.error("Error fetching newly added research:", error)
       return { research: [] }
@@ -256,7 +291,7 @@ const URsrchCatalog = () => {
             <div className="lg:w-1/4 lg:block md:hidden space-y-4">
               <ArcOpHr />
               <UpEvents />
-              {!isGuest &&<Services />}
+              {!isGuest && <Services />}
             </div>
           )}
 
@@ -327,4 +362,3 @@ const URsrchCatalog = () => {
 }
 
 export default URsrchCatalog
-
