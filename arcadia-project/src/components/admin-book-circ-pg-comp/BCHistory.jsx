@@ -5,6 +5,7 @@ import LibBookCirc from "../admin-lib-analytics-comp/LibBookCirc"
 import BookReceiptView from "../../z_modals/BookReceiptView"
 import { toast } from "react-toastify";
 import { useUser } from "../../backend/UserContext"
+import PrintReportModal from "../../z_modals/PrintTableReport"
 
 const BCHistory = () => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -17,6 +18,7 @@ const BCHistory = () => {
   const [loading, setLoading] = useState(true)
   const [transactionContent, setTransactionContent] = useState([])
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   const { user } = useUser()
   console.log(user)
@@ -373,20 +375,30 @@ const BCHistory = () => {
           </div>
         </div>
 
-        {/* Search */}
-        <div className="flex items-center space-x-2 min-w-[0]">
-          <label htmlFor="search" className="font-medium text-sm">
-            Search:
-          </label>
-          <input
-            type="text"
-            id="search"
-            className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
-            placeholder="Title, borrower, or barcode"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+
+        <div>
+          <button
+            className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+            onClick={() => setIsPrintModalOpen(true)}
+          >
+            Print Report
+          </button>
         </div>
+      </div>
+
+      {/* Search */}
+      <div className="flex items-center space-x-2 min-w-[0]">
+        <label htmlFor="search" className="font-medium text-sm">
+          Search:
+        </label>
+        <input
+          type="text"
+          id="search"
+          className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+          placeholder="Title, borrower, or barcode"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
       {/* Table */}
@@ -503,6 +515,19 @@ const BCHistory = () => {
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={() => handleReceiptPrint(transactionContent)}
         content={transactionContent}
+      />
+      <PrintReportModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        filteredData={filteredData} // Pass the filtered data
+        reportType={"BookCirculation"}
+        filters={{
+          type: typeFilter,
+          dateRange,
+          sortOrder,
+          searchTerm,
+        }}
+        username={username}
       />
     </div>
   )

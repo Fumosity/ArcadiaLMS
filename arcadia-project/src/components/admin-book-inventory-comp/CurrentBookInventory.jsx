@@ -4,6 +4,8 @@ import { Link } from "react-router-dom"
 import BookCopies from "../../z_modals/BookCopies"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
+import { useUser } from "../../backend/UserContext"
+import PrintReportModal from "../../z_modals/PrintTableReport"
 
 const CurrentBookInventory = ({ onBookSelect }) => {
   const [inventoryData, setInventoryData] = useState([])
@@ -19,6 +21,12 @@ const CurrentBookInventory = ({ onBookSelect }) => {
   const [categoryType, setCategoryType] = useState("All")
   const [genreType, setGenreType] = useState("All")
   const [availableGenres, setAvailableGenres] = useState([])
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+
+  const { user } = useUser()
+  console.log(user)
+  const username = user.userFName + " " + user.userLName
+  console.log(username)
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -275,7 +283,16 @@ const CurrentBookInventory = ({ onBookSelect }) => {
             </select>
           </div>
         </div>
-        {/* Search */}
+        <div>
+          <button
+            className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+            onClick={() => setIsPrintModalOpen(true)}
+          >
+            Print Report
+          </button>
+        </div>
+      </div>
+      {/* Search */}
         <div className="flex items-center space-x-2 min-w-[0]">
           <label htmlFor="search" className="font-medium text-sm">
             Search:
@@ -289,7 +306,6 @@ const CurrentBookInventory = ({ onBookSelect }) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -450,6 +466,19 @@ const CurrentBookInventory = ({ onBookSelect }) => {
       {isModalOpen && selectedBook && (
         <BookCopies isOpen={isModalOpen} onClose={closeModal} titleID={selectedBook.titleID} />
       )}
+      <PrintReportModal
+              isOpen={isPrintModalOpen}
+              onClose={() => setIsPrintModalOpen(false)}
+              filteredData={filteredData} // Pass the filtered data
+              reportType={"BookInventory"}
+              filters={{
+                type: [genreType, categoryType],
+                pubDateFilter,
+                sortOrder,
+                searchTerm,
+              }}
+              username={username}
+            />
     </div>
   )
 }

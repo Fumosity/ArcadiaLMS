@@ -44,6 +44,7 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
                 bookLocation: '',
                 bookAcqDate: '',
                 bookID: null,
+                notes: ''
             });
             setStatusColor('');
         }
@@ -91,14 +92,14 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
             return;
         }
 
-        const { bookStatus, bookBarcode, bookAcqDate } = formData;
+        const { bookStatus, bookBarcode, bookAcqDate, notes } = formData;
         console.log("Are we in Add Mode?", isAddMode)
         try {
             if (!isAddMode && formData.bookID) {
                 // Editing an existing copy
                 const { error } = await supabase
                     .from('book_indiv')
-                    .update({ bookStatus, bookBarcode, bookAcqDate })
+                    .update({ bookStatus, bookBarcode, bookAcqDate, notes})
                     .eq('bookID', formData.bookID);
 
                 if (error) {
@@ -121,6 +122,7 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
                         bookStatus,
                         bookBarcode,
                         bookAcqDate,
+                        notes,
                         titleID: titleID, // Add titleID here
                     });
 
@@ -235,6 +237,16 @@ export default function ABCopiesMgmt({ formData, setFormData, originalFormData, 
                         onChange={handleChange}
                         style={validationErrors.bookAcqDate ? errorStyle : {}}
                         placeholder="Book Acquisition Date"
+                    />
+                </div>
+                <div className="flex justify-between items-center" key="notes">
+                    <label className="w-1/4">Notes:</label>
+                    <textarea name="notes" required
+                        className="w-2/3 px-3 py-1 rounded-2xl border border-grey"
+                        value={formData.notes}
+                        onChange={handleChange}
+                        style={validationErrors.notes ? errorStyle : {}}
+                        placeholder="Enter notes here..."
                     />
                 </div>
             </form>

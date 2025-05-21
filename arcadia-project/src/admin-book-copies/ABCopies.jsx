@@ -28,6 +28,7 @@ const ABCopies = () => {
     bookLocation: "",
     bookAcqDate: "",
     bookID: "",
+    notes: "",
     titleID: null,
   })
 
@@ -42,6 +43,7 @@ const ABCopies = () => {
       bookLocation: selectedCopy.book_titles.location || "",
       bookAcqDate: selectedCopy.bookAcqDate || "",
       bookID: selectedCopy.bookID,
+      notes: selectedCopy.notes,
       titleID: selectedCopy.titleID,
     }
 
@@ -74,6 +76,7 @@ const ABCopies = () => {
           bookLocation: data.location || "",
           bookAcqDate: "",
           bookID: "",
+          notes: "",
           titleID: null,
         })
       } else {
@@ -85,6 +88,7 @@ const ABCopies = () => {
           bookLocation: "",
           bookAcqDate: "",
           bookID: "",
+          notes: "",
           titleID: null,
         })
         console.error("Book title not found")
@@ -97,6 +101,7 @@ const ABCopies = () => {
         bookLocation: "",
         bookAcqDate: "",
         bookID: "",
+        notes: "",
         titleID: null,
       })
       console.error("titleID is not set")

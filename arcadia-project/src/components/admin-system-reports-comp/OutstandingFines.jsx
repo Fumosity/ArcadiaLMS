@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react"
 import { supabase } from "/src/supabaseClient.js"
 import { useNavigate, Link } from "react-router-dom"
+import PrintReportModal from "../../z_modals/PrintTableReport"
+import { useUser } from "../../backend/UserContext"
 
 function OutstandingFines({ onDataExport }) {
   const [bkHistoryData, setBkhistoryData] = useState([])
   const [damageFinesData, setDamageFinesData] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [damageSearchTerm, setDamageSearchTerm] = useState("")
+  const [isPrintOverdueModalOpen, setIsPrintOverdueModalOpen] = useState(false);
+  const [isPrintDamagesModalOpen, setIsPrintDamagesModalOpen] = useState(false);
   const navigate = useNavigate()
+
+  const { user } = useUser()
+  console.log(user)
+  const username = user.userFName + " " + user.userLName
+  console.log(username)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +44,9 @@ function OutstandingFines({ onDataExport }) {
                         user_accounts(
                             userFName, 
                             userLName, 
-                            userLPUID)
+                            userLPUID,
+                            userCollege,
+                            userDepartment)
                         `)
           .not("deadline", "is.null")
           .lt("deadline", today.toISOString().split("T")[0])
@@ -66,11 +77,12 @@ function OutstandingFines({ onDataExport }) {
               acc[userId] = {
                 user_id: userId,
                 user_name: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
+                user_college: item.user_accounts.userCollege,
+                user_department: item.user_accounts.userDepartment,
                 school_id: item.user_accounts.userLPUID,
                 book_title: bookDetails.book_titles.title,
                 book_title_id: bookDetails.book_titles.titleID,
                 book_barcode: item.bookBarcode,
-                days_overdue: 0,
                 deadline,
                 checkout_date,
                 checkout_time,
@@ -107,7 +119,9 @@ function OutstandingFines({ onDataExport }) {
     user_accounts (
         userFName,
         userLName,
-        userLPUID
+        userLPUID,
+        userCollege,
+        userDepartment
     )
 `)
           .eq("book_indiv.bookStatus", "Damaged") // Get only damaged book transactions
@@ -135,6 +149,8 @@ function OutstandingFines({ onDataExport }) {
               book_title: bookDetails.title,
               book_title_id: bookDetails.titleID,
               fine: bookDetails.price || 0,
+              user_college: item.user_accounts.userCollege,
+              user_department: item.user_accounts.userDepartment,
               user_name: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
               school_id: item.user_accounts.userLPUID,
             }
@@ -286,6 +302,14 @@ function OutstandingFines({ onDataExport }) {
           </div>
         </div>
       </div>
+      <div className="w-full flex justify-end mb-2 -mt-2">
+        <button
+          className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+          onClick={() => setIsPrintOverdueModalOpen(true)}
+        >
+          Print Report
+        </button>
+      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead>
@@ -389,15 +413,24 @@ function OutstandingFines({ onDataExport }) {
               onChange={(e) => setDamageSearchTerm(e.target.value)}
             />
           </div>
+
         </div>
+      </div>
+      <div className="w-full flex justify-end mb-2 -mt-2">
+        <button
+          className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+          onClick={() => setIsPrintDamagesModalOpen(true)}
+        >
+          Print Report
+        </button>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead>
             <tr>
               <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Fine</th>
-              <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Barcode</th>
               <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Book Title</th>
+              <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Barcode</th>
               <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Name</th>
               <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">School ID</th>
             </tr>
@@ -459,6 +492,28 @@ function OutstandingFines({ onDataExport }) {
           Next Page
         </button>
       </div>
+      <PrintReportModal
+        isOpen={isPrintOverdueModalOpen}
+        onClose={() => setIsPrintOverdueModalOpen(false)}
+        filteredData={outstandingFilteredData} // Pass the filtered data
+        reportType={"Outstanding"}
+        filters={{
+          outstandingSortOrder,
+          searchTerm,
+        }}
+        username={username}
+      />
+      <PrintReportModal
+        isOpen={isPrintDamagesModalOpen}
+        onClose={() => setIsPrintDamagesModalOpen(false)}
+        filteredData={damagedFilteredData} // Pass the filtered data
+        reportType={"Damaged"}
+        filters={{
+          damagedSortOrder,
+          damageSearchTerm,
+        }}
+        username={username}
+      />
     </div>
   )
 }

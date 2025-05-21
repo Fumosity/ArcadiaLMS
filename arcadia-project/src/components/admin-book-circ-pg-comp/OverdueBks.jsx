@@ -1,6 +1,8 @@
 import { supabase } from "../../supabaseClient"
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import PrintReportModal from "../../z_modals/PrintTableReport"
+import { useUser } from "../../backend/UserContext"
 
 const OverdueBks = () => {
   const [sortOrder, setSortOrder] = useState("Descending")
@@ -11,6 +13,13 @@ const OverdueBks = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [overdueData, setOverdueData] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+
+  const { user } = useUser()
+  console.log(user)
+  const username = user.userFName + " " + user.userLName
+  console.log(username)
+
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -38,12 +47,15 @@ const OverdueBks = () => {
                                 titleID,
                                 title,
                                 price
-                            )
+                            ),
+                            notes
                         ),
                         user_accounts (
                             userFName,
                             userLName,
-                            userLPUID
+                            userLPUID,
+                            userCollege,
+                            userDepartment
                         )`)
           .not("deadline", "is.null")
           .lt("deadline", today.toISOString().split("T")[0])
@@ -102,8 +114,12 @@ const OverdueBks = () => {
               date: formattedDate,
               time: formattedTime,
               borrower: `${item.user_accounts.userFName} ${item.user_accounts.userLName}`,
+              user_college: item.user_accounts.userCollege,
+              user_department: item.user_accounts.userDepartment,
+              school_id: item.user_accounts.userLPUID,
               bookTitle: bookDetails.title,
               bookBarcode: item.book_indiv.bookBarcode,
+              notes: item.book_indiv.notes,
               userId: item.userID,
               titleID: bookDetails.titleID,
               rawDeadline: item.deadline, // Keep original for sorting
@@ -239,8 +255,17 @@ const OverdueBks = () => {
             </select>
           </div>
         </div>
-
-        {/* Search */}
+<div>
+        <button
+          className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+          onClick={() => setIsPrintModalOpen(true)}
+        >
+          Print Report
+        </button>
+      </div>
+        
+      </div>
+      {/* Search */}
         <div className="flex items-center space-x-2 min-w-[0]">
           <label htmlFor="search" className="font-medium text-sm">
             Search:
@@ -254,8 +279,6 @@ const OverdueBks = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-      </div>
-
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -344,6 +367,18 @@ const OverdueBks = () => {
           Next Page
         </button>
       </div>
+      <PrintReportModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        filteredData={filteredData} // Pass the filtered data
+        reportType={"OverdueBooks"}
+        filters={{
+          dateRange,
+          sortOrder,
+          searchTerm,
+        }}
+        username={username}
+      />
     </div>
   )
 }

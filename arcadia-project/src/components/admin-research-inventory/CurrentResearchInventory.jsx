@@ -3,6 +3,8 @@ import { supabase } from "/src/supabaseClient.js"
 import { Link } from "react-router-dom"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
+import { useUser } from "../../backend/UserContext"
+import PrintReportModal from "../../z_modals/PrintTableReport"
 
 const CurrentResearchInventory = ({ onResearchSelect, showArchived = false }) => {
   const [inventoryData, setInventoryData] = useState([])
@@ -18,6 +20,12 @@ const CurrentResearchInventory = ({ onResearchSelect, showArchived = false }) =>
   const [availableDepartments, setAvailableDepartments] = useState([])
   const [collegeArchiveStatus, setCollegeArchiveStatus] = useState({})
   const [showArchivedColleges, setShowArchivedColleges] = useState(false)
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+
+  const { user } = useUser()
+  console.log(user)
+  const username = user.userFName + " " + user.userLName
+  console.log(username)
 
   useEffect(() => {
     const fetchColleges = async () => {
@@ -288,24 +296,34 @@ const CurrentResearchInventory = ({ onResearchSelect, showArchived = false }) =>
             </select>
           </div>
 
+
+          <div>
+            <button
+              className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+              onClick={() => setIsPrintModalOpen(true)}
+            >
+              Print Report
+            </button>
+          </div>
+
           
-
-        {/* Search */}
-        <div className="flex items-center space-x-2 min-w-[0]">
-          <label htmlFor="search" className="font-medium text-sm">
-            Search:
-          </label>
-          <input
-            type="text"
-            id="search"
-            className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
-            placeholder="Title, author, or keywords"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
         </div>
+        {/* Search */}
+          <div className="flex items-center space-x-2 min-w-[0]">
+            <label htmlFor="search" className="font-medium text-sm">
+              Search:
+            </label>
+            <input
+              type="text"
+              id="search"
+              className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+              placeholder="Title, author, or keywords"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-        {/* Show Archived Toggle */}
+          {/* Show Archived Toggle */}
           <div className="flex items-center">
             <label className="inline-flex items-center cursor-pointer">
               <input
@@ -320,7 +338,6 @@ const CurrentResearchInventory = ({ onResearchSelect, showArchived = false }) =>
               </span>
             </label>
           </div>
-        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -369,9 +386,8 @@ const CurrentResearchInventory = ({ onResearchSelect, showArchived = false }) =>
               displayedResearch.map((item, index) => (
                 <tr
                   key={index}
-                  className={`hover:bg-light-gray cursor-pointer ${
-                    selectedResearch?.researchID === item.researchID ? "bg-gray-200" : ""
-                  } ${collegeArchiveStatus[item.college] ? "bg-gray-100" : ""}`}
+                  className={`hover:bg-light-gray cursor-pointer ${selectedResearch?.researchID === item.researchID ? "bg-gray-200" : ""
+                    } ${collegeArchiveStatus[item.college] ? "bg-gray-100" : ""}`}
                   onClick={() => handleRowClick(item)}
                 >
                   <td className="px-4 py-4 text-sm text-gray-900 max-w-36">
@@ -459,6 +475,19 @@ const CurrentResearchInventory = ({ onResearchSelect, showArchived = false }) =>
           Next Page
         </button>
       </div>
+      <PrintReportModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        filteredData={filteredData} // Pass the filtered data
+        reportType={"ResearchInventory"}
+        filters={{
+          type: [collegeType, departmentType],
+          pubDateFilter,
+          sortOrder,
+          searchTerm,
+        }}
+        username={username}
+      />
     </div>
   )
 }

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "../../supabaseClient.js"; // Adjust the import path as necessary.
 import { useNavigate } from "react-router-dom"; // Ensure you're using the useNavigate hook
+import { useUser } from "../../backend/UserContext.jsx";
+import PrintReportModal from "../../z_modals/PrintTableReport.jsx";
 
 const ListOfAdminAcc = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -12,6 +14,12 @@ const ListOfAdminAcc = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const adminAccountsRef = useRef(null);
+    const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+
+    const { user } = useUser()
+    console.log(user)
+    const username = user.userFName + " " + user.userLName
+    console.log(username)
 
 
     useEffect(() => {
@@ -156,20 +164,28 @@ const ListOfAdminAcc = () => {
                             </select>
                         </div>
                     </div>
-                    {/* Search */}
-                    <div className="flex items-center space-x-2 min-w-[0]">
-                        <label htmlFor="search" className="font-medium text-sm">Search:</label>
-                        <input
-                            type="text"
-                            id="search"
-                            className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
-                            placeholder="Name, email, or ID"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                    <div>
+                        <button
+                            className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+                            onClick={() => setIsPrintModalOpen(true)}
+                        >
+                            Print Report
+                        </button>
                     </div>
-                </div>
 
+                </div>
+                {/* Search */}
+                <div className="flex items-center space-x-2 min-w-[0]">
+                    <label htmlFor="search" className="font-medium text-sm">Search:</label>
+                    <input
+                        type="text"
+                        id="search"
+                        className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+                        placeholder="Name, email, or ID"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
                 {/* Table */}
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y ">
@@ -220,6 +236,18 @@ const ListOfAdminAcc = () => {
                     </button>
                 </div>
             </div>
+            <PrintReportModal
+                isOpen={isPrintModalOpen}
+                onClose={() => setIsPrintModalOpen(false)}
+                filteredData={filteredData} // Pass the filtered data
+                reportType={"AdminAccounts"}
+                filters={{
+                    type: typeFilter,
+                    sortOrder,
+                    searchTerm,
+                }}
+                username={username}
+            />
         </div>
     );
 };

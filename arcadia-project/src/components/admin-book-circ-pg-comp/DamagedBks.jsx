@@ -1,6 +1,8 @@
 import { supabase } from "../../supabaseClient"
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { useUser } from "../../backend/UserContext"
+import PrintReportModal from "../../z_modals/PrintTableReport"
 
 const DamagedBks = () => {
   const [sortOrder, setSortOrder] = useState("Descending")
@@ -11,6 +13,12 @@ const DamagedBks = () => {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const [dateRange, setDateRange] = useState("All Time")
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+
+  const { user } = useUser()
+  console.log(user)
+  const username = user.userFName + " " + user.userLName
+  console.log(username)
 
   useEffect(() => {
     // Fetch damaged book data from Supabase
@@ -23,6 +31,7 @@ const DamagedBks = () => {
                         bookBarcode,
                         bookStatus,
                         bookAcqDate,
+                        notes,
                         book_titles (
                             titleID,
                             title,
@@ -35,7 +44,9 @@ const DamagedBks = () => {
                             user_accounts (
                                 userFName,
                                 userLName,
-                                userLPUID
+                                userLPUID,
+                                userCollege,
+                                userDepartment
                             )
                         )
                     `)
@@ -51,6 +62,9 @@ const DamagedBks = () => {
             let checkinDate = null
             let borrower = "N/A"
             let userId = null
+            let school_id = null
+            let user_college = null
+            let user_department = null
 
             if (item.book_transactions && item.book_transactions.length > 0) {
               // Sort transactions by checkinDate (most recent first)
@@ -68,6 +82,9 @@ const DamagedBks = () => {
 
                 if (lastTransaction.user_accounts) {
                   borrower = `${lastTransaction.user_accounts.userFName} ${lastTransaction.user_accounts.userLName}`
+                  user_college = lastTransaction.user_accounts.userCollege
+                  user_department = lastTransaction.user_accounts.userDepartment
+                  school_id = lastTransaction.user_accounts.userLPUID
                   userId = lastTransaction.userID
                 }
               }
@@ -93,12 +110,16 @@ const DamagedBks = () => {
               rawDate: checkinDate, // Keep original for sorting
               dateAcquired: formattedDate,
               borrower: borrower,
+              user_college: user_college,
+              user_department: user_department,
+              school_id: school_id,
               bookTitle: bookDetails.title || "Unknown Title",
               publisher: bookDetails.publisher || "Unknown Publisher",
               bookBarcode: item.bookBarcode,
               userId: userId,
               titleID: bookDetails.titleID,
               price: bookDetails.price || "N/A",
+              notes: item.notes
             }
           })
 
@@ -234,21 +255,29 @@ const DamagedBks = () => {
             </select>
           </div>
         </div>
-
-        {/* Search */}
-        <div className="flex items-center space-x-2 min-w-[0]">
-          <label htmlFor="search" className="font-medium text-sm">
-            Search:
-          </label>
-          <input
-            type="text"
-            id="search"
-            className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
-            placeholder="Title, publisher, borrower, or barcode"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div>
+          <button
+            className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+            onClick={() => setIsPrintModalOpen(true)}
+          >
+            Print Report
+          </button>
         </div>
+      </div>
+
+      {/* Search */}
+      <div className="flex items-center space-x-2 min-w-[0]">
+        <label htmlFor="search" className="font-medium text-sm">
+          Search:
+        </label>
+        <input
+          type="text"
+          id="search"
+          className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+          placeholder="Title, publisher, borrower, or barcode"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
       {/* Table */}
@@ -345,6 +374,18 @@ const DamagedBks = () => {
           Next Page
         </button>
       </div>
+      <PrintReportModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        filteredData={filteredData} // Pass the filtered data
+        reportType={"DamagedBooks"}
+        filters={{
+          dateRange,
+          sortOrder,
+          searchTerm,
+        }}
+        username={username}
+      />
     </div>
   )
 }
