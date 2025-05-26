@@ -4,6 +4,67 @@ import { supabase } from "../../../supabaseClient";
 import { useLocation } from "react-router-dom";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { locClassifications, locSubclassifications, ddcClassifications, ddcSubclassifications } from "../../../utils/classificationData";
+
+function getSubjectDescription(callNo, classificationType) {
+    if (!callNo || !classificationType) return "";
+
+    const cleanedCallNo = callNo.trim();
+
+    if (classificationType === "LoC") {
+        const mainClassMatch = cleanedCallNo.match(/^([A-Z]{1,3})/);
+        if (mainClassMatch) {
+            const mainClassPrefix = mainClassMatch[1];
+            let descriptionParts = [];
+            let mainDescription = locClassifications[mainClassPrefix.charAt(0)]; // Get primary class from first letter
+
+            if (mainDescription) {
+                descriptionParts.push(`Class ${mainClassPrefix.charAt(0)} ${mainDescription}`);
+            }
+
+            // Try to find a more specific subclass
+            let foundSubclass = false;
+            // Iterate over subclass keys, prioritizing longer matches (e.g., 'QA' before 'Q')
+            const sortedSubclassKeys = Object.keys(locSubclassifications).sort((a, b) => b.length - a.length);
+
+            for (const subPrefix of sortedSubclassKeys) {
+                if (cleanedCallNo.startsWith(subPrefix)) {
+                    descriptionParts.push(`Subclass ${subPrefix} ${locSubclassifications[subPrefix]}`);
+                    foundSubclass = true;
+                    break;
+                }
+            }
+
+            return descriptionParts.join(", ");
+        }
+    } else if (classificationType === "DDC") {
+        const mainDivisionMatch = cleanedCallNo.match(/^(\d{3})/);
+        if (mainDivisionMatch) {
+            const mainDivision = mainDivisionMatch[1];
+            let descriptionParts = [];
+
+            let mainDescription = ddcClassifications[mainDivision.substring(0, 3) + "00".substring(mainDivision.length - 1)]; // Get main division e.g., for 510, get 500
+            if (mainDescription) {
+                descriptionParts.push(`${mainDivision.substring(0, 1)}00s ${mainDescription}`); // E.g., 500s Science
+            }
+
+            let foundSubdivision = false;
+            // Iterate over subdivision keys, prioritizing longer matches
+            const sortedSubdivisionKeys = Object.keys(ddcSubclassifications).sort((a, b) => b.length - a.length);
+
+            for (const subDivision of sortedSubdivisionKeys) {
+                if (cleanedCallNo.startsWith(subDivision)) {
+                    descriptionParts.push(`Division ${subDivision} ${ddcSubclassifications[subDivision]}`);
+                    foundSubdivision = true;
+                    break;
+                }
+            }
+
+            return descriptionParts.join(", ");
+        }
+    }
+    return "";
+}
 
 export default function Pathfinder({ book }) {
     const [gridData, setGridData] = useState([]);
@@ -19,11 +80,18 @@ export default function Pathfinder({ book }) {
 
     let callNo = ""
     let callNoPrefix = "";
+    let subjectDescription = ""; // New variable for the subject description
 
     if (book) {
         callNo = book.titleCallNum || book.researchCallNum;
         callNoPrefix = callNo.trim().split(/[\s-]/)[0];
         //console.log(callNo, callNoPrefix);
+        if (book.titleCallNum) {
+            const classificationType = getClassificationType(callNo); // Determine classification here
+            subjectDescription = getSubjectDescription(callNo, classificationType);
+        } else if (book.researchCallNum) {
+            subjectDescription = "the Periodicals Section";
+        }
     }
 
     const locations = {
@@ -582,6 +650,9 @@ export default function Pathfinder({ book }) {
                 <>
                     <div className="w-full text-center font-semibold text-lg mb-3">
                         {callNo} is located at the {book.location}
+                        {subjectDescription && (
+                            <><br /> at {subjectDescription}</>
+                        )}
                     </div>
                     <div className="my-4 flex justify-center overflow-auto">
                         <div style={gridStyle}>
@@ -598,7 +669,7 @@ export default function Pathfinder({ book }) {
                         {[
                             { label: "Entrance", color: "#2980b9" },
                             { label: "Path", color: "#27ae60" },
-                            { label: "Shelf", color: "#c0392b" },
+                            { label: "Destination Shelf", color: "#c0392b" },
                             { label: "Obstacle", color: "#4a4a4a" },
                             { label: "Empty", color: "white", border: "1px solid #bbb" },
                         ].map(({ label, color, border }, idx) => (
