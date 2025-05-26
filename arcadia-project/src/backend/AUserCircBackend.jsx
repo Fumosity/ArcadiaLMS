@@ -76,7 +76,8 @@ export const useUserCirculation = (propUser) => {
                             book_titles (
                                 titleID,
                                 title,
-                                price
+                                price,
+                                location
                             )
                         ),
                         user_accounts (
@@ -163,6 +164,7 @@ export const useUserCirculation = (propUser) => {
               department: item.user_accounts.userDepartment,
               bookTitle: bookDetails.title,
               bookBarcode: item.book_indiv.bookBarcode,
+              location: bookDetails.location,
               userId: item.userID,
               deadline: formattedDeadline,
               titleID: bookDetails.titleID,

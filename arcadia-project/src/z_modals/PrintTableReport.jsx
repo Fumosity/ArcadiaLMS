@@ -5,6 +5,7 @@ import DamagedBks from "../components/admin-book-circ-pg-comp/DamagedBks";
 
 const REPORT_COLUMNS = {
   BookCirculation: {
+    reportTitle: "Book Circulation Report",
     transNo: "Transaction No.",
     type: "Type",
     date: "Date",
@@ -18,6 +19,7 @@ const REPORT_COLUMNS = {
     deadline: "Deadline"
   },
   Outstanding: {
+    reportTitle: "Outstanding Users Report",
     user_name: "Borrower",
     school_id: "School No.",
     user_college: "College",
@@ -29,6 +31,7 @@ const REPORT_COLUMNS = {
   }
   ,
   Damaged: {
+    reportTitle: "Damaged Books Report",
     user_name: "Borrower",
     school_id: "School No.",
     user_college: "College",
@@ -38,6 +41,7 @@ const REPORT_COLUMNS = {
     fine: "Total Fine"
   },
   OverdueBooks: {
+    reportTitle: "Overdue Books Report",
     type: "Type",
     date: "Date",
     time: "Time",
@@ -50,6 +54,7 @@ const REPORT_COLUMNS = {
     deadline: "Deadline",
   },
   DecommissionedBooks: {
+    reportTitle: "Decommissioned Books Report",
     type: "Type",
     borrower: "Latest Borrower",
     school_id: "School No.",
@@ -60,6 +65,7 @@ const REPORT_COLUMNS = {
     notes: "Notes",
   },
   DamagedBooks: {
+    reportTitle: "Damaged Books Report",
     type: "Type",
     borrower: "Latest Borrower",
     school_id: "School No.",
@@ -70,6 +76,7 @@ const REPORT_COLUMNS = {
     notes: "Notes",
   },
   BookInventory: {
+    reportTitle: "Book Inventory Report",
     title: "Title",
     author: "Author",
     publisher: "Publisher",
@@ -79,6 +86,7 @@ const REPORT_COLUMNS = {
     procurementDate: "Date Procured",
   },
   ResearchInventory: {
+    reportTitle: "Research Inventory Report",
     title: "Title",
     author: "Author",
     college: "College",
@@ -88,6 +96,7 @@ const REPORT_COLUMNS = {
     location: "Location",
   },
   UserAccounts: {
+    reportTitle: "User Accounts Report",
     type: "Type",
     college: "College",
     department: "Department",
@@ -96,10 +105,22 @@ const REPORT_COLUMNS = {
     email: "Email",
   },
   AdminAccounts: {
+    reportTitle: "Admin Accounts Report",
     type: "Type",
     name: "Name",
     schoolId: "School No.",
     email: "Email",
+  },
+  BookCopies: {
+    reportTitle: "Book Copies Report",
+    type: "Type",
+    borrower: "Latest Borrower",
+    school_id: "School No.",
+    user_college: "College",
+    user_department: "Department",
+    bookTitle: "Book Title",
+    bookBarcode: "Barcode",
+    notes: "Notes",
   },
   // Add more report types as needed
 };
@@ -110,15 +131,17 @@ const PrintReportModal = ({ isOpen, onClose, filteredData, filters, username, re
   const columnConfig = REPORT_COLUMNS[reportType] || {};
   const visibleKeys = Object.keys(columnConfig);
 
+  const now = new Date().toLocaleString();
+
   console.log(filteredData)
 
   const formattedFilters = Object.entries(filters)
-  .map(([key, value]) => {
-    const label = key.charAt(0).toUpperCase() + key.slice(1);
-    const val = Array.isArray(value) ? value.filter(Boolean).join(", ") : value || "N/A";
-    return `${label}: ${val}`;
-  })
-  .join(", ");
+    .map(([key, value]) => {
+      const label = key.charAt(0).toUpperCase() + key.slice(1);
+      const val = Array.isArray(value) ? value.filter(Boolean).join(", ") : value || "N/A";
+      return `${label}: ${val}`;
+    })
+    .join(", ");
 
 
   const handlePrint = () => {
@@ -152,8 +175,9 @@ const PrintReportModal = ({ isOpen, onClose, filteredData, filters, username, re
   </head>
   <body>
     <h2>Lyceum of the Philippines University - Cavite</h2>
-    <h4>${columnConfig.title || "Report"}</h4>
+    <h4>${columnConfig.reportTitle || "Report"}</h4>
     <p><strong>Printed by:</strong> ${username}</p>
+    <p><strong>Printed on:</strong> ${now}</p>
 <p><strong>Filters:</strong> ${formattedFilters}</p>
     <table>
       <thead>

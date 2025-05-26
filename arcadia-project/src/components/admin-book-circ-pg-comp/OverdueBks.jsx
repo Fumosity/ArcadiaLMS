@@ -255,30 +255,30 @@ const OverdueBks = () => {
             </select>
           </div>
         </div>
-<div>
-        <button
-          className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
-          onClick={() => setIsPrintModalOpen(true)}
-        >
-          Print Report
-        </button>
-      </div>
-        
+        <div>
+          <button
+            className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+            onClick={() => setIsPrintModalOpen(true)}
+          >
+            Print Report
+          </button>
+        </div>
+
       </div>
       {/* Search */}
-        <div className="flex items-center space-x-2 min-w-[0]">
-          <label htmlFor="search" className="font-medium text-sm">
-            Search:
-          </label>
-          <input
-            type="text"
-            id="search"
-            className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
-            placeholder="Title, borrower, or barcode"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      <div className="flex items-center space-x-2 min-w-[0]">
+        <label htmlFor="search" className="font-medium text-sm">
+          Search:
+        </label>
+        <input
+          type="text"
+          id="search"
+          className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+          placeholder="Title, borrower, or barcode"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">

@@ -1,6 +1,8 @@
 import { supabase } from "../../supabaseClient"
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import PrintReportModal from "../../z_modals/PrintTableReport"
+import { useUser } from "../../backend/UserContext"
 
 const ABCopiesHistory = ({ titleID }) => {
     const [currentPage, setCurrentPage] = useState(1)
@@ -10,6 +12,13 @@ const ABCopiesHistory = ({ titleID }) => {
     const [typeFilter, setTypeFilter] = useState("All")
     const [bkhistoryData, setBkhistoryData] = useState([])
     const [loading, setLoading] = useState(true)
+    const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+
+    const { user } = useUser()
+    console.log(user)
+    const username = user.userFName + " " + user.userLName
+    console.log(username)
+
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -44,7 +53,9 @@ const ABCopiesHistory = ({ titleID }) => {
                         user_accounts (
                             userFName,
                             userLName,
-                            userLPUID
+                            userLPUID,
+                            userCollege,
+                            userDepartment
                         )
                     `)
                     .eq("book_indiv.book_titles.titleID", titleID);
@@ -81,6 +92,9 @@ const ABCopiesHistory = ({ titleID }) => {
                             date,
                             time: formattedTime,
                             borrower: `${item.user_accounts?.userFName} ${item.user_accounts?.userLName}`,
+                            school_id: item.user_accounts?.userLPUID,
+                            user_college: item.user_accounts?.userCollege,
+                            user_department: item.user_accounts?.userDepartment,
                             bookTitle: bookDetails.title,
                             bookBarcode: item.book_indiv?.bookBarcode,
                             userId: item.userID,
@@ -181,23 +195,31 @@ const ABCopiesHistory = ({ titleID }) => {
                         </select>
                     </div>
                 </div>
-
-                {/* Search */}
-                <div className="flex items-center space-x-2 min-w-[0]">
-                    <label htmlFor="search" className="font-medium text-sm">
-                        Search:
-                    </label>
-                    <input
-                        type="text"
-                        id="search"
-                        className=" border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
-                        placeholder="Title, borrower, or barcode"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                <div>
+                    <button
+                        className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+                        onClick={() => setIsPrintModalOpen(true)}
+                    >
+                        Print Report
+                    </button>
                 </div>
-            </div>
 
+
+            </div>
+            {/* Search */}
+            <div className="flex items-center space-x-2 min-w-[0]">
+                <label htmlFor="search" className="font-medium text-sm">
+                    Search:
+                </label>
+                <input
+                    type="text"
+                    id="search"
+                    className=" border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[420px]"
+                    placeholder="Title, borrower, or barcode"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
 
             {/* Table */}
             <div className="overflow-x-auto">
@@ -283,7 +305,18 @@ const ABCopiesHistory = ({ titleID }) => {
                     Next Page
                 </button>
             </div>
-
+            <PrintReportModal
+                isOpen={isPrintModalOpen}
+                onClose={() => setIsPrintModalOpen(false)}
+                filteredData={filteredData} // Pass the filtered data
+                reportType={"BookCopies"}
+                filters={{
+                    typeFilter,
+                    sortOrder,
+                    searchTerm,
+                }}
+                username={username}
+            />
         </div>
     )
 }

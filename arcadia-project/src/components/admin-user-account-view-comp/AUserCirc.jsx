@@ -221,6 +221,9 @@ const AUserCirc = ({ user }) => {
                 Barcode
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Location
+              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Deadline
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -258,6 +261,7 @@ const AUserCirc = ({ user }) => {
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.location}</td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.deadline || "N/A"}</td>
                   <td className="px-4 py-3 text-sm text-center">
                     <div className="flex justify-center space-x-2">

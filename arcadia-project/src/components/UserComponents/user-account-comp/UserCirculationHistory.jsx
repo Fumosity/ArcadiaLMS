@@ -55,7 +55,8 @@ const UserCirculationHistory = () => {
                             bookStatus,
                             book_titles:titleID (
                                 titleID,
-                                title
+                                title,
+                                location
                             )
                         )
                     `)
@@ -164,6 +165,7 @@ const UserCirculationHistory = () => {
             bookBarcode: bookIndiv.bookBarcode || item.bookBarcode || "N/A",
             titleID: bookTitles.titleID,
             deadline: formattedDeadline || "N/A",
+            location: bookTitles.location
           }
         })
 
@@ -346,6 +348,9 @@ const UserCirculationHistory = () => {
                 Barcode
               </th>
               <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Location
+              </th>
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Deadline
               </th>
             </tr>
@@ -363,15 +368,14 @@ const UserCirculationHistory = () => {
                   <td className="px-4 py-2 text-sm text-gray-900 flex justify-center">
                     <span
                       className={`inline-flex items-center justify-center text-sm font-medium rounded-full px-2 py-1 
-                                            ${
-                                              book.type === "Returned"
-                                                ? "bg-resolved text-white"
-                                                : book.type === "Borrowed"
-                                                  ? "bg-ongoing"
-                                                  : book.type === "Overdue"
-                                                    ? "bg-dark-blue text-white"
-                                                    : "bg-grey"
-                                            }`}
+                                            ${book.type === "Returned"
+                          ? "bg-resolved text-white"
+                          : book.type === "Borrowed"
+                            ? "bg-ongoing"
+                            : book.type === "Overdue"
+                              ? "bg-dark-blue text-white"
+                              : "bg-grey"
+                        }`}
                     >
                       {book.type}
                     </span>
@@ -392,6 +396,7 @@ const UserCirculationHistory = () => {
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.bookBarcode}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.location}</td>
                   <td className="px-4 py-3 text-sm text-gray-900 text-center">{book.deadline}</td>
                 </tr>
               ))
