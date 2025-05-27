@@ -3,21 +3,18 @@ import { supabase } from "../../supabaseClient"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 
-const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
+const ASAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [validationErrors, setValidationErrors] = useState({})
   const [departments, setDepartments] = useState([{ name: "", abbrev: "" }])
-  // New state to store available classes based on the selected standard
-  const [availableClassesForStandard, setAvailableClassesForStandard] = useState([]);
-  // State to manage if a custom class input is needed (if user wants to add a new class)
-  const [isNewClassInput, setIsNewClassInput] = useState(false);
+  const [availableClassesForStandard, setAvailableClassesForStandard] = useState([])
+  const [isNewClassInput, setIsNewClassInput] = useState(false)
 
-  // Initialize formData if not provided
   useEffect(() => {
     if (!formData || typeof formData !== "object") {
       setFormData({
-        sectionStandard: "LOC", // Set a default standard, e.g., "LOC"
+        sectionStandard: "LOC",
         sectionClass: "",
         sectionClassDesc: "",
         sectionSubclass: "",
@@ -27,20 +24,18 @@ const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
   }, [formData, setFormData])
 
   useEffect(() => {
-    // If not in modify mode, clear the form fields
     if (!isModifying) {
       setFormData({
-        sectionStandard: "LOC", // Reset to default "LOC"
+        sectionStandard: "LOC",
         sectionClass: "",
         sectionClassDesc: "",
         sectionSubclass: "",
         sectionSubclassDesc: "",
       })
-      setIsNewClassInput(false); // Reset new class input
+      setIsNewClassInput(false)
     }
   }, [isModifying, setFormData])
 
-  // Effect to fetch classes based on selected standard
   useEffect(() => {
     const fetchClasses = async () => {
       if (formData.sectionStandard) {
@@ -48,72 +43,63 @@ const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
           const { data, error } = await supabase
             .from("library_sections")
             .select("class")
-            .eq("standard", formData.sectionStandard);
+            .eq("standard", formData.sectionStandard)
+            .eq("isarchived", false) // Only fetch non-archived sections
 
           if (error) {
-            console.error("Error fetching classes:", error.message);
-            return;
+            console.error("Error fetching classes:", error.message)
+            return
           }
 
-          const uniqueClasses = [...new Set(data.map(item => item.class))].sort();
-          setAvailableClassesForStandard(uniqueClasses);
+          const uniqueClasses = [...new Set(data.map((item) => item.class))].sort()
+          setAvailableClassesForStandard(uniqueClasses)
 
-          // If the current class in formData isn't in the fetched unique classes,
-          // or if it's the first load, set it to the first available or "All"
-          // Or, if modifying, keep the existing one.
           if (!isModifying) {
             if (uniqueClasses.length > 0 && !uniqueClasses.includes(formData.sectionClass)) {
-              setFormData(prev => ({ ...prev, sectionClass: "" })); // Clear if not found
+              setFormData((prev) => ({ ...prev, sectionClass: "" }))
             } else if (uniqueClasses.length === 0) {
-              setFormData(prev => ({ ...prev, sectionClass: "" })); // Clear if no classes
+              setFormData((prev) => ({ ...prev, sectionClass: "" }))
             }
           }
-
         } catch (error) {
-          console.error("An unexpected error occurred while fetching classes:", error);
+          console.error("An unexpected error occurred while fetching classes:", error)
         }
       } else {
-        setAvailableClassesForStandard([]);
-        setFormData(prev => ({ ...prev, sectionClass: "" })); // Clear class if no standard selected
+        setAvailableClassesForStandard([])
+        setFormData((prev) => ({ ...prev, sectionClass: "" }))
       }
-    };
+    }
 
-    fetchClasses();
-  }, [formData.sectionStandard, isModifying, setFormData]); // Re-run when standard changes or modify mode changes
-
+    fetchClasses()
+  }, [formData.sectionStandard, isModifying, setFormData])
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
 
-    // If standard changes, reset class and class description
     if (name === "sectionStandard") {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         sectionClass: "",
         sectionClassDesc: "",
-        sectionSubclass: "", // Also reset subclass
-        sectionSubclassDesc: "" // And subclass description
-      }));
-      setIsNewClassInput(false); // Assume not adding a new class initially
+        sectionSubclass: "",
+        sectionSubclassDesc: "",
+      }))
+      setIsNewClassInput(false)
     }
   }
 
-
   const handleClassSelect = (e) => {
-    const selectedClass = e.target.value;
+    const selectedClass = e.target.value
     if (selectedClass === "addNewClass") {
-      // User selected to add a new class
-      setIsNewClassInput(true);
-      setFormData(prev => ({ ...prev, sectionClass: "", sectionClassDesc: "" })); // Clear class and description
+      setIsNewClassInput(true)
+      setFormData((prev) => ({ ...prev, sectionClass: "", sectionClassDesc: "" }))
     } else {
-      // User selected an existing class
-      setIsNewClassInput(false);
-      setFormData(prev => ({ ...prev, sectionClass: selectedClass }));
-      // Optionally, fetch and pre-fill classDesc if available for this class
-      fetchClassDescription(formData.sectionStandard, selectedClass);
+      setIsNewClassInput(false)
+      setFormData((prev) => ({ ...prev, sectionClass: selectedClass }))
+      fetchClassDescription(formData.sectionStandard, selectedClass)
     }
-  };
+  }
 
   const fetchClassDescription = async (standard, className) => {
     try {
@@ -122,119 +108,120 @@ const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
         .select("classDesc")
         .eq("standard", standard)
         .eq("class", className)
-        .limit(1); // Get only one description for the class
+        .eq("isarchived", false) // Only fetch from non-archived sections
+        .limit(1)
 
       if (error) {
-        console.error("Error fetching class description:", error.message);
-        return;
+        console.error("Error fetching class description:", error.message)
+        return
       }
 
       if (data && data.length > 0) {
-        setFormData(prev => ({ ...prev, sectionClassDesc: data[0].classDesc || "" }));
+        setFormData((prev) => ({ ...prev, sectionClassDesc: data[0].classDesc || "" }))
       } else {
-        setFormData(prev => ({ ...prev, sectionClassDesc: "" })); // Clear if no description found
+        setFormData((prev) => ({ ...prev, sectionClassDesc: "" }))
       }
     } catch (error) {
-      console.error("An unexpected error occurred while fetching class description:", error);
+      console.error("An unexpected error occurred while fetching class description:", error)
     }
-  };
+  }
 
   const handleSubmit = async () => {
-        setIsSubmitting(true);
-        setValidationErrors({}); // Clear previous errors
+    setIsSubmitting(true)
+    setValidationErrors({})
 
-        // --- Frontend Validation ---
-        if (!formData.sectionStandard.trim()) {
-            setValidationErrors((prev) => ({ ...prev, sectionStandard: "Standard is required" }));
-            setIsSubmitting(false);
-            return;
+    if (!formData.sectionStandard.trim()) {
+      setValidationErrors((prev) => ({ ...prev, sectionStandard: "Standard is required" }))
+      setIsSubmitting(false)
+      return
+    }
+    if (!formData.sectionClass.trim()) {
+      setValidationErrors((prev) => ({ ...prev, sectionClass: "Section class is required" }))
+      setIsSubmitting(false)
+      return
+    }
+    if (!formData.sectionClassDesc.trim()) {
+      setValidationErrors((prev) => ({ ...prev, sectionClassDesc: "Section class description is required" }))
+      setIsSubmitting(false)
+      return
+    }
+
+    try {
+      let existingRecords = []
+      let checkError = null
+
+      if (formData.sectionSubclass.trim()) {
+        ;({ data: existingRecords, error: checkError } = await supabase
+          .from("library_sections")
+          .select("subclass")
+          .eq("standard", formData.sectionStandard)
+          .eq("subclass", formData.sectionSubclass)
+          .eq("isarchived", false)) // Only check non-archived sections
+      } else {
+        ;({ data: existingRecords, error: checkError } = await supabase
+          .from("library_sections")
+          .select("class")
+          .eq("standard", formData.sectionStandard)
+          .eq("class", formData.sectionClass)
+          .eq("isarchived", false)) // Only check non-archived sections
+      }
+
+      if (checkError) {
+        throw checkError
+      }
+
+      if (existingRecords && existingRecords.length > 0) {
+        if (formData.sectionSubclass.trim()) {
+          setValidationErrors((prev) => ({
+            ...prev,
+            sectionSubclass: "A section with this subclass already exists for this standard.",
+          }))
+        } else {
+          setValidationErrors((prev) => ({
+            ...prev,
+            sectionClass: "A section with this class already exists for this standard (and no subclass was provided).",
+          }))
         }
-        if (!formData.sectionClass.trim()) {
-            setValidationErrors((prev) => ({ ...prev, sectionClass: "Section class is required" }));
-            setIsSubmitting(false);
-            return;
-        }
-        if (!formData.sectionClassDesc.trim()) {
-            setValidationErrors((prev) => ({ ...prev, sectionClassDesc: "Section class description is required" }));
-            setIsSubmitting(false);
-            return;
-        }
-        // --- End Frontend Validation ---
+        setIsSubmitting(false)
+        return
+      }
 
-        try {
-            let existingRecords = [];
-            let checkError = null;
+      const { data: section, error: sectionError } = await supabase
+        .from("library_sections")
+        .insert([
+          {
+            standard: formData.sectionStandard,
+            class: formData.sectionClass,
+            classDesc: formData.sectionClassDesc,
+            subclass: formData.sectionSubclass.trim() === "" ? null : formData.sectionSubclass,
+            subclassDesc: formData.sectionSubclassDesc.trim() === "" ? null : formData.sectionSubclassDesc,
+            isarchived: false, // New sections are active by default
+          },
+        ])
+        .select("sectionID")
 
-            if (formData.sectionSubclass.trim()) {
-                // If subclass is provided, check for uniqueness of subclass within the standard
-                ({ data: existingRecords, error: checkError } = await supabase
-                    .from("library_sections")
-                    .select("subclass") // Only need to select 'subclass' for this check
-                    .eq("standard", formData.sectionStandard)
-                    .eq("subclass", formData.sectionSubclass));
-            } else {
-                // If no subclass, check for uniqueness of class within the standard
-                ({ data: existingRecords, error: checkError } = await supabase
-                    .from("library_sections")
-                    .select("class") // Only need to select 'class' for this check
-                    .eq("standard", formData.sectionStandard)
-                    .eq("class", formData.sectionClass));
-            }
+      if (sectionError) {
+        throw sectionError
+      }
 
-            if (checkError) {
-                throw checkError; // Propagate Supabase query errors
-            }
+      toast.success("Section added successfully!")
+      refreshSections()
 
-            // Check if any existing record was found
-            if (existingRecords && existingRecords.length > 0) {
-                if (formData.sectionSubclass.trim()) {
-                    setValidationErrors((prev) => ({ ...prev, sectionSubclass: "A section with this subclass already exists for this standard." }));
-                } else {
-                    setValidationErrors((prev) => ({ ...prev, sectionClass: "A section with this class already exists for this standard (and no subclass was provided)." }));
-                }
-                setIsSubmitting(false);
-                return; // Stop submission if uniqueness check fails
-            }
-
-            // --- Proceed with insertion if no conflicts found ---
-            const { data: section, error: sectionError } = await supabase
-                .from("library_sections")
-                .insert([
-                    {
-                        standard: formData.sectionStandard,
-                        class: formData.sectionClass,
-                        classDesc: formData.sectionClassDesc,
-                        // Store empty subclass/subclassDesc as null in DB if not provided
-                        subclass: formData.sectionSubclass.trim() === '' ? null : formData.sectionSubclass,
-                        subclassDesc: formData.sectionSubclassDesc.trim() === '' ? null : formData.sectionSubclassDesc,
-                    },
-                ])
-                .select("sectionID"); // Select sectionID to confirm insertion
-
-            if (sectionError) {
-                throw sectionError; // Propagate Supabase insertion errors
-            }
-
-            toast.success("Section added successfully!");
-            refreshSections(); // Inform parent component to refresh its data
-
-            // Reset form fields after successful submission
-            setFormData({
-                sectionStandard: "LOC", // Reset to default
-                sectionClass: "",
-                sectionClassDesc: "",
-                sectionSubclass: "",
-                sectionSubclassDesc: ""
-            });
-            setIsNewClassInput(false); // Reset new class input mode
-
-        } catch (error) {
-            console.error("Error adding section: ", error);
-            toast.error(`Failed to add section: ${error.message || error.details || "Unknown error"}`);
-        } finally {
-            setIsSubmitting(false); // Ensure button is re-enabled regardless of outcome
-        }
-    };
+      setFormData({
+        sectionStandard: "LOC",
+        sectionClass: "",
+        sectionClassDesc: "",
+        sectionSubclass: "",
+        sectionSubclassDesc: "",
+      })
+      setIsNewClassInput(false)
+    } catch (error) {
+      console.error("Error adding section: ", error)
+      toast.error(`Failed to add section: ${error.message || error.details || "Unknown error"}`)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div className="bg-white border border-grey rounded-lg p-4 mt-12 w-full h-fit">
@@ -252,13 +239,14 @@ const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
             <option value={"LOC"}>LOC</option>
             <option value={"DDC"}>DDC</option>
           </select>
-          {validationErrors.sectionStandard && <span className="text-red-500 text-sm">{validationErrors.sectionStandard}</span>}
+          {validationErrors.sectionStandard && (
+            <span className="text-red-500 text-sm">{validationErrors.sectionStandard}</span>
+          )}
         </div>
 
         <div className="flex justify-between items-center">
           <label className="w-1/3">Class:</label>
           {isNewClassInput || availableClassesForStandard.length === 0 ? (
-            // If no existing classes or user wants to add new, show text input
             <input
               type="text"
               name="sectionClass"
@@ -268,7 +256,6 @@ const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
               placeholder="Enter new Class"
             />
           ) : (
-            // Otherwise, show select dropdown
             <select
               name="sectionClass"
               className="w-2/3 px-3 py-1 rounded-full border border-grey"
@@ -284,7 +271,9 @@ const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
               <option value="addNewClass">-- Add New Class --</option>
             </select>
           )}
-          {validationErrors.sectionClass && <span className="text-red-500 text-sm">{validationErrors.sectionClass}</span>}
+          {validationErrors.sectionClass && (
+            <span className="text-red-500 text-sm">{validationErrors.sectionClass}</span>
+          )}
         </div>
 
         <div className="flex justify-between items-center">
@@ -294,9 +283,13 @@ const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
             className="w-2/3 px-3 py-1 rounded-2xl border border-grey"
             value={formData?.sectionClassDesc || ""}
             onChange={handleChange}
-            disabled={!isNewClassInput && formData.sectionClass && availableClassesForStandard.includes(formData.sectionClass)} // Disable if existing class selected
+            disabled={
+              !isNewClassInput && formData.sectionClass && availableClassesForStandard.includes(formData.sectionClass)
+            }
           />
-          {validationErrors.sectionClassDesc && <span className="text-red-500 text-sm">{validationErrors.sectionClassDesc}</span>}
+          {validationErrors.sectionClassDesc && (
+            <span className="text-red-500 text-sm">{validationErrors.sectionClassDesc}</span>
+          )}
         </div>
 
         <div className="flex justify-between items-center">
@@ -321,7 +314,6 @@ const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
           />
         </div>
 
-
         <div className="flex justify-center mt-4">
           <button
             type="button"
@@ -337,4 +329,4 @@ const ACAdding = ({ formData, setFormData, refreshSections, isModifying }) => {
   )
 }
 
-export default ACAdding
+export default ASAdding

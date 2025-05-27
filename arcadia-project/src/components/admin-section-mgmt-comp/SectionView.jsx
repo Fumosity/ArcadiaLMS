@@ -2,14 +2,14 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Skeleton from "react-loading-skeleton"
 import "react-loading-skeleton/dist/skeleton.css"
-import WrngDeleteSection from "../../z_modals/warning-modals/WrngDeleteSection"
+import WrngArchiveSection from "../../z_modals/warning-modals/WrngArchiveSection"
 import { supabase } from "../../supabaseClient"
 import { toast } from "react-toastify"
 
 const SectionView = ({ section, onSectionDeleted, onModifySection }) => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false)
 
   console.log(section)
 
@@ -58,65 +58,24 @@ const SectionView = ({ section, onSectionDeleted, onModifySection }) => {
     classDesc: section.classDesc,
     subclass: section.subclass,
     subclassDesc: section.subclassDesc,
+    status: section.isarchived ? "Archived" : "Active",
   }
 
   const handleModifySection = () => {
     if (section) {
-      onModifySection(section) // Pass the selected section data to the parent
+      onModifySection(section)
     }
-  }
-
-  const handleDeleteSection = () => {
-    setIsDeleteModalOpen(true)
   }
 
   const handleArchiveSection = () => {
     setIsArchiveModalOpen(true)
   }
 
-  const confirmDeleteSection = async () => {
-    try {
-      // Only allow deletion if the section is archived
-      if (!section.isarchived) {
-        toast.error("Section must be archived before it can be deleted.", {
-          position: "bottom-right",
-          autoClose: 3000,
-          theme: "colored",
-        })
-        setIsDeleteModalOpen(false)
-        return
-      }
-
-      // Delete departments first
-      const { error: deptError } = await supabase.from("department_list").delete().eq("sectionID", section.sectionID)
-
-      if (deptError) throw deptError
-
-      // Then delete section
-      const { error } = await supabase.from("section_list").delete().eq("sectionID", section.sectionID)
-
-      if (error) throw error
-
-      setIsDeleteModalOpen(false)
-      toast.success("Section and its departments successfully deleted.", {
-        position: "bottom-right",
-        autoClose: 2000,
-        theme: "colored",
-      })
-
-      // Notify parent that section was deleted (clear selection and refresh)
-      onSectionDeleted(null)
-    } catch (error) {
-      alert("An unexpected error occurred while deleting the section.")
-      setIsDeleteModalOpen(false)
-    }
-  }
-
   const confirmArchiveSection = async () => {
     try {
       // Toggle the archive status
       const { error } = await supabase
-        .from("section_list")
+        .from("library_sections")
         .update({ isarchived: !section.isarchived })
         .eq("sectionID", section.sectionID)
 
@@ -132,13 +91,12 @@ const SectionView = ({ section, onSectionDeleted, onModifySection }) => {
         theme: "colored",
       })
 
+      setTimeout(() => {
+        window.location.reload()
+      }, 2100)
+
       // Update the section object with the new archive status
       const updatedSection = { ...section, isarchived: !section.isarchived }
-
-      // Reset showArchived when archiving a section
-      if (!section.isarchived) {
-        setShowArchived(false)
-      }
 
       onSectionDeleted(updatedSection)
     } catch (error) {
@@ -156,14 +114,13 @@ const SectionView = ({ section, onSectionDeleted, onModifySection }) => {
         >
           Modify Selected Section
         </button>
-        {section.isarchived && (
-          <button
-            className="add-book w-full mb-2 px-2 py-2 rounded-lg border-grey hover:bg-arcadia-red hover:text-white"
-            onClick={handleDeleteSection}
-          >
-            Delete Section
-          </button>
-        )}
+        <button
+          className={`add-book w-full mb-2 px-2 py-2 rounded-lg border-grey hover:text-white ${section.isarchived ? "hover:bg-arcadia-red" : "hover:bg-arcadia-red"
+            }`}
+          onClick={handleArchiveSection}
+        >
+          {section.isarchived ? "Restore Section" : "Archive Section"}
+        </button>
       </div>
 
       <div className="bg-white p-4 rounded-lg border-grey border w-full min-w-min">
@@ -176,7 +133,8 @@ const SectionView = ({ section, onSectionDeleted, onModifySection }) => {
               <div className="flex w-full gap-4" key={key}>
                 <label className="w-1/4 px-1 py-1 capitalize">{key}:</label>
                 <div
-                  className={`w-3/4 px-3 py-1 rounded-full border border-grey ${key === "status" && (value === "Archived" ? "bg-gray-100" : "bg-green-50")}`}
+                  className={`w-3/4 px-3 py-1 rounded-full border border-grey ${key === "status" && (value === "Archived" ? "bg-gray-100" : "bg-green-50")
+                    }`}
                 >
                   {value}
                 </div>
@@ -184,17 +142,16 @@ const SectionView = ({ section, onSectionDeleted, onModifySection }) => {
             ))}
           </div>
         </div>
-
       </div>
 
-      {/* Delete Confirmation Modal */}
-      <WrngDeleteSection
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={confirmDeleteSection}
-        itemName={section.section}
+      {/* Archive Confirmation Modal */}
+      <WrngArchiveSection
+        isOpen={isArchiveModalOpen}
+        onClose={() => setIsArchiveModalOpen(false)}
+        onConfirm={confirmArchiveSection}
+        itemName={`${section.class} - ${section.subclass || "No Subclass"}`}
+        isArchived={section.isarchived}
       />
-
     </div>
   )
 }

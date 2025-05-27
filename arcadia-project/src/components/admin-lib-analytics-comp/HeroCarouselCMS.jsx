@@ -2,8 +2,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "../../supabaseClient"
 import { toast } from "react-toastify"
 
-// Change this to match your existing bucket name
-const STORAGE_BUCKET = "hero-images" // Common default bucket name in Supabase
+const STORAGE_BUCKET = "hero-images" // upload to this bucket
 
 const HeroCarouselCMS = () => {
   const [slides, setSlides] = useState([])
@@ -13,7 +12,7 @@ const HeroCarouselCMS = () => {
   const [currentSlide, setCurrentSlide] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [slideToDelete, setSlideToDelete] = useState(null)
-  const [sortField, setSortField] = useState("displayorder") // Changed to lowercase
+  const [sortField, setSortField] = useState("displayorder")
   const [sortDirection, setSortDirection] = useState("asc")
 
   // Form state

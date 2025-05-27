@@ -41,7 +41,7 @@ const UpdateProfilePic = ({ isOpen, onClose }) => {
       const fileExt = uploadedFile.name.split('.').pop();
       const fileName = `${user.userID}-${Date.now()}.${fileExt}`;
       
-      // Changed bucket name to 'avatars' which is more commonly used
+      // Changed bucket name to 'avatars'
       const { data, error } = await supabase.storage
         .from('avatars')
         .upload(fileName, uploadedFile);
