@@ -4,66 +4,124 @@ import { supabase } from "../../../supabaseClient";
 import { useLocation } from "react-router-dom";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { locClassifications, locSubclassifications, ddcClassifications, ddcSubclassifications } from "../../../utils/classificationData";
 
-function getSubjectDescription(callNo, classificationType) {
-    if (!callNo || !classificationType) return "";
-
+function getClassificationType(callNo) {
+    if (!callNo) return "";
     const cleanedCallNo = callNo.trim();
-
-    if (classificationType === "LoC") {
-        const mainClassMatch = cleanedCallNo.match(/^([A-Z]{1,3})/);
-        if (mainClassMatch) {
-            const mainClassPrefix = mainClassMatch[1];
-            let descriptionParts = [];
-            let mainDescription = locClassifications[mainClassPrefix.charAt(0)]; // Get primary class from first letter
-
-            if (mainDescription) {
-                descriptionParts.push(`Class ${mainClassPrefix.charAt(0)} ${mainDescription}`);
-            }
-
-            // Try to find a more specific subclass
-            let foundSubclass = false;
-            // Iterate over subclass keys, prioritizing longer matches (e.g., 'QA' before 'Q')
-            const sortedSubclassKeys = Object.keys(locSubclassifications).sort((a, b) => b.length - a.length);
-
-            for (const subPrefix of sortedSubclassKeys) {
-                if (cleanedCallNo.startsWith(subPrefix)) {
-                    descriptionParts.push(`Subclass ${subPrefix} ${locSubclassifications[subPrefix]}`);
-                    foundSubclass = true;
-                    break;
-                }
-            }
-
-            return descriptionParts.join(", ");
-        }
-    } else if (classificationType === "DDC") {
-        const mainDivisionMatch = cleanedCallNo.match(/^(\d{3})/);
-        if (mainDivisionMatch) {
-            const mainDivision = mainDivisionMatch[1];
-            let descriptionParts = [];
-
-            let mainDescription = ddcClassifications[mainDivision.substring(0, 3) + "00".substring(mainDivision.length - 1)]; // Get main division e.g., for 510, get 500
-            if (mainDescription) {
-                descriptionParts.push(`${mainDivision.substring(0, 1)}00s ${mainDescription}`); // E.g., 500s Science
-            }
-
-            let foundSubdivision = false;
-            // Iterate over subdivision keys, prioritizing longer matches
-            const sortedSubdivisionKeys = Object.keys(ddcSubclassifications).sort((a, b) => b.length - a.length);
-
-            for (const subDivision of sortedSubdivisionKeys) {
-                if (cleanedCallNo.startsWith(subDivision)) {
-                    descriptionParts.push(`Division ${subDivision} ${ddcSubclassifications[subDivision]}`);
-                    foundSubdivision = true;
-                    break;
-                }
-            }
-
-            return descriptionParts.join(", ");
-        }
+    if (/^[A-Z]/.test(cleanedCallNo)) {
+        return "LOC";
+    } else if (/^\d{3}/.test(cleanedCallNo)) {
+        return "DDC";
     }
     return "";
+}
+
+function getSubjectDescription(callNo, classificationType, dbSections) {
+    if (!callNo || !classificationType) return "";
+    if (!dbSections || dbSections.length === 0) {
+        return "Data not loaded for subject description.";
+    }
+
+    const cleanedCallNo = callNo.trim();
+    let effectiveCallNoForLookup = ""; // e.g., "PQ", "PR", "510"
+
+    // Extract the relevant prefix from the call number
+    if (classificationType === "LOC") {
+        const match = cleanedCallNo.match(/^([A-Z]{1,2})/); // Match 1 or 2 letters
+        if (match) {
+            effectiveCallNoForLookup = match[1];
+        }
+    } else if (classificationType === "DDC") {
+        const match = cleanedCallNo.match(/^(\d{3})/); // Match 3 digits
+        if (match) {
+            effectiveCallNoForLookup = match[1];
+        }
+    }
+
+    // If no valid prefix extracted, we can't find a description.
+    if (!effectiveCallNoForLookup) {
+        return "Invalid call number format for classification lookup.";
+    }
+
+    const relevantSections = dbSections.filter(section => section.standard === classificationType);
+
+    let foundClassCode = null;
+    let foundClassDesc = null;
+    let foundSubclassCode = null;
+    let foundSubclassDesc = null;
+    let classIsDivision = false; // To track if it's a DDC X00 type (e.g., 500s Science)
+
+    // Iterate through all relevant sections to find the *most specific* class and subclass that match.
+    // Sorting here helps ensure that if multiple prefixes match (e.g., 'P' and 'PR' for lookup 'PR'),
+    // we capture the longest/most specific one for each category.
+    relevantSections.sort((a, b) => {
+        const aLen = Math.max((a.subclass || '').length, (a.class || '').length);
+        const bLen = Math.max((b.subclass || '').length, (b.class || '').length);
+        return bLen - aLen; // Sort by overall code length (descending)
+    });
+
+    for (const section of relevantSections) {
+        // --- Try to find Subclass Match ---
+        // If effectiveCallNoForLookup starts with a section's subclass,
+        // and this is the longest/most specific subclass match found so far
+        if (section.subclass && effectiveCallNoForLookup.startsWith(section.subclass)) {
+            if (!foundSubclassCode || section.subclass.length > foundSubclassCode.length) {
+                foundSubclassCode = section.subclass;
+                foundSubclassDesc = section.subclassDesc;
+            }
+        }
+
+        // --- Try to find Class Match ---
+        // Only consider entries that are primarily class-level (no subclass or empty subclass)
+        if (section.class && (!section.subclass || section.subclass.trim() === '')) {
+            if (effectiveCallNoForLookup.startsWith(section.class)) {
+                // Special handling for DDC X00 divisions (e.g., matching "510" to a "500" entry)
+                if (classificationType === "DDC" && section.class.length === 3) {
+                    const mainDivisionDigits = effectiveCallNoForLookup.substring(0, 1) + "00";
+                    if (section.class === mainDivisionDigits) { // If the DB entry is specifically for the X00 division
+                        if (!foundClassCode || section.class.length > foundClassCode.length) {
+                            foundClassCode = section.class;
+                            foundClassDesc = section.classDesc;
+                            classIsDivision = true;
+                        }
+                    }
+                } else { // LoC or specific DDC class
+                    // Prioritize longer class codes if `effectiveCallNoForLookup` matches it
+                    if (!foundClassCode || section.class.length > foundClassCode.length) {
+                        foundClassCode = section.class;
+                        foundClassDesc = section.classDesc;
+                        classIsDivision = false;
+                    }
+                }
+            }
+        }
+    }
+
+    // --- Assemble the final description string ---
+    const descriptionParts = [];
+
+    // Add Class description first (if found and not redundant with subclass)
+    if (foundClassCode) {
+        // Avoid redundancy: If subclass fully covers the class (e.g., class 'PR' and subclass 'PR'),
+        // we might only show the subclass for conciseness unless the user specifically wants exact duplication.
+        // For "P" (class) and "PR" (subclass), they are distinct, so we want both.
+        // A simple check: if the found subclass code is exactly the same as the found class code, skip the class.
+        if (!foundSubclassCode || foundClassCode !== foundSubclassCode) {
+            const classLabel = classIsDivision ? 'Division' : 'Class';
+            descriptionParts.push(`${classLabel} ${foundClassCode}: ${foundClassDesc || 'No description available'}`);
+        }
+    }
+
+    // Add Subclass description
+    if (foundSubclassCode) {
+        descriptionParts.push(`Subclass ${foundSubclassCode}: ${foundSubclassDesc || 'No description available'}`);
+    }
+
+    if (descriptionParts.length > 0) {
+        return descriptionParts.join(", ");
+    }
+
+    return "No specific section description found in database.";
 }
 
 export default function Pathfinder({ book }) {
@@ -76,24 +134,59 @@ export default function Pathfinder({ book }) {
     const prevPathRef = useRef([]);
     const [gridColumns, setGridColumns] = useState("");
 
+    const [allSections, setAllSections] = useState([]);
+    const [isLoadingSections, setIsLoadingSections] = useState(true);
+    const [subjectDescription, setSubjectDescription] = useState("");
+
     //console.log(book)
 
     let callNo = ""
     let callNoPrefix = "";
-    let subjectDescription = ""; // New variable for the subject description
+
+    useEffect(() => {
+        const fetchSections = async () => {
+            setIsLoadingSections(true);
+            try {
+                const { data, error } = await supabase
+                    .from('library_sections')
+                    .select('standard, class, classDesc, subclass, subclassDesc');
+
+                if (error) {
+                    console.error("Error fetching library sections:", error.message);
+                } else {
+                    setAllSections(data || []);
+                }
+            } catch (err) {
+                console.error("Unexpected error fetching sections:", err);
+            } finally {
+                setIsLoadingSections(false);
+            }
+        };
+
+        fetchSections();
+    }, []);
+
+    useEffect(() => {
+        if (!book) {
+            setSubjectDescription("");
+            return;
+        }
+
+        callNo = book.titleCallNum || book.researchCallNum;
+
+        if (book.researchCallNum) {
+            setSubjectDescription("the Periodicals Section");
+        } else if (book.titleCallNum) {
+            const classificationType = getClassificationType(callNo);
+            setSubjectDescription(getSubjectDescription(callNo, classificationType, allSections));
+        }
+    }, [book, allSections, isLoadingSections]);
 
     if (book) {
         callNo = book.titleCallNum || book.researchCallNum;
         callNoPrefix = callNo.trim().split(/[\s-]/)[0];
-        //console.log(callNo, callNoPrefix);
-        if (book.titleCallNum) {
-            const classificationType = getClassificationType(callNo); // Determine classification here
-            subjectDescription = getSubjectDescription(callNo, classificationType);
-        } else if (book.researchCallNum) {
-            subjectDescription = "the Periodicals Section";
-        }
     }
-
+    
     const locations = {
         "2nd Floor, Circulation Section": { w: 28, h: 19 },
         "4th Floor, Circulation Section": { w: 27, h: 11 },
@@ -289,7 +382,7 @@ export default function Pathfinder({ book }) {
             return;
         }
 
-        if (!isHighschoolSection && classificationType !== "LoC") {
+        if (!isHighschoolSection && classificationType !== "LOC") {
             setPathfindingError("This section only supports Library of Congress classified books. Please contact the help desk if you see this error.");
             return;
         }
@@ -338,12 +431,12 @@ export default function Pathfinder({ book }) {
 
         if (book.researchCallNum) {
             //og("is research");
-            return "LoC";
+            return "LOC";
         }
 
         if (/^[A-Z]{1,3}\s?\d+/.test(cleanedCallNo)) {
-            //console.log(callNo, "is LoC");
-            return "LoC";
+            //console.log(callNo, "is LOC");
+            return "LOC";
         } else if (/^\d{3}(\.\d+)?/.test(cleanedCallNo)) {
             //console.log(callNo, "is DDC");
             return "DDC";
@@ -353,7 +446,7 @@ export default function Pathfinder({ book }) {
 
     function normalizeCallNumber(callNo) {
         const classification = getClassificationType(callNo);
-        if (classification === "LoC") {
+        if (classification === "LOC") {
             const match = callNo.match(/^([A-Z]{1,3})/);
             return match ? match[1].padEnd(3, " ") : callNo;  // pad to 3 letters
         } else if (classification === "DDC") {
@@ -365,7 +458,7 @@ export default function Pathfinder({ book }) {
 
     function normalizeString(str, classification) {
         if (!str) return "";
-        if (classification === "LoC") {
+        if (classification === "LOC") {
             return str.toUpperCase().padEnd(3, " "); // ensure A becomes 'A  ', etc.
         } else if (classification === "DDC") {
             return str.padStart(3, "0");

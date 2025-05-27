@@ -122,6 +122,14 @@ const REPORT_COLUMNS = {
     bookBarcode: "Barcode",
     notes: "Notes",
   },
+  LibrarySections: {
+    reportTitle: "Library Sections Report",
+    standard: "Standard",
+    class: "Class",
+    classDesc: "Class Description",
+    subclass: "Subclass",
+    subclassDesc: "Subclass Description",
+  },
   // Add more report types as needed
 };
 
@@ -182,13 +190,13 @@ const PrintReportModal = ({ isOpen, onClose, filteredData, filters, username, re
     <table>
       <thead>
         <tr>
-          ${visibleKeys.map(key => `<th>${columnConfig[key]}</th>`).join("")}
+          ${visibleKeys.filter(key => key !== 'reportTitle').map(key => `<th>${columnConfig[key]}</th>`).join("")}
         </tr>
       </thead>
       <tbody>
         ${filteredData.map(item => `
           <tr>
-            ${visibleKeys.map(key => `<td>${item[key] ?? ''}</td>`).join("")}
+            ${visibleKeys.filter(key => key !== 'reportTitle').map(key => `<td>${item[key] ?? ''}</td>`).join("")}
           </tr>
         `).join("")}
       </tbody>
@@ -224,11 +232,20 @@ const PrintReportModal = ({ isOpen, onClose, filteredData, filters, username, re
           </ul>
         </div>
 
+        <div className="my-3 text-left">
+          <button
+            onClick={handlePrint}
+            className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
+          >
+            Print Report
+          </button>
+        </div>
+
         <div className="overflow-auto border border-gray-300 rounded">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-200">
               <tr>
-                {visibleKeys.map((key) => (
+                {visibleKeys.filter(key => key !== 'reportTitle').map((key) => (
                   <th key={key} className="p-2 border">{columnConfig[key]}</th>
                 ))}
               </tr>
@@ -236,7 +253,7 @@ const PrintReportModal = ({ isOpen, onClose, filteredData, filters, username, re
             <tbody>
               {filteredData.map((item, index) => (
                 <tr key={index} className="odd:bg-white even:bg-gray-100">
-                  {visibleKeys.map((key) => (
+                  {visibleKeys.filter(key => key !== 'reportTitle').map((key) => (
                     <td key={key} className="p-2 border">{item[key] ?? ''}</td>
                   ))}
                 </tr>
@@ -244,16 +261,7 @@ const PrintReportModal = ({ isOpen, onClose, filteredData, filters, username, re
             </tbody>
 
           </table>
-        </div>
-
-        <div className="mt-6 text-right">
-          <button
-            onClick={handlePrint}
-            className="sort-by bg-arcadia-red hover:bg-white text-white hover:text-arcadia-red font-semibold py-1 px-3 rounded-lg text-sm w-28"
-          >
-            Print
-          </button>
-        </div>
+        </div>   
       </div>
     </div>
   );

@@ -170,7 +170,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
     const matchesPubDate =
       !pubDateFilter ||
       (String(book.pubDate).toLowerCase().includes(pubDateFilter.toLowerCase()))
-  
+
     // Helper function to check if a value matches the search term
     const matchesSearchTerm = (value) => {
       if (typeof value === "string") {
@@ -180,7 +180,7 @@ const CurrentBookInventory = ({ onBookSelect }) => {
       }
       return false
     }
-  
+
     // Filter by search term
     const matchesSearch =
       !searchTerm ||
@@ -191,16 +191,16 @@ const CurrentBookInventory = ({ onBookSelect }) => {
       (book.author &&
         ((typeof book.author === "string" && matchesSearchTerm(book.author)) ||
           (Array.isArray(book.author) && book.author.some((author) => matchesSearchTerm(author)))))
-  
+
     // Filter by category type
     const matchesCategory = categoryType === "All" || book.category === categoryType
-  
+
     // Filter by genre type
     const matchesGenre = genreType === "All" || (book.genres && book.genres.includes(genreType))
-  
+
     return matchesPubDate && matchesSearch && matchesCategory && matchesGenre
   })
-  
+
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / entriesPerPage)
@@ -293,19 +293,19 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         </div>
       </div>
       {/* Search */}
-        <div className="flex items-center space-x-2 min-w-[0]">
-          <label htmlFor="search" className="font-medium text-sm">
-            Search:
-          </label>
-          <input
-            type="text"
-            id="search"
-            className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[370px]"
-            placeholder="Title, author, category, keywords, or call no."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      <div className="flex items-center space-x-2 min-w-[0]">
+        <label htmlFor="search" className="font-medium text-sm">
+          Search:
+        </label>
+        <input
+          type="text"
+          id="search"
+          className="border border-grey rounded-md py-1 px-2 text-sm w-auto sm:w-[370px]"
+          placeholder="Title, author, category, keywords, or call no."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -467,18 +467,18 @@ const CurrentBookInventory = ({ onBookSelect }) => {
         <BookCopies isOpen={isModalOpen} onClose={closeModal} titleID={selectedBook.titleID} />
       )}
       <PrintReportModal
-              isOpen={isPrintModalOpen}
-              onClose={() => setIsPrintModalOpen(false)}
-              filteredData={filteredData} // Pass the filtered data
-              reportType={"BookInventory"}
-              filters={{
-                type: [genreType, categoryType],
-                pubDateFilter,
-                sortOrder,
-                searchTerm,
-              }}
-              username={username}
-            />
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        filteredData={filteredData} // Pass the filtered data
+        reportType={"BookInventory"}
+        filters={{
+          type: [genreType, categoryType],
+          pubDateFilter,
+          sortOrder,
+          searchTerm,
+        }}
+        username={username}
+      />
     </div>
   )
 }

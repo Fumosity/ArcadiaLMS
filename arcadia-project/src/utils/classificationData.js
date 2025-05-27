@@ -1164,6 +1164,8 @@ export const ddcSubclassifications = {
     "797": "Aquatic and air sports",
     "798": "Equestrian sports and animal racing",
     "799": "Fishing, hunting, shooting",
+
+
     "801": "Philosophy & theory of literature",
     "802": "Miscellany of literature",
     "803": "Dictionaries, encyclopedias, concordances of literature",
@@ -1345,6 +1347,8 @@ export const ddcSubclassifications = {
     "897": "North American native literatures",
     "898": "South American native literatures",
     "899": "Other literatures (e.g., Artificial languages, Eskimo-Aleut, Austronesian, Oceanic, etc.)",
+
+    
     "900": "History & Geography",
     "901": "Philosophy & theory of history",
     "902": "Miscellany of history",

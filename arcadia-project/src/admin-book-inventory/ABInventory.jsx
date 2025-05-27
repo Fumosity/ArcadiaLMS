@@ -158,6 +158,12 @@ const ABInventory = () => {
             </button>
             <button
               className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
+              onClick={() => navigate('/admin/libsecmanagement')} // Navigate to ABAdd on click
+            >
+              Library Section Management
+            </button>
+            <button
+              className="add-book w-full mb-2 px-4 py-2 rounded-lg border-grey hover:bg-light-gray transition"
               onClick={handleExportClick}
             >
               Export Book Inventory
