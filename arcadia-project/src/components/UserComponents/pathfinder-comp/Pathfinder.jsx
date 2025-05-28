@@ -149,8 +149,9 @@ export default function Pathfinder({ book }) {
             try {
                 const { data, error } = await supabase
                     .from('library_sections')
-                    .select('standard, class, classDesc, subclass, subclassDesc');
-
+                    .select('standard, class, classDesc, subclass, subclassDesc')
+                    .eq('isarchived', false);
+                    
                 if (error) {
                     console.error("Error fetching library sections:", error.message);
                 } else {
