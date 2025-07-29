@@ -1,15 +1,13 @@
-import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Header from './components/main-comp/Header';
-import Navbar from './components/main-comp/Navbar';
-import Footer from './components/main-comp/Footer';
-import Copyright from './components/main-comp/Copyright';
+import "react-toastify/dist/ReactToastify.css";
+//Outlet
+import UserLayout from './UserLayout';
+import AdminLayout from './AdminLayout';
+
 import ProtectedRoute from './backend/ProtectedRoute.jsx';
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 // Admin Components
 import AHomePage from './admin-home-page/AHomePage';
-import ALibAnal from './admin-lib-services/AServices.jsx';
 import ABCirculationPage from './admin-book-circulation-page/ABCirculationPage';
 import ABInventory from './admin-book-inventory/ABInventory';
 import ASupportPage from './admin-support/ASupportPage';
@@ -36,10 +34,7 @@ import ALibSecMgmt from './admin-section-mgmt/ALibSecMgmt.jsx';
 
 // User Components
 import UsrRegistration from './UserPages/user-registration-page/UsrRegistration';
-import UFooter from './components/UserComponents/user-main-comp/UFooter';
-import UHeader from './components/UserComponents/user-main-comp/UHeader';
 import UHomePage from './UserPages/user-home-page/UHomePage';
-import UCopyright from './components/UserComponents/user-main-comp/UCopyright';
 import URsrchCatalog from './UserPages/user-rsrch-catalog-page/URsrchCatalog';
 
 import UDiscussionReserv from './UserPages/user-room-reserv-page/UDiscussionReserv';
@@ -74,97 +69,80 @@ import DPAPage from './UserPages/DPAPage.jsx';
 import BookReservation from './components/UserComponents/user-book-view-comp/BookReservation.jsx';
 import AServices from './admin-lib-services/AServices.jsx';
 
+
 function App() {
   return (
     <>
-    <ToastContainer />
-    <Routes>
-      <Route path="/user/login" element={<ULogin />}/>
-      <Route path="/user/forgotpassword" element={<ForgotPassword />}/>
-      <Route path="/user/resetpassword" element={<ResetPassword />}/>
-      <Route path="/user/register" element={<URegister />} />
-      <Route
-        path="/*"
-        element={
-          <>
-            <UHeader />
-            <Routes>
-              <Route path="/" element={<UHomePage />} />
-              <Route path="/user/register" element={<UsrRegistration />} />
-              <Route path="/user/bookmanagement" element={<UBkCatalog />} />
-              <Route path="/user/bookreservation" element={<BookReservation />} />
-              <Route path="/user/researchmanagement" element={<URsrchCatalog />} />
-              <Route path="/user/reservations" element={<ProtectedRoute><UDiscussionReserv /></ProtectedRoute>} />
-              <Route path="/user/services" element={<ProtectedRoute><UServices /></ProtectedRoute>} />
-              <Route path="/user/support" element={<USupport />} />  
-              <Route path="/user/support/supportticket" element={<USupportTix />} />
-              <Route path="/user/support/reportticket" element={<UReports />} />
-              <Route path="/user/accountview" element={<UAccountProfile />} />
-              <Route path="/user/faqs" element={<UFAQs />} />
-              <Route path="/user/mostpopularbooks" element={<UMostPop />} />
-              <Route path="/user/highlyratedbooks" element={<UHighlyRated />} />
-              <Route path="/user/bookview" element={<UBookView />} />
-              <Route path="/user/researchview" element={<URsrchView/>} />
-              <Route path="*" element={<ErrorPage />} /> 
-              <Route path="/auth-complete" element={<AuthComplete />} />
-              <Route path="/genre/page" element={<GenrePage />} />
-              <Route path="/user/privacypolicy" element={<DPAPage />} />
-            </Routes>
-            <UFooter />
-            <UCopyright />
-          </>
-        }
-      />
+      <ToastContainer />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/user/login" element={<ULogin />} />
+        <Route path="/user/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/user/resetpassword" element={<ResetPassword />} />
+        <Route path="/user/register" element={<URegister />} />
 
-      {/* Admin Routes */}
-      <Route
-        path="/admin/*"
-        element={
-          <>
-            <Header />
-            <Routes>
-              <Route path="/" element={<ProtectedRoute><AHomePage /></ProtectedRoute>} />
-              <Route path="adminservices" element={<AServices />} />
-              <Route path="circulationhistory" element={<ABCirculationPage />} />
-              <Route path="bookmanagement" element={<ABInventory />} />
-              <Route path="researchmanagement" element={<ARInventory />} />
-              <Route path="useraccounts" element={<AUsrAcc />} />
-              <Route path="support" element={<ASupportPage />} />
-              <Route path="reservations" element={<AReserv />} />
-              <Route path="abcirculationpage" element={<ABCirculationPage />} />
-              <Route path="bookcheckinout" element={<ABChecking />} />
-              <Route path="bookadding" element={<ABAdd />} />
-              <Route path="bookexport" element={<ABExport />} />
-              <Route path="copymanagement" element={<ABCopies />} />
-              <Route path="genremanagement" element={<AGenreMgmt />} />
-              <Route path="genreadding" element={<AGAdd />} />
-              <Route path="genremodify" element={<AGModify />} />
-              <Route path="collegemanagement" element={<ACollegeMgmt />} />
-              <Route path="libsecmanagement" element={<ALibSecMgmt />} />
-              <Route path="researchadding" element={<ARAdd />} />
-              <Route path="researchexport" element={<ARExport />} />
-              <Route path="abviewer" element={<ABViewer />} />
-              <Route path="arviewer" element={<ARViewer />} />
-              <Route path="bookmodify" element={<ABModify />} />
-              <Route path="researchmodify" element={<ARModify />} />
-              <Route path="reportticket" element={<AReportViewPage />} />
-              <Route path="supportticket" element={<ASupportViewPage />} />
-              <Route path="useraccounts/viewusers" element={<AUAccView />} />
-              <Route path="useraccounts/viewadmins" element={<AAccountView />} />
-              <Route path="accountview" element={<AAccountSettings />} />
-              <Route path="reservationsview" element={<AReservView />} />
-              <Route path="schedule" element={<ASchedule />} />
-              <Route path="systemreports" element={<ASystemReports />} />
-              <Route path="adminerrorpage" element={<AdminErrorPage />} />
-              <Route path="*" element={<AdminErrorPage />} />
-              <Route path="data-privacy" element={<ADPAPage />} />
-            </Routes>
-            <Footer />
-            <Copyright />
-          </>
-        }
-      />
-    </Routes>
+        {/* User Layout Routes */}
+        <Route path="/" element={<UserLayout />}>
+          <Route index element={<UHomePage />} />
+          <Route path="user/register" element={<UsrRegistration />} />
+          <Route path="user/bookmanagement" element={<UBkCatalog />} />
+          <Route path="user/bookreservation" element={<BookReservation />} />
+          <Route path="user/researchmanagement" element={<URsrchCatalog />} />
+          <Route path="user/reservations" element={<ProtectedRoute><UDiscussionReserv /></ProtectedRoute>} />
+          <Route path="user/services" element={<ProtectedRoute><UServices /></ProtectedRoute>} />
+          <Route path="user/support" element={<USupport />} />
+          <Route path="user/support/supportticket" element={<USupportTix />} />
+          <Route path="user/support/reportticket" element={<UReports />} />
+          <Route path="user/accountview" element={<UAccountProfile />} />
+          <Route path="user/faqs" element={<UFAQs />} />
+          <Route path="user/mostpopularbooks" element={<UMostPop />} />
+          <Route path="user/highlyratedbooks" element={<UHighlyRated />} />
+          <Route path="user/bookview" element={<UBookView />} />
+          <Route path="user/researchview" element={<URsrchView />} />
+          <Route path="auth-complete" element={<AuthComplete />} />
+          <Route path="genre/page" element={<GenrePage />} />
+          <Route path="user/privacypolicy" element={<DPAPage />} />
+          <Route path="*" element={<ErrorPage />} />
+        </Route>
+
+        {/* Admin Layout Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<ProtectedRoute><AHomePage /></ProtectedRoute>} />
+          <Route path="adminservices" element={<AServices />} />
+          <Route path="circulationhistory" element={<ABCirculationPage />} />
+          <Route path="bookmanagement" element={<ABInventory />} />
+          <Route path="researchmanagement" element={<ARInventory />} />
+          <Route path="useraccounts" element={<AUsrAcc />} />
+          <Route path="support" element={<ASupportPage />} />
+          <Route path="reservations" element={<AReserv />} />
+          <Route path="abcirculationpage" element={<ABCirculationPage />} />
+          <Route path="bookcheckinout" element={<ABChecking />} />
+          <Route path="bookadding" element={<ABAdd />} />
+          <Route path="bookexport" element={<ABExport />} />
+          <Route path="copymanagement" element={<ABCopies />} />
+          <Route path="genremanagement" element={<AGenreMgmt />} />
+          <Route path="genreadding" element={<AGAdd />} />
+          <Route path="genremodify" element={<AGModify />} />
+          <Route path="collegemanagement" element={<ACollegeMgmt />} />
+          <Route path="libsecmanagement" element={<ALibSecMgmt />} />
+          <Route path="researchadding" element={<ARAdd />} />
+          <Route path="researchexport" element={<ARExport />} />
+          <Route path="abviewer" element={<ABViewer />} />
+          <Route path="arviewer" element={<ARViewer />} />
+          <Route path="bookmodify" element={<ABModify />} />
+          <Route path="researchmodify" element={<ARModify />} />
+          <Route path="reportticket" element={<AReportViewPage />} />
+          <Route path="supportticket" element={<ASupportViewPage />} />
+          <Route path="useraccounts/viewusers" element={<AUAccView />} />
+          <Route path="useraccounts/viewadmins" element={<AAccountView />} />
+          <Route path="accountview" element={<AAccountSettings />} />
+          <Route path="reservationsview" element={<AReservView />} />
+          <Route path="schedule" element={<ASchedule />} />
+          <Route path="systemreports" element={<ASystemReports />} />
+          <Route path="data-privacy" element={<ADPAPage />} />
+          <Route path="*" element={<AdminErrorPage />} />
+        </Route>
+      </Routes>
     </>
   );
 }
