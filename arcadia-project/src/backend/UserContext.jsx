@@ -110,7 +110,7 @@ export const UserProvider = ({ children }) => {
     if (["Admin", "Superadmin", "Intern"].includes(userType)) {
       return adminRoutes.some((route) => path.startsWith(route))
     }
-    if (["Student", "Teacher", "Guest"].includes(userType)) {
+    if (["Student", "Faculty", "Guest"].includes(userType)) {
       return userRoutes.some((route) => path.startsWith(route))
     }
     return false
