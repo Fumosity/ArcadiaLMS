@@ -115,7 +115,6 @@ const ReservSupport = () => {
             >
               <option value="All">All</option>
               <option value="Student">Student</option>
-              <option value="Teacher">Teacher</option>
               <option value="Faculty">Faculty</option>
               <option value="Admin">Admin</option>
               <option value="Intern">Intern</option>
