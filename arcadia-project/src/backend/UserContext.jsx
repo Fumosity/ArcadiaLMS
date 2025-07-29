@@ -9,6 +9,7 @@ export const UserProvider = ({ children }) => {
   const navigate = useNavigate()
   const location = useLocation()
 
+  // Load user from localStorage on mount
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"))
     if (storedUser) {
@@ -17,45 +18,51 @@ export const UserProvider = ({ children }) => {
     setLoading(false)
   }, [])
 
-  // Add storage event listener to detect changes in localStorage from other tabs
+  // Sync changes across browser tabs
   useEffect(() => {
     const handleStorageChange = (event) => {
-      // Only react to changes in the "user" item
       if (event.key === "user") {
-        // If user was removed (logout in another tab)
         if (event.newValue === null) {
           setUser(null)
           navigate("/user/login")
-        } else if (event.newValue) {
-          // If user was updated in another tab
+        } else {
           setUser(JSON.parse(event.newValue))
         }
       }
     }
 
-    // Add event listener
     window.addEventListener("storage", handleStorageChange)
-
-    // Clean up event listener on unmount
     return () => {
       window.removeEventListener("storage", handleStorageChange)
     }
   }, [navigate])
 
+  // Navigate based on user role after loading
   useEffect(() => {
-    const mode = localStorage.getItem("mode")
-    if (user && !loading && mode !== "user") {
-      if (!isValidRoute(location.pathname, user.userAccountType)) {
-        navigateBasedOnRole(user.userAccountType)
-      }
+    if (loading) return // Wait until user is loaded
+
+    const mode = localStorage.getItem("mode") || "user"
+
+    if (!user) {
+      navigate("/user/login")
+      return
     }
+
+    if (mode !== "user" && !isValidRoute(location.pathname, user.userAccountType)) {
+      navigateBasedOnRole(user.userAccountType)
+    }
+
+    // Optional debug logs
+    // console.log("User loaded:", user)
+    // console.log("Path:", location.pathname)
+    // console.log("Mode:", mode)
   }, [user, loading, location.pathname])
 
   const updateUser = (newUser) => {
     if (newUser) {
       localStorage.setItem("user", JSON.stringify(newUser))
       setUser(newUser)
-      navigateBasedOnRole(newUser.userAccountType) // Navigate immediately
+      navigateBasedOnRole(newUser.userAccountType)
     } else {
       localStorage.removeItem("user")
       setUser(null)
@@ -65,18 +72,15 @@ export const UserProvider = ({ children }) => {
 
   const loginAsGuest = () => {
     const guestUser = {
-      userID: "0", // Add timestamp for uniqueness
+      userID: "0",
       name: "Guest",
       userAccountType: "Guest",
-      isGuest: true, // Flag to identify guest users
-      loginTime: new Date().toISOString(), // Track when the guest logged in
+      isGuest: true,
+      loginTime: new Date().toISOString(),
     }
 
-    // Store guest user in localStorage
     localStorage.setItem("user", JSON.stringify(guestUser))
     setUser(guestUser)
-
-    // Navigate to home page
     navigate("/")
   }
 
@@ -102,7 +106,6 @@ export const UserProvider = ({ children }) => {
     const userRoutes = ["/", "/bookmanagement", "/catalog", "/research"]
     const restrictedRoutes = ["/user/reservations", "/user/services", "/user/support"]
 
-    // Guest users cannot access restricted routes
     if (userType === "Guest" && restrictedRoutes.some((route) => path.startsWith(route))) {
       return false
     }
@@ -116,11 +119,20 @@ export const UserProvider = ({ children }) => {
     return false
   }
 
-  if (loading) {
-    return <p>Loading...</p>
+  // Better loading UI
+  if (loading || (user === null && localStorage.getItem("user"))) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="text-lg font-semibold text-gray-700">Loading user data...</div>
+      </div>
+    )
   }
 
-  return <UserContext.Provider value={{ user, updateUser, loginAsGuest }}>{children}</UserContext.Provider>
+  return (
+    <UserContext.Provider value={{ user, updateUser, loginAsGuest }}>
+      {children}
+    </UserContext.Provider>
+  )
 }
 
 export const useUser = () => useContext(UserContext)
