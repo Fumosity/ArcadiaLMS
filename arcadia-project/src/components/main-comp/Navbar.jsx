@@ -1,41 +1,79 @@
-import React from "react";
-import { Link, useMatch, useResolvedPath} from "react-router-dom";
+import { useState, useRef } from "react"
+import { Link, useMatch, useResolvedPath } from "react-router-dom"
+import { toast } from "react-toastify"
+import { useUser } from "../../../backend/UserContext"
+import { useNavigate } from "react-router-dom"
 
-export default function Navbar(){
-  return(
-  <div className="navbar-cont bg-white py-2 shadow-md">
-    <nav className="flex justify-center items-center px-4">
-      <div className="navbar-content flex">
-        <CustomLink to="/admin" className="nav-link">Home</CustomLink>
-        {/* <CustomLink to="/admin/analytics" className="nav-link">Analytics</CustomLink> */}
-        <CustomLink to="/admin/circulationhistory" className="nav-link">Circulation History</CustomLink>
-        <CustomLink to="/admin/bookmanagement" className="nav-link">Book Management</CustomLink>
-        <CustomLink to="/admin/researchmanagement" className="nav-link">Research Management</CustomLink>
-        <CustomLink to="/admin/useraccounts" className="nav-link">User Accounts</CustomLink>
-        <CustomLink to="/admin/support" className="nav-link">Support</CustomLink>
-        <CustomLink to="/admin/reservations" className="nav-link">Room Reservations</CustomLink>
-        <CustomLink to="/admin/systemreports" className="nav-link">System Reports</CustomLink>
-        <CustomLink to="/admin/schedule" className="nav-link">Schedule</CustomLink>
-        <CustomLink to="/admin/adminservices" className="nav-link">Content Management</CustomLink>
-      </div>
-    </nav>
-  </div>)
+export default function UNavbar() {
+  return (
+    <div className="userNavbar-cont bg-white shadow-md">
+      <nav className="flex justify-center items-center">
+        <div className="userNavbar-content flex">
+          <CustomLink to="/" className="userNav-link w-[150px] text-center">
+            Home
+          </CustomLink>
+          <CustomLink to="/user/bookmanagement" className="userNav-link w-[150px] text-center">
+            Book Catalog
+          </CustomLink>
+          <CustomLink to="/user/researchmanagement" className="userNav-link w-[150px] text-center">
+            Research Catalog
+          </CustomLink>
+          <CustomLink to="/user/reservations" className="userNav-link w-[150px] text-center" restricted>
+            Room Reservations
+          </CustomLink>
+          <CustomLink to="/user/services" className="userNav-link w-[150px] text-center" restricted>
+            Services
+          </CustomLink>
+          <CustomLink to="/user/support" className="userNav-link w-[150px] text-center" restricted>
+            Support
+          </CustomLink>
+        </div>
+      </nav>
+    </div>
+  )
 }
 
-function CustomLink({ to, children, ...props }) {
+function CustomLink({ to, children, className, restricted, ...props }) {
   const resolvePath = useResolvedPath(to)
   const isActive = useMatch({ path: resolvePath.pathname, end: true })
+  const { user } = useUser()
+  const navigate = useNavigate()
+  const [toastClosed, setToastClosed] = useState(false)
+  const toastIdRef = useRef(null)
 
-  const handleClick = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" }) // Scroll to top
+  const handleClick = (e) => {
+    if (user?.userAccountType === "Guest" && restricted) {
+      e.preventDefault()
+
+      toastIdRef.current = toast.warning("You need to log in first to access this page! Redirecting to Login...", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        theme: "colored",
+        onClose: (closedByUser) => {
+          if (!closedByUser) {
+            navigate("/user/login")
+            window.scrollTo({ top: 0, behavior: "smooth" }) // 👈 Scroll to top after redirect
+          }
+        },
+      })
+    } else {
+      // Not restricted or user is not guest — scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
   }
 
+
   return (
-    <Link 
+    <Link
       to={to}
-      onClick={handleClick}
       {...props}
-      className={`nav-link ${isActive ? "font-semibold text-arcadia-red" : ""}`}
+      onClick={handleClick}
+      className={`userNav-link px-2 py-3 text-white transition duration-200 ${isActive ? "bg-red font-semibold !text-white" : "hover:bg-grey hover:text-black"
+        } ${className}`}
     >
       {children}
     </Link>
