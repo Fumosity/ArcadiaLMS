@@ -10,11 +10,12 @@ export const UserProvider = ({ children }) => {
   const location = useLocation()
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"))
+    const storedUser = localStorage.getItem("user")
     if (storedUser) {
-      setUser(storedUser)
+      setUser(JSON.parse(storedUser))
     }
-    setLoading(false)
+    // Use a small delay to ensure reactivity
+    setTimeout(() => setLoading(false), 0)
   }, [])
 
   // Add storage event listener to detect changes in localStorage from other tabs
@@ -43,13 +44,13 @@ export const UserProvider = ({ children }) => {
   }, [navigate])
 
   useEffect(() => {
-    const mode = localStorage.getItem("mode")
-    if (user && !loading && mode !== "user") {
-      if (!isValidRoute(location.pathname, user.userAccountType)) {
+    if (!loading && user) {
+      const mode = localStorage.getItem("mode")
+      if (mode !== "user" && !isValidRoute(location.pathname, user.userAccountType)) {
         navigateBasedOnRole(user.userAccountType)
       }
     }
-  }, [user, loading, location.pathname])
+  }, [loading, user, location.pathname])
 
   const updateUser = (newUser) => {
     if (newUser) {
