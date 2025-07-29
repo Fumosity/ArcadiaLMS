@@ -1,149 +1,81 @@
-import { createContext, useState, useContext, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useState, useRef } from "react"
+import { Link, useMatch, useResolvedPath } from "react-router-dom"
+import { toast } from "react-toastify"
+import { useUser } from "../../../backend/UserContext"
+import { useNavigate } from "react-router-dom"
 
-const UserContext = createContext()
-
-export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  // Load user from localStorage on mount
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"))
-    if (storedUser) {
-      setUser(storedUser)
-    }
-    setLoading(false)
-  }, [])
-
-  // Sync changes across browser tabs
-  useEffect(() => {
-    const handleStorageChange = (event) => {
-      if (event.key === "user") {
-        if (event.newValue === null) {
-          setUser(null)
-          navigate("/user/login")
-        } else {
-          setUser(JSON.parse(event.newValue))
-        }
-      }
-    }
-
-    window.addEventListener("storage", handleStorageChange)
-    return () => {
-      window.removeEventListener("storage", handleStorageChange)
-    }
-  }, [navigate])
-
-  // Navigate based on user role after loading
-  useEffect(() => {
-    if (loading) return // Wait until user is loaded
-
-    const mode = localStorage.getItem("mode") || "user"
-
-    if (!user) {
-      navigate("/user/login")
-      return
-    }
-
-    if (mode !== "user" && !isValidRoute(location.pathname, user.userAccountType)) {
-      navigateBasedOnRole(user.userAccountType)
-    }
-  }, [user, loading, location.pathname])
-
-  const updateUser = (newUser) => {
-    if (newUser) {
-      localStorage.setItem("user", JSON.stringify(newUser))
-      setUser(newUser)
-      navigateBasedOnRole(newUser.userAccountType)
-    } else {
-      localStorage.removeItem("user")
-      setUser(null)
-      navigate("/user/login")
-    }
-  }
-
-  const loginAsGuest = () => {
-    const guestUser = {
-      userID: "0",
-      name: "Guest",
-      userAccountType: "Guest",
-      isGuest: true,
-      loginTime: new Date().toISOString(),
-    }
-
-    localStorage.setItem("user", JSON.stringify(guestUser))
-    setUser(guestUser)
-    navigate("/")
-  }
-
-  const navigateBasedOnRole = (userAccountType) => {
-    if (!userAccountType) {
-      navigate("/user/login")
-      return
-    }
-
-    const userRoutes = [
-      "/",
-      "/user/bookmanagement",
-      "/user/researchmanagement",
-      "/user/reservations",
-      "/user/services",
-      "/user/support",
-    ]
-
-    if (["Admin", "Superadmin", "Intern"].includes(userAccountType)) {
-      navigate("/admin")
-    } else if (["Student", "Faculty", "Guest"].includes(userAccountType)) {
-      navigate(userRoutes.includes(location.pathname) ? location.pathname : "/")
-    } else {
-      navigate("/user/login")
-    }
-  }
-
-  const isValidRoute = (path, userType) => {
-    const adminRoutes = ["/admin", "/admin/bookmanagement", "/admin/analytics"]
-    const userRoutes = [
-      "/",
-      "/user/bookmanagement",
-      "/user/researchmanagement",
-      "/user/reservations",
-      "/user/services",
-      "/user/support",
-    ]
-    const restrictedRoutes = ["/user/reservations", "/user/services", "/user/support"]
-
-    if (userType === "Guest" && restrictedRoutes.some((route) => path.startsWith(route))) {
-      return false
-    }
-
-    if (["Admin", "Superadmin", "Intern"].includes(userType)) {
-      return adminRoutes.some((route) => path.startsWith(route))
-    }
-
-    if (["Student", "Faculty", "Guest"].includes(userType)) {
-      return userRoutes.some((route) => path.startsWith(route))
-    }
-
-    return false
-  }
-
-  // Better loading UI
-  if (loading || (user === null && localStorage.getItem("user"))) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-gray-100">
-        <div className="text-lg font-semibold text-gray-700">Loading user data...</div>
-      </div>
-    )
-  }
-
+export default function UNavbar() {
   return (
-    <UserContext.Provider value={{ user, updateUser, loginAsGuest }}>
-      {children}
-    </UserContext.Provider>
+    <div className="userNavbar-cont bg-white shadow-md">
+      <nav className="flex justify-center items-center">
+        <div className="userNavbar-content flex">
+          <CustomLink to="/" className="userNav-link w-[150px] text-center">
+            Home
+          </CustomLink>
+          <CustomLink to="/user/bookmanagement" className="userNav-link w-[150px] text-center">
+            Book Catalog
+          </CustomLink>
+          <CustomLink to="/user/researchmanagement" className="userNav-link w-[150px] text-center">
+            Research Catalog
+          </CustomLink>
+          <CustomLink to="/user/reservations" className="userNav-link w-[150px] text-center" restricted>
+            Room Reservations
+          </CustomLink>
+          <CustomLink to="/user/services" className="userNav-link w-[150px] text-center" restricted>
+            Services
+          </CustomLink>
+          <CustomLink to="/user/support" className="userNav-link w-[150px] text-center" restricted>
+            Support
+          </CustomLink>
+        </div>
+      </nav>
+    </div>
   )
 }
 
-export const useUser = () => useContext(UserContext)
+function CustomLink({ to, children, className, restricted, ...props }) {
+  const resolvePath = useResolvedPath(to)
+  const isActive = useMatch({ path: resolvePath.pathname, end: true })
+  const { user } = useUser()
+  const navigate = useNavigate()
+  const [toastClosed, setToastClosed] = useState(false)
+  const toastIdRef = useRef(null)
+
+  const handleClick = (e) => {
+    if (user?.userAccountType === "Guest" && restricted) {
+      e.preventDefault()
+
+      toastIdRef.current = toast.warning("You need to log in first to access this page! Redirecting to Login...", {
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        theme: "colored",
+        onClose: (closedByUser) => {
+          if (!closedByUser) {
+            navigate("/user/login")
+            window.scrollTo({ top: 0, behavior: "smooth" }) // 👈 Scroll to top after redirect
+          }
+        },
+      })
+    } else {
+      // Not restricted or user is not guest — scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }
+
+
+  return (
+    <Link
+      to={to}
+      {...props}
+      onClick={handleClick}
+      className={`userNav-link px-2 py-3 text-white transition duration-200 ${isActive ? "bg-red font-semibold !text-white" : "hover:bg-grey hover:text-black"
+        } ${className}`}
+    >
+      {children}
+    </Link>
+  )
+}
