@@ -12,7 +12,7 @@ export default function UNavbar() {
           <CustomLink to="/" className="userNav-link w-[150px] text-center">
             Home
           </CustomLink>
-          <CustomLink to="/user/bookmanagement" className="userNav-link w-[150px] text-center">``
+          <CustomLink to="/user/bookmanagement" className="userNav-link w-[150px] text-center">
             Book Catalog
           </CustomLink>
           <CustomLink to="/user/researchmanagement" className="userNav-link w-[150px] text-center">
