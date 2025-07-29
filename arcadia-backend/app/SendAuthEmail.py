@@ -15,6 +15,9 @@ from email.message import EmailMessage
 from email.utils import make_msgid
 import smtplib
 from pathlib import Path
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
+from sib_api_v3_sdk.configuration import Configuration
 
 # Load environment variables
 load_dotenv()
@@ -46,15 +49,42 @@ def verify_token(token: str) -> dict:
 
 # Send email function
 def send_verification_email(to_email: str, first_name: str, token: str):
+    configuration = Configuration()
+    configuration.api_key['api-key'] = os.getenv("BREVO_API_KEY")
+
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
     link = f"{FRONTEND_URL}/auth-complete?token={token}"
-    msg = EmailMessage()
+
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+        to=[{"email": to_email, "name": first_name}],
+        subject="Account Verification",
+        html_content=f"""
+        <html>
+            <body>
+                <p>Hello, {first_name}.</p>
+                <p>To activate your account, click the link below:</p>
+                <p><a href="{link}">Verify Account</a></p>
+                <p>Thank you,<br/>Arcadia</p>
+            </body>
+        </html>
+        """,
+        sender={"name": "Arcadia", "email": EMAIL_USER}
+    )
+
+    try:
+        api_instance.send_transac_email(send_smtp_email)
+    except ApiException as e:
+        print("Brevo email error:", e)
+        raise HTTPException(status_code=500, detail="Failed to send verification email")
+
+    """msg = EmailMessage()
     
     # Generate a Content-ID for the image
     image_cid = make_msgid(domain="xyz.com")  # You can use your own domain
     
     # Set HTML content with embedded image
     msg.set_content(f"Hello, {first_name}. Verify your account here: {link}")  # Fallback plain text
-    msg.add_alternative(f"""
+    msg.add_alternative(f
     <html>
         <body>
             <p>Hello, {first_name}.</p>
@@ -67,7 +97,7 @@ def send_verification_email(to_email: str, first_name: str, token: str):
             <img src="cid:{image_cid[1:-1]}" alt="Verification Image" style="width:500px;" />
         </body>
     </html>
-    """, subtype='html')
+    , subtype='html')
     
     msg["Subject"] = "Account Verification"
     msg["From"] = EMAIL_USER
@@ -86,7 +116,7 @@ def send_verification_email(to_email: str, first_name: str, token: str):
     with smtplib.SMTP("smtp.office365.com", 587) as server:
         server.starttls()
         server.login(EMAIL_USER, EMAIL_PASS)
-        server.send_message(msg)
+        server.send_message(msg)"""
 
 # Endpoint to send email
 @router.post("/send-email")
@@ -167,7 +197,36 @@ def generate_reset_token():
 
 # Send password reset email
 def send_password_reset_email(to_email: str, reset_token: str):
+    configuration = Configuration()
+    configuration.api_key['api-key'] = os.getenv("BREVO_API_KEY")
+
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+
     reset_link = f"{FRONTEND_URL}/user/resetpassword?token={reset_token}"
+
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+        to=[{"email": to_email}],
+        subject="Password Reset Request - Arcadia",
+        html_content=f"""
+        <html>
+            <body>
+                <p>You requested to reset your password. Click below:</p>
+                <p><a href="{reset_link}">Reset Password</a></p>
+                <p>This link expires in 1 hour.</p>
+                <p>If you didn’t request this, ignore it.</p>
+            </body>
+        </html>
+        """,
+        sender={"name": "Arcadia", "email": EMAIL_USER}
+    )
+
+    try:
+        api_instance.send_transac_email(send_smtp_email)
+    except ApiException as e:
+        print("Brevo password reset error:", e)
+        raise HTTPException(status_code=500, detail="Failed to send password reset email")
+    
+    """reset_link = f"{FRONTEND_URL}/user/resetpassword?token={reset_token}"
     msg = EmailMessage()
     msg.set_content(
         f"Hello,\n\nYou have requested to reset your password. Please click the link below to proceed:\n\n{reset_link}\n\nThis link will expire in 1 hour.\n\nIf you did not request this, please ignore this email."
@@ -184,7 +243,7 @@ def send_password_reset_email(to_email: str, reset_token: str):
         print("Password reset email sent successfully via Gmail!")
     except Exception as e:
         print(f"Error sending email via Gmail: {e}")
-        raise  # Re-raise the exception to be handled by the caller
+        raise  # Re-raise the exception to be handled by the caller"""
 
 @router.post("/forgot-password")
 async def forgot_password(payload: ForgotPasswordRequest):
