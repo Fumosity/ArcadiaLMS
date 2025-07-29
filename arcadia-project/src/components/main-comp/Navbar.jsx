@@ -1,9 +1,9 @@
 import { useState, useRef } from "react"
 import { Link, useMatch, useResolvedPath } from "react-router-dom"
 import { toast } from "react-toastify"
-import { useUser } from "../../../backend/UserContext"
+import { useUser } from "../../backend/UserContext"
 import { useNavigate } from "react-router-dom"
-
+ 
 export default function UNavbar() {
   return (
     <div className="userNavbar-cont bg-white shadow-md">
