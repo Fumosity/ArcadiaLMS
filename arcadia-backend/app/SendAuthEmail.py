@@ -83,7 +83,8 @@ def send_verification_email(to_email: str, first_name: str, token: str):
             cid=image_cid
         )
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+    with smtplib.SMTP("smtp.office365.com", 587) as server:
+        server.starttls()
         server.login(EMAIL_USER, EMAIL_PASS)
         server.send_message(msg)
 
@@ -176,8 +177,9 @@ def send_password_reset_email(to_email: str, reset_token: str):
     msg["To"] = to_email
 
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:  # Use Gmail's server and port
-            server.login(EMAIL_USER, EMAIL_PASS)  # Use the credentials from .env
+        with smtplib.SMTP("smtp.office365.com", 587) as server:
+            server.starttls()
+            server.login(EMAIL_USER, EMAIL_PASS)
             server.send_message(msg)
         print("Password reset email sent successfully via Gmail!")
     except Exception as e:
