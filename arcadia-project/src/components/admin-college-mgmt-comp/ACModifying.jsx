@@ -11,7 +11,7 @@ const ACModifying = ({ formData, setFormData, selectedCollege, refreshColleges, 
         if (selectedCollege) {
             setFormData({
                 collegeName: selectedCollege.collegeName || "",
-                collegeAbbrev: selectedCollege.collegeAbbrev || "",
+                college: selectedCollege.college || "",
             });
             fetchDepartments(selectedCollege.collegeID);
         }
@@ -68,7 +68,7 @@ const ACModifying = ({ formData, setFormData, selectedCollege, refreshColleges, 
                 .from("college_list")
                 .update({
                     collegeName: formData.collegeName,
-                    collegeAbbrev: formData.collegeAbbrev,
+                    college: formData.college,
                 })
                 .eq("collegeID", selectedCollege.collegeID);
 
@@ -135,9 +135,9 @@ const ACModifying = ({ formData, setFormData, selectedCollege, refreshColleges, 
                         <label className="w-1/3">College Abbreviation:</label>
                         <input
                             type="text"
-                            name="collegeAbbrev"
+                            name="college"
                             className="w-2/3 px-3 py-1 rounded-full border border-grey"
-                            value={formData.collegeAbbrev}
+                            value={formData.college}
                             onChange={handleChange}
                         />
                     </div>

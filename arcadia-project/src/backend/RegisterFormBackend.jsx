@@ -40,13 +40,13 @@ export function useRegisterForm(onBack, onRegister, userData) {
         // Fetch colleges
         const { data: collegeData, error: collegeError } = await supabase
           .from("college_list")
-          .select("collegeID, collegeAbbrev");
+          .select("collegeID, college");
 
         if (collegeError) throw new Error(collegeError.message);
 
         // Map colleges and replace "Graduate School" with "GS"
         const fetchedColleges = collegeData
-          .map(c => c.collegeAbbrev === "Graduate School" ? "GS" : c.collegeAbbrev)
+          .map(c => c.college === "Graduate School" ? "GS" : c.college)
 
         setColleges(fetchedColleges);
 
@@ -60,8 +60,8 @@ export function useRegisterForm(onBack, onRegister, userData) {
         // Map college IDs to names
         const collegeIdToName = {};
         collegeData.forEach(c => {
-          const collegeAbbrev = c.collegeAbbrev;
-          collegeIdToName[c.collegeID] = collegeAbbrev;
+          const college = c.college;
+          collegeIdToName[c.collegeID] = college;
         });
 
         // Group departments by college name
@@ -71,10 +71,10 @@ export function useRegisterForm(onBack, onRegister, userData) {
         });
 
         departmentData.forEach(dept => {
-          const collegeAbbrev = collegeIdToName[dept.collegeID];
-          if (collegeAbbrev) {
-            if (!deptByCollege[collegeAbbrev]) deptByCollege[collegeAbbrev] = [];
-            deptByCollege[collegeAbbrev].push(dept.departmentAbbrev);
+          const college = collegeIdToName[dept.collegeID];
+          if (college) {
+            if (!deptByCollege[college]) deptByCollege[college] = [];
+            deptByCollege[college].push(dept.departmentAbbrev);
           }
         });
 
